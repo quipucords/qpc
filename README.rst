@@ -225,36 +225,6 @@ You must have `Docker installed <https://docs.docker.com/engine/installation/>`_
 
   **NOTE:** There are usually multiple gunicorn processes running. You can kill them all at once by listing PIDs as shown in the example above.
 
-Running quipucords server in gunicorn
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can run the server locally inside of gunicorn.  This can be a useful way to debug.
-
-1. Clone the repository::
-
-    git clone git@github.com:quipucords/qpc.git
-    cd quipucords
-
-2. Switch to quipucords django app module::
-
-    cd quipucords
-
-3. Make symbolic link to ansible roles::
-
-    ln -s ../roles/ roles
-
-4. Install gunicorn::
-
-    pip install gunicorn==19.7.1
-
-5. Start gunicorn::
-
-    gunicorn quipucords.wsgi -c ./local_gunicorn.conf.py
-
-6. Configure the CLI by using the following commands::
-
-    qpc server config --host 127.0.0.1 --port 8000
-    qpc server login
-
 Issues
 ------
 To report bugs for quipucords `open issues <https://github.com/quipucords/qpc/issues>`_ against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.

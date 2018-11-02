@@ -3,7 +3,7 @@ Contributing to quipucords
 ######################
 
 Bug reports and code and documentation patches are welcome. You can
-help this project also by using the development version of quipucords
+help this project also by using the development version of qpc
 and by reporting any bugs you might encounter.
 
 1. Reporting bugs
@@ -32,9 +32,9 @@ branch should correspond to an associated issue opened on the main repository
 
 .. code-block:: bash
 
-    git clone https://github.com/quipucords/qpc-cli
+    git clone https://github.com/quipucords/qpc
 
-    cd quipucords-cli
+    cd qpc
 
     git checkout -b issues/my_issue_#
 
@@ -57,7 +57,7 @@ Testing
 -------
 
 Before opening a pull requests, please make sure the `tests`_ pass
-in all of the supported Python environments (3.5, 3.6).
+in all of the supported Python environments (3.4, 3.5, 3.6).
 You should also add tests for any new features and bug fixes.
 
 quipucords uses `pytest`_ for testing.

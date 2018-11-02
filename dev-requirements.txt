@@ -14,6 +14,7 @@ pylint==2.1.1
 pyflakes==2.0.0
 
 # Test
+requests_mock==1.5.2
 tox==3.5.3
 
 # Doc

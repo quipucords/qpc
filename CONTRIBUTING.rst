@@ -25,14 +25,14 @@ it.
 Creating Development Environment
 --------------------------------
 
-Go to https://github.com/quipucords/quipucords and fork the project repository. Each
+Go to https://github.com/quipucords/qpc and fork the project repository. Each
 branch should correspond to an associated issue opened on the main repository
-(e.g. ``issues/5`` --> https://github.com/quipucords/quipucords/issues/5).
+(e.g. ``issues/5`` --> https://github.com/quipucords/qpc/issues/5).
 
 
 .. code-block:: bash
 
-    git clone https://github.com/quipucords/quipucords-cli
+    git clone https://github.com/quipucords/qpc-cli
 
     cd quipucords-cli
 
@@ -79,8 +79,8 @@ Running all tests:
 
 See `Makefile`_ for additional development utilities.
 
-.. _existing issues: https://github.com/quipucords/quipucords/issues?state=open
-.. _AUTHORS: https://github.com/quipucords/quipucords/blob/master/AUTHORS.rst
-.. _Makefile: https://github.com/quipucords/quipucords/blob/master/Makefile
+.. _existing issues: https://github.com/quipucords/qpc/issues?state=open
+.. _AUTHORS: https://github.com/quipucords/qpc/blob/master/AUTHORS.rst
+.. _Makefile: https://github.com/quipucords/qpc/blob/master/Makefile
 .. _pytest: http://pytest.org/
 .. _Style Guide for Python Code: http://python.org/dev/peps/pep-0008/

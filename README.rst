@@ -1,12 +1,12 @@
-.. image:: https://travis-ci.org/quipucords/quipucords.svg?branch=master
-    :target: https://travis-ci.org/quipucords/quipucords
-.. image:: https://codecov.io/gh/quipucords/quipucords/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/quipucords/quipucords
-.. image:: https://landscape.io/github/quipucords/quipucords/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/quipucords/quipucords/master
+.. image:: https://travis-ci.org/quipucords/qpc.svg?branch=master
+    :target: https://travis-ci.org/quipucords/qpc
+.. image:: https://codecov.io/gh/quipucords/qpc/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/quipucords/qpc
+.. image:: https://landscape.io/github/quipucords/qpc/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/quipucords/qpc/master
    :alt: Code Health
-.. image:: https://requires.io/github/quipucords/quipucords/requirements.svg?branch=master
-    :target: https://requires.io/github/quipucords/quipucords/requirements/?branch=master
+.. image:: https://requires.io/github/quipucords/qpc/requirements.svg?branch=master
+    :target: https://requires.io/github/quipucords/qpc/requirements/?branch=master
     :alt: Requirements Status
 .. image:: https://readthedocs.org/projects/quipucords/badge/?version=latest
     :alt: Documentation Status
@@ -86,7 +86,7 @@ Development
 -----------
 To work with the quipucords code, begin by cloning the repository::
 
-    git clone git@github.com:quipucords/quipucords.git
+    git clone git@github.com:quipucords/qpc.git
 
 quipucords currently supports Python 3.4, 3.5 and 3.6. If you do not have Python on your system, follow these `instructions <https://www.python.org/downloads/>`_.
 
@@ -176,7 +176,7 @@ You must have `Docker installed <https://docs.docker.com/engine/installation/>`_
 
 1. Clone the repository::
 
-    git clone git@github.com:quipucords/quipucords.git
+    git clone git@github.com:quipucords/qpc.git
 
 2. *Optional* - Build UI.::
 
@@ -234,7 +234,7 @@ You can run the server locally inside of gunicorn.  This can be a useful way to 
 
 1. Clone the repository::
 
-    git clone git@github.com:quipucords/quipucords.git
+    git clone git@github.com:quipucords/qpc.git
     cd quipucords
 
 2. Switch to quipucords django app module::
@@ -260,7 +260,7 @@ You can run the server locally inside of gunicorn.  This can be a useful way to 
 
 Issues
 ------
-To report bugs for quipucords `open issues <https://github.com/quipucords/quipucords/issues>`_ against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.
+To report bugs for quipucords `open issues <https://github.com/quipucords/qpc/issues>`_ against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.
 
 
 Changes

@@ -56,7 +56,7 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
-* Fri Oct 19 2018 Cody Myers <cmyers@redhat.com> 0.0.45-1
+* Fri Nov 2 2018 Cody Myers <cmyers@redhat.com> 0.0.45-1
 - Deprecate summary and detail report commands. <kholdawa@redhat.com>
 - Add server status command to QPC. <aaiken@redhat.com>
 - Add async report merge and merge status commands. <cmyers@redhat.com>

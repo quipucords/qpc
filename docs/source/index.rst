@@ -5,7 +5,7 @@
 
 Welcome to QPC's documentation!
 ===============================
-qpc is the command line tool for the quipucords project. To learn more about the quipucords project, check out the `readthedocs <https://quipucords.readthedocs.io/en/releases-0.0.44/#>`_.
+qpc is the command line tool for the quipucords project. To learn more about the quipucords project, check out the `readthedocs <https://quipucords.readthedocs.io/en/releases-0.0.45/#>`_.
 
 .. toctree::
    :maxdepth: 2

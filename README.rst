@@ -17,7 +17,7 @@
 qpc - RPM command line tool for quipucords
 ==========================================
 
-qpc is the RPM command line tool for quipucords. To learn more about quipucords visit the `GitHub page <https://github.com/quipucords/quipucords/>`_.
+qpc is the RPM command line tool for quipucords. To learn more about quipucords visit the `GitHub page <https://github.com/quipucords/quipucords/>`_. Documentation for qpc is available through `readthedocs <https://qpc.readthedocs.io/en/latest/`_.
 
 
 This *README* file contains information about the installation and development of qpc, as well as instructions about where to find basic usage, known issues, and best practices information.

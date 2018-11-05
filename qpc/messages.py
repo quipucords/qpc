@@ -251,7 +251,7 @@ MERGE_JOB_ID_NOT_FOUND = 'Report merge job %s not found.'
 MERGE_JOB_ID_STATUS = 'Report merge job %s is %s.'
 DISPLAY_REPORT_ID = \
     'Created merge report with id: "%s". To download report, run "qpc report' \
-    ' summary --report %s --csv --output-file temp.csv"'
+    ' deployments --report %s --csv --output-file temp.csv"'
 SERVER_CONFIG_REQUIRED = 'Configure server using command below:'
 SERVER_LOGIN_REQUIRED = 'Log in using the command below:'
 SERVER_CONFIG_HOST_HELP = 'Host or IP address for the server.'

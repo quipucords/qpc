@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: qpc
-Version: 0.0.45
+Version: 0.0.46
 Release: 1%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 

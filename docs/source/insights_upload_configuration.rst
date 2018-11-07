@@ -2,7 +2,6 @@ Installing the Insights Client
 ------------------------------
 To work with the Insights Client, we must also install the Insights Core. To begin, create the insights directory at the same level as quipucords and clone the following repositories::
 
-    mkdir insights && cd insights
     git clone git@github.com:RedHatInsights/insights-core.git
     git clone git@github.com:RedHatInsights/insights-client.git
 
@@ -15,9 +14,9 @@ The insights-client will need to be installed inside of the same virtual environ
 
 Edit the Insights Client Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You will need modify the Insights Client Configuration in order to be authorized to upload::
+You will need uncomment and modify these values in the Insights Client Configuration in order to be authorized to upload::
 
-    cd ../insights/insights-client
+    cd insights-client
     vim etc/insights-client.conf
     auto_config=False
     username=<your_username>
@@ -45,19 +44,27 @@ To check your connection status using the Insight Clients you will need to run t
 
     sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --test-connection
 
-Upload Command:
-^^^^^^^^^^^^^^^
-To upload a QPC report file using the Insight Clients you will need to run the following command::
+Insights Upload Command:
+^^^^^^^^^^^^^^^^^^^^^^^^
+To upload a tar.gz file using the Insight Clients you will need to run the following command::
 
     sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.test+tgz
 
+QPC Upload Command:
+^^^^^^^^^^^^^^^^^^^
+To upload a deployments report using the QPC Client you will need to run the following command::
+
+    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --test)
+
+**Note:** If you developing on a mac, you will need to use the ``--test`` arguement.
+
 Troubleshoot Caching Issues:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you run into caching issues while working with the insights client, you could always ensure that previous rpm that was created is completely deleted by running the following commands::
+If you run into caching issues while working with the insights client, you can delete the previous rpm that was created by running the following commands::
 
     cd /etc/insights-client/
     rm insights-client.conf
     rm rpm.egg
     rm rpm.egg.asc
-    cd -
-    sudo lay-the-eggs-osx.sh
+
+**Note:** After removing the previous rpm, you will need to build the insights client.

@@ -12,3 +12,4 @@ qpc is the command line tool for the quipucords project. To learn more about the
    :caption: Contents:
 
    Command Line Reference <man>
+   Insights <working_with_insights>

@@ -1,12 +1,14 @@
 Working with Insights
 ---------------------
-If you would like to use Quipucords to upload data to Red Hat Insights, some additional external setup is required. The qpc commands related to Insights expect the Insights client to be installed. More information about setting up the Insights client can be found here: https://access.redhat.com/products/red-hat-insights#getstarted.
+In order to use Quipucords to upload data to Red Hat Insights, the Insights client must be installed. To install and setup the Insights client, visit https://access.redhat.com/products/red-hat-insights#getstarted and follow the instructions.
 
 
 Uploading To Insights
 ^^^^^^^^^^^^^^^^^^^^^
-When a scan completes, it returns a report identifier that can then be used to upload a deployments report to Insights. The deployments report process runs steps to merge the facts found during the inspection of various hosts that are contacted during the scan. To generate and upload a deployments report to insights, run the ``qpc insights upload`` command and specify the report identifier.
+Use the qpc insights upload command to upload a deployments report to Red Hat Insights. You can upload a report to Insights using the associated report identifier or scan job identifier for the scan that is used to generate the report::
 
-For example, to create and upload the deployments report for a scan with report identifier ``1``, you would enter the following command::
+  # qpc insights upload (--scan-job scan_job_identifier | --report report_identifier )
+
+For example, to create and upload the deployments report with a report identifier of ``1``, you would enter the following command::
 
   # qpc insights upload --report 1

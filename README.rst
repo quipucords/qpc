@@ -98,6 +98,11 @@ On Linux run the following command to set up a virtual environment::
     pip install -r dev-requirements.txt
 
 
+Developing with Insights Client
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Information on installing and developing with the insights client can be found in `Insights Upload Configuration <docs/source/insights_upload_configuration.rst>`_.
+
+
 Linting
 ^^^^^^^
 To lint changes that are made to the source code, run the following command::

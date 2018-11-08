@@ -24,9 +24,9 @@ copyright = '2018, Red Hat'
 author = 'Red Hat'
 
 # The short X.Y version
-version = ''
+version = '0.0'
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '0.0.46'
 
 
 # -- General configuration ---------------------------------------------------

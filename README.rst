@@ -100,7 +100,7 @@ On Linux run the following command to set up a virtual environment::
 
 Developing with Insights Client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Information on installing and developing with the insights client can be found in `Insights Upload Configuration <docs/source/insights_upload_configuration.rst>`_.
+Information on installing and developing with the insights client can be found in `Insights Configuration <insights_configuration.rst>`_.
 
 
 Linting

@@ -39,7 +39,7 @@ FACTS_KEY = 'facts'
 SERVER_ID_KEY = 'server_id'
 REPORT_VERSION_KEY = 'report_version'
 REPORT_TYPE_KEY = 'report_type'
-DEFAULT_REPORT_VERSION = '1.0.0.legacy'
+DEFAULT_REPORT_VERSION = '0.0.44.legacy'
 DETAILS_REPORT_TYPE = 'details'
 
 

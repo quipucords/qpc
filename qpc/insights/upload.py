@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 import time
+from argparse import SUPPRESS
 
 import qpc.insights as insights
 from qpc import messages, scan
@@ -57,7 +58,8 @@ class InsightsUploadCommand(CliCommand):
                               metavar='SCAN_JOB_ID',
                               help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
 
-        self.parser.add_argument('--test', dest='test', action='store_true')
+        self.parser.add_argument('--test', dest='test', action='store_true',
+                                 help=SUPPRESS)
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
         self.insights_command = None

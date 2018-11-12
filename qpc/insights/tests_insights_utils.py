@@ -15,6 +15,7 @@ import unittest
 from qpc.insights.utils import (check_insights_install,
                                 check_insights_version)
 
+
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the validation for install of insights-client."""
 
@@ -53,21 +54,21 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.assertEqual(test, False)
 
     def test_check_insights_version_failed(self):
-        """Testing failed response with out of date client versions"""
+        """Testing failed response with out of date client versions."""
         old_versions = ['3.0.0-4', '3.0.2-2', '3.0.1-5']
         for version in old_versions:
             streamdata = 'Client: %s\nCore: 3.0.8-1' % version
             result = check_insights_version(streamdata,
                                             '3.0.3-1',
                                             '3.0.8')
-            self.assertIn('client',result.keys())
+            self.assertIn('client', result.keys())
 
     def test_check_insights_version_success(self):
-        """Testing success response with new client versions"""
+        """Testing success response with new client versions."""
         new_versions = ['3.0.0-4', '3.0.2-2', '3.0.1-5', '3.0.3-1']
         for version in new_versions:
             streamdata = 'Client: %s\nCore: 3.0.8-1' % version
             result = check_insights_version(streamdata,
                                             '3.0.0-4',
                                             '3.0.8')
-            self.assertNotIn('client',result.keys())
+            self.assertNotIn('client', result.keys())

@@ -21,10 +21,11 @@ import time
 import qpc.insights as insights
 from qpc import messages, scan
 from qpc.clicommand import CliCommand
-from qpc.insights.utils import (check_insights_install,
+from qpc.insights.utils import (InsightsCommands,
+                                check_insights_install,
+                                check_insights_version,
                                 check_successful_upload,
-                                insights_command,
-                                test_insights_command)
+                                format_subprocess_stderr)
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (write_file)
@@ -62,6 +63,50 @@ class InsightsUploadCommand(CliCommand):
         self.insights_command = None
         self.report_id = None
 
+    def _check_insights_install(self):
+        connection_test_command = self.insights_command.test_connection()
+        process = subprocess.Popen(connection_test_command,
+                                   stderr=subprocess.PIPE)
+        streamdata = format_subprocess_stderr(process)
+        code = process.returncode
+        print(_(messages.CHECKING_INSIGHTS_INSTALL %
+                (' '.join(connection_test_command))))
+        install_check = check_insights_install(streamdata)
+        if not install_check or code is not 0:
+            print(_(messages.BAD_INSIGHTS_INSTALL %
+                    (streamdata)))
+        else:
+            print(_(messages.GOOD_INSIGHTS_INSTALL))
+
+    def _check_insights_version(self):
+        version_command = self.insights_command.version()
+        process = subprocess.Popen(version_command,
+                                   stderr=subprocess.PIPE,
+                                   stdout=subprocess.PIPE)
+        streamdata = format_subprocess_stderr(process)
+        code = process.returncode
+        print(_(messages.CHECKING_INSIGHTS_VERSION %
+                (insights.CLIENT_VERSION,
+                 insights.CORE_VERSION)))
+        version_check = check_insights_version(streamdata,
+                                               insights.CLIENT_VERSION,
+                                               insights.CORE_VERSION)
+        if not version_check['results'] or code is not 0:
+            if 'client' in version_check.keys():
+                print(_(messages.BAD_CLIENT_VERSION %
+                        (version_check['client'])))
+            if 'core' in version_check.keys():
+                print(_(messages.BAD_CORE_VERSION %
+                        (version_check['core'])))
+            if 'error' in version_check.keys():
+                print(_(messages.ERROR_INSIGHTS_VERSION %
+                        (version_check['error'])))
+            print(_(messages.CHECK_VERSION %
+                    (' '.join(version_command))))
+            sys.exit(1)
+        else:
+            print(_(messages.GOOD_INSIGHTS_VERSION))
+
     def _validate_args(self):
         CliCommand._validate_args(self)
         self.req_headers = {'Accept': 'application/json+gzip'}
@@ -83,27 +128,11 @@ class InsightsUploadCommand(CliCommand):
         else:
             self.report_id = self.args.report_id
         if self.args.test:
-            self.insights_command = \
-                test_insights_command(self.tmp_tar_name,
-                                      insights.CONTENT_TYPE)
+            self.insights_command = InsightsCommands(test=True)
         else:
-            self.insights_command = insights_command(self.tmp_tar_name,
-                                                     insights.CONTENT_TYPE)
-        connection_test_command = self.insights_command[:-2]
-        connection_test_command.append('--test-connection')
-        proc = subprocess.Popen(connection_test_command,
-                                stderr=subprocess.PIPE)
-        format_streamdata = proc.communicate()[1].decode('utf-8').strip('\n')
-        code = proc.returncode
-        print(_(messages.CHECKING_INSIGHTS %
-                (' '.join(connection_test_command))))
-        insights_check = check_insights_install(format_streamdata)
-        if not insights_check or code is not 0:
-            print(_(messages.BAD_INSIGHTS_CHECK %
-                    (format_streamdata)))
-            sys.exit(1)
-        else:
-            print(_(messages.GOOD_INSIGHTS_CHECK))
+            self.insights_command = InsightsCommands()
+        self._check_insights_install()
+        self._check_insights_version()
 
     def _build_req_params(self):
         self.req_path = '%s%s%s' % (
@@ -115,20 +144,21 @@ class InsightsUploadCommand(CliCommand):
         write_file(self.tmp_tar_name,
                    self.response.content,
                    True)
+        upload_command = self.insights_command.upload(self.tmp_tar_name)
         print(_(messages.UPLOADING_REPORT_INSIGHTS %
-                (' '.join(self.insights_command))))
-        proc = subprocess.Popen(self.insights_command, stderr=subprocess.PIPE)
-        format_streamdata = proc.communicate()[1].decode('utf-8').strip('\n')
-        code = proc.returncode
-        report_check = check_successful_upload(format_streamdata)
+                (' '.join(upload_command))))
+        process = subprocess.Popen(upload_command, stderr=subprocess.PIPE)
+        streamdata = format_subprocess_stderr(process)
+        code = process.returncode
+        report_check = check_successful_upload(streamdata)
         if not report_check or code is not 0:
             print(_(messages.BAD_INSIGHTS_UPLOAD %
-                    (format_streamdata)))
+                    (streamdata)))
             os.remove(self.tmp_tar_name)
             sys.exit(1)
         else:
             print(_(messages.GOOD_INSIGHTS_UPLOAD %
-                    (format_streamdata)))
+                    (streamdata)))
             os.remove(self.tmp_tar_name)
 
     def _handle_response_error(self):

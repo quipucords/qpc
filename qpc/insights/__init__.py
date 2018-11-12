@@ -14,6 +14,8 @@
 SUBCOMMAND = 'insights'
 UPLOAD = 'upload'
 
-CONTENT_TYPE = '--content-type=application/vnd.redhat.qpc.test+tgz'
 REPORT_URI = '/api/v1/reports/'
 DEPLOYMENTS_PATH_SUFFIX = '/deployments/'
+# Note the the insights version check does not hangle if versions equal
+CLIENT_VERSION = '3.0.3-1'
+CORE_VERSION = '3.0.8'

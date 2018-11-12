@@ -3,7 +3,7 @@
 --editable .
 
 #Coverage
-coverage==4.5.1
+coverage==4.5.2
 
 # Linting
 flake8==3.6.0

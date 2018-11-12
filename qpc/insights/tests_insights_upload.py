@@ -136,7 +136,8 @@ class InsightsUploadCliTests(unittest.TestCase):
                 with redirect_stdout(report_out):
                     nac.main(args)
             self.assertIn(messages.BAD_INSIGHTS_INSTALL %
-                          ('Unknown Response'), report_out.getvalue())
+                          ('sudo insights-client --test-connection'),
+                          report_out.getvalue())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_unexpected_response_version(self, subprocess):

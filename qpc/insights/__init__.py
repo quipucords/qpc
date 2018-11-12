@@ -16,6 +16,6 @@ UPLOAD = 'upload'
 
 REPORT_URI = '/api/v1/reports/'
 DEPLOYMENTS_PATH_SUFFIX = '/deployments/'
-# Note the the insights version check does not hangle if versions equal
+# Note the the insights version check does not handle if versions equal
 CLIENT_VERSION = '3.0.3-1'
 CORE_VERSION = '3.0.8'

@@ -1,4 +1,4 @@
 # Include Locked Server Requirements
 
-requests==2.20.0
+requests==2.20.1
 whitenoise==4.1

@@ -12,8 +12,8 @@
 
 import unittest
 
-from qpc.insights.utils import check_insights_install
-
+from qpc.insights.utils import (check_insights_install,
+                                check_insights_version)
 
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the validation for install of insights-client."""
@@ -51,3 +51,23 @@ class InsightsUploadCliTests(unittest.TestCase):
         bad_connection_return = 'Running connection test...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 401\nHTTP Status Text: Unauthorized\nHTTP Response Text: \nConnection failed\n=== End Upload URL Connection Test: FAILURE ===\n\n=== Begin API URL Connection Test ===\nHTTP  Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed with some errors\nSee /var/log/insights-client/insights-client.log for more details.\n'  # noqa: E501
         test = check_insights_install(bad_connection_return)
         self.assertEqual(test, False)
+
+    def test_check_insights_version_failed(self):
+        """Testing failed response with out of date client versions"""
+        old_versions = ['3.0.0-4', '3.0.2-2', '3.0.1-5']
+        for version in old_versions:
+            streamdata = 'Client: %s\nCore: 3.0.8-1' % version
+            result = check_insights_version(streamdata,
+                                            '3.0.3-1',
+                                            '3.0.8')
+            self.assertIn('client',result.keys())
+
+    def test_check_insights_version_success(self):
+        """Testing success response with new client versions"""
+        new_versions = ['3.0.0-4', '3.0.2-2', '3.0.1-5', '3.0.3-1']
+        for version in new_versions:
+            streamdata = 'Client: %s\nCore: 3.0.8-1' % version
+            result = check_insights_version(streamdata,
+                                            '3.0.0-4',
+                                            '3.0.8')
+            self.assertNotIn('client',result.keys())

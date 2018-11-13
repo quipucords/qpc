@@ -26,7 +26,8 @@ from qpc.insights.utils import (InsightsCommands,
                                 check_insights_install,
                                 check_insights_version,
                                 check_successful_upload,
-                                format_subprocess_stderr)
+                                format_subprocess_stderr,
+                                format_upload_success)
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (validate_write_file,
@@ -105,12 +106,11 @@ class InsightsUploadCommand(CliCommand):
             sys.exit(1)
 
     def _validate_args(self):
+        print(_(messages.INSIGHTS_REQUIRE_SUDO))
         CliCommand._validate_args(self)
-        retrieve_msg = None
+        print_scan_job_message = False
         self.req_headers = {'Accept': 'application/json+gzip'}
         if self.args.report_id is None:
-            retrieve_msg = (messages.INSIGHTS_RETRIEVE_SCAN_JOB_ID %
-                            self.args.scan_job_id)
             response = request(parser=self.parser, method=GET,
                                path='%s%s' % (scan.SCAN_JOB_URI,
                                               self.args.scan_job_id),
@@ -126,10 +126,9 @@ class InsightsUploadCommand(CliCommand):
                 print(_(messages.REPORT_SJ_DOES_NOT_EXIST %
                         self.args.scan_job_id))
                 sys.exit(1)
+            print_scan_job_message = True
         else:
             self.report_id = self.args.report_id
-            retrieve_msg = (messages.INSIGHTS_RETRIEVE_REPORT_ID %
-                            self.args.report_id)
         if self.args.dev:
             self.insights_command = InsightsCommands(dev=True)
         else:
@@ -142,7 +141,11 @@ class InsightsUploadCommand(CliCommand):
         except ValueError:
             print(_(messages.INSIGHTS_TMP_ERROR % self.tmp_tar_name))
             sys.exit(1)
-        print(_(retrieve_msg))
+        if print_scan_job_message:
+            print(_(messages.INSIGHTS_SCAN_JOB_ID_PRODUCED %
+                    (self.args.scan_job_id,
+                     self.report_id)))
+        print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
 
     def _build_req_params(self):
         self.req_path = '%s%s%s' % (
@@ -159,13 +162,14 @@ class InsightsUploadCommand(CliCommand):
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
         report_check = check_successful_upload(streamdata)
+        print(_(messages.INSIGHTS_UPLOAD_REPORT % self.report_id))
         if not report_check or code is not 0:
             print(_(messages.BAD_INSIGHTS_UPLOAD % (' '.join(upload_command))))
             os.remove(self.tmp_tar_name)
             sys.exit(1)
         else:
-            print(_(messages.GOOD_INSIGHTS_UPLOAD %
-                    (streamdata)))
+            format_streamdata = format_upload_success(streamdata)
+            print(_((format_streamdata)))
             os.remove(self.tmp_tar_name)
 
     def _handle_response_error(self):

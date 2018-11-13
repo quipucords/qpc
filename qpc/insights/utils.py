@@ -118,3 +118,12 @@ def format_subprocess_stderr(process):
         if result:
             byte_string = result.decode('utf-8').strip('\n')
     return byte_string
+
+
+def format_upload_success(streamdata):
+    """Will parse the streamdata to retrieve helpful output."""
+    try:
+        stream_list = streamdata.split('\n')
+        return stream_list[2]
+    except IndexError:
+        return streamdata

@@ -276,8 +276,7 @@ LOGOUT_SUCCESS = 'Logged out.'
 NEXT_RESULTS = 'Press enter to see the next set of results.'
 BAD_INSIGHTS_INSTALL = 'Insights installation check failed. Checked if '\
     'insights was installed and configured with command "%s"'
-GOOD_INSIGHTS_UPLOAD = 'Report Successfully uploaded.'\
-    ' Information from insights:\n %s'
+INSIGHTS_UPLOAD_REPORT = 'Uploading report %s to Insights service.'
 BAD_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
     ' Attempted to upload report with command "%s"'
 INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
@@ -292,7 +291,8 @@ CHECK_VERSION = 'You can check your insights version with this insights '\
 ERROR_INSIGHTS_VERSION = \
     'An error occurred while trying to retrieve the insights versions. %s'
 INSIGHTS_IS_VERIFIED = 'Insights is installed and properly configured.'
-INSIGHTS_RETRIEVE_REPORT_ID = 'Retrieving report for id %s'
-INSIGHTS_RETRIEVE_SCAN_JOB_ID = 'Retrieving report for scan job id %s'
+INSIGHTS_RETRIEVE_REPORT = 'Retrieving report %s.'
+INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
 INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
     ' the QPC report.  Cannot write file to %s.'
+INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'

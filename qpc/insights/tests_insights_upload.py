@@ -67,7 +67,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              dev=None)
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.GOOD_INSIGHTS_UPLOAD.replace('%s', ''),
+                self.assertIn('Successfully uploaded report',
                               report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
@@ -94,7 +94,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              dev=None)
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.GOOD_INSIGHTS_UPLOAD.replace('%s', ''),
+                self.assertIn('Successfully uploaded report',
                               report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
@@ -119,7 +119,7 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_unexpected_response_install(self, subprocess):
-        """Testing error response with an invalid report id."""
+        """Testing error response with unexpected response install."""
         subprocess.return_value.communicate.return_value =\
             (None, b'Unknown Response')
         subprocess.return_value.returncode = 0
@@ -141,7 +141,7 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_unexpected_response_version(self, subprocess):
-        """Testing error response with an invalid report id."""
+        """Testing error response with unexpected response version."""
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (None, b'Unknown Response')]  # noqa: E501
         subprocess.return_value.returncode = 0
@@ -162,7 +162,7 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_unexpected_response_upload(self, subprocess):
-        """Testing error response with an invalid report id."""
+        """Testing error response with unexpected upload."""
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.8-1\n', b''), (None, b'Unknown Response')]  # noqa: E501
         subprocess.return_value.returncode = 0

@@ -169,7 +169,7 @@ class InsightsUploadCommand(CliCommand):
             sys.exit(1)
         else:
             format_streamdata = format_upload_success(streamdata)
-            print(_((format_streamdata)))
+            print(_(format_streamdata))
             os.remove(self.tmp_tar_name)
 
     def _handle_response_error(self):

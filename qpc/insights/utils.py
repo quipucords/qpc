@@ -33,7 +33,6 @@ class InsightsCommands():
     def build_base(self):
         """Will create a base used for creating insights commands."""
         if self.dev:
-            self.content_type = 'application/vnd.redhat.qpc.test+tgz'
             return ['sudo',
                     'EGG=/etc/insights-client/rpm.egg',
                     'BYPASS_GPG=True',

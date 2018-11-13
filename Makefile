@@ -38,6 +38,9 @@ clean:
 install: build
 	$(PYTHON) setup.py install -f
 
+lint:
+	tox -e lint
+
 test:
 	tox -e py36
 

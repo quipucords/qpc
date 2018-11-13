@@ -65,7 +65,6 @@ class InsightsUploadCommand(CliCommand):
             time.strftime('%Y%m%d_%H%M%S'))
         self.insights_command = None
         self.report_id = None
-        self.report_source = None
 
     def _check_insights_install(self):
         connection_test_command = self.insights_command.test_connection()
@@ -107,8 +106,11 @@ class InsightsUploadCommand(CliCommand):
 
     def _validate_args(self):
         CliCommand._validate_args(self)
+        retrieve_msg = None
         self.req_headers = {'Accept': 'application/json+gzip'}
         if self.args.report_id is None:
+            retrieve_msg = (messages.INSIGHTS_RETRIEVE_SCAN_JOB_ID %
+                            self.args.scan_job_id)
             response = request(parser=self.parser, method=GET,
                                path='%s%s' % (scan.SCAN_JOB_URI,
                                               self.args.scan_job_id),
@@ -124,10 +126,10 @@ class InsightsUploadCommand(CliCommand):
                 print(_(messages.REPORT_SJ_DOES_NOT_EXIST %
                         self.args.scan_job_id))
                 sys.exit(1)
-            self.report_source = 'scan job id(%s).' % self.args.scan_job_id
         else:
             self.report_id = self.args.report_id
-            self.report_source = 'id (%s).' % self.args.report_id
+            retrieve_msg = (messages.INSIGHTS_RETRIEVE_REPORT_ID %
+                            self.args.report_id)
         if self.args.dev:
             self.insights_command = InsightsCommands(dev=True)
         else:
@@ -137,10 +139,10 @@ class InsightsUploadCommand(CliCommand):
         print(_(messages.INSIGHTS_IS_VERIFIED))
         try:
             validate_write_file(self.tmp_tar_name, 'tmp_tar_name')
-        except ValueError as error:
-            print(error)
+        except ValueError:
+            print(_(messages.INSIGHTS_TMP_ERROR % self.tmp_tar_name))
             sys.exit(1)
-        print(_(messages.INSIGHTS_RETRIEVING_REPORT % self.report_source))
+        print(_(retrieve_msg))
 
     def _build_req_params(self):
         self.req_path = '%s%s%s' % (

@@ -292,4 +292,7 @@ CHECK_VERSION = 'You can check your insights version with this insights '\
 ERROR_INSIGHTS_VERSION = \
     'An error occurred while trying to retrieve the insights versions. %s'
 INSIGHTS_IS_VERIFIED = 'Insights is installed and properly configured.'
-INSIGHTS_RETRIEVING_REPORT = 'Retrieving report for %s'
+INSIGHTS_RETRIEVE_REPORT_ID = 'Retrieving report for id %s'
+INSIGHTS_RETRIEVE_SCAN_JOB_ID = 'Retrieving report for scan job id %s'
+INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
+    ' the QPC report.  Cannot write file to %s.'

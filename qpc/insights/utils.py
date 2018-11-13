@@ -20,19 +20,20 @@ from distutils.version import LooseVersion
 class InsightsCommands():
     """Creates insights-client commands for qpc client."""
 
-    def __init__(self, test=False):
+    def __init__(self, dev=False):
         """Set class variables.
 
         Args:
-            test (bool): used to test insights commands locally.
+            dev (bool): used to build dev insights commands for local use.
         """
-        self.test = test
+        self.dev = dev
         # mime type for QPC report data for uploading to insights
-        self.content_type = 'application/vnd.redhat.qpc.test+tgz'
+        self.content_type = 'application/vnd.redhat.qpc.deployments+tgz'
 
     def build_base(self):
         """Will create a base used for creating insights commands."""
-        if self.test:
+        if self.dev:
+            self.content_type = 'application/vnd.redhat.qpc.test+tgz'
             return ['sudo',
                     'EGG=/etc/insights-client/rpm.egg',
                     'BYPASS_GPG=True',

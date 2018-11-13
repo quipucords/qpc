@@ -64,7 +64,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
-                             test=None)
+                             dev=None)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertIn(messages.GOOD_INSIGHTS_UPLOAD.replace('%s', ''),
@@ -91,7 +91,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             test=None)
+                             dev=None)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertIn(messages.GOOD_INSIGHTS_UPLOAD.replace('%s', ''),
@@ -110,7 +110,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             test=None)
+                             dev=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -131,7 +131,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             test=None)
+                             dev=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -153,7 +153,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             test=None)
+                             dev=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -176,7 +176,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             test=None)
+                             dev=None)
             with self.assertRaises(SystemExit):
                 nac.main(args)
                 self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),

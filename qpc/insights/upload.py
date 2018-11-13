@@ -59,7 +59,7 @@ class InsightsUploadCommand(CliCommand):
                               metavar='SCAN_JOB_ID',
                               help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
 
-        self.parser.add_argument('--test', dest='test', action='store_true',
+        self.parser.add_argument('--dev', dest='dev', action='store_true',
                                  help=SUPPRESS)
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
@@ -128,8 +128,8 @@ class InsightsUploadCommand(CliCommand):
         else:
             self.report_id = self.args.report_id
             self.report_source = 'id (%s).' % self.args.report_id
-        if self.args.test:
-            self.insights_command = InsightsCommands(test=True)
+        if self.args.dev:
+            self.insights_command = InsightsCommands(dev=True)
         else:
             self.insights_command = InsightsCommands()
         self._check_insights_install()

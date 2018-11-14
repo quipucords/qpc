@@ -200,9 +200,9 @@ REPORT_SJ_DOES_NOT_EXIST = \
     'Scan Job %s does not exist.'
 REPORT_SJS_DO_NOT_EXIST = 'The following scan jobs do not exist: %s.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ = \
-    'No report summary available for scan job %s.'
+    'No deployments report available for scan job %s.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID = \
-    'No report summary available for report id %s.'
+    'Report %s does not exist.'
 REPORT_NO_DETAIL_REPORT_FOR_SJ = \
     'No report detail available for scan job %s.'
 REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID = \
@@ -274,3 +274,25 @@ LOGIN_SUCCESS = 'Login successful.'
 LOGOUT_SUCCESS = 'Logged out.'
 
 NEXT_RESULTS = 'Press enter to see the next set of results.'
+BAD_INSIGHTS_INSTALL = 'Insights installation check failed. Checked if '\
+    'insights was installed and configured with command "%s"'
+INSIGHTS_UPLOAD_REPORT = 'Uploading report %s to Insights service.'
+BAD_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
+    ' Attempted to upload report with command "%s"'
+INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
+INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
+INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
+BAD_CORE_VERSION = 'Insights version check failed. Your insights-core' \
+    'version (%s) does not meet the QPC requirements of %s or greater.'
+BAD_CLIENT_VERSION = 'Insights version check failed. Your insights-client' \
+    'version (%s) does not meet the QPC requirements of %s or greater.'
+CHECK_VERSION = 'You can check your insights version with this insights '\
+    'client command: (%s).'
+ERROR_INSIGHTS_VERSION = \
+    'An error occurred while trying to retrieve the insights versions. %s'
+INSIGHTS_IS_VERIFIED = 'Insights is installed and properly configured.'
+INSIGHTS_RETRIEVE_REPORT = 'Retrieving report %s.'
+INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
+INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
+    ' the QPC report.  Cannot write file to %s.'
+INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'

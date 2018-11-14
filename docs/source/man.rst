@@ -585,6 +585,24 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
 
   Contains the job identifier that will be used to checked for status of a merge.
 
+Insights
+________
+Use the ``qpc insights`` command to interact with Red Hat Insights.
+
+Uploading to Insights
+~~~~~~~~~~~~~~~~~~~~~
+The ``qpc insights upload`` command can be used to upload a deployments report to Red Hat Insights. You can upload a report to Insights using the associated report identifier or scan job identifier for the scan that is used to generate the report.
+
+**qpc insights upload (--scan-job** *scan_job_identifier* **|** **--report** *report_identifiers* **)**
+
+``--scan-job=scan_job_identifier``
+
+  Contains the scan job identifier for the scan that is used to generate the deployments report. Mutually exclusive with the ``--report`` option.
+
+``--report=report_identifier``
+
+  Contains the report identifier that is used to generate the deployments report.  Mutually exclusive with the ``--scan-job`` option.
+
 Options for All Commands
 ------------------------
 

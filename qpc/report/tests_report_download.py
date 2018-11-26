@@ -11,7 +11,6 @@
 """Test the CLI module."""
 
 
-import json
 import os
 import sys
 import time
@@ -20,8 +19,9 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
+from qpc.cli import CLI
 from qpc.report import REPORT_URI
-from qpc.report.details import ReportDetailsCommand
+from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
                                  create_tar_buffer, redirect_stdout)
@@ -63,7 +63,7 @@ class ReportDetailsTests(unittest.TestCase):
             SCAN_JOB_URI + '1'
         get_scanjob_json_data = {'id': 1, 'report_id': 1}
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/details/'
+            REPORT_URI + '1'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
         test_dict['test.json'] = get_report_json_data
@@ -74,7 +74,7 @@ class ReportDetailsTests(unittest.TestCase):
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
                        content=buffer_content)
-            nac = ReportDetailsCommand(SUBPARSER)
+            nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
                              output_json=True,
@@ -84,7 +84,98 @@ class ReportDetailsTests(unittest.TestCase):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_SUCCESSFULLY_WRITTEN)
-                with open(self.test_tar_filename, 'r') as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                self.assertDictEqual(get_report_json_data, file_content_dict)
+
+    def test_download_report_id(self):
+        """Testing download with report id."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_tar_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_tar_filename)
+            with redirect_stdout(report_out):
+                nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.REPORT_SUCCESSFULLY_WRITTEN)
+
+    def test_download_output_directory(self):
+        """Testing fail because of output directory."""
+        with self.assertRaises(SystemExit):
+            sys.argv = ['/bin/qpc', 'report', 'download',
+                        '--output-file', '/foo/bar']
+            CLI().main()
+
+    def test_download_output_directory_not_exist(self):
+        """Testing fail because output directory does not exist."""
+        with self.assertRaises(SystemExit):
+            sys.argv = ['/bin/qpc', 'report', 'download',
+                        '--output-file', '/foo/bar/']
+            CLI().main()
+
+    def test_download_output_file_empty(self):
+        """Testing fail because output file empty."""
+        with self.assertRaises(SystemExit):
+            sys.argv = ['/bin/qpc', 'report', 'download',
+                        '--json', '--output-file', '']
+            CLI().main()
+
+    def test_download_report_empty(self):
+        """Testing fail because output file empty."""
+        with self.assertRaises(SystemExit):
+            sys.argv = ['/bin/qpc', 'report', 'download',
+                        '--report', '', '--output-file', 'test.json']
+            CLI().main()
+
+    def test_download_scan_job_not_exist(self):
+        """Summary report with nonexistent scanjob."""
+        report_out = StringIO()
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        get_scanjob_json_data = {'id': 1, 'report_id': 1}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=400,
+                       json=get_scanjob_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             output_json=True,
+                             report_id=None,
+                             output_csv=False,
+                             path=self.test_tar_filename)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    nac.main(args)
+                    self.assertEqual(report_out.getvalue(),
+                                     messages.REPORT_SJ_DOES_NOT_EXIST)
+
+    def test_summary_report_invalid_scan_job(self):
+        """Summary report with scanjob but no report_id."""
+        report_out = StringIO()
+
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        get_scanjob_json_data = {'id': 1}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=200,
+                       json=get_scanjob_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             report_id=None,
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_tar_filename)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    nac.main(args)
+                    self.assertEqual(
+                        report_out.getvalue(),
+                        messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ)

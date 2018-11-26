@@ -24,6 +24,7 @@ from qpc.utils import (validate_write_file,
 
 from requests import codes
 
+
 # pylint: disable=too-few-public-methods
 class ReportDownloadCommand(CliCommand):
     """Defines the report download command.

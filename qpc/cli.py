@@ -30,9 +30,9 @@ from qpc.report.commands import (DeprecatedReportDetailCommand,
                                  DeprecatedReportSummaryCommand,
                                  ReportDeploymentsCommand,
                                  ReportDetailsCommand,
+                                 ReportDownloadCommand,
                                  ReportMergeCommand,
-                                 ReportMergeStatusCommand,
-                                 ReportDownloadCommand)
+                                 ReportMergeStatusCommand)
 from qpc.scan.commands import (ScanAddCommand,
                                ScanCancelCommand,
                                ScanClearCommand,

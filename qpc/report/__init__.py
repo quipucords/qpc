@@ -17,6 +17,7 @@ DEPLOYMENTS = 'deployments'
 DETAILS = 'details'
 MERGE = 'merge'
 MERGE_STATUS = 'merge-status'
+DOWNLOAD = 'download'
 
 # deprecated
 SUMMARY = 'summary'

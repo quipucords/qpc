@@ -31,7 +31,8 @@ from qpc.report.commands import (DeprecatedReportDetailCommand,
                                  ReportDeploymentsCommand,
                                  ReportDetailsCommand,
                                  ReportMergeCommand,
-                                 ReportMergeStatusCommand)
+                                 ReportMergeStatusCommand,
+                                 ReportDownloadCommand)
 from qpc.scan.commands import (ScanAddCommand,
                                ScanCancelCommand,
                                ScanClearCommand,
@@ -108,6 +109,7 @@ class CLI():
                               ReportDetailsCommand,
                               ReportMergeCommand,
                               ReportMergeStatusCommand,
+                              ReportDownloadCommand,
                               DeprecatedReportSummaryCommand,
                               DeprecatedReportDetailCommand])
         self._add_subcommand(insights.SUBCOMMAND,

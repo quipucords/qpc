@@ -74,7 +74,7 @@ class InsightsUploadCommand(CliCommand):
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
         install_check = check_insights_install(streamdata)
-        if not install_check or code is not 0:
+        if not install_check or code != 0:
             print(_(messages.BAD_INSIGHTS_INSTALL %
                     (' '.join(connection_test_command))))
             sys.exit(1)
@@ -89,7 +89,7 @@ class InsightsUploadCommand(CliCommand):
         version_check = check_insights_version(streamdata,
                                                insights.CLIENT_VERSION,
                                                insights.CORE_VERSION)
-        if not version_check['results'] or code is not 0:
+        if not version_check['results'] or code != 0:
             if 'client' in version_check.keys():
                 print(_(messages.BAD_CLIENT_VERSION %
                         (version_check['client'],
@@ -163,7 +163,7 @@ class InsightsUploadCommand(CliCommand):
         code = process.returncode
         report_check = check_successful_upload(streamdata)
         print(_(messages.INSIGHTS_UPLOAD_REPORT % self.report_id))
-        if not report_check or code is not 0:
+        if not report_check or code != 0:
             print(_(messages.BAD_INSIGHTS_UPLOAD % (' '.join(upload_command))))
             os.remove(self.tmp_tar_name)
             sys.exit(1)

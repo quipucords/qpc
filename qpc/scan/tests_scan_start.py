@@ -47,7 +47,7 @@ class ScanStartCliTests(unittest.TestCase):
     def test_start_req_args_err(self):
         """Testing the scan start command required flags."""
         with self.assertRaises(SystemExit):
-            sys.argv = ['/bin/qpc', 'scan', 'start' '--name' 'scan1']
+            sys.argv = ['/bin/qpc', 'scan', 'start', '--name', 'scan1']
             CLI().main()
 
     def test_scan_with_scan_none(self):

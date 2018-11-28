@@ -107,9 +107,9 @@ class CLI():
         self._add_subcommand(report.SUBCOMMAND,
                              [ReportDeploymentsCommand,
                               ReportDetailsCommand,
+                              ReportDownloadCommand,
                               ReportMergeCommand,
                               ReportMergeStatusCommand,
-                              ReportDownloadCommand,
                               DeprecatedReportSummaryCommand,
                               DeprecatedReportDetailCommand])
         self._add_subcommand(insights.SUBCOMMAND,

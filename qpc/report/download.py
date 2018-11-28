@@ -49,7 +49,7 @@ class ReportDownloadCommand(CliCommand):
                               metavar='REPORT_ID',
                               help=_(messages.REPORT_REPORT_ID_HELP))
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
-                                 help=_(messages.REPORT_PATH_HELP),
+                                 help=_(messages.DOWNLOAD_PATH_HELP),
                                  required=True)
         self.report_id = None
 
@@ -60,7 +60,9 @@ class ReportDownloadCommand(CliCommand):
         except ValueError as error:
             print(error)
             sys.exit(1)
-
+        if '.tar.gz' not in self.args.path:
+            print(_(messages.DOWNLOAD_REQUIRE_TAR))
+            sys.exit(1)
         if self.args.report_id is None:
             # Lookup scan job id
             response = request(parser=self.parser, method=GET,
@@ -73,11 +75,11 @@ class ReportDownloadCommand(CliCommand):
                 if self.report_id:
                     self.req_path = '%s%s' % (self.req_path, self.report_id)
                 else:
-                    print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ %
+                    print(_(messages.DOWNLOAD_NO_REPORT_FOR_SJ %
                             self.args.scan_job_id))
                     sys.exit(1)
             else:
-                print(_(messages.REPORT_SJ_DOES_NOT_EXIST %
+                print(_(messages.DOWNLOAD_SJ_DOES_NOT_EXIST %
                         self.args.scan_job_id))
                 sys.exit(1)
         else:
@@ -88,17 +90,13 @@ class ReportDownloadCommand(CliCommand):
         file_content = self.response.content
         try:
             write_file(self.args.path, file_content, True)
-            print(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+            print(_(messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % self.args.path))
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
             print(err_msg)
             sys.exit(1)
 
     def _handle_response_error(self):
-        if self.args.report_id is None:
-            print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ %
-                    self.args.scan_job_id))
-        else:
-            print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID %
-                    self.args.report_id))
+        print(_(messages.DOWNLOAD_NO_REPORT_FOR_REPORT_ID %
+                self.args.report_id))
         sys.exit(1)

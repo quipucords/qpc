@@ -15,8 +15,9 @@ import os
 import sys
 import time
 import unittest
-from argparse import ArgumentParser, Namespace
-from io import StringIO
+from unittest.mock import patch
+from argparse import ArgumentParser, Namespace  # noqa: I100
+from io import StringIO  # noqa: I100
 
 from qpc import messages
 from qpc.cli import CLI
@@ -77,13 +78,12 @@ class ReportDetailsTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             output_json=True,
-                             output_csv=False,
                              path=self.test_tar_filename)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 messages.REPORT_SUCCESSFULLY_WRITTEN)
+                                 messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
+                                 self.test_tar_filename)
 
     def test_download_report_id(self):
         """Testing download with report id."""
@@ -100,13 +100,12 @@ class ReportDetailsTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             output_json=True,
-                             output_csv=False,
                              path=self.test_tar_filename)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 messages.REPORT_SUCCESSFULLY_WRITTEN)
+                                 messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
+                                 self.test_tar_filename)
 
     def test_download_output_directory(self):
         """Testing fail because of output directory."""
@@ -126,7 +125,7 @@ class ReportDetailsTests(unittest.TestCase):
         """Testing fail because output file empty."""
         with self.assertRaises(SystemExit):
             sys.argv = ['/bin/qpc', 'report', 'download',
-                        '--json', '--output-file', '']
+                        '--output-file', '']
             CLI().main()
 
     def test_download_report_empty(self):
@@ -137,7 +136,7 @@ class ReportDetailsTests(unittest.TestCase):
             CLI().main()
 
     def test_download_scan_job_not_exist(self):
-        """Summary report with nonexistent scanjob."""
+        """Testing download with nonexistent scanjob."""
         report_out = StringIO()
         get_scanjob_url = get_server_location() + \
             SCAN_JOB_URI + '1'
@@ -147,20 +146,17 @@ class ReportDetailsTests(unittest.TestCase):
                        json=get_scanjob_json_data)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
-                             output_json=True,
                              report_id=None,
-                             output_csv=False,
                              path=self.test_tar_filename)
-            with self.assertRaises(SystemExit):
-                with redirect_stdout(report_out):
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
                     nac.main(args)
-                    self.assertEqual(report_out.getvalue(),
-                                     messages.REPORT_SJ_DOES_NOT_EXIST)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_SJ_DOES_NOT_EXIST % 1)
 
-    def test_summary_report_invalid_scan_job(self):
-        """Summary report with scanjob but no report_id."""
+    def test_download_invalid_scan_job(self):
+        """Testing download with scanjob but no report_id."""
         report_out = StringIO()
-
         get_scanjob_url = get_server_location() + \
             SCAN_JOB_URI + '1'
         get_scanjob_json_data = {'id': 1}
@@ -170,12 +166,100 @@ class ReportDetailsTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             output_json=True,
-                             output_csv=False,
                              path=self.test_tar_filename)
-            with self.assertRaises(SystemExit):
-                with redirect_stdout(report_out):
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
                     nac.main(args)
-                    self.assertEqual(
-                        report_out.getvalue(),
-                        messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_NO_REPORT_FOR_SJ % '1')
+
+    def test_output_is_nonexistent_directory(self):
+        """Testing error for nonexistent directory in output."""
+        fake_dir = '/cody/is/awesome/'
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_tar_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path=fake_dir)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 (messages.REPORT_DIRECTORY_DOES_NOT_EXIST %
+                                  os.path.dirname(fake_dir)))
+
+    @patch('qpc.report.download.write_file')
+    def test_file_fails_to_write(self, file):
+        """Testing download failure while writing to file."""
+        err = 'Mock Fail'
+        file.side_effect = OSError(err)
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_tar_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path=self.test_tar_filename)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                err_msg = (messages.WRITE_FILE_ERROR %
+                           (self.test_tar_filename, err))
+                self.assertEqual(report_out.getvalue().strip(), err_msg)
+
+    def test_download_report_id_not_exist(self):
+        """Test download with nonexistent report id."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=400,
+                       json=get_report_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id=1,
+                             path=self.test_tar_filename)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_NO_REPORT_FOR_REPORT_ID % 1)
+
+    def test_download_bad_file_extension(self):
+        """Test download with bad file extension."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_tar_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path='test.json')
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_REQUIRE_TAR)

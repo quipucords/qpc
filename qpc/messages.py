@@ -296,3 +296,11 @@ INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
 INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
     ' the QPC report.  Cannot write file to %s.'
 INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
+DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
+DOWNLOAD_NO_REPORT_FOR_REPORT_ID = \
+    'No report detail available for report id %s.'
+DOWNLOAD_PATH_HELP = 'The output file\'s name and location. This file is ' \
+    'required to be a tar.gz'
+DOWNLOAD_REQUIRE_TAR = 'The output file\'s extension is required to be tar.gz'
+DOWNLOAD_SUCCESSFULLY_WRITTEN = '%s successfully created.'
+DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'

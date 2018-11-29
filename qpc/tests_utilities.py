@@ -42,7 +42,7 @@ def redirect_stdout(stream):
 
 def create_tar_buffer(files_data):
     """Gernerate a file buffer based off a dictionary."""
-    if not isinstance(files_data, (dict,)) or files_data.keys() is 0:
+    if not isinstance(files_data, (dict,)):
         return None
     if not all(isinstance(v, (str, dict)) for v in files_data.values()):
         return None

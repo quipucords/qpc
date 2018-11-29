@@ -90,7 +90,9 @@ class ReportDownloadCommand(CliCommand):
         file_content = self.response.content
         try:
             write_file(self.args.path, file_content, True)
-            print(_(messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % self.args.path))
+            print(_(messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
+                    (self.report_id,
+                     self.args.path)))
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
             print(err_msg)

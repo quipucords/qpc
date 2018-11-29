@@ -83,7 +83,7 @@ class ReportDetailsTests(unittest.TestCase):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
-                                 self.test_tar_filename)
+                                 ('1', self.test_tar_filename))
 
     def test_download_report_id(self):
         """Testing download with report id."""
@@ -105,7 +105,7 @@ class ReportDetailsTests(unittest.TestCase):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
-                                 self.test_tar_filename)
+                                 ('1', self.test_tar_filename))
 
     def test_download_output_directory(self):
         """Testing fail because of output directory."""

@@ -114,12 +114,9 @@ class ReportDetailsCommand(CliCommand):
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
             print(err_msg)
+            sys.exit(1)
 
     def _handle_response_error(self):
-        if self.args.report_id is None:
-            print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ %
-                    self.args.scan_job_id))
-        else:
-            print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID %
-                    self.args.report_id))
+        print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID %
+                self.args.report_id))
         sys.exit(1)

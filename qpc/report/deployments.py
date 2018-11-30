@@ -117,6 +117,10 @@ class ReportDeploymentsCommand(CliCommand):
             sys.exit(1)
 
     def _handle_response_error(self):
-        print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
-                self.args.report_id))
+        if self.args.report_id is None:
+            print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
+                    self.args.scan_job_id))
+        else:
+            print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
+                    self.args.report_id))
         sys.exit(1)

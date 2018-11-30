@@ -300,3 +300,34 @@ class ReportDeploymentsTests(unittest.TestCase):
                 err = (messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
                        1)
                 self.assertEqual(report_out.getvalue().strip(), err)
+
+    def test_deployments_report_error_scan_job(self):
+        """Testing error with scan job id."""
+        report_out = StringIO()
+
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        get_scanjob_json_data = {'id': 1, 'report_id': 1}
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=200,
+                       json=get_scanjob_json_data)
+            mocker.get(get_report_url, status_code=400,
+                       content=buffer_content)
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             report_id=None,
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_json_filename)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
+                                 1)

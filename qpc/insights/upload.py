@@ -27,7 +27,8 @@ from qpc.insights.utils import (InsightsCommands,
                                 check_insights_version,
                                 check_successful_upload,
                                 format_subprocess_stderr,
-                                format_upload_success)
+                                format_upload_success,
+                                verify_report_details)
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (validate_write_file,
@@ -157,6 +158,10 @@ class InsightsUploadCommand(CliCommand):
         write_file(self.tmp_tar_name,
                    self.response.content,
                    True)
+        valid = verify_report_details(self.tmp_tar_name)
+        if not valid:
+            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % self.report_id))
+            sys.exit(1)
         upload_command = self.insights_command.upload(self.tmp_tar_name)
         process = subprocess.Popen(upload_command, stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)

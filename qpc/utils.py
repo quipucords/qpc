@@ -379,3 +379,16 @@ def extract_json_from_tar(fileobj_content):
     json_data = pretty_print(json.loads(tar_info.read().decode('utf-8')))
     os.remove(filename)
     return json_data
+
+
+def extract_json_from_tarfile(filename):
+    """Extract json from existing tar.gz file.
+
+    :param filename: Compressed file.
+    :returns json_data from file
+    """
+    tar = tarfile.open(filename)
+    json_file = tar.getmembers()[0]
+    tar_info = tar.extractfile(json_file)
+    json_data = json.loads(tar_info.read().decode('utf-8'))
+    return json_data

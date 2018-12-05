@@ -279,6 +279,14 @@ BAD_INSIGHTS_INSTALL = 'Insights installation check failed. Checked if '\
 INSIGHTS_UPLOAD_REPORT = 'Uploading report %s to Insights service.'
 BAD_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
     ' Attempted to upload report with command "%s"'
+INVALID_REPORT_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
+    ' Report "%s" was invalid.'
+INSIGHTS_REPORT_MISSING_FIELD = 'Report is missing required field "%s".'
+INSIGHTS_MISSING_OR_INVALID = 'Report has a missing or invalid value for' \
+                              ' required field "%s".'
+INSIGHTS_REPORT_NO_VALID_FP = 'Report "%s" contained no valid fingerprints.'
+INSIGHTS_REPORT_INVALID_FP = 'Report "%s" contains an invalid fingerprint' \
+                             ' with no canonical facts: %s.'
 INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'

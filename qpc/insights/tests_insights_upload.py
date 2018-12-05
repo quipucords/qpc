@@ -66,9 +66,11 @@ class InsightsUploadCliTests(unittest.TestCase):
                              scan_job=None,
                              dev=None)
             with redirect_stdout(report_out):
-                nac.main(args)
-                self.assertIn('Successfully uploaded report',
-                              report_out.getvalue().strip())
+                with patch('qpc.insights.utils.verify_report_details',
+                           return_value=True):
+                    nac.main(args)
+                    self.assertIn('Successfully uploaded report',
+                                  report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_valid_scan_job(self, subprocess):
@@ -93,9 +95,11 @@ class InsightsUploadCliTests(unittest.TestCase):
                              report_id=None,
                              dev=None)
             with redirect_stdout(report_out):
-                nac.main(args)
-                self.assertIn('Successfully uploaded report',
-                              report_out.getvalue().strip())
+                with patch('qpc.insights.utils.verify_report_details',
+                           return_value=True):
+                    nac.main(args)
+                    self.assertIn('Successfully uploaded report',
+                                  report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_invalid_report(self, subprocess):
@@ -161,11 +165,13 @@ class InsightsUploadCliTests(unittest.TestCase):
                           report_out.getvalue())
 
     @patch('qpc.insights.upload.subprocess.Popen')
-    def test_unexpected_response_upload(self, subprocess):
+    @patch('qpc.insights.utils.verify_report_details')
+    def test_unexpected_response_upload(self, report_details, subprocess):
         """Testing error response with unexpected upload."""
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.8-1\n', b''), (None, b'Unknown Response')]  # noqa: E501
         subprocess.return_value.returncode = 0
+        report_details.return_value = True
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/deployments/'

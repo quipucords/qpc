@@ -114,6 +114,7 @@ class ReportDeploymentsCommand(CliCommand):
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
             print(err_msg)
+            sys.exit(1)
 
     def _handle_response_error(self):
         if self.args.report_id is None:

@@ -34,7 +34,7 @@ PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
-class ReportDetailsTests(unittest.TestCase):
+class ReportDownloadTests(unittest.TestCase):
     """Class for testing the report download command."""
 
     # pylint: disable=invalid-name

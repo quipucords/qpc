@@ -27,15 +27,35 @@ from qpc.insights.utils import (InsightsCommands,
                                 check_insights_version,
                                 check_successful_upload,
                                 format_subprocess_stderr,
-                                format_upload_success,
-                                verify_report_details)
+                                format_upload_success)
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (validate_write_file,
+from qpc.utils import (extract_json_from_tarfile,
+                       validate_write_file,
                        write_file)
 
 # pylint:disable=no-member
 from requests import codes
+
+
+def verify_report_fingerprints(fingerprints, report_id):
+    """Verify that report fingerprints contain canonical facts."""
+    canonical_facts = ['insights_client_id', 'bios_uuid', 'ip_addresses',
+                       'mac_addresses', 'vm_uuid', 'etc_machine_id',
+                       'subscription_manager_id']
+    verified_fingerprints = []
+    for fingerprint in fingerprints:
+        found_facts = False
+        for fact in canonical_facts:
+            if fingerprint.get(fact):
+                found_facts = True
+                break
+        if found_facts:
+            verified_fingerprints.append(fingerprint)
+        else:
+            print(_(messages.INSIGHTS_REPORT_INVALID_FP %
+                    (report_id, fingerprint.pop('metadata', None))))
+    return verified_fingerprints
 
 
 # pylint: disable=too-few-public-methods
@@ -148,6 +168,51 @@ class InsightsUploadCommand(CliCommand):
                      self.report_id)))
         print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
 
+    def verify_report_details(self):
+        """
+        Verify that the report contents are a valid deployments report.
+
+        :returns boolean regarding report validity
+        """
+        report_contents = extract_json_from_tarfile(self.tmp_tar_name)
+
+        # validate report_platform_id
+        report_platform_id = report_contents.get('report_platform_id')
+        if not report_platform_id:
+            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_platform_id'))
+            return False
+
+        # validate report id
+        report_id = report_contents.get('report_id')
+        if not report_id:
+            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_id'))
+            return False
+
+        # validate version type
+        report_version = report_contents.get('report_version')
+        if not report_version:
+            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_version'))
+            return False
+
+        # validate report type
+        report_type = report_contents.get('report_type', '')
+        if report_type != 'deployments':
+            print(_(messages.INSIGHTS_MISSING_OR_INVALID % 'report_type'))
+            return False
+
+        # validate system fingerprints
+        fingerprints = report_contents.get('system_fingerprints')
+        if not fingerprints:
+            print((messages.INSIGHTS_REPORT_MISSING_FIELD % 'system_fingerprints'))
+            return False
+
+        if fingerprints and report_platform_id:
+            verified_fingerprints = verify_report_fingerprints(fingerprints, report_id)
+            if not verified_fingerprints:
+                print(_(messages.INSIGHTS_REPORT_NO_VALID_FP % report_id))
+                return False
+        return True
+
     def _build_req_params(self):
         self.req_path = '%s%s%s' % (
             insights.REPORT_URI,
@@ -158,7 +223,7 @@ class InsightsUploadCommand(CliCommand):
         write_file(self.tmp_tar_name,
                    self.response.content,
                    True)
-        valid = verify_report_details(self.tmp_tar_name)
+        valid = self.verify_report_details()
         if not valid:
             print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % self.report_id))
             sys.exit(1)

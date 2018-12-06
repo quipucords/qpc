@@ -39,6 +39,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
         self.orig_stderr = sys.stderr
+
         sys.stderr = HushUpStderr()
         # pylint:disable=line-too-long
         self.success_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.8-1\n', b''), (None, b'Uploading Insights data.\nSuccessfully uploaded report for.\n')]  # noqa: E501
@@ -66,7 +67,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              scan_job=None,
                              dev=None)
             with redirect_stdout(report_out):
-                with patch('qpc.insights.utils.verify_report_details',
+                with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
                            return_value=True):
                     nac.main(args)
                     self.assertIn('Successfully uploaded report',
@@ -95,7 +96,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              report_id=None,
                              dev=None)
             with redirect_stdout(report_out):
-                with patch('qpc.insights.utils.verify_report_details',
+                with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
                            return_value=True):
                     nac.main(args)
                     self.assertIn('Successfully uploaded report',
@@ -165,13 +166,11 @@ class InsightsUploadCliTests(unittest.TestCase):
                           report_out.getvalue())
 
     @patch('qpc.insights.upload.subprocess.Popen')
-    @patch('qpc.insights.utils.verify_report_details')
-    def test_unexpected_response_upload(self, report_details, subprocess):
+    def test_unexpected_response_upload(self, subprocess):
         """Testing error response with unexpected upload."""
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.8-1\n', b''), (None, b'Unknown Response')]  # noqa: E501
         subprocess.return_value.returncode = 0
-        report_details.return_value = True
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/deployments/'
@@ -184,6 +183,23 @@ class InsightsUploadCliTests(unittest.TestCase):
                              scan_job_id=None,
                              dev=None)
             with self.assertRaises(SystemExit):
-                nac.main(args)
-                self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),
-                              report_out.getvalue())
+                with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
+                           return_value=True):
+                    nac.main(args)
+                    self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),
+                                  report_out.getvalue())
+
+    def test_verify_report_missing_fingerprints(self):
+        """Test to verify a QPC report with empty fingerprints is failed."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'deployments',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'system_fingerprints': []}
+
+        command = InsightsUploadCommand(SUBPARSER)
+        command.tmp_tar_name = self.tmp_tar
+        status = command.verify_report_details()
+        self.assertEqual(status, False)

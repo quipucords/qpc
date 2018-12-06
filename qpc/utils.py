@@ -13,11 +13,11 @@
 
 from __future__ import print_function
 
+import io
 import json
 import logging
 import os
 import tarfile
-import time
 
 from qpc import messages
 from qpc.translation import _ as t
@@ -371,13 +371,10 @@ def extract_json_from_tar(fileobj_content):
 
     :param fileobj_content: BytesIo object with tarball of json dict
     """
-    filename = '/tmp/cli_tmp_%s.tar.gz' % time.strftime('%Y%m%d_%H%M%S')
-    write_file(filename, fileobj_content, True)
-    tar = tarfile.open(filename)
+    tar = tarfile.open(fileobj=io.BytesIO(fileobj_content), mode='r:gz')
     json_file = tar.getmembers()[0]
     tar_info = tar.extractfile(json_file)
     json_data = pretty_print(json.loads(tar_info.read().decode('utf-8')))
-    os.remove(filename)
     return json_data
 
 

@@ -208,7 +208,6 @@ class InsightsUploadCommand(CliCommand):
             insights.DEPLOYMENTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
-        print(type(self.response.content))
         write_file(self.tmp_tar_name,
                    self.response.content,
                    True)

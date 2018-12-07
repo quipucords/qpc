@@ -13,7 +13,6 @@
 import os
 import time
 import unittest
-import tarfile
 
 from qpc import utils
 from qpc.tests_utilities import create_tar_buffer
@@ -31,9 +30,8 @@ class UtilsTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'bios_uuid': 'value'}]}
-        self.file = {'test.json': self.report_json}
+        self.test_file = {'test.json': self.report_json}
         self.tmp_tar = 'test_%d.tar.gz' % time.time()
-
 
     def tearDown(self):
         """Remove test setup."""
@@ -45,7 +43,7 @@ class UtilsTests(unittest.TestCase):
 
     def create_tarfile(self):
         """Create a tarfile to test the extract json from tarfile method."""
-        utils.write_file(self.tmp_tar, create_tar_buffer(self.file), True)
+        utils.write_file(self.tmp_tar, create_tar_buffer(self.test_file), True)
 
     def test_read_client_token(self):
         """Testing the read client token function."""

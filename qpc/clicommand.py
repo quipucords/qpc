@@ -14,9 +14,15 @@
 from __future__ import print_function
 
 import sys
+# pylint: disable=no-name-in-module,import-error
+from distutils.version import LooseVersion
 
+from qpc import messages
 from qpc.request import request
-from qpc.utils import handle_error_response, log_args
+from qpc.translation import _
+from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       handle_error_response,
+                       log_args)
 
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -38,6 +44,10 @@ class CliCommand():
         self.req_params = None
         self.req_headers = None
         self.response = None
+
+        # If you add or change API, you must update these versions
+        # this includes self.min_server_version
+        self.min_server_version = QPC_MIN_SERVER_VERSION
 
     def _validate_args(self):
         """Sub-commands can override."""
@@ -74,6 +84,16 @@ class CliCommand():
                                 payload=self.req_payload,
                                 headers=self.req_headers,
                                 parser=self.parser)
+
+        server_version = self.response.headers.get('X-Server-Version')
+        if not server_version:
+            server_version = QPC_MIN_SERVER_VERSION
+
+        if LooseVersion(server_version) < LooseVersion(self.min_server_version):
+            print(_(messages.SERVER_TOO_OLD_FOR_CLI %
+                    (self.min_server_version, self.min_server_version, server_version)))
+            sys.exit(1)
+
         # pylint: disable=no-member
         if self.response.status_code not in self.success_codes:
             # handle error cases

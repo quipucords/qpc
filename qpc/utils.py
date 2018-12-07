@@ -40,6 +40,8 @@ CONFIG_SSL_VERIFY = 'ssl_verify'
 
 LOG_LEVEL_INFO = 0
 
+QPC_MIN_SERVER_VERSION = '0.0.45'
+
 # pylint: disable=invalid-name
 logging.captureWarnings(True)
 log = logging.getLogger('qpc')

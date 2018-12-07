@@ -7,7 +7,7 @@ PYDIRS	= quipucords
 
 BINDIR  = bin
 
-OMIT_PATTERNS = */test*.py,*/manage.py,*/apps.py,*/wsgi.py,*/settings.py,*/migrations/*,*/docs/*,*/client/*,*/deploy/*,*/local_gunicorn.conf.py
+OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
@@ -45,8 +45,9 @@ test:
 	tox -e py36
 
 test-coverage:
-	coverage run --source=qpc tox -e py36
+	coverage run -m unittest discover qpc/ -v
 	coverage report -m --omit $(OMIT_PATTERNS)
+	echo $(OMIT_PATTERNS)
 
 html:
 	@cd docs; $(MAKE) html

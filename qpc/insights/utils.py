@@ -16,10 +16,6 @@ from __future__ import print_function
 # pylint: disable=no-name-in-module,import-error
 from distutils.version import LooseVersion
 
-from qpc import messages
-from qpc.translation import _
-from qpc.utils import extract_json_from_tarfile
-
 
 class InsightsCommands():
     """Creates insights-client commands for qpc client."""

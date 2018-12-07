@@ -55,7 +55,7 @@ def verify_report_fingerprints(fingerprints, report_id):
         else:
             print(_(messages.INSIGHTS_REPORT_INVALID_FP %
                     (report_id, fingerprint.pop('metadata', None))))
-    return verified_fingerprints
+    return len(verified_fingerprints) > 0
 
 
 # pylint: disable=too-few-public-methods
@@ -174,43 +174,31 @@ class InsightsUploadCommand(CliCommand):
 
         :returns boolean regarding report validity
         """
+        # validate required keys
         report_contents = extract_json_from_tarfile(self.tmp_tar_name)
-
-        # validate report_platform_id
-        report_platform_id = report_contents.get('report_platform_id')
-        if not report_platform_id:
-            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_platform_id'))
-            return False
-
-        # validate report id
-        report_id = report_contents.get('report_id')
-        if not report_id:
-            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_id'))
-            return False
-
-        # validate version type
-        report_version = report_contents.get('report_version')
-        if not report_version:
-            print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % 'report_version'))
-            return False
-
-        # validate report type
-        report_type = report_contents.get('report_type', '')
-        if report_type != 'deployments':
-            print(_(messages.INSIGHTS_MISSING_OR_INVALID % 'report_type'))
-            return False
-
-        # validate system fingerprints
-        fingerprints = report_contents.get('system_fingerprints')
-        if not fingerprints:
-            print((messages.INSIGHTS_REPORT_MISSING_FIELD % 'system_fingerprints'))
-            return False
-
-        if fingerprints and report_platform_id:
-            verified_fingerprints = verify_report_fingerprints(fingerprints, report_id)
-            if not verified_fingerprints:
-                print(_(messages.INSIGHTS_REPORT_NO_VALID_FP % report_id))
+        required_keys = ['report_platform_id',
+                         'report_id',
+                         'report_version',
+                         'report_type',
+                         'system_fingerprints']
+        for key in required_keys:
+            present = report_contents.get(key)
+            if not present:
+                print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % key))
                 return False
+        report_id = report_contents.get('report_id')
+        # validate report type
+        report_type = report_contents.get('report_type')
+        if report_type != 'deployments':
+            print(_(messages.INSIGHTS_INVALID_REPORT_TYPE % report_id))
+            return False
+
+        # validate fingerprints contain canonical facts
+        fingerprints = report_contents.get('system_fingerprints')
+        verified_fingerprints = verify_report_fingerprints(fingerprints, report_id)
+        if not verified_fingerprints:
+            print(_(messages.INSIGHTS_REPORT_NO_VALID_FP % report_id))
+            return False
         return True
 
     def _build_req_params(self):

@@ -282,8 +282,8 @@ BAD_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
 INVALID_REPORT_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
     ' Report "%s" was invalid.'
 INSIGHTS_REPORT_MISSING_FIELD = 'Report is missing required field "%s".'
-INSIGHTS_MISSING_OR_INVALID = 'Report has a missing or invalid value for' \
-                              ' required field "%s".'
+INSIGHTS_INVALID_REPORT_TYPE = 'Report "%s" has an invalid report_type.' \
+                               ' Must be a deployments report.'
 INSIGHTS_REPORT_NO_VALID_FP = 'Report "%s" contained no valid fingerprints.'
 INSIGHTS_REPORT_INVALID_FP = 'Report "%s" contains an invalid fingerprint' \
                              ' with no canonical facts: %s.'

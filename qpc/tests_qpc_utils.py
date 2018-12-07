@@ -11,13 +11,41 @@
 """Test the utils module."""
 
 import os
+import time
 import unittest
+import tarfile
 
 from qpc import utils
+from qpc.tests_utilities import create_tar_buffer
 
 
 class UtilsTests(unittest.TestCase):
     """Class for testing the utils module qpc."""
+
+    def setUp(self):
+        """Set up the class variables."""
+        self.report_json = {
+            'report_id': 1,
+            'report_type': 'deployments',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'system_fingerprints': [{'bios_uuid': 'value'}]}
+        self.file = {'test.json': self.report_json}
+        self.tmp_tar = 'test_%d.tar.gz' % time.time()
+
+
+    def tearDown(self):
+        """Remove test setup."""
+        # Restore stderr
+        try:
+            os.remove(self.tmp_tar)
+        except FileNotFoundError:
+            pass
+
+    def create_tarfile(self):
+        """Create a tarfile to test the extract json from tarfile method."""
+        utils.write_file(self.tmp_tar, create_tar_buffer(self.file), True)
 
     def test_read_client_token(self):
         """Testing the read client token function."""
@@ -31,3 +59,9 @@ class UtilsTests(unittest.TestCase):
         self.assertTrue(isinstance(token, str))
         if check_value:
             self.assertEqual(token, expected_token)
+
+    def test_extract_json_from_tarfile(self):
+        """Test extracting json from tarfile."""
+        self.create_tarfile()
+        json = utils.extract_json_from_tarfile(self.tmp_tar)
+        self.assertEqual(json, self.report_json)

@@ -20,7 +20,9 @@ from distutils.version import LooseVersion
 from qpc import messages
 from qpc.request import request
 from qpc.translation import _
-from qpc.utils import handle_error_response, log_args
+from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       handle_error_response,
+                       log_args)
 
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -45,7 +47,7 @@ class CliCommand():
 
         # If you add or change API, you must update these versions
         # this includes self.min_server_version
-        self.min_server_version = '0.0.45'
+        self.min_server_version = QPC_MIN_SERVER_VERSION
 
     def _validate_args(self):
         """Sub-commands can override."""
@@ -85,7 +87,7 @@ class CliCommand():
 
         server_version = self.response.headers.get('X-Server-Version')
         if not server_version:
-            server_version = '0.0.45'
+            server_version = QPC_MIN_SERVER_VERSION
 
         if LooseVersion(server_version) < LooseVersion(self.min_server_version):
             print(_(messages.SERVER_TOO_OLD_FOR_CLI %

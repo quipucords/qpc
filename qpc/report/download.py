@@ -51,6 +51,7 @@ class ReportDownloadCommand(CliCommand):
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
                                  help=_(messages.DOWNLOAD_PATH_HELP),
                                  required=True)
+        self.min_server_version = '0.0.46'
         self.report_id = None
 
     def _validate_args(self):

@@ -26,7 +26,9 @@ from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
                                  create_tar_buffer, redirect_stdout)
-from qpc.utils import get_server_location, write_server_config
+from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       get_server_location,
+                       write_server_config)
 
 import requests_mock
 
@@ -74,6 +76,7 @@ class ReportDownloadTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.46'},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
@@ -96,6 +99,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.46'},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -211,6 +215,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.46'},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -231,6 +236,7 @@ class ReportDownloadTests(unittest.TestCase):
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.46'},
                        json=get_report_json_data)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -241,6 +247,27 @@ class ReportDownloadTests(unittest.TestCase):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.DOWNLOAD_NO_REPORT_FOR_REPORT_ID % 1)
+
+    def test_download_from_server_with_old_version(self):
+        """Test download with nonexistent report id."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': QPC_MIN_SERVER_VERSION},
+                       json=get_report_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id=1,
+                             path=self.test_tar_filename)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.SERVER_TOO_OLD_FOR_CLI %
+                                 ('0.0.46', '0.0.46', QPC_MIN_SERVER_VERSION))
 
     def test_download_bad_file_extension(self):
         """Test download with bad file extension."""
@@ -253,6 +280,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.46'},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,

@@ -12,7 +12,7 @@
 
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
 
@@ -79,7 +79,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              scan_job=None,
                              dev=None)
             with redirect_stdout(report_out):
-                with patch('qpc.insights.upload.extract_json_from_tarfile',
+                with patch('qpc.insights.upload.extract_json_from_tar',
                            return_value=self.success_json):
                     nac.main(args)
                     self.assertIn('Successfully uploaded report',
@@ -102,7 +102,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              dev=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    with patch('qpc.insights.upload.extract_json_from_tarfile',
+                    with patch('qpc.insights.upload.extract_json_from_tar',
                                return_value=self.json_missing_fingerprints):
                         nac.main(args)
                         self.assertIn(
@@ -228,8 +228,10 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     def test_verify_report_success(self):
         """Test to verify a QPC report with the correct structure passes validation."""
+        response = Mock(content=self.success_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=self.success_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=self.success_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, True)
 
@@ -242,8 +244,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'key': 'value'}]}
 
+        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=report_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
 
@@ -256,9 +260,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'name': 'value'}]}
-
+        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=report_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
 
@@ -272,8 +277,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'key': 'value'}]}
 
+        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=report_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
 
@@ -286,8 +293,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'key': 'value'}]}
 
+        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=report_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
 
@@ -300,15 +309,19 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'system_fingerprints': [{'key': 'value'}]}
 
+        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile', return_value=report_json):
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
 
     def test_verify_report_missing_fingerprints(self):
         """Test to verify a QPC report with empty fingerprints is failed."""
+        response = Mock(content=self.json_missing_fingerprints)
         command = InsightsUploadCommand(SUBPARSER)
-        with patch('qpc.insights.upload.extract_json_from_tarfile',
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar',
                    return_value=self.json_missing_fingerprints):
             status = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
@@ -330,7 +343,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.assertEqual(valid, True)
 
         # test that as long as there is one valid fingerprint we move on
-        invalid_print = {'no': 'canonical facts'}
+        invalid_print = {'no': 'canonical facts', 'metadata': {'key': 'val'}}
         fingerprints.append(invalid_print)
         valid = verify_report_fingerprints(fingerprints,
                                            report_id)

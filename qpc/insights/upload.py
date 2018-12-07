@@ -30,7 +30,7 @@ from qpc.insights.utils import (InsightsCommands,
                                 format_upload_success)
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (extract_json_from_tarfile,
+from qpc.utils import (extract_json_from_tar,
                        validate_write_file,
                        write_file)
 
@@ -53,8 +53,9 @@ def verify_report_fingerprints(fingerprints, report_id):
         if found_facts:
             verified_fingerprints.append(fingerprint)
         else:
+            fingerprint.pop('metadata', None)
             print(_(messages.INSIGHTS_REPORT_INVALID_FP %
-                    (report_id, fingerprint.pop('metadata', None))))
+                    (report_id, fingerprint)))
     return len(verified_fingerprints) > 0
 
 
@@ -175,7 +176,8 @@ class InsightsUploadCommand(CliCommand):
         :returns boolean regarding report validity
         """
         # validate required keys
-        report_contents = extract_json_from_tarfile(self.tmp_tar_name)
+        report_contents = extract_json_from_tar(self.response.content,
+                                                print_pretty=False)
         required_keys = ['report_platform_id',
                          'report_id',
                          'report_version',
@@ -208,13 +210,13 @@ class InsightsUploadCommand(CliCommand):
             insights.DEPLOYMENTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
-        write_file(self.tmp_tar_name,
-                   self.response.content,
-                   True)
         valid = self.verify_report_details()
         if not valid:
             print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % self.report_id))
             sys.exit(1)
+        write_file(self.tmp_tar_name,
+                   self.response.content,
+                   True)
         upload_command = self.insights_command.upload(self.tmp_tar_name)
         process = subprocess.Popen(upload_command, stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)

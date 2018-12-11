@@ -43,7 +43,8 @@ def verify_report_fingerprints(fingerprints, report_id):
     canonical_facts = ['insights_client_id', 'bios_uuid', 'ip_addresses',
                        'mac_addresses', 'vm_uuid', 'etc_machine_id',
                        'subscription_manager_id']
-    verified_fingerprints = []
+    valid_fp = []
+    invalid_fp = []
     for fingerprint in fingerprints:
         found_facts = False
         for fact in canonical_facts:
@@ -51,12 +52,25 @@ def verify_report_fingerprints(fingerprints, report_id):
                 found_facts = True
                 break
         if found_facts:
-            verified_fingerprints.append(fingerprint)
+            valid_fp.append(fingerprint)
         else:
-            fingerprint.pop('metadata', None)
-            print(_(messages.INSIGHTS_REPORT_INVALID_FP %
-                    (report_id, fingerprint)))
-    return len(verified_fingerprints) > 0
+            invalid_fp.append(fingerprint)
+
+    print(_(messages.INSIGHTS_TOTAL_VALID_FP % (report_id,
+                                                (len(valid_fp)),
+                                                str(len(fingerprints)))))
+    if invalid_fp:
+        print(_(messages.INSIGHTS_TOTAL_INVALID_FP % (report_id,
+                                                      canonical_facts)))
+        for fingerprint in invalid_fp:
+            fp_name = fingerprint.get('name', 'UNKNOWN')
+            fp_metadata = fingerprint.get('metadata', {})
+            name_metadata = fp_metadata.get('name', {})
+            source_name = name_metadata.get('source_name', 'UNKNOWN')
+
+            print(_(messages.INSIGHTS_INVALID_FP_NAME % (source_name, fp_name)))
+
+    return len(valid_fp) > 0
 
 
 # pylint: disable=too-few-public-methods
@@ -197,8 +211,8 @@ class InsightsUploadCommand(CliCommand):
 
         # validate fingerprints contain canonical facts
         fingerprints = report_contents.get('system_fingerprints')
-        verified_fingerprints = verify_report_fingerprints(fingerprints, report_id)
-        if not verified_fingerprints:
+        valid_fp = verify_report_fingerprints(fingerprints, report_id)
+        if not valid_fp:
             print(_(messages.INSIGHTS_REPORT_NO_VALID_FP % report_id))
             return False
         return True

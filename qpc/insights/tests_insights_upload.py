@@ -337,20 +337,19 @@ class InsightsUploadCliTests(unittest.TestCase):
                         {'etc_machine_id': 'value'},
                         {'subscription_manager_id': 'value'}]
         report_id = '1'
-        valid = verify_report_fingerprints(fingerprints,
-                                           report_id)
+        valid = verify_report_fingerprints(fingerprints, report_id)
 
         self.assertEqual(valid, True)
 
-        # test that as long as there is one valid fingerprint we move on
-        invalid_print = {'no': 'canonical facts', 'metadata': {'key': 'val'}}
+        # test that mixed valid/invalid prints work as expected
+        invalid_print = {'no': 'canonical facts',
+                         'metadata': {'key': 'val',
+                                      'name': {'source_name': 'NSource1'}}}
         fingerprints.append(invalid_print)
-        valid = verify_report_fingerprints(fingerprints,
-                                           report_id)
+        valid = verify_report_fingerprints(fingerprints, report_id)
         self.assertEqual(valid, True)
 
         # test that if there are no valid fingerprints we return []
         fingerprints = [invalid_print]
-        valid = verify_report_fingerprints(fingerprints,
-                                           report_id)
+        valid = verify_report_fingerprints(fingerprints, report_id)
         self.assertEqual(valid, False)

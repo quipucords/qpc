@@ -285,8 +285,12 @@ INSIGHTS_REPORT_MISSING_FIELD = 'Report is missing required field "%s".'
 INSIGHTS_INVALID_REPORT_TYPE = 'Report "%s" has an invalid report_type.' \
                                ' Must be a deployments report.'
 INSIGHTS_REPORT_NO_VALID_FP = 'Report "%s" contained no valid fingerprints.'
-INSIGHTS_REPORT_INVALID_FP = 'Report "%s" contains an invalid fingerprint' \
-                             ' with no canonical facts: %s.'
+INSIGHTS_INVALID_FP_NAME = 'Fingerprint produced by source "%s" from system' \
+                           ' "%s" missing canonical facts.'
+INSIGHTS_TOTAL_VALID_FP = 'Report "%s" contains %s/%s valid fingerprints.'
+INSIGHTS_TOTAL_INVALID_FP = 'Report "%s" contains the following invalid' \
+                            ' fingerprints with no canonical facts.' \
+                            ' Fingerprints must contain one of the following: %s'
 INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'

@@ -40,9 +40,9 @@ from requests import codes
 
 def verify_report_fingerprints(fingerprints, report_id):
     """Verify that report fingerprints contain canonical facts."""
-    canonical_facts = ['insights_client_id', 'bios_uuid', 'ip_addresses',
-                       'mac_addresses', 'vm_uuid', 'etc_machine_id',
-                       'subscription_manager_id']
+    canonical_facts = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
+                       'ip_addresses', 'mac_addresses',
+                       'subscription_manager_id', 'vm_uuid']
     valid_fp = []
     invalid_fp = []
     for fingerprint in fingerprints:
@@ -238,7 +238,7 @@ class InsightsUploadCommand(CliCommand):
         report_check = check_successful_upload(streamdata)
         print(_(messages.INSIGHTS_UPLOAD_REPORT % self.report_id))
         if not report_check or code != 0:
-            print(_(messages.BAD_INSIGHTS_UPLOAD % (' '.join(upload_command))))
+            print(_(messages.BAD_INSIGHTS_UPLOAD % (self.report_id, (' '.join(upload_command)))))
             os.remove(self.tmp_tar_name)
             sys.exit(1)
         else:

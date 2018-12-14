@@ -277,18 +277,17 @@ NEXT_RESULTS = 'Press enter to see the next set of results.'
 BAD_INSIGHTS_INSTALL = 'Insights installation check failed. Checked if '\
     'insights was installed and configured with command "%s"'
 INSIGHTS_UPLOAD_REPORT = 'Uploading report %s to Insights service.'
-BAD_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
+BAD_INSIGHTS_UPLOAD = 'Failed to upload report %s to Insights.'\
     ' Attempted to upload report with command "%s"'
-INVALID_REPORT_INSIGHTS_UPLOAD = 'Insights Upload QPC Report Failed.'\
-    ' Report "%s" was invalid.'
+INVALID_REPORT_INSIGHTS_UPLOAD = 'Failed to upload report %s to Insights.'
 INSIGHTS_REPORT_MISSING_FIELD = 'Report is missing required field "%s".'
-INSIGHTS_INVALID_REPORT_TYPE = 'Report "%s" has an invalid report_type.' \
+INSIGHTS_INVALID_REPORT_TYPE = 'Report %s has an invalid report_type.' \
                                ' Must be a deployments report.'
-INSIGHTS_REPORT_NO_VALID_FP = 'Report "%s" contained no valid fingerprints.'
+INSIGHTS_REPORT_NO_VALID_FP = 'Report %s contained no valid fingerprints.'
 INSIGHTS_INVALID_FP_NAME = 'Fingerprint produced by source "%s" from system' \
-                           ' "%s" missing canonical facts.'
-INSIGHTS_TOTAL_VALID_FP = 'Report "%s" contains %s/%s valid fingerprints.'
-INSIGHTS_TOTAL_INVALID_FP = 'Report "%s" contains the following invalid' \
+                           ' "%s" is missing all canonical facts.'
+INSIGHTS_TOTAL_VALID_FP = 'Report %s contains %s/%s valid fingerprints.'
+INSIGHTS_TOTAL_INVALID_FP = 'Report %s contains the following invalid' \
                             ' fingerprints with no canonical facts.' \
                             ' Fingerprints must contain one of the following: %s'
 INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'

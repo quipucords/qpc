@@ -54,9 +54,9 @@ QPC Upload Command:
 ^^^^^^^^^^^^^^^^^^^
 To upload a deployments report using the QPC Client you will need to run the following command::
 
-    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --test)
+    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --dev)
 
-**Note:** If you developing on a mac, you will need to use the ``--test`` argument.
+**Note:** If you developing on a mac, you will need to use the ``--dev`` argument.
 
 Troubleshoot Caching Issues:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

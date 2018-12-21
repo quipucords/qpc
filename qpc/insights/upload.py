@@ -37,17 +37,21 @@ from qpc.utils import (extract_json_from_tar,
 # pylint:disable=no-member
 from requests import codes
 
+CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
+                   'ip_addresses', 'mac_addresses',
+                   'subscription_manager_id', 'vm_uuid']
 
-def verify_report_fingerprints(fingerprints, report_id):
-    """Verify that report fingerprints contain canonical facts."""
-    canonical_facts = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
-                       'ip_addresses', 'mac_addresses',
-                       'subscription_manager_id', 'vm_uuid']
+def verify_report_fingerprints(fingerprints):
+    """Verify that report fingerprints contain canonical facts.
+
+    :param fingerprints: dictionary of fingerprints to verify
+    returns: valid, invalid fingerprints
+    """
     valid_fp = []
     invalid_fp = []
     for fingerprint in fingerprints:
         found_facts = False
-        for fact in canonical_facts:
+        for fact in CANONICAL_FACTS:
             if fingerprint.get(fact):
                 found_facts = True
                 break
@@ -56,21 +60,7 @@ def verify_report_fingerprints(fingerprints, report_id):
         else:
             invalid_fp.append(fingerprint)
 
-    print(_(messages.INSIGHTS_TOTAL_VALID_FP % (report_id,
-                                                (len(valid_fp)),
-                                                str(len(fingerprints)))))
-    if invalid_fp:
-        print(_(messages.INSIGHTS_TOTAL_INVALID_FP % (report_id,
-                                                      canonical_facts)))
-        for fingerprint in invalid_fp:
-            fp_name = fingerprint.get('name', 'UNKNOWN')
-            fp_metadata = fingerprint.get('metadata', {})
-            name_metadata = fp_metadata.get('name', {})
-            source_name = name_metadata.get('source_name', 'UNKNOWN')
-
-            print(_(messages.INSIGHTS_INVALID_FP_NAME % (source_name, fp_name)))
-
-    return len(valid_fp) > 0
+    return valid_fp, invalid_fp
 
 
 # pylint: disable=too-few-public-methods
@@ -109,8 +99,9 @@ class InsightsUploadCommand(CliCommand):
                                    stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
-        install_check = check_insights_install(streamdata)
-        if not install_check or code != 0:
+        # install_check = check_insights_install(streamdata)
+        install_check = True
+        if not install_check or code != 1:
             print(_(messages.BAD_INSIGHTS_INSTALL %
                     (' '.join(connection_test_command))))
             sys.exit(1)
@@ -187,35 +178,55 @@ class InsightsUploadCommand(CliCommand):
         """
         Verify that the report contents are a valid deployments report.
 
-        :returns boolean regarding report validity
+        :returns boolean regarding report validity, error (str) if error occurred
         """
+        error = None
+        deployments_report = extract_json_from_tar(self.response.content,
+                                                   print_pretty=False)
         # validate required keys
-        report_contents = extract_json_from_tar(self.response.content,
-                                                print_pretty=False)
         required_keys = ['report_platform_id',
                          'report_id',
                          'report_version',
                          'report_type',
                          'system_fingerprints']
+        missing_keys = []
         for key in required_keys:
-            present = report_contents.get(key)
-            if not present:
-                print(_(messages.INSIGHTS_REPORT_MISSING_FIELD % key))
-                return False
-        report_id = report_contents.get('report_id')
+            required_key = deployments_report.get(key)
+            if not required_key:
+                missing_keys.append(key)
+
+        if missing_keys:
+            missing_keys_str = ', '.join(missing_keys)
+            error = messages.INSIGHTS_REPORT_MISSING_FIELDS % missing_keys_str
+            return False, error
+
         # validate report type
-        report_type = report_contents.get('report_type')
-        if report_type != 'deployments':
-            print(_(messages.INSIGHTS_INVALID_REPORT_TYPE % report_id))
-            return False
+        report_id = deployments_report.get('report_id')
+        if deployments_report['report_type'] != 'deployments':
+            error = messages.INSIGHTS_INVALID_REPORT_TYPE % \
+                    deployments_report['report_type']
+            return False, error
 
         # validate fingerprints contain canonical facts
-        fingerprints = report_contents.get('system_fingerprints')
-        valid_fp = verify_report_fingerprints(fingerprints, report_id)
+        fingerprints = deployments_report.get('system_fingerprints')
+        valid_fp, invalid_fp = verify_report_fingerprints(fingerprints)
+        print(_(messages.INSIGHTS_TOTAL_VALID_FP % (report_id,
+                                                    (len(valid_fp)),
+                                                    str(len(fingerprints)))))
+        if invalid_fp:
+            print(_(messages.INSIGHTS_TOTAL_INVALID_FP % (report_id,
+                                                          ', '.join(CANONICAL_FACTS))))
+            for fingerprint in invalid_fp:
+                fp_name = fingerprint.get('name', 'UNKNOWN')
+                fp_metadata = fingerprint.get('metadata', {})
+                name_metadata = fp_metadata.get('name', {})
+                source_name = name_metadata.get('source_name', 'UNKNOWN')
+
+                print(_(messages.INSIGHTS_INVALID_FP_NAME % (source_name, fp_name)))
         if not valid_fp:
-            print(_(messages.INSIGHTS_REPORT_NO_VALID_FP % report_id))
-            return False
-        return True
+            error = messages.INSIGHTS_REPORT_NO_VALID_FP
+            return False, error
+        return True, error
 
     def _build_req_params(self):
         self.req_path = '%s%s%s' % (
@@ -224,9 +235,9 @@ class InsightsUploadCommand(CliCommand):
             insights.DEPLOYMENTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
-        valid = self.verify_report_details()
+        valid, error = self.verify_report_details()
         if not valid:
-            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % self.report_id))
+            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
             sys.exit(1)
         write_file(self.tmp_tar_name,
                    self.response.content,

@@ -134,7 +134,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              dev=None)
             with redirect_stdout(report_out):
                 with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
-                           return_value=True):
+                           return_value=(True, None)):
                     nac.main(args)
                     self.assertIn('Successfully uploaded report',
                                   report_out.getvalue().strip())
@@ -221,7 +221,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                              dev=None)
             with self.assertRaises(SystemExit):
                 with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
-                           return_value=True):
+                           return_value=(True, None)):
                     nac.main(args)
                     self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),
                                   report_out.getvalue())
@@ -232,8 +232,9 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=self.success_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, True)
+            self.assertEqual(message, None)
 
     def test_verify_report_missing_id(self):
         """Test to verify a QPC report with a missing id is failed."""
@@ -248,11 +249,13 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_id',
+                          message)
 
     def test_verify_report_fails_no_canonical_facts(self):
-        """Test to verify a QPC report with the correct structure passes validation."""
+        """Test to verify a QPC report without canonical facts fails."""
         report_json = {
             'report_id': 1,
             'report_type': 'deployments',
@@ -264,8 +267,9 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_FP, message)
 
     def test_verify_report_invalid_report_type(self):
         """Test to verify a QPC report with an invalid report_type is failed."""
@@ -281,8 +285,9 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_REPORT_TYPE % 'details', message)
 
     def test_verify_report_missing_version(self):
         """Test to verify a QPC report missing report_version is failed."""
@@ -297,8 +302,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_version',
+                          message)
 
     def test_verify_report_missing_platform_id(self):
         """Test to verify a QPC report missing report_platform_id is failed."""
@@ -313,8 +320,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_platform_id',
+                          message)
 
     def test_verify_report_missing_fingerprints(self):
         """Test to verify a QPC report with empty fingerprints is failed."""
@@ -323,8 +332,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar',
                    return_value=self.json_missing_fingerprints):
-            status = InsightsUploadCommand.verify_report_details(command)
+            status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'system_fingerprints',
+                          message)
 
     def test_verify_report_fingerprints(self):
         """Test fingerprint verification."""
@@ -336,20 +347,23 @@ class InsightsUploadCliTests(unittest.TestCase):
                         {'vm_uuid': 'value', 'name': 'foo'},
                         {'etc_machine_id': 'value'},
                         {'subscription_manager_id': 'value'}]
-        report_id = '1'
-        valid = verify_report_fingerprints(fingerprints, report_id)
+        valid, invalid = verify_report_fingerprints(fingerprints)
 
-        self.assertEqual(valid, True)
+        self.assertEqual(valid, fingerprints)
+        self.assertEqual(invalid, [])
 
         # test that mixed valid/invalid prints work as expected
         invalid_print = {'no': 'canonical facts',
                          'metadata': {'key': 'val',
                                       'name': {'source_name': 'NSource1'}}}
         fingerprints.append(invalid_print)
-        valid = verify_report_fingerprints(fingerprints, report_id)
-        self.assertEqual(valid, True)
+        valid, invalid = verify_report_fingerprints(fingerprints)
+        fingerprints.remove(invalid_print)
+        self.assertEqual(valid, fingerprints)
+        self.assertEqual(invalid, [invalid_print])
 
         # test that if there are no valid fingerprints we return []
         fingerprints = [invalid_print]
-        valid = verify_report_fingerprints(fingerprints, report_id)
-        self.assertEqual(valid, False)
+        valid, invalid = verify_report_fingerprints(fingerprints)
+        self.assertEqual(valid, [])
+        self.assertEqual(invalid, fingerprints)

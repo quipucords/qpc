@@ -41,6 +41,7 @@ CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
                    'ip_addresses', 'mac_addresses',
                    'subscription_manager_id', 'vm_uuid']
 
+
 def verify_report_fingerprints(fingerprints):
     """Verify that report fingerprints contain canonical facts.
 
@@ -99,9 +100,8 @@ class InsightsUploadCommand(CliCommand):
                                    stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
-        # install_check = check_insights_install(streamdata)
-        install_check = True
-        if not install_check or code != 1:
+        install_check = check_insights_install(streamdata)
+        if not install_check or code != 0:
             print(_(messages.BAD_INSIGHTS_INSTALL %
                     (' '.join(connection_test_command))))
             sys.exit(1)
@@ -180,6 +180,7 @@ class InsightsUploadCommand(CliCommand):
 
         :returns boolean regarding report validity, error (str) if error occurred
         """
+        # pylint: disable=too-many-locals
         error = None
         deployments_report = extract_json_from_tar(self.response.content,
                                                    print_pretty=False)
@@ -203,8 +204,7 @@ class InsightsUploadCommand(CliCommand):
         # validate report type
         report_id = deployments_report.get('report_id')
         if deployments_report['report_type'] != 'deployments':
-            error = messages.INSIGHTS_INVALID_REPORT_TYPE % \
-                    deployments_report['report_type']
+            error = messages.INSIGHTS_INVALID_REPORT_TYPE % deployments_report['report_type']
             return False, error
 
         # validate fingerprints contain canonical facts

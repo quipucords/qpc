@@ -61,7 +61,6 @@ class ReportDownloadTests(unittest.TestCase):
     def test_download_scan_job(self):
         """Testing download with scan job id."""
         report_out = StringIO()
-        get_scanjob_url = get_server_location()
         get_scanjob_url = get_server_location() + \
             SCAN_JOB_URI + '1'
         get_scanjob_json_data = {'id': 1, 'report_id': 1}

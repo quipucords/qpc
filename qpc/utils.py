@@ -368,13 +368,17 @@ def write_file(filename, content, binary=False):
     return result
 
 
-def extract_json_from_tar(fileobj_content):
+def extract_json_from_tar(fileobj_content, print_pretty=True):
     """Extract json data from tar.gz bytes.
 
     :param fileobj_content: BytesIo object with tarball of json dict
+    :param print_pretty: Boolean to determine whether to return pretty
+        print json (str) or normal json
     """
     tar = tarfile.open(fileobj=io.BytesIO(fileobj_content), mode='r:gz')
     json_file = tar.getmembers()[0]
     tar_info = tar.extractfile(json_file)
-    json_data = pretty_print(json.loads(tar_info.read().decode('utf-8')))
+    json_data = json.loads(tar_info.read().decode('utf-8'))
+    if print_pretty:
+        return pretty_print(json_data)
     return json_data

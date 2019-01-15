@@ -19,7 +19,7 @@ from qpc.cli import CLI
 from qpc.tests_utilities import HushUpStderr, redirect_stdout
 from qpc.utils import read_server_config, write_server_config
 
-DEFAULT_PORT = 443
+DEFAULT_PORT = 9443
 
 
 class ConfigureHostTests(unittest.TestCase):
@@ -37,17 +37,17 @@ class ConfigureHostTests(unittest.TestCase):
         # Reset server config to default ip/port
         config_out = StringIO()
         sys.argv = ['/bin/qpc', 'server', 'config',
-                    '--host', '127.0.0.1', '--port', '443']
+                    '--host', '127.0.0.1', '--port', str(DEFAULT_PORT)]
 
         with redirect_stdout(config_out):
             CLI().main()
             config = read_server_config()
             self.assertEqual(config['host'], '127.0.0.1')
-            self.assertEqual(config['port'], 443)
+            self.assertEqual(config['port'], DEFAULT_PORT)
             self.assertEqual(config_out.getvalue(),
                              messages.SERVER_CONFIG_SUCCESS % ('https',
                                                                '127.0.0.1',
-                                                               '443') + '\n')
+                                                               str(DEFAULT_PORT) + '\n')
         # Restore stderr
         sys.stderr = self.orig_stderr
 
@@ -86,7 +86,7 @@ class ConfigureHostTests(unittest.TestCase):
         CLI().main()
         config = read_server_config()
         self.assertEqual(config['host'], '127.0.0.1')
-        self.assertEqual(config['port'], 443)
+        self.assertEqual(config['port'], DEFAULT_PORT)
 
     def test_invalid_configuration(self):
         """Test reading bad JSON on cli start."""
@@ -97,7 +97,7 @@ class ConfigureHostTests(unittest.TestCase):
         CLI().main()
         config = read_server_config()
         self.assertEqual(config['host'], '127.0.0.1')
-        self.assertEqual(config['port'], 443)
+        self.assertEqual(config['port'], DEFAULT_PORT)
 
     def test_run_command_no_config(self):
         """Test running command without config."""

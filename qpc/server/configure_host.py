@@ -44,7 +44,7 @@ class ConfigureHostCommand(CliCommand):
                                  help=_(messages.SERVER_CONFIG_HOST_HELP),
                                  required=True)
         self.parser.add_argument('--port', dest='port', metavar='PORT',
-                                 type=validate_port, default=443,
+                                 type=validate_port, default=9443,
                                  help=_(messages.SERVER_CONFIG_PORT_HELP),
                                  required=False)
         self.parser.add_argument('--ssl-verify', dest='ssl_verify',

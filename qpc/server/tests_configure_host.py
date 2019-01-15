@@ -47,7 +47,7 @@ class ConfigureHostTests(unittest.TestCase):
             self.assertEqual(config_out.getvalue(),
                              messages.SERVER_CONFIG_SUCCESS % ('https',
                                                                '127.0.0.1',
-                                                               str(DEFAULT_PORT) + '\n')
+                                                               str(DEFAULT_PORT)) + '\n')
         # Restore stderr
         sys.stderr = self.orig_stderr
 

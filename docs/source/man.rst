@@ -82,7 +82,7 @@ To configure the connection to the server, supply the host address. Supplying a 
 
 ``--port=port``
 
-  Optional. Sets the port to use to connect to the server. The default is ``443``.
+  Optional. Sets the port to use to connect to the server. The default is ``9443``.
 
 
 Logging in to the server

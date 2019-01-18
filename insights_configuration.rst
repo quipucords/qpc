@@ -22,7 +22,7 @@ You will need uncomment and modify these values in the Insights Client Configura
 
 Copy files into etc directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The insights-client requires specific files to be present ```/etc/insights-client/``::
+The insights-client requires specific files to be present ``/etc/insights-client/``::
 
     cd ../insights-client
     sudo cp etc/insights-client.conf /etc/insights-client/
@@ -50,7 +50,7 @@ To upload a deployments report using the QPC Client you will need to run the fol
 
     qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --no-gpg)
 
-**Note:** If you developing on a mac, you will need to use the ``--no-gpg`` argument.
+**Note:** If you are developing on a mac, you will need to use the ``--no-gpg`` argument.
 
 Troubleshoot Caching Issues:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

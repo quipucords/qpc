@@ -585,6 +585,7 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
 
   Contains the job identifier that will be used to checked for status of a merge.
 
+
 Insights
 ________
 Use the ``qpc insights`` command to interact with Red Hat Insights.

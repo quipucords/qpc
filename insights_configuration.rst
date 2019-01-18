@@ -22,7 +22,7 @@ You will need uncomment and modify these values in the Insights Client Configura
 
 Copy files into etc directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The insights-client requires specific files to be present ``/etc/insights-client/``::
+The insights-client requires the following files to be present inside of ``/etc/insights-client/``::
 
     cd ../insights-client
     sudo cp etc/insights-client.conf /etc/insights-client/

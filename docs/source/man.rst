@@ -587,7 +587,8 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
 
 
 Insights
-________
+--------
+
 Use the ``qpc insights`` command to interact with Red Hat Insights.
 
 Uploading to Insights

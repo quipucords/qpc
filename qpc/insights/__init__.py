@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -18,4 +18,4 @@ REPORT_URI = '/api/v1/reports/'
 DEPLOYMENTS_PATH_SUFFIX = '/deployments/'
 # Note the the insights version check does not handle if versions equal
 CLIENT_VERSION = '3.0.3-1'
-CORE_VERSION = '3.0.8'
+CORE_VERSION = '3.0.71-1'

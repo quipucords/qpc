@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2018 Red Hat, Inc.
+# Copyright (c) 2017-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -308,6 +308,7 @@ INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
 INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
     ' the QPC report.  Cannot write file to %s.'
 INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
+INSIGHTS_NO_GPG_HELP = 'GNU Privacy Gaurd is not installed.'
 DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
 DOWNLOAD_NO_REPORT_FOR_REPORT_ID = 'Report %s not found.'
 DOWNLOAD_PATH_HELP = 'The output file\'s name and location. This file is ' \

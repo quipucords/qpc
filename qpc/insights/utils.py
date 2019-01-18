@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -20,21 +20,21 @@ from distutils.version import LooseVersion
 class InsightsCommands():
     """Creates insights-client commands for qpc client."""
 
-    def __init__(self, dev=False):
+    def __init__(self, no_gpg=False):
         """Set class variables.
 
         Args:
-            dev (bool): used to build dev insights commands for local use.
+            no_gpg (bool): used to build insights client command without
+            requiring GNU Privacy Guard.
         """
-        self.dev = dev
+        self.no_gpg = no_gpg
         # mime type for QPC report data for uploading to insights
         self.content_type = 'application/vnd.redhat.qpc.deployments+tgz'
 
     def build_base(self):
         """Will create a base used for creating insights commands."""
-        if self.dev:
+        if self.no_gpg:
             return ['sudo',
-                    'EGG=/etc/insights-client/rpm.egg',
                     'BYPASS_GPG=True',
                     'insights-client',
                     '--no-gpg']
@@ -63,10 +63,9 @@ class InsightsCommands():
 
 def check_insights_install(streamdata):
     """Will check stream data for failure clause."""
-    failures = ['FAILURE',
-                'command not found',
+    failures = ['command not found',
                 'No module named \'insights\'']
-    require_success = 'Connectivity tests completed successfully'
+    require_success = 'End Upload URL Connection Test: SUCCESS'
     for fail in failures:
         if fail in str(streamdata):
             return False

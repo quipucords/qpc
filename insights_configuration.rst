@@ -1,16 +1,10 @@
 Installing the Insights Client
 ------------------------------
-To work with the Insights Client, we must also install the Insights Core. To begin, create the insights directory at the same level as quipucords and clone the following repositories::
+To work with the Insights Client, we must also install the Insights Core::
 
-    git clone git@github.com:RedHatInsights/insights-core.git
     git clone git@github.com:RedHatInsights/insights-client.git
-
-Setting Up a Virtual Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The insights-client will need to be installed inside of the same virtual environment as the QPC client::
-
-    cd ../location/of/qpc/client
-    pipenv shell
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > /var/lib/insights/last_stable.egg.asc
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > /var/lib/insights/last_stable.egg
 
 Edit the Insights Client Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,39 +18,37 @@ You will need uncomment and modify these values in the Insights Client Configura
 
 **Note:** The username and password is based off your login for https://accesss.redhat.com/
 
-Building with Insights Client on Mac
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
+Copy files into etc directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The insights-client requires specific files to be present ```/etc/insights-client/``::
 
     cd ../insights-client
-    git fetch origin os-x-test && git checkout os-x-test
-    sudo sh lay-the-eggs-osx.sh
+    sudo cp etc/insights-client.conf /etc/insights-client/
+    sudo cp etc/cert-api.access.redhat.com.pem /etc/insights-client/
 
-Building with Insights Client on RHEL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-After configuration is setup, you will need to build the insights client::
-
-    sudo sh lay-the-eggs.sh
+**Note:** You may need to create the ``/etc/insights-client`` directory.
 
 Test Connection Command:
 ^^^^^^^^^^^^^^^^^^^^^^^^
 To check your connection status using the Insight Clients you will need to run the following command::
 
-    sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --test-connection
+    sudo BYPASS_GPG=True insights-client --no-gpg --test-connection
 
 Insights Upload Command:
 ^^^^^^^^^^^^^^^^^^^^^^^^
 To upload a tar.gz file using the Insight Clients you will need to run the following command::
 
-    sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.test+tgz
+    sudo BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.test+tgz
+
+**WARNING:** If a ``machine-id`` is not present in the ``/etc/insights-client`` directory, your first upload attempt will fail. However, the ``machine-id`` will be created for you by the insights client, so your second attempt will work.
 
 QPC Upload Command:
 ^^^^^^^^^^^^^^^^^^^
 To upload a deployments report using the QPC Client you will need to run the following command::
 
-    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --dev)
+    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --no-gpg)
 
-**Note:** If you developing on a mac, you will need to use the ``--dev`` argument.
+**Note:** If you developing on a mac, you will need to use the ``--no-gpg`` argument.
 
 Troubleshoot Caching Issues:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64,7 +56,4 @@ If you run into caching issues while working with the insights client, you can d
 
     cd /etc/insights-client/
     rm insights-client.conf
-    rm rpm.egg
-    rm rpm.egg.asc
-
-**Note:** After removing the previous rpm, you will need to build the insights client.
+    sudo cp etc/insights-client.conf /etc/insights-client/

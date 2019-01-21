@@ -32,7 +32,7 @@ You will need uncomment and modify these values in the Insights Client Configura
 **Note:** The username and password is based off your login for https://accesss.redhat.com/
 
 Building with Insights Client on Mac
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
   cd ../insights-client
   git stash

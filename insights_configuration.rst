@@ -5,9 +5,9 @@ To work with the Insights Client, we must also install the Insights Core. To beg
     git clone git@github.com:RedHatInsights/insights-client.git
     git clone git@github.com:RedHatInsights/insights-core.git
     curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
-    mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+    sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
     curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
-    mv last_stable.egg /var/lib/insights/last_stable.egg
+    sudo mv last_stable.egg /var/lib/insights/last_stable.egg
 
 **Note:** You may need to create the ``/var/lib/insights`` structure.
 

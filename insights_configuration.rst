@@ -34,6 +34,7 @@ You will need uncomment and modify these values in the Insights Client Configura
 Building with Insights Client on Mac
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
+
   cd ../insights-client
   git stash
   git fetch origin os-x-test && git checkout os-x-test
@@ -44,7 +45,7 @@ Building with Insights Client on RHEL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 After configuration is setup, you will need to build the insights client::
 
-     sudo sh lay-the-eggs.sh
+    sudo sh lay-the-eggs.sh
 
 Test Connection Command:
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -74,6 +75,7 @@ If you run into caching issues while working with the insights client, you can d
 
     cd /etc/insights-client/
     rm insights-client.conf
-    sudo cp etc/insights-client.conf /etc/insights-client/
     rm rpm.egg
     rm rpm.egg.asc
+
+**Note:** After removing the previous rpm, you will need to build the insights client.

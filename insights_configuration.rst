@@ -23,6 +23,7 @@ Edit the Insights Client Configuration
 You will need uncomment and modify these values in the Insights Client Configuration in order to be authorized to upload::
 
     cd insights-client
+    git fetch origin os-x-test && git checkout os-x-test
     vim etc/insights-client.conf
     auto_config=False
     username=<your_username>
@@ -36,9 +37,6 @@ Building with Insights Client on Mac
 After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
 
   cd ../insights-client
-  git stash
-  git fetch origin os-x-test && git checkout os-x-test
-  git stash pop
   sudo sh lay-the-eggs-osx.sh
 
 Building with Insights Client on RHEL

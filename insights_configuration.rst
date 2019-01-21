@@ -1,12 +1,21 @@
 Installing the Insights Client
 ------------------------------
-To work with the Insights Client, we must also install the Insights Core::
+To work with the Insights Client, we must also install the Insights Core. To begin, create the insights directory at the same level as quipucords and clone the following repositories::
 
     git clone git@github.com:RedHatInsights/insights-client.git
+    git clone git@github.com:RedHatInsights/insights-core.git
     curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
-    mv last_stable.egg.asc /var/lib/insights/
-    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg
-    mv last_stable.egg /var/lib/insights/
+    mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
+    mv last_stable.egg /var/lib/insights/last_stable.egg
+
+**Note:** You may need to create the ``/var/lib/insights`` structure.
+
+Setting Up a Virtual Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The insights-client will need to be installed inside of the same virtual environmnet as the QPC client::
+  cd ../location/of/qpc/client
+  pipenv shell
 
 Edit the Insights Client Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -17,18 +26,18 @@ You will need uncomment and modify these values in the Insights Client Configura
     auto_config=False
     username=<your_username>
     password=<your_password>
+    http_timeout=20
 
 **Note:** The username and password is based off your login for https://accesss.redhat.com/
 
-Copy files into etc directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The insights-client requires the following files to be present inside of ``/etc/insights-client/``::
-
-    cd ../insights-client
-    sudo cp etc/insights-client.conf /etc/insights-client/
-    sudo cp etc/cert-api.access.redhat.com.pem /etc/insights-client/
-
-**Note:** You may need to create the ``/etc/insights-client`` directory.
+Building with Insights Client on Mac
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
+  cd ../insights-client
+  git stash
+  git fetch origin os-x-test && git checkout os-x-test
+  git stash pop
+  sudo sh lay-the-eggs-osx.sh
 
 Test Connection Command:
 ^^^^^^^^^^^^^^^^^^^^^^^^

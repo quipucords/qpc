@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -12,8 +12,10 @@
 
 import unittest
 
-from qpc.insights.utils import (check_insights_install,
-                                check_insights_version)
+from qpc.insights.utils import (InsightsCommands,
+                                check_insights_install,
+                                check_insights_version,
+                                check_successful_upload)
 
 
 class InsightsUploadCliTests(unittest.TestCase):
@@ -72,3 +74,17 @@ class InsightsUploadCliTests(unittest.TestCase):
                                             '3.0.0-4',
                                             '3.0.8')
             self.assertNotIn('client', result.keys())
+
+    def test_no_gpg_base_command_build(self):
+        """Test if no_gpg flag adds required data to insights command."""
+        init_insights = InsightsCommands(no_gpg=True)
+        command = init_insights.build_base()
+        no_gpg_required = ['BYPASS_GPG=True', '--no-gpg']
+        for item in no_gpg_required:
+            self.assertIn(item, command)
+
+    def test_unsuccessful_upload_return(self):
+        """Test is unsuccessful upload returns False."""
+        unsuccessful_msg = b'Report not uploaded.'
+        result = check_successful_upload(unsuccessful_msg)
+        self.assertEqual(result, False)

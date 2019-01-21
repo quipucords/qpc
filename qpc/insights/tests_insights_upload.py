@@ -17,7 +17,7 @@ from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
 
 from qpc import messages
-from qpc.insights import REPORT_URI
+from qpc.insights import CLIENT_VERSION, REPORT_URI
 from qpc.insights.upload import InsightsUploadCommand, verify_report_fingerprints
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
@@ -77,7 +77,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
-                             no_gpg=None)
+                             no_gpg=True)
             with redirect_stdout(report_out):
                 with patch('qpc.insights.upload.extract_json_from_tar',
                            return_value=self.success_json):
@@ -225,6 +225,28 @@ class InsightsUploadCliTests(unittest.TestCase):
                     nac.main(args)
                     self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),
                                   report_out.getvalue())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_outdated_version_response(self, subprocess):
+        """Testing error response with unexpected response version."""
+        # pylint:disable=line-too-long
+        subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.1\nCore: 3.0.72-1\n', b'')]  # noqa: E501
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=400, json=None)
+            nac = InsightsUploadCommand(SUBPARSER)
+            args = Namespace(report_id='1',
+                             scan_job_id=None,
+                             no_gpg=None)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    nac.main(args)
+            cli_error_msg = (messages.BAD_CLIENT_VERSION %
+                             ('3.0.1', CLIENT_VERSION))
+            self.assertIn(cli_error_msg, report_out.getvalue())
 
     def test_verify_report_success(self):
         """Test to verify a QPC report with the correct structure passes validation."""

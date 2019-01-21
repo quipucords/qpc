@@ -15,8 +15,8 @@ Setting Up a Virtual Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The insights-client will need to be installed inside of the same virtual environmnet as the QPC client::
 
-  cd ../location/of/qpc/client
-  pipenv shell
+    cd ../location/of/qpc/client
+    pipenv shell
 
 Edit the Insights Client Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

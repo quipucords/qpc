@@ -40,6 +40,12 @@ After configuration is setup, you will need to build the insights client. For QP
   git stash pop
   sudo sh lay-the-eggs-osx.sh
 
+Building with Insights Client on RHEL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+After configuration is setup, you will need to build the insights client::
+
+     sudo sh lay-the-eggs.sh
+
 Test Connection Command:
 ^^^^^^^^^^^^^^^^^^^^^^^^
 To check your connection status using the Insight Clients you will need to run the following command::
@@ -69,3 +75,5 @@ If you run into caching issues while working with the insights client, you can d
     cd /etc/insights-client/
     rm insights-client.conf
     sudo cp etc/insights-client.conf /etc/insights-client/
+    rm rpm.egg
+    rm rpm.egg.asc

@@ -85,8 +85,8 @@ To upload a deployments report using the QPC Client you will need to run the fol
 
 **Note:** If you are developing on a mac, you will need to use the ``--no-gpg`` argument.
 
-Helpful Insights Debug Command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Helpful Insights Debug Commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To check your connection status using the Insight Clients you will need to run the following command::
 
     sudo BYPASS_GPG=True insights-client --no-gpg --test-connection

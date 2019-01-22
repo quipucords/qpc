@@ -98,9 +98,8 @@ class InsightsUploadCommand(CliCommand):
         process = subprocess.Popen(connection_test_command,
                                    stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
-        code = process.returncode
         install_check = check_insights_install(streamdata)
-        if not install_check or code != 0:
+        if not install_check:
             print(_(messages.BAD_INSIGHTS_INSTALL %
                     (' '.join(connection_test_command))))
             sys.exit(1)

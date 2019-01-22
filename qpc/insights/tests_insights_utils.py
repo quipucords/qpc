@@ -48,13 +48,6 @@ class InsightsUploadCliTests(unittest.TestCase):
         test = check_insights_install(no_module_return)
         self.assertEqual(test, False)
 
-    def test_check_insights_install_failed_connection(self):
-        """Testing error response if bad connection."""
-        # pylint:disable=line-too-long
-        bad_connection_return = 'Running connection test...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 401\nHTTP Status Text: Unauthorized\nHTTP Response Text: \nConnection failed\n=== End Upload URL Connection Test: FAILURE ===\n\n=== Begin API URL Connection Test ===\nHTTP  Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed with some errors\nSee /var/log/insights-client/insights-client.log for more details.\n'  # noqa: E501
-        test = check_insights_install(bad_connection_return)
-        self.assertEqual(test, False)
-
     def test_check_insights_version_failed(self):
         """Testing failed response with out of date client versions."""
         old_versions = ['3.0.0-4', '3.0.2-2', '3.0.1-5']

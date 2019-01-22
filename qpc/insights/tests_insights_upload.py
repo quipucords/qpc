@@ -160,28 +160,6 @@ class InsightsUploadCliTests(unittest.TestCase):
                           ('1'), report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
-    def test_unexpected_response_install(self, subprocess):
-        """Testing error response with unexpected response install."""
-        subprocess.return_value.communicate.return_value =\
-            (None, b'Unknown Response')
-        subprocess.return_value.returncode = 0
-        report_out = StringIO()
-        get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=400, json=None)
-            nac = InsightsUploadCommand(SUBPARSER)
-            args = Namespace(report_id='1',
-                             scan_job_id=None,
-                             no_gpg=None)
-            with self.assertRaises(SystemExit):
-                with redirect_stdout(report_out):
-                    nac.main(args)
-            self.assertIn(messages.BAD_INSIGHTS_INSTALL %
-                          ('sudo insights-client --test-connection'),
-                          report_out.getvalue())
-
-    @patch('qpc.insights.upload.subprocess.Popen')
     def test_unexpected_response_version(self, subprocess):
         """Testing error response with unexpected response version."""
         # pylint:disable=line-too-long

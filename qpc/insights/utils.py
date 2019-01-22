@@ -65,13 +65,10 @@ def check_insights_install(streamdata):
     """Will check stream data for failure clause."""
     failures = ['command not found',
                 'No module named \'insights\'']
-    require_success = 'End Upload URL Connection Test: SUCCESS'
     for fail in failures:
         if fail in str(streamdata):
             return False
-    if require_success in str(streamdata):
-        return True
-    return False
+    return True
 
 
 def check_successful_upload(streamdata):

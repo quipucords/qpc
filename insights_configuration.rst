@@ -1,9 +1,9 @@
 Installing the Insights Client
 ------------------------------
-To work with the Insights Client, we must also install the Insights Core. To begin, create the insights directory at the same level as quipucords and clone the following repositories::
+The Insights Client requires the installation of the Insights Core. To begin, create the insights directory at the same level as quipucords and clone the following repositories::
 
-    git clone git@github.com:RedHatInsights/insights-core.git
     git clone git@github.com:RedHatInsights/insights-client.git
+    git clone git@github.com:RedHatInsights/insights-core.git
 
 Setting Up a Virtual Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -11,25 +11,45 @@ The insights-client will need to be installed inside of the same virtual environ
 
     cd ../location/of/qpc/client
     pipenv shell
+    make install
 
-Edit the Insights Client Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You will need uncomment and modify these values in the Insights Client Configuration in order to be authorized to upload::
+Essential Preparation Steps
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
 
     cd insights-client
-    vim etc/insights-client.conf
+    git fetch origin os-x-test && git checkout os-x-test
+
+**VPN ACCESS:**
+
+**Ensure that you are connected to the VPN before continuing to the next stage.**
+
+Insights Client Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need to uncomment, add, or modify the following values in the file located at ``insights-client/etc/insights-client.conf`` in order to be authorized to upload. The ``<your_username>`` and ``<your_password>`` are variables based off your login for https://access.redhat.com/.
+
+**CI Configuration**::
+
+    auto_config=False
+    username=<your_username>
+    password=redhat
+    http_timeout=20
+    base_url=api.access.ci.itop.redhat.com/r/insights
+    cert_verify=False
+    auto_update=False
+
+**Production Configuration**::
+
     auto_config=False
     username=<your_username>
     password=<your_password>
-
-**Note:** The username and password is based off your login for https://accesss.redhat.com/
+    http_timeout=20
 
 Building with Insights Client on Mac
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-After configuration is setup, you will need to build the insights client. For QPC to access the Insights Client locally on Mac, we need to checkout the `os-x-test` branch::
+After configuration is setup, you will need to build the insights client::
 
     cd ../insights-client
-    git fetch origin os-x-test && git checkout os-x-test
     sudo sh lay-the-eggs-osx.sh
 
 Building with Insights Client on RHEL
@@ -38,33 +58,47 @@ After configuration is setup, you will need to build the insights client::
 
     sudo sh lay-the-eggs.sh
 
-Test Connection Command:
-^^^^^^^^^^^^^^^^^^^^^^^^
-To check your connection status using the Insight Clients you will need to run the following command::
+Download Insights Core RPM
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Download the last stable version of the insights core::
 
-    sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --test-connection
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
+    sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
+    sudo mv last_stable.egg /var/lib/insights/last_stable.egg
 
-Insights Upload Command:
-^^^^^^^^^^^^^^^^^^^^^^^^
+**Note:** You may need to create the ``/var/lib/insights`` structure.
+
+Insights Upload Command
+^^^^^^^^^^^^^^^^^^^^^^^
 To upload a tar.gz file using the Insight Clients you will need to run the following command::
 
-    sudo EGG=/etc/insights-client/rpm.egg BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.test+tgz
+    sudo BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.deployments+tgz
 
-QPC Upload Command:
-^^^^^^^^^^^^^^^^^^^
+**WARNING:** If a ``machine-id`` is not present in the ``/etc/insights-client`` directory, your first upload attempt will fail. However, the ``machine-id`` will be created for you by the insights client, so your second attempt will work.
+
+QPC Upload Command
+^^^^^^^^^^^^^^^^^^
 To upload a deployments report using the QPC Client you will need to run the following command::
 
-    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --dev)
+    qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --no-gpg)
 
-**Note:** If you developing on a mac, you will need to use the ``--dev`` argument.
+**Note:** If you are developing on a mac, you will need to use the ``--no-gpg`` argument.
 
-Troubleshoot Caching Issues:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you run into caching issues while working with the insights client, you can delete the previous rpm that was created by running the following commands::
+Helpful Insights Debug Commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To check your connection status using the Insight Clients you will need to run the following command::
 
-    cd /etc/insights-client/
-    rm insights-client.conf
-    rm rpm.egg
-    rm rpm.egg.asc
+    sudo BYPASS_GPG=True insights-client --no-gpg --test-connection
 
-**Note:** After removing the previous rpm, you will need to build the insights client.
+To check the version of your insights-client and insights core you will need to run::
+
+    sudo BYPASS_GPG=True insights-client --no-gpg --version --debug
+
+Clean Up
+^^^^^^^^
+If you make any changes to your configuraiton, insights client, or insights core in order to prevent caching issues you will need to run the following commands::
+
+    sudo rm -rf /etc/insights-client/* && sudo rm -rf /var/lib/insights/*
+
+**Note:** After removing these files, you will need to rebuild the insights client egg & download the insights core again.

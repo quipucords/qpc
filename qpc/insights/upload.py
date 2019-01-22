@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -17,7 +17,6 @@ import os
 import subprocess
 import sys
 import time
-from argparse import SUPPRESS
 
 import qpc.insights as insights
 from qpc import messages, scan
@@ -87,8 +86,8 @@ class InsightsUploadCommand(CliCommand):
                               metavar='SCAN_JOB_ID',
                               help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
 
-        self.parser.add_argument('--dev', dest='dev', action='store_true',
-                                 help=SUPPRESS)
+        self.parser.add_argument('--no-gpg', dest='no_gpg', action='store_true',
+                                 help=_(messages.INSIGHTS_NO_GPG_HELP))
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
         self.insights_command = None
@@ -99,9 +98,8 @@ class InsightsUploadCommand(CliCommand):
         process = subprocess.Popen(connection_test_command,
                                    stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
-        code = process.returncode
         install_check = check_insights_install(streamdata)
-        if not install_check or code != 0:
+        if not install_check:
             print(_(messages.BAD_INSIGHTS_INSTALL %
                     (' '.join(connection_test_command))))
             sys.exit(1)
@@ -156,8 +154,8 @@ class InsightsUploadCommand(CliCommand):
             print_scan_job_message = True
         else:
             self.report_id = self.args.report_id
-        if self.args.dev:
-            self.insights_command = InsightsCommands(dev=True)
+        if self.args.no_gpg:
+            self.insights_command = InsightsCommands(no_gpg=True)
         else:
             self.insights_command = InsightsCommands()
         self._check_insights_install()

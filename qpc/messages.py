@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2018 Red Hat, Inc.
+# Copyright (c) 2017-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -275,7 +275,7 @@ LOGOUT_SUCCESS = 'Logged out.'
 
 NEXT_RESULTS = 'Press enter to see the next set of results.'
 BAD_INSIGHTS_INSTALL = 'Insights installation check failed. Checked if '\
-    'insights was installed and configured with command "%s"'
+    'Insights was installed and configured with command "%s"'
 INSIGHTS_UPLOAD_REPORT = 'Uploading report %s to Insights service.'
 BAD_INSIGHTS_UPLOAD = 'Failed to upload report %s to Insights.'\
     ' Attempted to upload report with command "%s"'
@@ -294,20 +294,21 @@ INSIGHTS_TOTAL_INVALID_FP = 'Report %s contains the following invalid' \
 INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
-BAD_CORE_VERSION = 'Insights version check failed. Your insights-core' \
+BAD_CORE_VERSION = 'Insights version check failed. Your Insights core' \
     'version (%s) does not meet the QPC requirements of %s or greater.'
-BAD_CLIENT_VERSION = 'Insights version check failed. Your insights-client' \
+BAD_CLIENT_VERSION = 'Insights version check failed. Your Insights client' \
     'version (%s) does not meet the QPC requirements of %s or greater.'
-CHECK_VERSION = 'You can check your insights version with this insights '\
+CHECK_VERSION = 'You can check your Insights version with this Insights '\
     'client command: (%s).'
 ERROR_INSIGHTS_VERSION = \
-    'An error occurred while trying to retrieve the insights versions. %s'
+    'An error occurred while trying to retrieve the Insights versions. %s'
 INSIGHTS_IS_VERIFIED = 'Insights is installed and properly configured.'
 INSIGHTS_RETRIEVE_REPORT = 'Retrieving report %s.'
 INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
 INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
     ' the QPC report.  Cannot write file to %s.'
 INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
+INSIGHTS_NO_GPG_HELP = 'Upload to Insights without GNU Privacy Guard.'
 DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
 DOWNLOAD_NO_REPORT_FOR_REPORT_ID = 'Report %s not found.'
 DOWNLOAD_PATH_HELP = 'The output file\'s name and location. This file is ' \

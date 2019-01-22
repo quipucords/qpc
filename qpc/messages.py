@@ -298,7 +298,7 @@ BAD_CORE_VERSION = 'Insights version check failed. Your insights-core' \
     'version (%s) does not meet the QPC requirements of %s or greater.'
 BAD_CLIENT_VERSION = 'Insights version check failed. Your insights-client' \
     'version (%s) does not meet the QPC requirements of %s or greater.'
-CHECK_VERSION = 'You can check your insights version with this insights '\
+CHECK_VERSION = 'You can check your Insights version with this insights '\
     'client command: (%s).'
 ERROR_INSIGHTS_VERSION = \
     'An error occurred while trying to retrieve the insights versions. %s'

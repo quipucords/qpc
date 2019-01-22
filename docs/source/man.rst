@@ -549,6 +549,24 @@ For example, the raw facts of a scan that includes both network and vcenter sour
 
   Required. Path to a file location where the report data is saved.
 
+Downloading all Reports
+~~~~~~~~~~~~~~~~~~~~~~~
+The ``qpc report download`` command downloads all reports as a tar.gz file.  The report tar.gz file contains both the details and deployments reports in both their JSON and CSV formats.
+
+**qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
+
+``--scan-job=scan_job_identifier``
+
+  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+
+``--report=report_identifier``
+
+  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+
+``--output-file=path``
+
+  Required. Path to a file location where the report data is saved.
+
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The ``qpc report merge`` command returns the identifier of the report that is created. You can use this identifier and the ``qpc report`` command with the ``details`` or ``deployments`` subcommands to generate a report from the merged results.

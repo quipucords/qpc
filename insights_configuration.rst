@@ -26,7 +26,7 @@ For QPC to access the Insights Client locally on Mac, we need to checkout the `o
 
 Insights Client Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You will need uncomment and modify these values in the Insights Client Configuration (``insights-client/etc/insights-client.conf``) in order to be authorized to upload. The ``<your_username>`` and ``<your_password>`` are variables based off your login for https://access.redhat.com/.
+You will need to uncomment, add, or modify the following values in the file located at ``insights-client/etc/insights-client.conf`` in order to be authorized to upload. The ``<your_username>`` and ``<your_password>`` are variables based off your login for https://access.redhat.com/.
 
 **CI Configuration**::
 

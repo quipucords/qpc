@@ -86,6 +86,32 @@ class InsightsUploadCliTests(unittest.TestCase):
                                   report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
+    def test_bad_insights_upload(self, subprocess):
+        """Testing response with a vaild report id."""
+        # pylint:disable=line-too-long
+        failed_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.72-1\n', b''), (None, b'failed to upload')]  # noqa: E501
+        subprocess.return_value.communicate.side_effect = failed_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        buffer_content = create_tar_buffer([self.success_json])
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = InsightsUploadCommand(SUBPARSER)
+            args = Namespace(report_id='1',
+                             scan_job=None,
+                             no_gpg=True)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    with patch('qpc.insights.upload.extract_json_from_tar',
+                               return_value=self.success_json):
+                        nac.main(args)
+                        self.assertIn(messages.BAD_INSIGHTS_UPLOAD,
+                                      report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_invalid_report(self, subprocess):
         """Testing response with an invaild report id."""
         subprocess.return_value.communicate.side_effect = self.success_effect
@@ -224,6 +250,28 @@ class InsightsUploadCliTests(unittest.TestCase):
                     nac.main(args)
             cli_error_msg = (messages.BAD_CLIENT_VERSION %
                              ('3.0.1', CLIENT_VERSION))
+            self.assertIn(cli_error_msg, report_out.getvalue())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_cmd_not_found_response(self, subprocess):
+        """Testing error response with unexpected response version."""
+        subprocess.return_value.communicate.side_effect = \
+            [(None, b'insights-client: command not found')]
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=400, json=None)
+            nac = InsightsUploadCommand(SUBPARSER)
+            args = Namespace(report_id='1',
+                             scan_job_id=None,
+                             no_gpg=None)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    nac.main(args)
+            cli_error_msg = (messages.BAD_INSIGHTS_INSTALL %
+                             ('sudo insights-client --test-connection'))
             self.assertIn(cli_error_msg, report_out.getvalue())
 
     def test_verify_report_success(self):

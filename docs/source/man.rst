@@ -565,7 +565,7 @@ The ``qpc report download`` command downloads all reports as a tar.gz file.  The
 
 ``--output-file=path``
 
-  Required. Path to a file location where the report data is saved.
+  Required. Path to a file location where the report data is saved.  File extension must be tar.gz.
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~

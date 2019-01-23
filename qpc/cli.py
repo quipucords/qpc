@@ -17,7 +17,7 @@ import sys
 from argparse import ArgumentParser
 
 
-from qpc import (cred, insights,
+from qpc import (cred,
                  messages, report,
                  scan, server, source)
 from qpc.cred.commands import (CredAddCommand,
@@ -25,7 +25,6 @@ from qpc.cred.commands import (CredAddCommand,
                                CredEditCommand,
                                CredListCommand,
                                CredShowCommand,)
-from qpc.insights.commands import (InsightsUploadCommand)
 from qpc.report.commands import (DeprecatedReportDetailCommand,
                                  DeprecatedReportSummaryCommand,
                                  ReportDeploymentsCommand,
@@ -112,8 +111,6 @@ class CLI():
                               ReportMergeStatusCommand,
                               DeprecatedReportSummaryCommand,
                               DeprecatedReportDetailCommand])
-        self._add_subcommand(insights.SUBCOMMAND,
-                             [InsightsUploadCommand])
         ensure_data_dir_exists()
         ensure_config_dir_exists()
 

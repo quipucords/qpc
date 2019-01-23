@@ -318,4 +318,4 @@ DOWNLOAD_SUCCESSFULLY_WRITTEN = 'Report %s successfully written to %s.'
 DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'
 
 SERVER_TOO_OLD_FOR_CLI = 'qpc CLI requires a minimum server version of %s.  '\
-    'Upgrade your server to %s.  Server is currently at version %s.'
+    'Upgrade your server to %s or greater.  Server is currently at version %s.'

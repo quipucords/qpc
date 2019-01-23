@@ -56,7 +56,7 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
-* Wed Jan 23 2018 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
+* Wed Jan 23 2019 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
 - Add deployment report verification to qpc insights upload command. <aaiken@redhat.com>
 - Add qpc insights commands. <cmyers@redhat.com>
 - Change qpc server default port to 9443. <cmyers@redhat.com>

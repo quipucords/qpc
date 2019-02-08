@@ -252,7 +252,7 @@ class ReportInsightsTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err = (messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
+                err = (messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID %
                        1)
                 self.assertEqual(report_out.getvalue().strip(), err)
 

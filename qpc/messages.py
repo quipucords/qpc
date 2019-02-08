@@ -202,11 +202,15 @@ REPORT_SJS_DO_NOT_EXIST = 'The following scan jobs do not exist: %s.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ = \
     'No deployments report available for scan job %s.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID = \
-    'Report %s does not exist.'
+    'Deployments report %s does not exist.'
 REPORT_NO_DETAIL_REPORT_FOR_SJ = \
     'No report detail available for scan job %s.'
 REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID = \
     'No report detail available for report id %s.'
+REPORT_NO_INSIGHTS_REPORT_FOR_SJ = \
+    'No insights report available for scan job %s.'
+REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID = \
+    'Insights report %s does not exist.'
 REPORT_OUTPUT_CANNOT_BE_EMPTY = '%s cannot be empty string.'
 REPORT_OUTPUT_IS_A_DIRECTORY = '%s %s was a directory.'
 REPORT_DIRECTORY_DOES_NOT_EXIST = \

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -13,8 +13,9 @@
 
 SUBCOMMAND = 'report'
 
-DEPLOYMENTS = 'deployments'
 DETAILS = 'details'
+DEPLOYMENTS = 'deployments'
+INSIGHTS = 'insights'
 MERGE = 'merge'
 MERGE_STATUS = 'merge-status'
 DOWNLOAD = 'download'
@@ -26,4 +27,5 @@ DETAIL = 'detail'
 REPORT_URI = '/api/v1/reports/'
 DETAILS_PATH_SUFFIX = '/details/'
 DEPLOYMENTS_PATH_SUFFIX = '/deployments/'
+INSIGHTS_PATH_SUFFIX = '/insights/'
 ASYNC_MERGE_URI = '/api/v1/reports/merge/jobs/'

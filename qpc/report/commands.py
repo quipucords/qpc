@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -17,5 +17,6 @@ from qpc.report.deprecated_detail import DeprecatedReportDetailCommand
 from qpc.report.details import ReportDetailsCommand
 from qpc.report.merge import ReportMergeCommand
 from qpc.report.download import ReportDownloadCommand
+from qpc.report.insights import ReportInsightsCommand
 from qpc.report.merge_status import ReportMergeStatusCommand
 from qpc.report.deprecated_summary import DeprecatedReportSummaryCommand

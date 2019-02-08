@@ -549,6 +549,25 @@ For example, the raw facts of a scan that includes both network and vcenter sour
 
   Required. Path to a file location where the report data is saved.
 
+Viewing the Insights Report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``qpc report insights`` command generates a report that contains the hosts to be uploaded to the subscription insights service. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
+
+**qpc report insights (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
+
+``--scan-job=scan_job_identifier``
+
+  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+
+``--report=report_identifier``
+
+  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+
+``--output-file=path``
+
+  Required. Path to a file location where the report data is saved.
+
+
 Downloading all Reports
 ~~~~~~~~~~~~~~~~~~~~~~~
 The ``qpc report download`` command downloads all reports as a tar.gz file.  The report tar.gz file contains both the details and deployments reports in both their JSON and CSV formats.

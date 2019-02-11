@@ -57,7 +57,8 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 
 %changelog
 * Fri Feb 8 2019 Kevan Holdaway <kholdawa@redhat.com> 0.0.47-1
-- Add insights report download to qpc. <kholdawa@redhat.com>
+- Add qpc report insights command to qpc. <kholdawa@redhat.com>
+- Update qpc insights upload command to use new QPC Insights report format. <kholdawa@redhat.com>
 * Wed Jan 23 2019 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
 - Add deployment report verification to qpc insights upload command. <aaiken@redhat.com>
 - Add qpc insights commands. <cmyers@redhat.com>

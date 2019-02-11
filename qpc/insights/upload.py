@@ -231,7 +231,7 @@ class InsightsUploadCommand(CliCommand):
         self.req_path = '%s%s%s' % (
             insights.REPORT_URI,
             str(self.report_id),
-            insights.DEPLOYMENTS_PATH_SUFFIX)
+            insights.INSIGHTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
         valid, error = self.verify_report_details()

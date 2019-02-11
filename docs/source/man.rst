@@ -630,7 +630,7 @@ Use the ``qpc insights`` command to interact with Red Hat Insights.
 
 Uploading to Insights
 ~~~~~~~~~~~~~~~~~~~~~
-The ``qpc insights upload`` command can be used to upload a deployments report to Red Hat Insights. You can upload a report to Insights using the associated report identifier or scan job identifier for the scan that is used to generate the report.
+The ``qpc insights upload`` command can be used to upload an QPC Insights report to Red Hat Insights. You can upload a report to Insights using the associated report identifier or scan job identifier for the scan that is used to generate the report.
 
 **qpc insights upload (--scan-job** *scan_job_identifier* **|** **--report** *report_identifiers* **|** **--no-gpg)**
 
@@ -640,11 +640,11 @@ The ``qpc insights upload`` command can be used to upload a deployments report t
 
 ``--report=report_identifier``
 
-  Contains the report identifier that is used to generate the deployments report.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier that is used to generate the QPC Insights report.  Mutually exclusive with the ``--scan-job`` option.
 
 ``--no-gpg``
 
-  Uploads the deployments report without requiring the presence of GNU Privacy Guard.
+  Uploads the QPC Insights report without requiring the presence of GNU Privacy Guard.
 
 
 Options for All Commands

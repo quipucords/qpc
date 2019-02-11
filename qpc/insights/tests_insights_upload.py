@@ -30,6 +30,7 @@ PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
+# pylint: disable=too-many-public-methods
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the scan job commands for qpc."""
 
@@ -307,7 +308,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'hosts': [{'key': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
@@ -334,6 +335,57 @@ class InsightsUploadCliTests(unittest.TestCase):
             status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
             self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_HOST, message)
+
+    def test_verify_report_fails_not_dict(self):
+        """Test to verify a QPC report with not dict."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': ['foo']}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+
+    def test_verify_report_fails_invalid_dict_key_not_str(self):
+        """Test to verify a QPC report with dict not str key."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': {1: {'name': 'value'}}}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+
+    def test_verify_report_fails_invalid_dict_value_not_dict(self):
+        """Test to verify a QPC report with dict not dict value."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce31b': ['name', 'value']}}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
 
     def test_verify_report_invalid_report_type(self):
         """Test to verify a QPC report with an invalid report_type is failed."""

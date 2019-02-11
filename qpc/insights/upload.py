@@ -208,6 +208,20 @@ class InsightsUploadCommand(CliCommand):
 
         # validate hosts contain canonical facts
         hosts = insights_report.get('hosts')
+        if not hosts or not isinstance(hosts, dict):
+            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
+            return False, error
+
+        invalid_host_dict_format = False
+        for host_id, host in hosts.items():
+            if not isinstance(host_id, str) or not isinstance(host, dict):
+                invalid_host_dict_format = True
+                break
+
+        if invalid_host_dict_format:
+            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
+            return False, error
+
         valid_hosts, invalid_hosts = verify_report_hosts(hosts)
         print(_(messages.INSIGHTS_TOTAL_VALID_HOST % (report_id,
                                                       (len(valid_hosts)),

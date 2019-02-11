@@ -287,7 +287,7 @@ INVALID_REPORT_INSIGHTS_UPLOAD = 'Not attempting to upload report %s to Insights
                                  ' because %s'
 INSIGHTS_REPORT_MISSING_FIELDS = 'the report is missing required fields: %s.'
 INSIGHTS_INVALID_REPORT_TYPE = 'the report has an invalid report_type: %s.' \
-                               ' Must be a Insights report.'
+                               ' Must be a QPC Insights report.'
 INSIGHTS_REPORT_NO_VALID_HOST = 'the report contained no valid hosts.'
 INSIGHTS_INVALID_HOST_NAME = 'Host produced by source "%s" from system' \
     ' "%s" is missing all canonical facts.'

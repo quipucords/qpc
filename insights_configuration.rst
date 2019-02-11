@@ -73,13 +73,13 @@ Insights Upload Command
 ^^^^^^^^^^^^^^^^^^^^^^^
 To upload a tar.gz file using the Insight Clients you will need to run the following command::
 
-    sudo BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.deployments+tgz
+    sudo BYPASS_GPG=True insights-client --no-gpg --payload=test.tar.gz --content-type=application/vnd.redhat.qpc.insights+tgz
 
 **WARNING:** If a ``machine-id`` is not present in the ``/etc/insights-client`` directory, your first upload attempt will fail. However, the ``machine-id`` will be created for you by the insights client, so your second attempt will work.
 
 QPC Upload Command
 ^^^^^^^^^^^^^^^^^^
-To upload a deployments report using the QPC Client you will need to run the following command::
+To upload a QPC insights report using the QPC Client you will need to run the following command::
 
     qpc insights upload (--scan-job scan_job_identifier | --report report_identifier | --no-gpg)
 

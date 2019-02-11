@@ -287,15 +287,15 @@ INVALID_REPORT_INSIGHTS_UPLOAD = 'Not attempting to upload report %s to Insights
                                  ' because %s'
 INSIGHTS_REPORT_MISSING_FIELDS = 'the report is missing required fields: %s.'
 INSIGHTS_INVALID_REPORT_TYPE = 'the report has an invalid report_type: %s.' \
-                               ' Must be a deployments report.'
-INSIGHTS_REPORT_NO_VALID_FP = 'the report contained no valid fingerprints.'
-INSIGHTS_INVALID_FP_NAME = 'Fingerprint produced by source "%s" from system' \
-                           ' "%s" is missing all canonical facts.'
-INSIGHTS_TOTAL_VALID_FP = 'Report %s contains %s/%s valid fingerprints.'
-INSIGHTS_TOTAL_INVALID_FP = 'Report %s contains the following invalid' \
-                            ' fingerprints. Fingerprints must contain' \
-                            ' one of the following: %s'
-INSIGHTS_REPORT_NOT_FOUND = 'No report could be found for report id: %s'
+                               ' Must be a insights report.'
+INSIGHTS_REPORT_NO_VALID_HOST = 'the report contained no valid hosts.'
+INSIGHTS_INVALID_HOST_NAME = 'Host produced by source "%s" from system' \
+    ' "%s" is missing all canonical facts.'
+INSIGHTS_TOTAL_VALID_HOST = 'Report %s contains %s/%s valid hosts.'
+INSIGHTS_TOTAL_INVALID_HOST = 'Report %s contains the following invalid' \
+    ' hosts. Fingerprints must contain' \
+    ' one of the following: %s'
+INSIGHTS_REPORT_NOT_FOUND = 'No insights report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
 BAD_CORE_VERSION = 'Insights version check failed. Your Insights core' \

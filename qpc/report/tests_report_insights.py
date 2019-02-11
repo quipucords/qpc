@@ -77,6 +77,7 @@ class ReportInsightsTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
@@ -107,6 +108,7 @@ class ReportInsightsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -197,6 +199,7 @@ class ReportInsightsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -244,6 +247,7 @@ class ReportInsightsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -273,6 +277,7 @@ class ReportInsightsTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',

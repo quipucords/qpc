@@ -29,7 +29,7 @@ class InsightsCommands():
         """
         self.no_gpg = no_gpg
         # mime type for QPC report data for uploading to insights
-        self.content_type = 'application/vnd.redhat.qpc.deployments+tgz'
+        self.content_type = 'application/vnd.redhat.qpc.insights+tgz'
 
     def build_base(self):
         """Will create a base used for creating insights commands."""

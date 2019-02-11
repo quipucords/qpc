@@ -18,7 +18,7 @@ from io import StringIO  # noqa: I100
 
 from qpc import messages
 from qpc.insights import CLIENT_VERSION, REPORT_URI
-from qpc.insights.upload import InsightsUploadCommand, verify_report_fingerprints
+from qpc.insights.upload import InsightsUploadCommand, verify_report_hosts
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
                                  create_tar_buffer, redirect_stdout)
@@ -30,6 +30,7 @@ PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
+# pylint: disable=too-many-public-methods
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the scan job commands for qpc."""
 
@@ -40,18 +41,20 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         self.success_json = {
             'report_id': 1,
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': [{'bios_uuid': 'value'}]}
+            'hosts': {
+                '2f2cc1fd-ec66-4c67-be1b-171a595ce319': {
+                    'bios_uuid': 'value'}}}
         self.json_missing_fingerprints = {
             'report_id': 1,
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': []}
+            'hosts': {}}
 
         sys.stderr = HushUpStderr()
         # pylint:disable=line-too-long
@@ -69,10 +72,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         buffer_content = create_tar_buffer([self.success_json])
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -94,10 +98,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         buffer_content = create_tar_buffer([self.success_json])
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -117,10 +122,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.communicate.side_effect = self.success_effect
         subprocess.return_value.returncode = 0
         report_out = StringIO()
-        get_report_url = get_server_location() + REPORT_URI + '1/deployments/'
+        get_report_url = get_server_location() + REPORT_URI + '1/insights/'
         buffer_content = create_tar_buffer([self.json_missing_fingerprints])
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -146,13 +152,14 @@ class InsightsUploadCliTests(unittest.TestCase):
             SCAN_JOB_URI + '1'
         get_scanjob_json_data = {'id': 1, 'report_id': 1}
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         buffer_content = create_tar_buffer([get_report_json_data])
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
@@ -172,9 +179,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=404, content=None)
+            mocker.get(get_report_url, status_code=404,
+                       headers={'X-Server-Version': '0.0.47'},
+                       content=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
@@ -193,9 +202,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=400, json=None)
+            mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.47'},
+                       json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
@@ -214,11 +225,13 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         buffer_content = create_tar_buffer([get_report_json_data])
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=200, content=buffer_content)
+            mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': '0.0.47'},
+                       content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
@@ -238,9 +251,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=400, json=None)
+            mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.47'},
+                       json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
@@ -260,9 +275,11 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
-            REPORT_URI + '1/deployments/'
+            REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_report_url, status_code=400, json=None)
+            mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.47'},
+                       json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
@@ -287,11 +304,11 @@ class InsightsUploadCliTests(unittest.TestCase):
     def test_verify_report_missing_id(self):
         """Test to verify a QPC report with a missing id is failed."""
         report_json = {
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': [{'key': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
@@ -306,18 +323,69 @@ class InsightsUploadCliTests(unittest.TestCase):
         """Test to verify a QPC report without canonical facts fails."""
         report_json = {
             'report_id': 1,
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': [{'name': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce31b': {'name': 'value'}}}
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
         command.response = response
         with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
             status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_FP, message)
+            self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_HOST, message)
+
+    def test_verify_report_fails_not_dict(self):
+        """Test to verify a QPC report with not dict."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': ['foo']}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+
+    def test_verify_report_fails_invalid_dict_key_not_str(self):
+        """Test to verify a QPC report with dict not str key."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': {1: {'name': 'value'}}}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+
+    def test_verify_report_fails_invalid_dict_value_not_dict(self):
+        """Test to verify a QPC report with dict not dict value."""
+        report_json = {
+            'report_id': 1,
+            'report_type': 'insights',
+            'report_version': '1.0.0.1b025b8',
+            'status': 'completed',
+            'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce31b': ['name', 'value']}}
+        response = Mock(content=report_json)
+        command = InsightsUploadCommand(SUBPARSER)
+        command.response = response
+        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
+            status, message = InsightsUploadCommand.verify_report_details(command)
+            self.assertEqual(status, False)
+            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
 
     def test_verify_report_invalid_report_type(self):
         """Test to verify a QPC report with an invalid report_type is failed."""
@@ -327,7 +395,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': [{'key': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
@@ -341,10 +409,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         """Test to verify a QPC report missing report_version is failed."""
         report_json = {
             'report_id': 1,
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
-            'system_fingerprints': [{'key': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
@@ -359,10 +427,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         """Test to verify a QPC report missing report_platform_id is failed."""
         report_json = {
             'report_id': 1,
-            'report_type': 'deployments',
+            'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
             'status': 'completed',
-            'system_fingerprints': [{'key': 'value'}]}
+            'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
         response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
@@ -382,36 +450,39 @@ class InsightsUploadCliTests(unittest.TestCase):
                    return_value=self.json_missing_fingerprints):
             status, message = InsightsUploadCommand.verify_report_details(command)
             self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'system_fingerprints',
+            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'hosts',
                           message)
 
-    def test_verify_report_fingerprints(self):
+    def test_verify_report_hosts(self):
         """Test fingerprint verification."""
         # test all valid fingerprints
-        fingerprints = [{'bios_uuid': 'value', 'name': 'value'},
-                        {'insights_client_id': 'value', 'name': 'foo'},
-                        {'ip_addresses': 'value', 'name': 'foo'},
-                        {'mac_addresses': 'value', 'name': 'foo'},
-                        {'vm_uuid': 'value', 'name': 'foo'},
-                        {'etc_machine_id': 'value'},
-                        {'subscription_manager_id': 'value'}]
-        valid, invalid = verify_report_fingerprints(fingerprints)
+        hosts = {'5f2cc1fd-ec66-4c67-be1b-171a595ce311': {'bios_uuid': 'value', 'name': 'value'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce312': {
+                     'insights_client_id': 'value', 'name': 'foo'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce313': {'ip_addresses': 'value', 'name': 'foo'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce314': {'mac_addresses': 'value', 'name': 'foo'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce315': {'vm_uuid': 'value', 'name': 'foo'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce316': {'etc_machine_id': 'value'},
+                 '5f2cc1fd-ec66-4c67-be1b-171a595ce317': {'subscription_manager_id': 'value'}}
+        valid, invalid = verify_report_hosts(hosts)
 
-        self.assertEqual(valid, fingerprints)
-        self.assertEqual(invalid, [])
+        self.assertEqual(valid, hosts)
+        self.assertEqual(invalid, {})
 
         # test that mixed valid/invalid prints work as expected
-        invalid_print = {'no': 'canonical facts',
-                         'metadata': {'key': 'val',
-                                      'name': {'source_name': 'NSource1'}}}
-        fingerprints.append(invalid_print)
-        valid, invalid = verify_report_fingerprints(fingerprints)
-        fingerprints.remove(invalid_print)
-        self.assertEqual(valid, fingerprints)
-        self.assertEqual(invalid, [invalid_print])
+        invalid_host = {'no': 'canonical facts',
+                        'metadata': {'key': 'val',
+                                     'name': {'source_name': 'NSource1'}}}
+        invalid_host_id = '5f2cc1fd-ec66-4c67-be1b-171a595ce318'
+        hosts['5f2cc1fd-ec66-4c67-be1b-171a595ce318'] = invalid_host
+        valid, invalid = verify_report_hosts(hosts)
+        hosts.pop(invalid_host_id, None)
 
-        # test that if there are no valid fingerprints we return []
-        fingerprints = [invalid_print]
-        valid, invalid = verify_report_fingerprints(fingerprints)
-        self.assertEqual(valid, [])
-        self.assertEqual(invalid, fingerprints)
+        self.assertEqual(valid, hosts)
+        self.assertEqual(invalid, {invalid_host_id: invalid_host})
+
+        # test that if there are no valid hosts we return []
+        hosts = {invalid_host_id: invalid_host}
+        valid, invalid = verify_report_hosts(hosts)
+        self.assertEqual(valid, {})
+        self.assertEqual(invalid, hosts)

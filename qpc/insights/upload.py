@@ -41,26 +41,26 @@ CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
                    'subscription_manager_id', 'vm_uuid']
 
 
-def verify_report_fingerprints(fingerprints):
-    """Verify that report fingerprints contain canonical facts.
+def verify_report_hosts(hosts):
+    """Verify that report hosts contain canonical facts.
 
-    :param fingerprints: dictionary of fingerprints to verify
-    returns: valid, invalid fingerprints
+    :param hosts: dictionary of hosts to verify
+    returns: (dicts) valid, invalid hosts
     """
-    valid_fp = []
-    invalid_fp = []
-    for fingerprint in fingerprints:
+    valid_hosts = {}
+    invalid_hosts = {}
+    for host_id, host in hosts.items():
         found_facts = False
         for fact in CANONICAL_FACTS:
-            if fingerprint.get(fact):
+            if host.get(fact):
                 found_facts = True
                 break
         if found_facts:
-            valid_fp.append(fingerprint)
+            valid_hosts[host_id] = host
         else:
-            invalid_fp.append(fingerprint)
+            invalid_hosts[host_id] = host
 
-    return valid_fp, invalid_fp
+    return valid_hosts, invalid_hosts
 
 
 # pylint: disable=too-few-public-methods
@@ -90,6 +90,7 @@ class InsightsUploadCommand(CliCommand):
                                  help=_(messages.INSIGHTS_NO_GPG_HELP))
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
+        self.min_server_version = '0.0.47'
         self.insights_command = None
         self.report_id = None
 
@@ -174,23 +175,23 @@ class InsightsUploadCommand(CliCommand):
 
     def verify_report_details(self):
         """
-        Verify that the report contents are a valid deployments report.
+        Verify that the report contents are a valid insights report.
 
         :returns boolean regarding report validity, error (str) if error occurred
         """
         # pylint: disable=too-many-locals
         error = None
-        deployments_report = extract_json_from_tar(self.response.content,
-                                                   print_pretty=False)
+        insights_report = extract_json_from_tar(self.response.content,
+                                                print_pretty=False)
         # validate required keys
         required_keys = ['report_platform_id',
                          'report_id',
                          'report_version',
                          'report_type',
-                         'system_fingerprints']
+                         'hosts']
         missing_keys = []
         for key in required_keys:
-            required_key = deployments_report.get(key)
+            required_key = insights_report.get(key)
             if not required_key:
                 missing_keys.append(key)
 
@@ -200,29 +201,43 @@ class InsightsUploadCommand(CliCommand):
             return False, error
 
         # validate report type
-        report_id = deployments_report.get('report_id')
-        if deployments_report['report_type'] != 'deployments':
-            error = messages.INSIGHTS_INVALID_REPORT_TYPE % deployments_report['report_type']
+        report_id = insights_report.get('report_id')
+        if insights_report['report_type'] != 'insights':
+            error = messages.INSIGHTS_INVALID_REPORT_TYPE % insights_report['report_type']
             return False, error
 
-        # validate fingerprints contain canonical facts
-        fingerprints = deployments_report.get('system_fingerprints')
-        valid_fp, invalid_fp = verify_report_fingerprints(fingerprints)
-        print(_(messages.INSIGHTS_TOTAL_VALID_FP % (report_id,
-                                                    (len(valid_fp)),
-                                                    str(len(fingerprints)))))
-        if invalid_fp:
-            print(_(messages.INSIGHTS_TOTAL_INVALID_FP % (report_id,
-                                                          ', '.join(CANONICAL_FACTS))))
-            for fingerprint in invalid_fp:
-                fp_name = fingerprint.get('name', 'UNKNOWN')
-                fp_metadata = fingerprint.get('metadata', {})
-                name_metadata = fp_metadata.get('name', {})
+        # validate hosts contain canonical facts
+        hosts = insights_report.get('hosts')
+        if not hosts or not isinstance(hosts, dict):
+            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
+            return False, error
+
+        invalid_host_dict_format = False
+        for host_id, host in hosts.items():
+            if not isinstance(host_id, str) or not isinstance(host, dict):
+                invalid_host_dict_format = True
+                break
+
+        if invalid_host_dict_format:
+            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
+            return False, error
+
+        valid_hosts, invalid_hosts = verify_report_hosts(hosts)
+        print(_(messages.INSIGHTS_TOTAL_VALID_HOST % (report_id,
+                                                      (len(valid_hosts)),
+                                                      str(len(hosts)))))
+        if invalid_hosts:
+            print(_(messages.INSIGHTS_TOTAL_INVALID_HOST % (report_id,
+                                                            ', '.join(CANONICAL_FACTS))))
+            for host in invalid_hosts.values():
+                host_name = host.get('name', 'UNKNOWN')
+                host_metadata = host.get('metadata', {})
+                name_metadata = host_metadata.get('name', {})
                 source_name = name_metadata.get('source_name', 'UNKNOWN')
 
-                print(_(messages.INSIGHTS_INVALID_FP_NAME % (source_name, fp_name)))
-        if not valid_fp:
-            error = messages.INSIGHTS_REPORT_NO_VALID_FP
+                print(_(messages.INSIGHTS_INVALID_HOST_NAME % (source_name, host_name)))
+        if not valid_hosts:
+            error = messages.INSIGHTS_REPORT_NO_VALID_HOST
             return False, error
         return True, error
 
@@ -230,7 +245,7 @@ class InsightsUploadCommand(CliCommand):
         self.req_path = '%s%s%s' % (
             insights.REPORT_URI,
             str(self.report_id),
-            insights.DEPLOYMENTS_PATH_SUFFIX)
+            insights.INSIGHTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
         valid, error = self.verify_report_details()

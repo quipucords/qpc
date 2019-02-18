@@ -100,6 +100,6 @@ class ReportDownloadCommand(CliCommand):
             sys.exit(1)
 
     def _handle_response_error(self):
-        print(_(messages.DOWNLOAD_NO_REPORT_FOR_REPORT_ID %
+        print(_(messages.DOWNLOAD_NO_REPORT_FOUND %
                 self.args.report_id))
         sys.exit(1)

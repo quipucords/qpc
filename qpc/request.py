@@ -13,10 +13,13 @@
 
 import json
 import sys
+# pylint: disable=no-name-in-module,import-error
+from distutils.version import LooseVersion
 
 from qpc import messages
 from qpc.translation import _
-from qpc.utils import (get_server_location,
+from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       get_server_location,
                        get_ssl_verify,
                        handle_error_response,
                        log,
@@ -44,12 +47,21 @@ except AttributeError:
     exception_class = ValueError
 
 
-def handle_general_errors(response):
+def handle_general_errors(response, min_server_version):
     """Handle general errors.
 
     :param response: The response object.
     :returns: The response object.
     """
+    server_version = response.headers.get('X-Server-Version')
+    if not server_version:
+        server_version = QPC_MIN_SERVER_VERSION
+
+    if LooseVersion(server_version) < LooseVersion(min_server_version):
+        print(_(messages.SERVER_TOO_OLD_FOR_CLI %
+                (min_server_version, min_server_version, server_version)))
+        sys.exit(1)
+
     token_expired = {'detail': 'Token has expired'}
     response_data = None
     try:
@@ -138,7 +150,7 @@ def put(url, payload, headers=None):
 
 # pylint: disable=too-many-arguments, too-many-branches
 def request(method, path, params=None, payload=None,
-            parser=None, headers=None):
+            parser=None, headers=None, min_server_version=QPC_MIN_SERVER_VERSION):
     """Create a generic handler for passing to specific request methods.
 
     :param method: the request method to execute
@@ -147,6 +159,7 @@ def request(method, path, params=None, payload=None,
     :param payload: dictionary of payload to be posted
     :param parser: parser for printing usage on failure
     :param headers: headers to include
+    :param min_server_version: min qpc server version allowed
     :returns: reponse object
     :raises: AssertionError error if method is not supported
     """
@@ -165,15 +178,15 @@ def request(method, path, params=None, payload=None,
 
     try:
         if method == POST:
-            result = handle_general_errors(post(url, payload, req_headers))
+            result = handle_general_errors(post(url, payload, req_headers), min_server_version)
         elif method == GET:
-            result = handle_general_errors(get(url, params, req_headers))
+            result = handle_general_errors(get(url, params, req_headers), min_server_version)
         elif method == PATCH:
-            result = handle_general_errors(patch(url, payload, req_headers))
+            result = handle_general_errors(patch(url, payload, req_headers), min_server_version)
         elif method == DELETE:
-            result = handle_general_errors(delete(url, req_headers))
+            result = handle_general_errors(delete(url, req_headers), min_server_version)
         elif method == PUT:
-            result = handle_general_errors(put(url, payload, req_headers))
+            result = handle_general_errors(put(url, payload, req_headers), min_server_version)
         else:
             log.error('Unsupported request method %s', method)
             parser.print_help()

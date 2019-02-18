@@ -382,3 +382,29 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
     if print_pretty:
         return pretty_print(json_data)
     return json_data
+
+
+def create_tar_buffer(files_data):
+    """Generate a file buffer based off a dictionary."""
+    if not isinstance(files_data, (dict,)):
+        print('ERROR: files_data is not a dict')
+        return None
+    if not all(isinstance(v, (str, dict)) for v in files_data.values()):
+        print('ERROR: Not correct structure for tar')
+        return None
+    tar_buffer = io.BytesIO()
+    with tarfile.open(fileobj=tar_buffer, mode='w:gz') as tar_file:
+        for file_name, file_content in files_data.items():
+            if file_name.endswith('json'):
+                file_buffer = \
+                    io.BytesIO(json.dumps(file_content).encode('utf-8'))
+            elif file_name.endswith('csv'):
+                file_buffer = io.BytesIO(file_content.encode('utf-8'))
+            else:
+                print('ERROR: unknown file extension')
+                return None
+            info = tarfile.TarInfo(name=file_name)
+            info.size = len(file_buffer.getvalue())
+            tar_file.addfile(tarinfo=info, fileobj=file_buffer)
+    tar_buffer.seek(0)
+    return tar_buffer.getvalue()

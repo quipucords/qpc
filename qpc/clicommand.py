@@ -14,12 +14,8 @@
 from __future__ import print_function
 
 import sys
-# pylint: disable=no-name-in-module,import-error
-from distutils.version import LooseVersion
 
-from qpc import messages
 from qpc.request import request
-from qpc.translation import _
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
                        handle_error_response,
                        log_args)
@@ -83,16 +79,8 @@ class CliCommand():
                                 params=self.req_params,
                                 payload=self.req_payload,
                                 headers=self.req_headers,
-                                parser=self.parser)
-
-        server_version = self.response.headers.get('X-Server-Version')
-        if not server_version:
-            server_version = QPC_MIN_SERVER_VERSION
-
-        if LooseVersion(server_version) < LooseVersion(self.min_server_version):
-            print(_(messages.SERVER_TOO_OLD_FOR_CLI %
-                    (self.min_server_version, self.min_server_version, server_version)))
-            sys.exit(1)
+                                parser=self.parser,
+                                min_server_version=self.min_server_version)
 
         # pylint: disable=no-member
         if self.response.status_code not in self.success_codes:

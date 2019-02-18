@@ -11,10 +11,7 @@
 """Test utilities for the CLI module."""
 
 import contextlib
-import io
-import json
 import sys
-import tarfile
 
 
 DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 8000, 'use_http': True}
@@ -38,26 +35,3 @@ def redirect_stdout(stream):
         yield
     finally:
         sys.stdout = old_stdout
-
-
-def create_tar_buffer(files_data):
-    """Gernerate a file buffer based off a dictionary."""
-    if not isinstance(files_data, (dict,)):
-        return None
-    if not all(isinstance(v, (str, dict)) for v in files_data.values()):
-        return None
-    tar_buffer = io.BytesIO()
-    with tarfile.open(fileobj=tar_buffer, mode='w:gz') as tar_file:
-        for file_name, file_content in files_data.items():
-            if file_name.endswith('json'):
-                file_buffer = \
-                    io.BytesIO(json.dumps(file_content).encode('utf-8'))
-            elif file_name.endswith('csv'):
-                file_buffer = io.BytesIO(file_content.encode('utf-8'))
-            else:
-                return None
-            info = tarfile.TarInfo(name=file_name)
-            info.size = len(file_buffer.getvalue())
-            tar_file.addfile(tarinfo=info, fileobj=file_buffer)
-    tar_buffer.seek(0)
-    return tar_buffer.getvalue()

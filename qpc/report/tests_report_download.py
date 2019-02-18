@@ -24,9 +24,9 @@ from qpc.cli import CLI
 from qpc.report import REPORT_URI
 from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
-                                 create_tar_buffer, redirect_stdout)
+from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       create_tar_buffer,
                        get_server_location,
                        write_server_config)
 
@@ -245,7 +245,7 @@ class ReportDownloadTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 messages.DOWNLOAD_NO_REPORT_FOR_REPORT_ID % 1)
+                                 messages.DOWNLOAD_NO_REPORT_FOUND % 1)
 
     def test_download_from_server_with_old_version(self):
         """Test download with nonexistent report id."""

@@ -385,7 +385,7 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
 
 
 def create_tar_buffer(files_data):
-    """Gernerate a file buffer based off a dictionary."""
+    """Generate a file buffer based off a dictionary."""
     if not isinstance(files_data, (dict,)):
         print('ERROR: files_data is not a dict')
         return None

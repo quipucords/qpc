@@ -131,7 +131,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         # pylint:disable=line-too-long
         failed_effect = [
             (None, b''),
-            (b'Client: %s\nCore: %s\n' % (CLIENT_VERSION.encode(), CORE_VERSION.encode()), b''),
+            (('Client: %s\nCore: %s\n' % (CLIENT_VERSION, CORE_VERSION)).encode(), b''),
             (None, b'failed to upload')]  # noqa: E501
         subprocess.return_value.communicate.side_effect = failed_effect
         subprocess.return_value.returncode = 0
@@ -304,7 +304,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [
             (None, b''),
-            (b'Client: %s\nCore: %s\n' % (CLIENT_VERSION.encode(), CORE_VERSION.encode()), b''),
+            (('Client: %s\nCore: %s\n' % (CLIENT_VERSION, CORE_VERSION)).encode(), b''),
             (None, b'Unknown Response')
             ]  # noqa: E501
         subprocess.return_value.returncode = 0
@@ -587,7 +587,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
                 nac.main(args)
-        self.assertIn(messages.INSIGHTS_INPUT_JSON_NOT_FILE % 'your_face_is_a',
+        self.assertIn(messages.INSIGHTS_LOCAL_REPORT_NOT % 'your_face_is_a',
                       report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
@@ -604,7 +604,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
                 nac.main(args)
-        self.assertIn(messages.INSIGHTS_INPUT_JSON_NOT_JSON_CONTENT_HELP % self.tmp_not_json_file,
+        self.assertIn(messages.INSIGHTS_LOCAL_REPORT_NOT_JSON % self.tmp_not_json_file,
                       report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')

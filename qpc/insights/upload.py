@@ -71,8 +71,6 @@ def verify_report_hosts(hosts):
 
     return valid_hosts, invalid_hosts
 
-# pylint: disable=too-few-public-methods
-
 
 class InsightsUploadCommand(CliCommand):
     """Defines the Insights command.
@@ -80,6 +78,7 @@ class InsightsUploadCommand(CliCommand):
     This command is for uploading QPC reports throught the insights client.
     """
 
+    # pylint: disable=too-few-public-methods
     SUBCOMMAND = insights.SUBCOMMAND
     ACTION = insights.UPLOAD
 
@@ -173,7 +172,7 @@ class InsightsUploadCommand(CliCommand):
         """Load local report, validate, and write tar.gz."""
         json_file = self.args.json_file
         if not os.path.isfile(json_file):
-            print(_(messages.INSIGHTS_INPUT_JSON_NOT_FILE % json_file))
+            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % json_file))
             sys.exit(1)
 
         insights_report_dict = None
@@ -181,7 +180,7 @@ class InsightsUploadCommand(CliCommand):
             try:
                 insights_report_dict = json.load(insights_report_file)
             except json_exception_class:
-                print(_(messages.INSIGHTS_INPUT_JSON_NOT_JSON_CONTENT_HELP % json_file))
+                print(_(messages.INSIGHTS_LOCAL_REPORT_NOT_JSON % json_file))
                 sys.exit(1)
 
         # Validate insights report

@@ -24,9 +24,9 @@ from qpc.cli import CLI
 from qpc.report import REPORT_URI
 from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
-                                 create_tar_buffer, redirect_stdout)
+from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
+                       create_tar_buffer,
                        get_server_location,
                        write_server_config)
 

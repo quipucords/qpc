@@ -211,6 +211,8 @@ REPORT_NO_INSIGHTS_REPORT_FOR_SJ = \
     'No Insights report available for scan job %s.'
 REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID = \
     'Insights report %s does not exist.'
+REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED = \
+    'Successfully uploaded report'
 REPORT_OUTPUT_CANNOT_BE_EMPTY = '%s cannot be empty string.'
 REPORT_OUTPUT_IS_A_DIRECTORY = '%s %s was a directory.'
 REPORT_DIRECTORY_DOES_NOT_EXIST = \
@@ -300,7 +302,10 @@ INSIGHTS_TOTAL_INVALID_HOST = 'Report %s contains the following invalid' \
 INSIGHTS_REPORT_NOT_FOUND = 'No QPC Insights report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
-BAD_CORE_VERSION = 'Insights version check failed. Your Insights core' \
+INSIGHTS_INPUT_JSON_HELP = 'Path to local JSON file containing QPC Insights report.'
+INSIGHTS_INPUT_JSON_NOT_FILE = '%s file cannot be found.'
+INSIGHTS_INPUT_JSON_NOT_JSON_CONTENT_HELP = '%s file does not contain valid JSON.'
+BAD_CORE_VERSION = 'Insights version check failed. Your Insights core ' \
     'version (%s) does not meet the QPC requirements of %s or greater.'
 BAD_CLIENT_VERSION = 'Insights version check failed. Your Insights client' \
     'version (%s) does not meet the QPC requirements of %s or greater.'

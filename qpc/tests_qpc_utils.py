@@ -14,7 +14,6 @@ import os
 import unittest
 
 from qpc import utils
-from qpc.tests_utilities import create_tar_buffer
 
 
 class UtilsTests(unittest.TestCase):
@@ -43,6 +42,6 @@ class UtilsTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'system_fingerprints': [{'bios_uuid': 'value'}]}
         test_file = {'test.json': report_json}
-        fileobj = create_tar_buffer(test_file)
+        fileobj = utils.create_tar_buffer(test_file)
         json = utils.extract_json_from_tar(fileobj, print_pretty=False)
         self.assertEqual(json, report_json)

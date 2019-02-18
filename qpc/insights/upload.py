@@ -13,6 +13,7 @@
 
 from __future__ import print_function
 
+import json
 import os
 import subprocess
 import sys
@@ -29,12 +30,20 @@ from qpc.insights.utils import (InsightsCommands,
                                 format_upload_success)
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (extract_json_from_tar,
+from qpc.utils import (create_tar_buffer,
+                       extract_json_from_tar,
                        validate_write_file,
                        write_file)
 
 # pylint:disable=no-member
 from requests import codes
+
+# pylint: disable=invalid-name
+try:
+    json_exception_class = json.decoder.JSONDecodeError
+except AttributeError:
+    json_exception_class = ValueError
+# pylint: disable=too-few-public-methods
 
 CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
                    'ip_addresses', 'mac_addresses',
@@ -62,8 +71,9 @@ def verify_report_hosts(hosts):
 
     return valid_hosts, invalid_hosts
 
-
 # pylint: disable=too-few-public-methods
+
+
 class InsightsUploadCommand(CliCommand):
     """Defines the Insights command.
 
@@ -78,13 +88,15 @@ class InsightsUploadCommand(CliCommand):
         CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
                             subparsers.add_parser(self.ACTION), GET,
                             insights.REPORT_URI, [codes.ok])
-        id_group = self.parser.add_mutually_exclusive_group(required=True)
-        id_group.add_argument('--report', dest='report_id',
-                              metavar='REPORT_ID',
-                              help=_(messages.INSIGHTS_REPORT_ID_HELP))
-        id_group.add_argument('--scan-job', dest='scan_job_id',
-                              metavar='SCAN_JOB_ID',
-                              help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
+        input_group = self.parser.add_mutually_exclusive_group(required=True)
+        input_group.add_argument('--report', dest='report_id',
+                                 metavar='REPORT_ID',
+                                 help=_(messages.INSIGHTS_REPORT_ID_HELP))
+        input_group.add_argument('--scan-job', dest='scan_job_id',
+                                 metavar='SCAN_JOB_ID',
+                                 help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
+        input_group.add_argument('--json-file', dest='json_file', metavar='JSON_FILE',
+                                 help=_(messages.INSIGHTS_INPUT_JSON_HELP))
 
         self.parser.add_argument('--no-gpg', dest='no_gpg', action='store_true',
                                  help=_(messages.INSIGHTS_NO_GPG_HELP))
@@ -134,15 +146,73 @@ class InsightsUploadCommand(CliCommand):
     def _validate_args(self):
         print(_(messages.INSIGHTS_REQUIRE_SUDO))
         CliCommand._validate_args(self)
-        print_scan_job_message = False
-        self.req_headers = {'Accept': 'application/json+gzip'}
+
+        # Validate target report output location
+        try:
+            validate_write_file(self.tmp_tar_name, 'tmp_tar_name')
+        except ValueError:
+            print(_(messages.INSIGHTS_TMP_ERROR % self.tmp_tar_name))
+            sys.exit(1)
+
+        # Validate Insights client
+        if self.args.no_gpg:
+            self.insights_command = InsightsCommands(no_gpg=True)
+        else:
+            self.insights_command = InsightsCommands()
+        self._check_insights_install()
+        self._check_insights_version()
+        print(_(messages.INSIGHTS_IS_VERIFIED))
+
+        # obtaining the report as tar.gz
+        if self.args.json_file:
+            self._obtain_insights_report_from_local_file()
+        else:
+            self._obtain_insights_report_from_qpc_server()
+
+    def _obtain_insights_report_from_local_file(self):
+        """Load local report, validate, and write tar.gz."""
+        json_file = self.args.json_file
+        if not os.path.isfile(json_file):
+            print(_(messages.INSIGHTS_INPUT_JSON_NOT_FILE % json_file))
+            sys.exit(1)
+
+        insights_report_dict = None
+        with open(json_file) as insights_report_file:
+            try:
+                insights_report_dict = json.load(insights_report_file)
+            except json_exception_class:
+                print(_(messages.INSIGHTS_INPUT_JSON_NOT_JSON_CONTENT_HELP % json_file))
+                sys.exit(1)
+
+        # Validate insights report
+        valid, error = self._verify_report_details(insights_report_dict)
+        if not valid:
+            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
+            sys.exit(1)
+
+        insights_name = 'report_id_%s/%s.%s' % (self.report_id,
+                                                'insights',
+                                                'json')
+        reports_dict = {}
+        reports_dict[insights_name] = insights_report_dict
+        tar_buffer = create_tar_buffer(reports_dict)
+        # write file content to disk
+        write_file(self.tmp_tar_name,
+                   tar_buffer,
+                   True)
+
+    def _obtain_insights_report_from_qpc_server(self):
+        """Download report, validate, and write tar.gz."""
+        # Obtain report ID
+        self.report_id = None
         if self.args.report_id is None:
-            response = request(parser=self.parser, method=GET,
-                               path='%s%s' % (scan.SCAN_JOB_URI,
-                                              self.args.scan_job_id),
-                               payload=None)
-            if response.status_code == codes.ok:  # pylint: disable=no-member
-                json_data = response.json()
+            # Make request to convert scan_job_id to self.report_id
+            scan_job_response = request(parser=self.parser, method=GET,
+                                        path='%s%s' % (scan.SCAN_JOB_URI,
+                                                       self.args.scan_job_id),
+                                        payload=None)
+            if scan_job_response.status_code == codes.ok:  # pylint: disable=no-member
+                json_data = scan_job_response.json()
                 self.report_id = json_data.get('report_id')
                 if self.report_id is None:
                     print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
@@ -152,37 +222,58 @@ class InsightsUploadCommand(CliCommand):
                 print(_(messages.REPORT_SJ_DOES_NOT_EXIST %
                         self.args.scan_job_id))
                 sys.exit(1)
-            print_scan_job_message = True
-        else:
-            self.report_id = self.args.report_id
-        if self.args.no_gpg:
-            self.insights_command = InsightsCommands(no_gpg=True)
-        else:
-            self.insights_command = InsightsCommands()
-        self._check_insights_install()
-        self._check_insights_version()
-        print(_(messages.INSIGHTS_IS_VERIFIED))
-        try:
-            validate_write_file(self.tmp_tar_name, 'tmp_tar_name')
-        except ValueError:
-            print(_(messages.INSIGHTS_TMP_ERROR % self.tmp_tar_name))
-            sys.exit(1)
-        if print_scan_job_message:
+
+            # Log report ID that was obtained from scanjob
             print(_(messages.INSIGHTS_SCAN_JOB_ID_PRODUCED %
                     (self.args.scan_job_id,
                      self.report_id)))
-        print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
+        else:
+            self.report_id = self.args.report_id
 
-    def verify_report_details(self):
+        # Request report from QCP server
+        print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
+        headers = {'Accept': 'application/json+gzip'}
+        report_path = '%s%s%s' % (
+            insights.REPORT_URI,
+            str(self.report_id),
+            insights.INSIGHTS_PATH_SUFFIX)
+        report_response = request(parser=self.parser,
+                                  method=GET,
+                                  path=report_path,
+                                  headers=headers,
+                                  payload=None,
+                                  min_server_version='0.0.47')
+
+        if report_response.status_code != codes.ok:  # pylint: disable=no-member
+            print(_(messages.INSIGHTS_REPORT_NOT_FOUND %
+                    self.report_id))
+            sys.exit(1)
+
+        # Validate insights report
+        insights_report_dict = extract_json_from_tar(report_response.content,
+                                                     print_pretty=False)
+        valid, error = self._verify_report_details(insights_report_dict)
+        if not valid:
+            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
+            sys.exit(1)
+
+        # write file content to disk
+        write_file(self.tmp_tar_name,
+                   report_response.content,
+                   True)
+
+    def _verify_report_details(self, insights_report):
         """
         Verify that the report contents are a valid insights report.
 
-        :returns boolean regarding report validity, error (str) if error occurred
+        :param insights_report: dict containing Insights report
+        :returns: boolean regarding report validity, error (str) if error occurred
         """
         # pylint: disable=too-many-locals
         error = None
-        insights_report = extract_json_from_tar(self.response.content,
-                                                print_pretty=False)
+
+        self.report_id = insights_report.get('report_id')
+
         # validate required keys
         required_keys = ['report_platform_id',
                          'report_id',
@@ -201,7 +292,6 @@ class InsightsUploadCommand(CliCommand):
             return False, error
 
         # validate report type
-        report_id = insights_report.get('report_id')
         if insights_report['report_type'] != 'insights':
             error = messages.INSIGHTS_INVALID_REPORT_TYPE % insights_report['report_type']
             return False, error
@@ -223,11 +313,11 @@ class InsightsUploadCommand(CliCommand):
             return False, error
 
         valid_hosts, invalid_hosts = verify_report_hosts(hosts)
-        print(_(messages.INSIGHTS_TOTAL_VALID_HOST % (report_id,
+        print(_(messages.INSIGHTS_TOTAL_VALID_HOST % (self.report_id,
                                                       (len(valid_hosts)),
                                                       str(len(hosts)))))
         if invalid_hosts:
-            print(_(messages.INSIGHTS_TOTAL_INVALID_HOST % (report_id,
+            print(_(messages.INSIGHTS_TOTAL_INVALID_HOST % (self.report_id,
                                                             ', '.join(CANONICAL_FACTS))))
             for host in invalid_hosts.values():
                 host_name = host.get('name', 'UNKNOWN')
@@ -241,20 +331,16 @@ class InsightsUploadCommand(CliCommand):
             return False, error
         return True, error
 
-    def _build_req_params(self):
-        self.req_path = '%s%s%s' % (
-            insights.REPORT_URI,
-            str(self.report_id),
-            insights.INSIGHTS_PATH_SUFFIX)
+    def _do_command(self):
+        """Execute command flow.
 
-    def _handle_response_success(self):
-        valid, error = self.verify_report_details()
-        if not valid:
-            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
-            sys.exit(1)
-        write_file(self.tmp_tar_name,
-                   self.response.content,
-                   True)
+        Sub-commands define this method to perform the
+        required action once all options have been verified.
+        """
+        # This command doesn't follow pattern so we just jump to success
+        self._upload_to_insights()
+
+    def _upload_to_insights(self):
         upload_command = self.insights_command.upload(self.tmp_tar_name)
         process = subprocess.Popen(upload_command, stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
@@ -265,11 +351,7 @@ class InsightsUploadCommand(CliCommand):
             print(_(messages.BAD_INSIGHTS_UPLOAD % (self.report_id, (' '.join(upload_command)))))
             os.remove(self.tmp_tar_name)
             sys.exit(1)
-        else:
-            format_streamdata = format_upload_success(streamdata)
-            print(_(format_streamdata))
-            os.remove(self.tmp_tar_name)
 
-    def _handle_response_error(self):
-        print(_(messages.INSIGHTS_REPORT_NOT_FOUND % (self.args.report_id)))
-        sys.exit(1)
+        format_streamdata = format_upload_success(streamdata)
+        print(_(format_streamdata))
+        os.remove(self.tmp_tar_name)

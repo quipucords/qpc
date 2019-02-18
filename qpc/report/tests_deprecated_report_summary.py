@@ -24,8 +24,8 @@ from qpc.report import REPORT_URI
 from qpc.report.deprecated_summary import DeprecatedReportSummaryCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
-                                 create_tar_buffer, redirect_stdout)
-from qpc.utils import get_server_location, write_server_config
+                                 redirect_stdout)
+from qpc.utils import create_tar_buffer, get_server_location, write_server_config
 
 import requests_mock
 

@@ -16,6 +16,9 @@ from __future__ import print_function
 # pylint: disable=no-name-in-module,import-error
 from distutils.version import LooseVersion
 
+from qpc import messages
+from qpc.translation import _
+
 
 class InsightsCommands():
     """Creates insights-client commands for qpc client."""
@@ -73,7 +76,7 @@ def check_insights_install(streamdata):
 
 def check_successful_upload(streamdata):
     """Will check stream data for success clause."""
-    success = 'Successfully uploaded report'
+    success = _(messages.REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED)
     if success in str(streamdata):
         return True
     return False

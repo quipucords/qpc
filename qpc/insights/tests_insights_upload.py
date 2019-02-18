@@ -10,19 +10,24 @@
 #
 """Test the CLI module."""
 
+import json
+import os
 import sys
+import time
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
 
 from qpc import messages
-from qpc.insights import CLIENT_VERSION, REPORT_URI
+from qpc.insights import CLIENT_VERSION, CORE_VERSION, REPORT_URI
 from qpc.insights.upload import InsightsUploadCommand, verify_report_hosts
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,
-                                 create_tar_buffer, redirect_stdout)
-from qpc.utils import get_server_location, write_server_config
+from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
+from qpc.utils import (create_tar_buffer,
+                       get_server_location,
+                       write_file,
+                       write_server_config)
 
 import requests_mock
 
@@ -30,7 +35,7 @@ PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
-# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-public-methods,protected-access
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the scan job commands for qpc."""
 
@@ -48,7 +53,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             'hosts': {
                 '2f2cc1fd-ec66-4c67-be1b-171a595ce319': {
                     'bios_uuid': 'value'}}}
-        self.json_missing_fingerprints = {
+        self.json_missing_hosts = {
             'report_id': 1,
             'report_type': 'insights',
             'report_version': '1.0.0.1b025b8',
@@ -60,20 +65,52 @@ class InsightsUploadCliTests(unittest.TestCase):
         # pylint:disable=line-too-long
         self.success_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.72-1\n', b''), (None, b'Uploading Insights data.\nSuccessfully uploaded report for.\n')]  # noqa: E501
 
+        self.tmp_json_file = '/tmp/insights_tmp_%s.json' % (
+            time.strftime('%Y%m%d_%H%M%S'))
+        write_file(self.tmp_json_file,
+                   json.dumps(self.success_json),
+                   False)
+
+        self.tmp_not_json_file = '/tmp/insights_tmp_%s.txt' % (
+            time.strftime('%Y%m%d_%H%M%S'))
+        write_file(self.tmp_not_json_file,
+                   'not really json',
+                   False)
+
+        self.tmp_invalid_insights_json = '/tmp/insights_invalid_tmp_%s.json' % (
+            time.strftime('%Y%m%d_%H%M%S'))
+        write_file(self.tmp_invalid_insights_json,
+                   json.dumps(self.json_missing_hosts),
+                   False)
+
     def tearDown(self):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
+        try:
+            os.remove(self.tmp_json_file)
+        except FileNotFoundError:
+            pass
+
+        try:
+            os.remove(self.tmp_not_json_file)
+        except FileNotFoundError:
+            pass
+
+        try:
+            os.remove(self.tmp_invalid_insights_json)
+        except FileNotFoundError:
+            pass
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_valid_report(self, subprocess):
-        """Testing response with a vaild report id."""
+        """Testing response with a valid report id."""
         subprocess.return_value.communicate.side_effect = self.success_effect
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
-        buffer_content = create_tar_buffer([self.success_json])
+        buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
                        headers={'X-Server-Version': '0.0.47'},
@@ -81,25 +118,27 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
+                             json_file=None,
                              no_gpg=True)
             with redirect_stdout(report_out):
-                with patch('qpc.insights.upload.extract_json_from_tar',
-                           return_value=self.success_json):
-                    nac.main(args)
-                    self.assertIn('Successfully uploaded report',
-                                  report_out.getvalue().strip())
+                nac.main(args)
+                self.assertIn(messages.REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED,
+                              report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_bad_insights_upload(self, subprocess):
         """Testing response with a vaild report id."""
         # pylint:disable=line-too-long
-        failed_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.72-1\n', b''), (None, b'failed to upload')]  # noqa: E501
+        failed_effect = [
+            (None, b''),
+            (b'Client: %s\nCore: %s\n' % (CLIENT_VERSION.encode(), CORE_VERSION.encode()), b''),
+            (None, b'failed to upload')]  # noqa: E501
         subprocess.return_value.communicate.side_effect = failed_effect
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
-        buffer_content = create_tar_buffer([self.success_json])
+        buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
                        headers={'X-Server-Version': '0.0.47'},
@@ -107,14 +146,13 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
+                             json_file=None,
                              no_gpg=True)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    with patch('qpc.insights.upload.extract_json_from_tar',
-                               return_value=self.success_json):
-                        nac.main(args)
-                        self.assertIn(messages.BAD_INSIGHTS_UPLOAD,
-                                      report_out.getvalue().strip())
+                    nac.main(args)
+            self.assertIn((messages.BAD_INSIGHTS_UPLOAD % ('1', ''))[:10],
+                          report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_invalid_report(self, subprocess):
@@ -123,7 +161,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + '1/insights/'
-        buffer_content = create_tar_buffer([self.json_missing_fingerprints])
+        buffer_content = create_tar_buffer({'insights.json': self.json_missing_hosts})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
                        headers={'X-Server-Version': '0.0.47'},
@@ -131,16 +169,14 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    with patch('qpc.insights.upload.extract_json_from_tar',
-                               return_value=self.json_missing_fingerprints):
-                        nac.main(args)
-                        self.assertIn(
-                            'Report "%s" contained no valid fingerprints.'
-                            % self.json_missing_fingerprints.get('report_id'),
-                            report_out.getvalue().strip())
+                    nac.main(args)
+            self.assertIn(
+                messages.INSIGHTS_REPORT_MISSING_FIELDS % 'hosts',
+                report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_valid_scan_job(self, subprocess):
@@ -153,8 +189,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         get_scanjob_json_data = {'id': 1, 'report_id': 1}
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
-        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
-        buffer_content = create_tar_buffer([get_report_json_data])
+        buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
@@ -164,13 +199,57 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
+                             json_file=None,
                              no_gpg=None)
             with redirect_stdout(report_out):
-                with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
-                           return_value=(True, None)):
+                nac.main(args)
+                self.assertIn(messages.REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED,
+                              report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_valid_scan_job_no_report_id(self, subprocess):
+        """Testing response with a valid scan job id but no report_id."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        get_scanjob_json_data = {'id': 1}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=200,
+                       json=get_scanjob_json_data)
+            nac = InsightsUploadCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             report_id=None,
+                             json_file=None,
+                             no_gpg=None)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
                     nac.main(args)
-                    self.assertIn('Successfully uploaded report',
-                                  report_out.getvalue().strip())
+            self.assertIn(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % '1',
+                          report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_invalid_scan_job(self, subprocess):
+        """Testing scan_job id not found."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=404,
+                       json=None)
+            nac = InsightsUploadCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             report_id=None,
+                             json_file=None,
+                             no_gpg=None)
+            with self.assertRaises(SystemExit):
+                with redirect_stdout(report_out):
+                    nac.main(args)
+            self.assertIn(messages.REPORT_SJ_DOES_NOT_EXIST % '1',
+                          report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_insights_upload_nonexistent_report(self, subprocess):
@@ -187,6 +266,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -210,6 +290,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -221,13 +302,16 @@ class InsightsUploadCliTests(unittest.TestCase):
     def test_unexpected_response_upload(self, subprocess):
         """Testing error response with unexpected upload."""
         # pylint:disable=line-too-long
-        subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.3-2\nCore: 3.0.8-1\n', b''), (None, b'Unknown Response')]  # noqa: E501
+        subprocess.return_value.communicate.side_effect = [
+            (None, b''),
+            (b'Client: %s\nCore: %s\n' % (CLIENT_VERSION.encode(), CORE_VERSION.encode()), b''),
+            (None, b'Unknown Response')
+            ]  # noqa: E501
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
-        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
-        buffer_content = create_tar_buffer([get_report_json_data])
+        buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
                        headers={'X-Server-Version': '0.0.47'},
@@ -235,19 +319,19 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
-                with patch('qpc.insights.upload.InsightsUploadCommand.verify_report_details',
-                           return_value=(True, None)):
+                with redirect_stdout(report_out):
                     nac.main(args)
-                    self.assertIn(messages.BAD_INSIGHTS_UPLOAD.replace('%s', ''),
-                                  report_out.getvalue())
+            self.assertIn((messages.BAD_INSIGHTS_UPLOAD % ('1', ''))[:10],
+                          report_out.getvalue())
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_outdated_version_response(self, subprocess):
         """Testing error response with unexpected response version."""
         # pylint:disable=line-too-long
-        subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.1\nCore: 3.0.72-1\n', b'')]  # noqa: E501
+        subprocess.return_value.communicate.side_effect = [(None, b'Running Connection Tests...\nConnection test config:\n=== Begin Certificate Chain Test ===\ndepth=1\nverify error:num=0\nverify return:1\ndepth=0\nverify error:num=0\nverify return:1\n=== End Certificate Chain Test: SUCCESS ===\n\n=== Begin Upload URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: \nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/uploads/\n=== End Upload URL Connection Test: SUCCESS ===\n\n=== Begin API URL Connection Test ===\nHTTP Status Code: 200\nHTTP Status Text: OK\nHTTP Response Text: lub-dub\nSuccessfully connected to: https://cert-api.access.redhat.com/r/insights/\n=== End API URL Connection Test: SUCCESS ===\n\n\nConnectivity tests completed successfully\nSee /var/log/insights-client/insights-client.log for more details.\n'), (b'Client: 3.0.1\nCore: 3.0.8\n', b'')]  # noqa: E501
         subprocess.return_value.returncode = 0
         report_out = StringIO()
         get_report_url = get_server_location() + \
@@ -259,13 +343,18 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
+            std_out = report_out.getvalue()
             cli_error_msg = (messages.BAD_CLIENT_VERSION %
                              ('3.0.1', CLIENT_VERSION))
-            self.assertIn(cli_error_msg, report_out.getvalue())
+            self.assertIn(cli_error_msg, std_out)
+            cli_error_msg = (messages.BAD_CORE_VERSION %
+                             ('3.0.8', CORE_VERSION))
+            self.assertIn(cli_error_msg, std_out)
 
     @patch('qpc.insights.upload.subprocess.Popen')
     def test_cmd_not_found_response(self, subprocess):
@@ -283,6 +372,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
+                             json_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -293,13 +383,10 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     def test_verify_report_success(self):
         """Test to verify a QPC report with the correct structure passes validation."""
-        response = Mock(content=self.success_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=self.success_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, True)
-            self.assertEqual(message, None)
+        status, message = command._verify_report_details(self.success_json)
+        self.assertEqual(status, True)
+        self.assertEqual(message, None)
 
     def test_verify_report_missing_id(self):
         """Test to verify a QPC report with a missing id is failed."""
@@ -310,14 +397,11 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_id',
-                          message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_id',
+                      message)
 
     def test_verify_report_fails_no_canonical_facts(self):
         """Test to verify a QPC report without canonical facts fails."""
@@ -328,13 +412,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce31b': {'name': 'value'}}}
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_HOST, message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_REPORT_NO_VALID_HOST, message)
 
     def test_verify_report_fails_not_dict(self):
         """Test to verify a QPC report with not dict."""
@@ -345,13 +426,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': ['foo']}
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
 
     def test_verify_report_fails_invalid_dict_key_not_str(self):
         """Test to verify a QPC report with dict not str key."""
@@ -362,13 +440,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {1: {'name': 'value'}}}
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
 
     def test_verify_report_fails_invalid_dict_value_not_dict(self):
         """Test to verify a QPC report with dict not dict value."""
@@ -379,13 +454,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce31b': ['name', 'value']}}
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_INVALID_HOST_DICT_TYPE, message)
 
     def test_verify_report_invalid_report_type(self):
         """Test to verify a QPC report with an invalid report_type is failed."""
@@ -397,13 +469,10 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_INVALID_REPORT_TYPE % 'details', message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_INVALID_REPORT_TYPE % 'details', message)
 
     def test_verify_report_missing_version(self):
         """Test to verify a QPC report missing report_version is failed."""
@@ -414,14 +483,11 @@ class InsightsUploadCliTests(unittest.TestCase):
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_version',
-                          message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_version',
+                      message)
 
     def test_verify_report_missing_platform_id(self):
         """Test to verify a QPC report missing report_platform_id is failed."""
@@ -432,26 +498,19 @@ class InsightsUploadCliTests(unittest.TestCase):
             'status': 'completed',
             'hosts': {'5f2cc1fd-ec66-4c67-be1b-171a595ce319': {'key': 'value'}}}
 
-        response = Mock(content=report_json)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar', return_value=report_json):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_platform_id',
-                          message)
+        status, message = command._verify_report_details(report_json)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'report_platform_id',
+                      message)
 
     def test_verify_report_missing_fingerprints(self):
         """Test to verify a QPC report with empty fingerprints is failed."""
-        response = Mock(content=self.json_missing_fingerprints)
         command = InsightsUploadCommand(SUBPARSER)
-        command.response = response
-        with patch('qpc.insights.upload.extract_json_from_tar',
-                   return_value=self.json_missing_fingerprints):
-            status, message = InsightsUploadCommand.verify_report_details(command)
-            self.assertEqual(status, False)
-            self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'hosts',
-                          message)
+        status, message = command._verify_report_details(self.json_missing_hosts)
+        self.assertEqual(status, False)
+        self.assertIn(messages.INSIGHTS_REPORT_MISSING_FIELDS % 'hosts',
+                      message)
 
     def test_verify_report_hosts(self):
         """Test fingerprint verification."""
@@ -486,3 +545,81 @@ class InsightsUploadCliTests(unittest.TestCase):
         valid, invalid = verify_report_hosts(hosts)
         self.assertEqual(valid, {})
         self.assertEqual(invalid, hosts)
+
+    def test_invalid_tmp_file(self):
+        """Test invalid temp file (is dir)."""
+        report_out = StringIO()
+        command = InsightsUploadCommand(SUBPARSER)
+        command.tmp_tar_name = '/'
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                command._validate_args()
+        cli_error_msg = messages.INSIGHTS_TMP_ERROR % command.tmp_tar_name
+        self.assertIn(cli_error_msg, report_out.getvalue())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_valid_report_from_file(self, subprocess):
+        """Testing uploading insights report from local json file."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        nac = InsightsUploadCommand(SUBPARSER)
+        args = Namespace(report_id=None,
+                         scan_job=None,
+                         json_file=self.tmp_json_file,
+                         no_gpg=True)
+        with redirect_stdout(report_out):
+            nac.main(args)
+            self.assertIn(messages.REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED,
+                          report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_invalid_local_json_path(self, subprocess):
+        """Testing uploading insights report with invalid path."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        nac = InsightsUploadCommand(SUBPARSER)
+        args = Namespace(report_id=None,
+                         scan_job=None,
+                         json_file='your_face_is_a',
+                         no_gpg=True)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+        self.assertIn(messages.INSIGHTS_INPUT_JSON_NOT_FILE % 'your_face_is_a',
+                      report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_invalid_local_json_content(self, subprocess):
+        """Testing uploading insights report with invalid json content."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        nac = InsightsUploadCommand(SUBPARSER)
+        args = Namespace(report_id=None,
+                         scan_job=None,
+                         json_file=self.tmp_not_json_file,
+                         no_gpg=True)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+        self.assertIn(messages.INSIGHTS_INPUT_JSON_NOT_JSON_CONTENT_HELP % self.tmp_not_json_file,
+                      report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_invalid_no_hosts(self, subprocess):
+        """Testing uploading insights report with no hosts."""
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        nac = InsightsUploadCommand(SUBPARSER)
+        args = Namespace(report_id=None,
+                         scan_job=None,
+                         json_file=self.tmp_invalid_insights_json,
+                         no_gpg=True)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+        self.assertIn(messages.INVALID_REPORT_INSIGHTS_UPLOAD % ('1', ''),
+                      report_out.getvalue().strip())

@@ -12,7 +12,7 @@ flake8-import-order==0.18.1
 flake8-quotes==1.0.0
 pylint==2.3.1
 pylint-plugin-utils==0.5
-pyflakes==2.1.0
+pyflakes==2.1.1
 
 # Test
 requests_mock==1.5.2

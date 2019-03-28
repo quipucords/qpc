@@ -51,7 +51,7 @@ class ScanAddCommand(CliCommand):
                                  required=True)
         self.parser.add_argument('--max-concurrency', dest='max_concurrency',
                                  metavar='MAX_CONCURRENCY',
-                                 type=int, default=50,
+                                 type=int, required=False,
                                  help=_(messages.SCAN_MAX_CONCURRENCY_HELP))
         self.parser.add_argument('--disabled-optional-products',
                                  dest='disabled_optional_products',
@@ -96,9 +96,11 @@ class ScanAddCommand(CliCommand):
             'name': self.args.name,
             'sources': self.source_ids,
             'scan_type': scan.SCAN_TYPE_INSPECT,
-            'options': {
-                'max_concurrency': self.args.max_concurrency}
+            'options': {}
         }
+        if self.args.max_concurrency:
+            self.req_payload['options']['max_concurrency'] \
+                = self.args.max_concurrency
         disabled_optional_products \
             = get_optional_products(self.args.disabled_optional_products)
         enabled_ext_product_search \

@@ -20,8 +20,8 @@ from glob import glob
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
-from qpc.request import GET, POST, PUT, request
 from qpc.release import PKG_NAME
+from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
 

@@ -26,6 +26,7 @@ from qpc.cred.commands import (CredAddCommand,
                                CredListCommand,
                                CredShowCommand,)
 from qpc.insights.commands import (InsightsUploadCommand)
+from qpc.release import (PKG_NAME, VERSION)
 from qpc.report.commands import (DeprecatedReportDetailCommand,
                                  DeprecatedReportSummaryCommand,
                                  ReportDeploymentsCommand,
@@ -60,7 +61,6 @@ from qpc.utils import (ensure_config_dir_exists,
                        log,
                        read_client_token,
                        setup_logging)
-from qpc.release import (VERSION, PKG_NAME)
 
 
 # pylint: disable=too-few-public-methods

@@ -17,8 +17,8 @@ import sys
 from distutils.version import LooseVersion
 
 from qpc import messages
-from qpc.translation import _
 from qpc.release import PKG_NAME
+from qpc.translation import _
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
                        get_server_location,
                        get_ssl_verify,

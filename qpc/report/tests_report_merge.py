@@ -18,6 +18,7 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
+from qpc.release import PKG_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI

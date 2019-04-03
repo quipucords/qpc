@@ -18,8 +18,8 @@ import sys
 import qpc.report as report
 from qpc import messages
 from qpc.clicommand import CliCommand
-from qpc.request import GET
 from qpc.release import PKG_NAME
+from qpc.request import GET
 from qpc.translation import _
 
 from requests import codes

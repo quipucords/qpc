@@ -20,8 +20,8 @@ from io import StringIO
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.report import REPORT_URI
 from qpc.release import PKG_NAME
+from qpc.report import REPORT_URI
 from qpc.report.deprecated_summary import DeprecatedReportSummaryCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr,

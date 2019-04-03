@@ -17,8 +17,8 @@ import sys
 
 from qpc import cred, messages, source
 from qpc.clicommand import CliCommand
-from qpc.request import GET, POST, request
 from qpc.release import PKG_NAME
+from qpc.request import GET, POST, request
 from qpc.source.utils import build_source_payload, validate_port
 from qpc.translation import _
 from qpc.utils import read_in_file

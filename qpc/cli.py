@@ -57,6 +57,7 @@ from qpc.translation import _
 from qpc.utils import (ensure_config_dir_exists,
                        ensure_data_dir_exists,
                        get_server_location,
+                       get_settings,
                        log,
                        read_client_token,
                        setup_logging)
@@ -75,6 +76,7 @@ class CLI():
     def __init__(self, name='cli', usage=None, shortdesc=None,
                  description=None):
         """Create main command line handler."""
+        self.settings = get_settings()
         self.shortdesc = shortdesc
         if shortdesc is not None and description is None:
             description = shortdesc
@@ -135,6 +137,7 @@ class CLI():
         to find the best command match. If no match is found the
         usage is displayed
         """
+        pkg_name = self.settings['package_name']
         self.args = self.parser.parse_args()
         setup_logging(self.args.verbosity)
         is_server_cmd = self.args.subcommand == server.SUBCOMMAND
@@ -145,14 +148,12 @@ class CLI():
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == '':
-                log.error(_(messages.SERVER_CONFIG_REQUIRED))
-                log.error('$ qpc server config --host HOST --port PORT')
+                log.error(_(messages.SERVER_CONFIG_REQUIRED % pkg_name))
                 sys.exit(1)
 
         if ((not is_server_cmd or is_server_logout) and
                 not read_client_token()):
-            log.error(_(messages.SERVER_LOGIN_REQUIRED))
-            log.error('$ qpc server login')
+            log.error(_(messages.SERVER_LOGIN_REQUIRED % pkg_name))
             sys.exit(1)
 
         if self.args.subcommand in self.subcommands:

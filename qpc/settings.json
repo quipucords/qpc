@@ -1,0 +1,7 @@
+{
+    "author": "QPC Team",
+    "author_email": "qpc@redhat.com",
+    "package_name": "qpc",
+    "bin_script": "bin/qpc",
+    "url":"https://github.com/quipucords/qpc"
+}

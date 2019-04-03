@@ -19,7 +19,7 @@ from qpc import messages
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge_status import ReportMergeStatusCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, write_server_config
+from qpc.utils import get_server_location, get_settings, write_server_config
 
 import requests_mock
 
@@ -37,6 +37,8 @@ class ReportMergeStatusTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
         self.url = get_server_location() + ASYNC_MERGE_URI
+        settings = get_settings()
+        self.pkg_name = settings['package_name']
 
     def tearDown(self):
         """Remove test setup."""
@@ -70,7 +72,7 @@ class ReportMergeStatusTests(unittest.TestCase):
                 result1 = messages.MERGE_JOB_ID_STATUS % (
                     '1', 'completed')
                 result2 = messages.DISPLAY_REPORT_ID % (
-                    '10', '10')
+                    '10', self.pkg_name, '10')
                 result = '%s\n%s' % (result1, result2)
                 self.assertEqual(result, report_out.getvalue().strip())
 

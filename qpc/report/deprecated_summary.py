@@ -64,5 +64,5 @@ class DeprecatedReportSummaryCommand(ReportDeploymentsCommand):
         self.report_id = None
 
     def _validate_args(self):
-        print(_(messages.REPORT_SUMMARY_DEPRECATED))
+        print(_(messages.REPORT_SUMMARY_DEPRECATED % (self.pkg_name, self.pkg_name)))
         super()._validate_args()

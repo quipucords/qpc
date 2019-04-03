@@ -22,7 +22,7 @@ from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, write_server_config
+from qpc.utils import get_server_location, get_settings, write_server_config
 
 import requests_mock
 
@@ -70,6 +70,8 @@ class ReportDetailTests(unittest.TestCase):
                 os.remove(file[0])
             with open(file[0], 'w') as test_file:
                 test_file.write(file[1])
+        settings = get_settings()
+        self.pkg_name = settings['package_name']
 
     def tearDown(self):
         """Remove test setup."""
@@ -114,7 +116,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(messages.REPORT_SUCCESSFULLY_MERGED %
-                                 ('1', '1'), report_out.getvalue().strip())
+                                 ('1', self.pkg_name, '1'),
+                                 report_out.getvalue().strip())
 
     def test_detail_merge_error_job_ids(self):
         """Testing report merge error with scan job ids."""
@@ -163,7 +166,7 @@ class ReportDetailTests(unittest.TestCase):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_SUCCESSFULLY_MERGED % (
-                                     '1', '1'))
+                                     '1', self.pkg_name, '1'))
 
     def test_detail_merge_error_report_ids(self):
         """Testing report merge error with report ids."""
@@ -200,7 +203,9 @@ class ReportDetailTests(unittest.TestCase):
                              report_ids=None)
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', '1'),
+                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1',
+                                                                     self.pkg_name,
+                                                                     '1'),
                               report_out.getvalue().strip())
 
     def test_detail_merge_json_files_not_exist(self):
@@ -270,7 +275,7 @@ class ReportDetailTests(unittest.TestCase):
                              json_dir=['/tmp/'])
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', '1'),
+                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', self.pkg_name, '1'),
                               report_out.getvalue().strip())
 
     def test_detail_merge_json_directory_error_dir_not_found(self):

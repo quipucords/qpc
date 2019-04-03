@@ -54,6 +54,7 @@ class ReportMergeStatusCommand(CliCommand):
             json_data.get('status').lower())))
         if json_data.get('report_id'):
             print(_(messages.DISPLAY_REPORT_ID % (json_data.get('report_id'),
+                                                  self.pkg_name,
                                                   json_data.get('report_id'))))
 
     def _handle_response_error(self):

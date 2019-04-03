@@ -408,12 +408,3 @@ def create_tar_buffer(files_data):
             tar_file.addfile(tarinfo=info, fileobj=file_buffer)
     tar_buffer.seek(0)
     return tar_buffer.getvalue()
-
-
-def get_settings():
-    """Collect the cli version from settings json."""
-    cwd = os.path.dirname(os.path.realpath(__file__))
-    settings_file = os.path.join(cwd, 'settings.json')
-    with open(settings_file) as json_file:
-        settings = json.load(json_file)
-    return settings

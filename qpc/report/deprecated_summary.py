@@ -17,6 +17,7 @@ from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.request import GET
+from qpc.release import PKG_NAME
 from qpc.translation import _
 
 from requests import codes
@@ -64,5 +65,5 @@ class DeprecatedReportSummaryCommand(ReportDeploymentsCommand):
         self.report_id = None
 
     def _validate_args(self):
-        print(_(messages.REPORT_SUMMARY_DEPRECATED % (self.pkg_name, self.pkg_name)))
+        print(_(messages.REPORT_SUMMARY_DEPRECATED % (PKG_NAME, PKG_NAME)))
         super()._validate_args()

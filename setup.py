@@ -6,9 +6,8 @@ import sys
 import json
 
 from setuptools import find_packages, setup
-
-with open('qpc/settings.json') as json_file:
-    settings = json.load(json_file)
+from qpc.release import (VERSION, AUTHOR, AUTHOR_EMAIL,
+                         PKG_NAME, BIN_SCRIPT, URL)
 
 BASE_QPC_DIR = os.path.abspath(
     os.path.normpath(
@@ -18,10 +17,10 @@ sys.path.insert(0, os.path.join(BASE_QPC_DIR, 'qpc'))
 from qpc import __version__  # noqa: E402, I100
 
 setup(
-    name=settings['package_name'],
-    version=__version__,
-    author=settings['author'],
-    author_email=settings['author_email'],
+    name=PKG_NAME,
+    version=VERSION,
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
@@ -29,10 +28,10 @@ setup(
     include_package_data=True,
     license='GPLv3',
     packages=find_packages(exclude=['test*.py']),
-    package_data={'': ['LICENSE', 'settings.json']},
-    url='https://github.com/quipucords/qpc',
+    package_data={'': ['LICENSE']},
+    url=URL,
     scripts=[
-        settings['bin_script'],
+        BIN_SCRIPT,
     ],
     zip_safe=False
 )

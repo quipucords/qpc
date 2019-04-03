@@ -17,7 +17,6 @@ import sys
 
 from qpc.request import request
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
-                       get_settings,
                        handle_error_response,
                        log_args)
 
@@ -44,8 +43,6 @@ class CliCommand():
 
         # If you add or change API, you must update these versions
         # this includes self.min_server_version
-        self.settings = get_settings()
-        self.pkg_name = self.settings['package_name']
         self.min_server_version = QPC_MIN_SERVER_VERSION
 
     def _validate_args(self):

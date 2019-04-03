@@ -21,12 +21,12 @@ from io import StringIO
 from qpc import messages
 from qpc.cli import CLI
 from qpc.report import REPORT_URI
+from qpc.release import PKG_NAME
 from qpc.report.deprecated_detail import DeprecatedReportDetailCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
 from qpc.utils import (create_tar_buffer,
                        get_server_location,
-                       get_settings,
                        write_server_config)
 
 import requests_mock
@@ -49,8 +49,6 @@ class ReportDetailTests(unittest.TestCase):
         self.test_json_filename = 'test_%d.json' % time.time()
         self.test_csv_filename = 'test_%d.csv' % time.time()
         sys.stderr = HushUpStderr()
-        settings = get_settings()
-        self.pkg_name = settings['package_name']
 
     def tearDown(self):
         """Remove test setup."""
@@ -92,8 +90,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (self.pkg_name,
-                                                                   self.pkg_name), output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_json_filename, 'r') as json_file:
                     data = json_file.read()
@@ -122,8 +120,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (self.pkg_name,
-                                                                   self.pkg_name), output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_json_filename, 'r') as json_file:
                     data = json_file.read()
@@ -158,8 +156,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (self.pkg_name,
-                                                                   self.pkg_name), output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_csv_filename, 'r') as json_file:
                     data = json_file.read()

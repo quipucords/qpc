@@ -18,9 +18,9 @@ from distutils.version import LooseVersion
 
 from qpc import messages
 from qpc.translation import _
+from qpc.release import PKG_NAME
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
                        get_server_location,
-                       get_settings,
                        get_ssl_verify,
                        handle_error_response,
                        log,
@@ -54,8 +54,6 @@ def handle_general_errors(response, min_server_version):
     :param response: The response object.
     :returns: The response object.
     """
-    settings = get_settings()
-    pkg_name = settings['package_name']
     server_version = response.headers.get('X-Server-Version')
     if not server_version:
         server_version = QPC_MIN_SERVER_VERSION
@@ -74,12 +72,12 @@ def handle_general_errors(response, min_server_version):
 
     if response.status_code == 401:
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED % (pkg_name)))
+        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
     elif (response.status_code == 400 and
           response_data == token_expired):
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED % (pkg_name)))
+        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
     elif response.status_code == 500:
         handle_error_response(response)

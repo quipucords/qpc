@@ -61,10 +61,10 @@ CRED_BECOME_PASSWORD_HELP = 'The privilege escalation password to be '\
 SOURCE_NAME_HELP = 'Source name.'
 SOURCES_NAME_HELP = 'List of source names.'
 SOURCE_TYPE_HELP = 'Type of source. Valid values: vcenter, network.'
-SOURCE_HOSTS_HELP = 'IP ranges to scan. Run the "man qpc" command for more '\
+SOURCE_HOSTS_HELP = 'IP ranges to scan. Run the "man %s" command for more '\
     'information about supported formats.'
 SOURCE_EXCLUDE_HOSTS_HELP = 'IP ranges to exclude from scan. Only supported '\
-    'for network sources. Run the "man qpc" command for more information '\
+    'for network sources. Run the "man %s" command for more information '\
     'about supported formats.'
 SOURCE_CREDS_HELP = 'Credentials to associate with a source.'
 SOURCE_PORT_HELP = 'Port to use for connection for the scan; '\
@@ -159,10 +159,10 @@ SCAN_EXT_SEARCH_DIRS_HELP = \
     'A list of fully-qualified paths to search for extended product '\
     'search.'
 
-REPORT_DETAIL_DEPRECATED = 'WARNING: "qpc report detail" is deprecated. ' \
-    'Use "qpc report details" instead.'
-REPORT_SUMMARY_DEPRECATED = 'WARNING: "qpc report summary" is deprecated. ' \
-    'Use "qpc report deployments" instead.'
+REPORT_DETAIL_DEPRECATED = 'WARNING: "%s report detail" is deprecated. ' \
+    'Use "%s report details" instead.'
+REPORT_SUMMARY_DEPRECATED = 'WARNING: "%s report summary" is deprecated. ' \
+    'Use "%s report deployments" instead.'
 
 REPORT_JSON_FILE_HELP = 'A list of files that contain the json details ' \
                         'reports to merge.'
@@ -220,7 +220,7 @@ REPORT_DIRECTORY_DOES_NOT_EXIST = \
 REPORT_JSON_DIR_NOT_FOUND = '%s is not a directory'
 REPORT_SUCCESSFULLY_WRITTEN = 'Report written successfully.'
 REPORT_SUCCESSFULLY_MERGED = 'Report merge job %s created. '\
-    'To check merge status, run "qpc report merge-status --job %s"'
+    'To check merge status, run "%s report merge-status --job %s"'
 
 DISABLE_OPT_PRODUCTS_HELP = 'The product inspection exclusions. '\
     'Contains the list of products to exclude from inspection. '\
@@ -256,10 +256,11 @@ BECOME_PASSWORD = 'Provide a privilege escalation password to be used when '\
 MERGE_JOB_ID_NOT_FOUND = 'Report merge job %s not found.'
 MERGE_JOB_ID_STATUS = 'Report merge job %s is %s.'
 DISPLAY_REPORT_ID = \
-    'Created merge report with id: "%s". To download report, run "qpc report' \
+    'Created merge report with id: "%s". To download report, run "%s report' \
     ' deployments --report %s --csv --output-file temp.csv"'
-SERVER_CONFIG_REQUIRED = 'Configure server using command below:'
-SERVER_LOGIN_REQUIRED = 'Log in using the command below:'
+SERVER_CONFIG_REQUIRED = 'Configure server using command below: \n$ %s server'\
+    ' config --host HOST --port PORT'
+SERVER_LOGIN_REQUIRED = 'Log in using the command below: \n$ %s server login'
 SERVER_CONFIG_HOST_HELP = 'Host or IP address for the server.'
 SERVER_CONFIG_PORT_HELP = 'Port number for the server; the default is 9443.'
 SERVER_CONFIG_SSL_CERT_HELP = 'File path to the SSL certificate '\
@@ -289,7 +290,7 @@ INVALID_REPORT_INSIGHTS_UPLOAD = 'Not attempting to upload report %s to Insights
                                  ' because %s'
 INSIGHTS_REPORT_MISSING_FIELDS = 'the report is missing required fields: %s.'
 INSIGHTS_INVALID_REPORT_TYPE = 'the report has an invalid report_type: %s.' \
-                               ' Must be a QPC Insights report.'
+                               ' Must be an Insights report.'
 INSIGHTS_REPORT_NO_VALID_HOST = 'the report did not contain any valid hosts.'
 INSIGHTS_INVALID_HOST_NAME = 'Host produced by source "%s" from system' \
     ' "%s" is missing all canonical facts.'
@@ -299,16 +300,16 @@ INSIGHTS_TOTAL_VALID_HOST = 'Report %s contains %s/%s valid hosts.'
 INSIGHTS_TOTAL_INVALID_HOST = 'Report %s contains the following invalid' \
     ' hosts. Fingerprints must contain' \
     ' one of the following: %s'
-INSIGHTS_REPORT_NOT_FOUND = 'No QPC Insights report could be found for report id: %s'
+INSIGHTS_REPORT_NOT_FOUND = 'No Insights report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
-INSIGHTS_INPUT_JSON_HELP = 'Path to local JSON file containing QPC Insights report.'
+INSIGHTS_INPUT_JSON_HELP = 'Path to local JSON file containing an Insights report.'
 INSIGHTS_LOCAL_REPORT_NOT = '%s file cannot be found.'
 INSIGHTS_LOCAL_REPORT_NOT_JSON = '%s file does not contain valid JSON.'
 BAD_CORE_VERSION = 'Insights version check failed. Your Insights core ' \
-    'version (%s) does not meet the QPC requirements of %s or greater.'
+    'version (%s) does not meet the requirements of %s or greater.'
 BAD_CLIENT_VERSION = 'Insights version check failed. Your Insights client' \
-    'version (%s) does not meet the QPC requirements of %s or greater.'
+    'version (%s) does not meet the requirements of %s or greater.'
 CHECK_VERSION = 'You can check your Insights version with this Insights '\
     'client command: (%s).'
 ERROR_INSIGHTS_VERSION = \
@@ -317,7 +318,7 @@ INSIGHTS_IS_VERIFIED = 'Insights is installed and properly configured.'
 INSIGHTS_RETRIEVE_REPORT = 'Retrieving report %s.'
 INSIGHTS_SCAN_JOB_ID_PRODUCED = 'Scan job %s produced report %s.'
 INSIGHTS_TMP_ERROR = 'An error occurred while saving a temporary copy of' \
-    ' the QPC report.  Cannot write file to %s.'
+    ' the report.  Cannot write file to %s.'
 INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
 INSIGHTS_NO_GPG_HELP = 'Upload to Insights without GNU Privacy Guard.'
 DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
@@ -328,5 +329,5 @@ DOWNLOAD_REQUIRE_TAR = 'The output file\'s extension is required to be tar.gz'
 DOWNLOAD_SUCCESSFULLY_WRITTEN = 'Report %s successfully written to %s.'
 DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'
 
-SERVER_TOO_OLD_FOR_CLI = 'qpc CLI requires a minimum server version of %s.  '\
+SERVER_TOO_OLD_FOR_CLI = 'The CLI requires a minimum server version of %s.  '\
     'Upgrade your server to %s or greater.  Server is currently at version %s.'

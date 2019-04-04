@@ -17,6 +17,7 @@ import sys
 from distutils.version import LooseVersion
 
 from qpc import messages
+from qpc.release import PKG_NAME
 from qpc.translation import _
 from qpc.utils import (QPC_MIN_SERVER_VERSION,
                        get_server_location,
@@ -71,14 +72,12 @@ def handle_general_errors(response, min_server_version):
 
     if response.status_code == 401:
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED))
-        log.error('$ qpc server login')
+        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
     elif (response.status_code == 400 and
           response_data == token_expired):
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED))
-        log.error('$ qpc server login')
+        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
     elif response.status_code == 500:
         handle_error_response(response)

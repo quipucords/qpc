@@ -26,6 +26,7 @@ from qpc.cred.commands import (CredAddCommand,
                                CredListCommand,
                                CredShowCommand,)
 from qpc.insights.commands import (InsightsUploadCommand)
+from qpc.release import (PKG_NAME, VERSION)
 from qpc.report.commands import (DeprecatedReportDetailCommand,
                                  DeprecatedReportSummaryCommand,
                                  ReportDeploymentsCommand,
@@ -61,8 +62,6 @@ from qpc.utils import (ensure_config_dir_exists,
                        read_client_token,
                        setup_logging)
 
-from . import __version__
-
 
 # pylint: disable=too-few-public-methods
 class CLI():
@@ -80,7 +79,7 @@ class CLI():
             description = shortdesc
         self.parser = ArgumentParser(usage=usage, description=description)
         self.parser.add_argument('--version', action='version',
-                                 version=__version__)
+                                 version=VERSION)
         self.parser.add_argument('-v', dest='verbosity', action='count',
                                  default=0, help=_(messages.VERBOSITY_HELP))
         self.subparsers = self.parser.add_subparsers(dest='subcommand')
@@ -145,14 +144,12 @@ class CLI():
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == '':
-                log.error(_(messages.SERVER_CONFIG_REQUIRED))
-                log.error('$ qpc server config --host HOST --port PORT')
+                log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
                 sys.exit(1)
 
         if ((not is_server_cmd or is_server_logout) and
                 not read_client_token()):
-            log.error(_(messages.SERVER_LOGIN_REQUIRED))
-            log.error('$ qpc server login')
+            log.error(_(messages.SERVER_LOGIN_REQUIRED % PKG_NAME))
             sys.exit(1)
 
         if self.args.subcommand in self.subcommands:

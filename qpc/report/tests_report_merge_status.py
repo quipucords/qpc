@@ -16,6 +16,7 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
+from qpc.release import PKG_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge_status import ReportMergeStatusCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -70,7 +71,7 @@ class ReportMergeStatusTests(unittest.TestCase):
                 result1 = messages.MERGE_JOB_ID_STATUS % (
                     '1', 'completed')
                 result2 = messages.DISPLAY_REPORT_ID % (
-                    '10', '10')
+                    '10', PKG_NAME, '10')
                 result = '%s\n%s' % (result1, result2)
                 self.assertEqual(result, report_out.getvalue().strip())
 

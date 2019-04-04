@@ -18,6 +18,7 @@ import sys
 import qpc.report as report
 from qpc import messages
 from qpc.clicommand import CliCommand
+from qpc.release import PKG_NAME
 from qpc.request import GET
 from qpc.translation import _
 
@@ -54,6 +55,7 @@ class ReportMergeStatusCommand(CliCommand):
             json_data.get('status').lower())))
         if json_data.get('report_id'):
             print(_(messages.DISPLAY_REPORT_ID % (json_data.get('report_id'),
+                                                  PKG_NAME,
                                                   json_data.get('report_id'))))
 
     def _handle_response_error(self):

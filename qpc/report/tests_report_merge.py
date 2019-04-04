@@ -18,6 +18,7 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
+from qpc.release import PKG_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI
@@ -114,7 +115,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(messages.REPORT_SUCCESSFULLY_MERGED %
-                                 ('1', '1'), report_out.getvalue().strip())
+                                 ('1', PKG_NAME, '1'),
+                                 report_out.getvalue().strip())
 
     def test_detail_merge_error_job_ids(self):
         """Testing report merge error with scan job ids."""
@@ -163,7 +165,7 @@ class ReportDetailTests(unittest.TestCase):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_SUCCESSFULLY_MERGED % (
-                                     '1', '1'))
+                                     '1', PKG_NAME, '1'))
 
     def test_detail_merge_error_report_ids(self):
         """Testing report merge error with report ids."""
@@ -200,7 +202,9 @@ class ReportDetailTests(unittest.TestCase):
                              report_ids=None)
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', '1'),
+                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1',
+                                                                     PKG_NAME,
+                                                                     '1'),
                               report_out.getvalue().strip())
 
     def test_detail_merge_json_files_not_exist(self):
@@ -270,7 +274,7 @@ class ReportDetailTests(unittest.TestCase):
                              json_dir=['/tmp/'])
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', '1'),
+                self.assertIn(messages.REPORT_SUCCESSFULLY_MERGED % ('1', PKG_NAME, '1'),
                               report_out.getvalue().strip())
 
     def test_detail_merge_json_directory_error_dir_not_found(self):

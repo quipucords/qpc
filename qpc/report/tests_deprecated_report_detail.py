@@ -20,11 +20,14 @@ from io import StringIO
 
 from qpc import messages
 from qpc.cli import CLI
+from qpc.release import PKG_NAME
 from qpc.report import REPORT_URI
 from qpc.report.deprecated_detail import DeprecatedReportDetailCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
-from qpc.utils import create_tar_buffer, get_server_location, write_server_config
+from qpc.utils import (create_tar_buffer,
+                       get_server_location,
+                       write_server_config)
 
 import requests_mock
 
@@ -87,7 +90,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED, output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_json_filename, 'r') as json_file:
                     data = json_file.read()
@@ -116,7 +120,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED, output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_json_filename, 'r') as json_file:
                     data = json_file.read()
@@ -151,7 +156,8 @@ class ReportDetailTests(unittest.TestCase):
             with redirect_stdout(report_out):
                 nac.main(args)
                 output = report_out.getvalue().strip()
-                self.assertIn(messages.REPORT_DETAIL_DEPRECATED, output)
+                self.assertIn(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME,
+                                                                   PKG_NAME), output)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, output)
                 with open(self.test_csv_filename, 'r') as json_file:
                     data = json_file.read()

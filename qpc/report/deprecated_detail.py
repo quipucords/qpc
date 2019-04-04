@@ -15,6 +15,7 @@ from __future__ import print_function
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
+from qpc.release import PKG_NAME
 from qpc.report.details import ReportDetailsCommand
 from qpc.request import GET
 from qpc.translation import _
@@ -63,5 +64,5 @@ class DeprecatedReportDetailCommand(ReportDetailsCommand):
         self.report_id = None
 
     def _validate_args(self):
-        print(_(messages.REPORT_DETAIL_DEPRECATED))
+        print(_(messages.REPORT_DETAIL_DEPRECATED % (PKG_NAME, PKG_NAME)))
         super()._validate_args()

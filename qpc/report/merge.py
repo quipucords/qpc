@@ -20,6 +20,7 @@ from glob import glob
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
+from qpc.release import PKG_NAME
 from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
@@ -247,6 +248,7 @@ class ReportMergeCommand(CliCommand):
         if json_data.get('id'):
             print(_(messages.REPORT_SUCCESSFULLY_MERGED % (
                 json_data.get('id'),
+                PKG_NAME,
                 json_data.get('id'))))
 
     def _handle_response_error(self):

@@ -15,6 +15,7 @@ import unittest
 from io import StringIO
 
 from qpc.cli import CLI
+from qpc.release import VERSION
 from qpc.tests_utilities import HushUpStderr, redirect_stdout
 
 
@@ -40,4 +41,4 @@ class CliTests(unittest.TestCase):
             with redirect_stdout(version_out):
                 sys.argv = ['/bin/qpc', '--version']
                 CLI().main()
-                self.assertEqual(version_out.getvalue(), '0.0.47')
+                self.assertEqual(version_out.getvalue(), VERSION)

@@ -13,8 +13,6 @@ BASE_QPC_DIR = os.path.abspath(
     os.path.normpath(
         os.path.join(os.path.dirname(sys.argv[0]), '.')))
 sys.path.insert(0, os.path.join(BASE_QPC_DIR, 'qpc'))
-# pylint: disable=wrong-import-position
-from qpc import __version__  # noqa: E402, I100
 
 setup(
     name=PKG_NAME,

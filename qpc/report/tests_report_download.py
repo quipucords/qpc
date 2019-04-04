@@ -21,6 +21,7 @@ from io import StringIO  # noqa: I100
 
 from qpc import messages
 from qpc.cli import CLI
+from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
@@ -75,7 +76,7 @@ class ReportDownloadTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
@@ -98,7 +99,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -214,7 +215,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -235,7 +236,7 @@ class ReportDownloadTests(unittest.TestCase):
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        json=get_report_json_data)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -279,7 +280,7 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,

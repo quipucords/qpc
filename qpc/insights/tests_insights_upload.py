@@ -22,6 +22,7 @@ from io import StringIO  # noqa: I100
 from qpc import messages
 from qpc.insights import CLIENT_VERSION, CORE_VERSION, REPORT_URI
 from qpc.insights.upload import InsightsUploadCommand, verify_report_hosts
+from qpc.release import VERSION
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
 from qpc.utils import (create_tar_buffer,
@@ -113,7 +114,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -141,7 +142,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -164,7 +165,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         buffer_content = create_tar_buffer({'insights.json': self.json_missing_hosts})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -194,7 +195,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
@@ -261,7 +262,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=404,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -285,7 +286,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -314,7 +315,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         buffer_content = create_tar_buffer({'insights.json': self.success_json})
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -338,7 +339,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
@@ -367,7 +368,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       headers={'X-Server-Version': '0.0.47'},
+                       headers={'X-Server-Version': VERSION},
                        json=None)
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',

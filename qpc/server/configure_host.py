@@ -54,13 +54,17 @@ class ConfigureHostCommand(CliCommand):
         self.parser.add_argument('--use-http', dest='use_http',
                                  action='store_true',
                                  help=SUPPRESS, required=False)
+        self.parser.add_argument('--disable-auth', dest='require_token',
+                                 action='store_false',
+                                 help=SUPPRESS, required=False)
 
     def _do_command(self):
         """Persist the server configuration."""
         server_config = {'host': self.args.host,
                          'port': int(self.args.port),
                          'use_http': self.args.use_http,
-                         'ssl_verify': self.args.ssl_verify}
+                         'ssl_verify': self.args.ssl_verify,
+                         'require_token': self.args.require_token}
         write_server_config(server_config)
         protocol = 'https'
         if self.args.use_http:

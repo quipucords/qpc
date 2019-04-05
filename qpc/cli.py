@@ -58,6 +58,7 @@ from qpc.utils import (ensure_config_dir_exists,
                        get_server_location,
                        log,
                        read_client_token,
+                       read_require_auth,
                        setup_logging)
 
 
@@ -143,10 +144,11 @@ class CLI():
                 log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
                 sys.exit(1)
 
-        if ((not is_server_cmd or is_server_logout) and
-                not read_client_token()):
-            log.error(_(messages.SERVER_LOGIN_REQUIRED % PKG_NAME))
-            sys.exit(1)
+        if(read_require_auth()):
+            if ((not is_server_cmd or is_server_logout) and
+                    not read_client_token()):
+                log.error(_(messages.SERVER_LOGIN_REQUIRED % PKG_NAME))
+                sys.exit(1)
 
         if self.args.subcommand in self.subcommands:
             subcommand = self.subcommands[self.args.subcommand]

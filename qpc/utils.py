@@ -37,6 +37,7 @@ CONFIG_HOST_KEY = 'host'
 CONFIG_PORT_KEY = 'port'
 CONFIG_USE_HTTP = 'use_http'
 CONFIG_SSL_VERIFY = 'ssl_verify'
+CONFIG_REQUIRE_TOKEN = 'require_token'
 
 LOG_LEVEL_INFO = 0
 
@@ -109,6 +110,17 @@ def read_client_token():
 
         return token
 
+def read_require_auth():
+    """Determines if CLI should require token.
+
+    :returns: True is auth token required.
+    """
+    config = read_server_config()
+    if config is None:
+        # No configuration so True
+        return True
+    return config.get(CONFIG_REQUIRE_TOKEN)
+
 
 def read_server_config():
     """Retrieve configuration for sonar server.
@@ -131,6 +143,7 @@ def read_server_config():
         port = config.get(CONFIG_PORT_KEY)
         use_http = config.get(CONFIG_USE_HTTP)
         ssl_verify = config.get(CONFIG_SSL_VERIFY, False)
+        require_token = config.get(CONFIG_REQUIRE_TOKEN)
 
         host_empty = host is None or host == ''
         port_empty = port is None or port == ''
@@ -151,9 +164,17 @@ def read_server_config():
         if use_http is None:
             use_http = True
 
+        if require_token is None:
+            require_token = True
+
         if not isinstance(use_http, bool):
             log.error('Server config %s has invalid value for use_http %s',
                       QPC_SERVER_CONFIG, use_http)
+            return None
+
+        if not isinstance(require_token, bool):
+            log.error('Server config %s has invalid value for require_token %s',
+                      QPC_SERVER_CONFIG, require_token)
             return None
 
         if (ssl_verify is not None and
@@ -173,7 +194,8 @@ def read_server_config():
         return {CONFIG_HOST_KEY: host,
                 CONFIG_PORT_KEY: port,
                 CONFIG_USE_HTTP: use_http,
-                CONFIG_SSL_VERIFY: ssl_verify}
+                CONFIG_SSL_VERIFY: ssl_verify,
+                CONFIG_REQUIRE_TOKEN: require_token}
 
 
 def write_server_config(server_config):

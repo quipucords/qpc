@@ -17,9 +17,9 @@ Description
 
 Quipucords, accessed through the ``qpc`` command, is an inspection and reporting tool. It is designed to identify environment data, or *facts*, such as the number of physical and virtual systems on a network, their operating systems, and other configuration data. In addition, it is designed to identify and report more detailed facts for some versions of key Red Hat packages and products for the Linux based IT resources in that network. The ability to inspect the software and systems that are running on your network improves your ability to understand and report on your entitlement usage. Ultimately, this inspection and reporting process is part of the larger system administration task of managing your inventories.
 
-Quipucords uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite, plus includes one or more credentials to use to access that network or systems management solution during the inspection process. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
+Quipucords uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite. Additionally, it includes one or more credentials to use to access that network or systems management solution during the inspection process. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
 
-By default, the credentials and sources that are created when using Quipucords are encrypted in a database. The values are encrypted with AES-256 encryption. They are decrypted when the Quipucords server runs a scan, by using a *vault password* to access the encrypted values that are stored in the database.
+By default, the credentials and sources that are created when using Quipucords are encrypted in a database. The values are encrypted with AES-256 encryption. They are decrypted when the Quipucords server runs a scan by using a *vault password* to access the encrypted values that are stored in the database.
 
 Quipucords is an *agentless* inspection tool, so there is no need to install the tool on the sources to be inspected.
 
@@ -88,9 +88,9 @@ To configure the connection to the server, supply the host address. Supplying a 
 Logging in to the server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token that is used for authentication with subsequent command line interface commands.
+To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token, which is used for authentication with any command line interface commands that follow it.
 
-**qpc server login [--username=** *username* **]**
+**qpc server login [--username=** *username* **]**A source defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite, plus includes one or more credentials to use to access that network or systems management solution during the inspection process.
 
 ``--username=username``
 
@@ -122,7 +122,7 @@ Credentials
 
 Use the ``qpc cred`` command to create and manage credentials.
 
-A credential contains a set of user authentication information to be used during a scan. A credential includes a user name and a password or SSH key. Quipucords uses SSH to connect to servers on the network and uses credentials to access those servers.
+A credential contains user name and password or SSH key information which is used during a scan.Quipucords uses SSH to connect to servers on the network and uses credentials to access those servers.
 
 When a scan runs, it uses a source that contains information such as the host names, IP addresses, a network, or a systems management solution to be accessed. The source also contains references to the credentials that are required to access those systems. A single source can contain a reference to multiple credentials as needed to connect to all systems in that network or systems management solution.
 
@@ -169,7 +169,7 @@ To create a credential, supply the type of credential and supply SSH credentials
 
   Prompts for the privilege escalation password to be used when running a network scan.
 
-The information in a credential, such as a password, become password, SSH keys, the become_method, or even the user name, might change. For example, network security might require passwords to be updated every few months. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
+The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, or even the user name. For example, network security might require passwords to be updated every few months. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
 
 **qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]**
 
@@ -216,7 +216,7 @@ Sources
 
 Use the ``qpc source`` command to create and manage sources.
 
-A source contains a single entity or a set of multiple entities that are to be inspected. A source can be a single physical machine, virtual machine, or container, or it can be a collection of network information, including IP addresses or host names, or information about a systems management solution such as vCenter Server or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
+A source contains a single entity or a set of multiple entities that are to be inspected. A source can be a single physical machine, virtual machine, or container, or it can be a collection of network information, including IP addresses or host names or information about a systems management solution such as vCenter Server or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
 
 When you configure a scan, it contains references to one or more sources, including the credentials that are provided in each source. Therefore, you can reference sources in different scan configurations for various purposes, for example, to scan your entire infrastructure or a specific sector of that infrastructure.
 
@@ -271,7 +271,7 @@ To create a source, supply the type of source with the ``type`` option, one or m
 
 ``--port=port``
 
-  Optional. Sets a port to be used for the scan. This value supports connection and inspection on a non-standard port. By default, a network scan runs on port 22 and a vcenter or satellite scan runs on port 443.
+  Optional. Sets a port to be used for the scan. This value supports connection and inspection on a non-standard port. By default, a Network scan runs on port 22, and a vCenter or Satellite scan runs on port 443.
 
 ``--use-paramiko=(True | False)``
 
@@ -343,7 +343,7 @@ Scans
 
 Use the ``qpc scan`` command to create, run and manage scans.
 
-A scan contains a set of one or more sources of any type plus additional options that refine how the scan runs, such as the products to omit from the scan and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include network and systems management solution (such as Satellite and vCenter Server) sources in a single scan. When you configure a scan to include multiple sources of different types, for example, a network source and a satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results, or a processed deployments report with deduplicated and merged results.
+A scan contains a set of one or more sources of any type plus additional options that refine how the scan runs, such as the products to omit from the scan and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include network and systems management solution, such as Satellite and vCenter Server, sources in a single scan. When you configure a scan to include multiple sources of different types, for example, a Network source and a Satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results, or a processed deployments report with deduplicated and merged results.
 
 The creation of a scan references the sources, the credentials contained within those sources, and the other options so that the act of running the scan is repeatable. When you run the scan, each instance is saved as a scan job.
 
@@ -367,7 +367,7 @@ Use the ``qpc scan add`` command to create scan objects with one or more sources
 
 ``--enabled-ext-product-search=products_list``
 
-  Optional. Contains the list of products to include for the extended product search. Extended product search is used to find products that might be installed in nondefault locations. Valid values are ``jboss_eap``, ``jboss_fuse``, ``jboss_ws``, and ``jboss_brms``.
+  Optional. Contains the list of products to include for the extended product search. Extended product search is used to find products that might be installed in non-default locations. Valid values are ``jboss_eap``, ``jboss_fuse``, ``jboss_ws``, and ``jboss_brms``.
 
 ``--ext-product-search-dirs=search_dirs_list``
 
@@ -497,7 +497,7 @@ Use the ``qpc report`` command to generate a report from a scan. You can generat
 
 Viewing the Details Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report details`` command generates a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from network, vcenter, and satellite scans, as applicable.
+The ``qpc report details`` command generates a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, and Satellite scans, as applicable.
 
 **qpc report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 
@@ -525,7 +525,7 @@ Viewing the Deployments Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``qpc report deployments`` command generates a report that contains the processed fingerprints from a scan. A *fingerprint* is the set of system, product, and entitlement facts for a particular physical or virtual machine. A processed fingerprint results from a procedure that merges facts from various sources, and, when possible, deduplicates redundant systems.
 
-For example, the raw facts of a scan that includes both network and vcenter sources could show two instances of a machine, indicated by an identical MAC address. The generation of a deployments report results in a deduplicated and merged fingerprint that shows both the network and vcenter facts for that machine.
+For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The generation of a deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine.
 
 **qpc report deployments (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 

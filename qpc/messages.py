@@ -158,12 +158,6 @@ SCAN_ENABLED_PRODUCT_HELP = \
 SCAN_EXT_SEARCH_DIRS_HELP = \
     'A list of fully-qualified paths to search for extended product '\
     'search.'
-
-REPORT_DETAIL_DEPRECATED = 'WARNING: "%s report detail" is deprecated. ' \
-    'Use "%s report details" instead.'
-REPORT_SUMMARY_DEPRECATED = 'WARNING: "%s report summary" is deprecated. ' \
-    'Use "%s report deployments" instead.'
-
 REPORT_JSON_FILE_HELP = 'A list of files that contain the json details ' \
                         'reports to merge.'
 REPORT_JSON_DIR_HELP = 'The path to a directory that contain files of json ' \

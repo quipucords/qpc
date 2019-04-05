@@ -27,9 +27,7 @@ from qpc.cred.commands import (CredAddCommand,
                                CredShowCommand,)
 from qpc.insights.commands import (InsightsUploadCommand)
 from qpc.release import (PKG_NAME, VERSION)
-from qpc.report.commands import (DeprecatedReportDetailCommand,
-                                 DeprecatedReportSummaryCommand,
-                                 ReportDeploymentsCommand,
+from qpc.report.commands import (ReportDeploymentsCommand,
                                  ReportDetailsCommand,
                                  ReportDownloadCommand,
                                  ReportInsightsCommand,
@@ -110,9 +108,7 @@ class CLI():
                               ReportInsightsCommand,
                               ReportDownloadCommand,
                               ReportMergeCommand,
-                              ReportMergeStatusCommand,
-                              DeprecatedReportSummaryCommand,
-                              DeprecatedReportDetailCommand])
+                              ReportMergeStatusCommand])
         self._add_subcommand(insights.SUBCOMMAND,
                              [InsightsUploadCommand])
         ensure_data_dir_exists()

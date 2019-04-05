@@ -19,11 +19,6 @@ INSIGHTS = 'insights'
 MERGE = 'merge'
 MERGE_STATUS = 'merge-status'
 DOWNLOAD = 'download'
-
-# deprecated
-SUMMARY = 'summary'
-DETAIL = 'detail'
-
 REPORT_URI = '/api/v1/reports/'
 DETAILS_PATH_SUFFIX = '/details/'
 DEPLOYMENTS_PATH_SUFFIX = '/deployments/'

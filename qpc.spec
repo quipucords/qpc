@@ -2,7 +2,7 @@
 
 Name: qpc
 Version: 0.0.46
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 
 Group: Applications/Internet
@@ -13,25 +13,33 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if 0%{?rhel}%{?el6}%{?el7}
+%if 0%{?el6}
 BuildRequires: epel-release
 BuildRequires: python34-devel
 BuildRequires: python34-setuptools
-%endif
-%if 0%{?fedora} >= 26
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-%endif
-BuildRequires: pandoc
-%if 0%{?rhel}%{?el6}%{?el7}
 Requires: epel-release
 Requires: python34
 Requires: python34-requests
 %endif
+
+%if 0%{?el7}
+BuildRequires: epel-release
+BuildRequires: python36-devel
+BuildRequires: python36-setuptools
+Requires: epel-release
+Requires: python36
+Requires: python36-requests
+%endif
+
 %if 0%{?fedora} >= 26
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 Requires: python3
 Requires: python3-requests
 %endif
+
+BuildRequires: pandoc
+
 
 %description
 QPC is tool for discovery and inspection of an IT environment.
@@ -56,6 +64,8 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
+* Tue Apr 9 2019 Kevan Holdaway <kholdawa@redhat.com> 0.0.46-2
+- Fix spec for CentOS/RHEL 7
 * Wed Jan 23 2019 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
 - Change qpc server default port to 9443. <cmyers@redhat.com>
 - Add qpc report download command. <cmyers@redhat.com>

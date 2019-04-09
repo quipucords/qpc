@@ -60,14 +60,14 @@ class ReportInsightsCommand(CliCommand):
     def _validate_args(self):
         CliCommand._validate_args(self)
         self.req_headers = {'Accept': 'application/json+gzip'}
+        if '.json' not in self.args.path:
+            print(_(messages.OUTPUT_FILE_TYPE % '.json'))
+            sys.exit(1)
 
         try:
             validate_write_file(self.args.path, 'output-file')
         except ValueError as error:
             print(error)
-            sys.exit(1)
-        if '.json' not in self.args.path:
-            print(_(messages.OUTPUT_FILE_TYPE % '.json'))
             sys.exit(1)
 
         if self.args.report_id is None:

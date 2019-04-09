@@ -13,13 +13,13 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if 0%{?rhel}%{?el6}
+%if 0%{?el6}
 BuildRequires: epel-release
 BuildRequires: python34-devel
 BuildRequires: python34-setuptools
 %endif
 
-%if 0%{?rhel}%{?el7}
+%if 0%{?el7}
 BuildRequires: epel-release
 BuildRequires: python36-devel
 BuildRequires: python36-setuptools
@@ -32,13 +32,13 @@ BuildRequires: python3-setuptools
 
 BuildRequires: pandoc
 
-%if 0%{?rhel}%{?el6}
+%if 0%{?el6}
 Requires: epel-release
 Requires: python34
 Requires: python34-requests
 %endif
 
-%if 0%{?rhel}%{?el7}
+%if 0%{?el7}
 Requires: epel-release
 Requires: python36
 Requires: python36-requests

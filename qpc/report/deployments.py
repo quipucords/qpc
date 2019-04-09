@@ -19,7 +19,8 @@ from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (extract_json_from_tar,
+from qpc.utils import (check_extension,
+                       extract_json_from_tar,
                        validate_write_file,
                        write_file)
 
@@ -63,16 +64,15 @@ class ReportDeploymentsCommand(CliCommand):
 
     def _validate_args(self):
         CliCommand._validate_args(self)
+        extension = None
         if self.args.output_json:
-            if '.json' not in self.args.path:
-                print(_(messages.OUTPUT_FILE_TYPE % '.json'))
-                sys.exit(1)
+            extension = '.json'
             self.req_headers = {'Accept': 'application/json+gzip'}
         if self.args.output_csv:
-            if '.csv' not in self.args.path:
-                print(_(messages.OUTPUT_FILE_TYPE % '.csv'))
-                sys.exit(1)
+            extension = '.csv'
             self.req_headers = {'Accept': 'text/csv'}
+        if extension:
+            check_extension(extension, self.args.path)
 
         try:
             validate_write_file(self.args.path, 'output-file')

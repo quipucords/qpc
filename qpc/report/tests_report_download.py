@@ -290,4 +290,4 @@ class ReportDownloadTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 messages.DOWNLOAD_REQUIRE_TAR)
+                                 messages.OUTPUT_FILE_TYPE % 'tar.gz.')

@@ -257,7 +257,7 @@ class ReportInsightsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_JSON))
+                                 (messages.OUTPUT_FILE_TYPE % '.json'))
 
     def test_insights_report_id_not_exist(self):
         """Test insights with nonexistent report id."""

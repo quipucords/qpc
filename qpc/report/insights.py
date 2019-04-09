@@ -67,7 +67,7 @@ class ReportInsightsCommand(CliCommand):
             print(error)
             sys.exit(1)
         if '.json' not in self.args.path:
-            print(_(messages.OUTPUT_FILE_JSON))
+            print(_(messages.OUTPUT_FILE_TYPE % '.json'))
             sys.exit(1)
 
         if self.args.report_id is None:

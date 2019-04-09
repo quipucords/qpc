@@ -62,7 +62,7 @@ class ReportDownloadCommand(CliCommand):
             print(error)
             sys.exit(1)
         if '.tar.gz' not in self.args.path:
-            print(_(messages.DOWNLOAD_REQUIRE_TAR))
+            print(_(messages.OUTPUT_FILE_TYPE % 'tar.gz.'))
             sys.exit(1)
         if self.args.report_id is None:
             # Lookup scan job id

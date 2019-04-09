@@ -298,7 +298,7 @@ class ReportDetailsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_JSON))
+                                 (messages.OUTPUT_FILE_TYPE % '.json'))
 
     def test_details_noncsv_path(self):
         """Testing error for noncsv file path."""
@@ -323,7 +323,7 @@ class ReportDetailsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_CSV))
+                                 (messages.OUTPUT_FILE_TYPE % '.csv'))
 
     def test_details_report_id_not_exist(self):
         """Test details with nonexistent report id."""

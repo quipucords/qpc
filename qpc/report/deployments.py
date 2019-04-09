@@ -65,12 +65,12 @@ class ReportDeploymentsCommand(CliCommand):
         CliCommand._validate_args(self)
         if self.args.output_json:
             if '.json' not in self.args.path:
-                print(_(messages.OUTPUT_FILE_JSON))
+                print(_(messages.OUTPUT_FILE_TYPE % '.json'))
                 sys.exit(1)
             self.req_headers = {'Accept': 'application/json+gzip'}
         if self.args.output_csv:
             if '.csv' not in self.args.path:
-                print(_(messages.OUTPUT_FILE_CSV))
+                print(_(messages.OUTPUT_FILE_TYPE % '.csv'))
                 sys.exit(1)
             self.req_headers = {'Accept': 'text/csv'}
 

@@ -299,7 +299,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_JSON))
+                                 (messages.OUTPUT_FILE_TYPE % '.json'))
 
     def test_deployments_noncsv_directory(self):
         """Testing error for noncsv output path."""
@@ -324,7 +324,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_CSV))
+                                 (messages.OUTPUT_FILE_TYPE % '.csv'))
 
     def test_deployments_report_id_not_exist(self):
         """Test deployments with nonexistent report id."""

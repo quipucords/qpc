@@ -17,37 +17,28 @@ BuildArch: noarch
 BuildRequires: epel-release
 BuildRequires: python34-devel
 BuildRequires: python34-setuptools
-%endif
-
-%if 0%{?el7}
-BuildRequires: epel-release
-BuildRequires: python36-devel
-BuildRequires: python36-setuptools
-%endif
-
-%if 0%{?fedora} >= 26
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-%endif
-
-BuildRequires: pandoc
-
-%if 0%{?el6}
 Requires: epel-release
 Requires: python34
 Requires: python34-requests
 %endif
 
 %if 0%{?el7}
+BuildRequires: epel-release
+BuildRequires: python36-devel
+BuildRequires: python36-setuptools
 Requires: epel-release
 Requires: python36
 Requires: python36-requests
 %endif
 
 %if 0%{?fedora} >= 26
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 Requires: python3
 Requires: python3-requests
 %endif
+
+BuildRequires: pandoc
 
 %description
 QPC is tool for discovery and inspection of an IT environment.

@@ -66,6 +66,9 @@ class ReportInsightsCommand(CliCommand):
         except ValueError as error:
             print(error)
             sys.exit(1)
+        if '.json' not in self.args.path:
+            print(_(messages.OUTPUT_FILE_JSON))
+            sys.exit(1)
 
         if self.args.report_id is None:
             # Lookup scan job id

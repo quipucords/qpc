@@ -252,7 +252,7 @@ class ReportDeploymentsTests(unittest.TestCase):
 
     def test_deployments_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
-        fake_dir = '/cody/is/awesome/'
+        fake_dir = '/cody/is/awesome/deployments.json'
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/deployments/'
@@ -275,6 +275,56 @@ class ReportDeploymentsTests(unittest.TestCase):
                 self.assertEqual(report_out.getvalue().strip(),
                                  (messages.REPORT_DIRECTORY_DOES_NOT_EXIST %
                                   os.path.dirname(fake_dir)))
+
+    def test_deployments_nonjson_directory(self):
+        """Testing error for nonjson output path."""
+        non_json_dir = '/Users/deployments.tar.gz'
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=True,
+                             output_csv=False,
+                             path=non_json_dir)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 (messages.OUTPUT_FILE_JSON))
+
+    def test_deployments_noncsv_directory(self):
+        """Testing error for noncsv output path."""
+        non_csv_dir = '/cody/is/awesome/deployments.tar.gz'
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=False,
+                             output_csv=True,
+                             path=non_csv_dir)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 (messages.OUTPUT_FILE_CSV))
 
     def test_deployments_report_id_not_exist(self):
         """Test deployments with nonexistent report id."""

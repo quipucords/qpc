@@ -110,8 +110,9 @@ def read_client_token():
 
         return token
 
+
 def read_require_auth():
-    """Determines if CLI should require token.
+    """Determine if CLI should require token.
 
     :returns: True is auth token required.
     """

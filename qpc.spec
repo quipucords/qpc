@@ -13,25 +13,32 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if 0%{?rhel}%{?el6}%{?el7}
+%if 0%{?el6}
 BuildRequires: epel-release
 BuildRequires: python34-devel
 BuildRequires: python34-setuptools
-%endif
-%if 0%{?fedora} >= 26
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-%endif
-BuildRequires: pandoc
-%if 0%{?rhel}%{?el6}%{?el7}
 Requires: epel-release
 Requires: python34
 Requires: python34-requests
 %endif
+
+%if 0%{?el7}
+BuildRequires: epel-release
+BuildRequires: python36-devel
+BuildRequires: python36-setuptools
+Requires: epel-release
+Requires: python36
+Requires: python36-requests
+%endif
+
 %if 0%{?fedora} >= 26
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 Requires: python3
 Requires: python3-requests
 %endif
+
+BuildRequires: pandoc
 
 %description
 QPC is tool for discovery and inspection of an IT environment.
@@ -61,6 +68,7 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 - Update qpc insights upload command to use new QPC Insights report format. <kholdawa@redhat.com>
 - Remove deprecated CLI summary/detail commands. <cmyers@redhat.com>
 - Bump version to 1.0.0
+- Modify spec file for RHEL 7 python36
 * Wed Jan 23 2019 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
 - Add deployment report verification to qpc insights upload command. <aaiken@redhat.com>
 - Add qpc insights commands. <cmyers@redhat.com>

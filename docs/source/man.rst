@@ -15,13 +15,13 @@ Synopsis
 Description
 -----------
 
-Quipucords, accessed through the ``qpc`` command, is an inspection and reporting tool. It is designed to identify environment data, or *facts*, such as the number of physical and virtual systems on a network, their operating systems, and other configuration data. In addition, it is designed to identify and report more detailed facts for some versions of key Red Hat packages and products for the Linux based IT resources in that network. The ability to inspect the software and systems that are running on your network improves your ability to understand and report on your entitlement usage. Ultimately, this inspection and reporting process is part of the larger system administration task of managing your inventories.
+The Quipucords tool, accessed through the ``qpc`` command, is an inspection and reporting tool. It is designed to identify environment data, or *facts*, such as the number of physical and virtual systems on a network, their operating systems, and other configuration data. In addition, it is designed to identify and report more detailed facts for some versions of key Red Hat packages and products for the Linux based IT resources in that network. The ability to inspect the software and systems that are running on your network improves your ability to understand and report on your entitlement usage. Ultimately, this inspection and reporting process is part of the larger system administration task of managing your inventories.
 
-Quipucords uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite. Additionally, it includes one or more credentials to use to access that network or systems management solution during the inspection process. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
+The Quipucords tool uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite. Additionally, it includes one or more credentials to use to access that network or systems management solution during the inspection process. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
 
 By default, the credentials and sources that are created when using Quipucords are encrypted in a database. The values are encrypted with AES-256 encryption. They are decrypted when the Quipucords server runs a scan by using a *vault password* to access the encrypted values that are stored in the database.
 
-Quipucords is an *agentless* inspection tool, so there is no need to install the tool on the sources to be inspected.
+The Quipucords tool is an *agentless* inspection tool, so there is no need to install the tool on the sources to be inspected.
 
 This manual page describes the commands, subcommands, and options for the ``qpc`` command and includes usage information and example commands.
 
@@ -122,14 +122,14 @@ Credentials
 
 Use the ``qpc cred`` command to create and manage credentials.
 
-A credential contains user name and password or SSH key information which is used during a scan.Quipucords uses SSH to connect to servers on the network and uses credentials to access those servers.
+A credential contains user name and password or SSH key information that is used for authentication during a scan. The Quipucords tool uses SSH to connect to servers on the network and uses credentials to access those servers.
 
 When a scan runs, it uses a source that contains information such as the host names, IP addresses, a network, or a systems management solution to be accessed. The source also contains references to the credentials that are required to access those systems. A single source can contain a reference to multiple credentials as needed to connect to all systems in that network or systems management solution.
 
 Creating and Editing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To create a credential, supply the type of credential and supply SSH credentials as either a user name-password pair or a user name-key pair. Quipucords stores each set of credentials in a separate credential entry.
+To create a credential, supply the type of credential and supply SSH credentials as either a user name-password pair or a user name-key pair. The Quipucords tool stores each set of credentials in a separate credential entry.
 
 **qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]**
 
@@ -688,7 +688,7 @@ The authentication data in the credentials and the network-specific and system-s
 Authors
 -------
 
-Quipucords was originally written by Chris Hambridge <chambrid@redhat.com>, Noah Lavine <nlavine@redhat.com>, Kevan Holdaway <kholdawa@redhat.com>, and Ashley Aiken <aaiken@redhat.com>.
+The Quipucords tool was originally written by Chris Hambridge <chambrid@redhat.com>, Kevan Holdaway <kholdawa@redhat.com>, Ashley Aiken <aaiken@redhat.com>, Cody Myers <cmyers@redhat.com>, and Cecilia Carter <cecarter@redhat.com>.
 
 Copyright
 ---------

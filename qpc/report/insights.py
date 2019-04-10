@@ -20,7 +20,8 @@ from qpc.clicommand import CliCommand
 from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (extract_json_from_tar,
+from qpc.utils import (check_extension,
+                       extract_json_from_tar,
                        validate_write_file,
                        write_file)
 
@@ -60,6 +61,7 @@ class ReportInsightsCommand(CliCommand):
     def _validate_args(self):
         CliCommand._validate_args(self)
         self.req_headers = {'Accept': 'application/json+gzip'}
+        check_extension('.json', self.args.path)
 
         try:
             validate_write_file(self.args.path, 'output-file')

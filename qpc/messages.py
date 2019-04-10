@@ -319,9 +319,9 @@ DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
 DOWNLOAD_NO_REPORT_FOUND = 'Report %s not found.'
 DOWNLOAD_PATH_HELP = 'The output file\'s name and location. This file is ' \
     'required to be a tar.gz'
-DOWNLOAD_REQUIRE_TAR = 'The output file\'s extension is required to be tar.gz'
 DOWNLOAD_SUCCESSFULLY_WRITTEN = 'Report %s successfully written to %s.'
 DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'
 
 SERVER_TOO_OLD_FOR_CLI = 'The CLI requires a minimum server version of %s.  '\
     'Upgrade your server to %s or greater.  Server is currently at version %s.'
+OUTPUT_FILE_TYPE = 'The output file\'s extension is required to be %s.'

@@ -144,7 +144,7 @@ class CLI():
                 log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
                 sys.exit(1)
 
-        if(read_require_auth()):
+        if read_require_auth():
             if ((not is_server_cmd or is_server_logout) and
                     not read_client_token()):
                 log.error(_(messages.SERVER_LOGIN_REQUIRED % PKG_NAME))

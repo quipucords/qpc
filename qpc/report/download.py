@@ -19,7 +19,8 @@ from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (validate_write_file,
+from qpc.utils import (check_extension,
+                       validate_write_file,
                        write_file)
 
 from requests import codes
@@ -61,9 +62,7 @@ class ReportDownloadCommand(CliCommand):
         except ValueError as error:
             print(error)
             sys.exit(1)
-        if '.tar.gz' not in self.args.path:
-            print(_(messages.DOWNLOAD_REQUIRE_TAR))
-            sys.exit(1)
+        check_extension('tar.gz', self.args.path)
         if self.args.report_id is None:
             # Lookup scan job id
             response = request(parser=self.parser, method=GET,

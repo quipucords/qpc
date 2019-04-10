@@ -17,6 +17,7 @@ import io
 import json
 import logging
 import os
+import sys
 import tarfile
 
 from qpc import messages
@@ -110,8 +111,9 @@ def read_client_token():
 
         return token
 
+
 def read_require_auth():
-    """Determines if CLI should require token.
+    """Determine if CLI should require token.
 
     :returns: True is auth token required.
     """
@@ -430,3 +432,10 @@ def create_tar_buffer(files_data):
             tar_file.addfile(tarinfo=info, fileobj=file_buffer)
     tar_buffer.seek(0)
     return tar_buffer.getvalue()
+
+
+def check_extension(extension, path):
+    """Check if .json is in the file extension."""
+    if extension not in path:
+        print(t(messages.OUTPUT_FILE_TYPE % extension))
+        sys.exit(1)

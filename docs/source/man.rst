@@ -17,7 +17,7 @@ Description
 
 The Quipucords tool, accessed through the ``qpc`` command, is an inspection and reporting tool. It is designed to identify environment data, or *facts*, such as the number of physical and virtual systems on a network, their operating systems, and other configuration data. In addition, it is designed to identify and report more detailed facts for some versions of key Red Hat packages and products for the Linux based IT resources in that network. The ability to inspect the software and systems that are running on your network improves your ability to understand and report on your entitlement usage. Ultimately, this inspection and reporting process is part of the larger system administration task of managing your inventories.
 
-The Quipucords tool uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite. Additionally, it includes one or more credentials to use to access that network or systems management solution during the inspection process. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
+The Quipucords tool uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected and one or more credentials to use during the inspection process. The entity to be inspected can be a host, subnet, network, or systems management solution such as vCenter Server or Satellite. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
 
 By default, the credentials and sources that are created when using Quipucords are encrypted in a database. The values are encrypted with AES-256 encryption. They are decrypted when the Quipucords server runs a scan by using a *vault password* to access the encrypted values that are stored in the database.
 
@@ -88,7 +88,7 @@ To configure the connection to the server, supply the host address. Supplying a 
 Logging in to the server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token, which is used for authentication with any command line interface commands that follow it.
+To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token that is used for authentication with any command line interface commands that follow it.
 
 **qpc server login [--username=** *username* **]**A source defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite, plus includes one or more credentials to use to access that network or systems management solution during the inspection process.
 
@@ -108,13 +108,13 @@ To log out of the server, use the ``logout`` subcommand. This command removes th
 Viewing the server status
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To view or save the status information of the server, use the ``status`` subcommand. This command returns the information from the status endpoint.
+To view or save the status information for the server, use the ``status`` subcommand. This command returns data about your Quipucords server environment, such as server build and API versions, environment variable information, installed prerequisites and versions, and other server metadata that can help diagnose issues during troubleshooting.
 
 **qpc server status [--output-file** *path* **]**
 
 ``--output-file=path``
 
-  Optional. Path to a file location where the status information is saved.
+  Optional. Sets the path to a file location where the status information is saved.
 
 
 Credentials
@@ -216,7 +216,7 @@ Sources
 
 Use the ``qpc source`` command to create and manage sources.
 
-A source contains a single entity or a set of multiple entities that are to be inspected. A source can be a single physical machine, virtual machine, or container, or it can be a collection of network information, including IP addresses or host names or information about a systems management solution such as vCenter Server or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
+A source contains a single entity or a set of multiple entities that are to be inspected. A source can be one or more physical machines, virtual machines, or containers, or it can be a collection of network information, including IP addresses or host names, or it can be information about a systems management solution such as vCenter Server or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
 
 When you configure a scan, it contains references to one or more sources, including the credentials that are provided in each source. Therefore, you can reference sources in different scan configurations for various purposes, for example, to scan your entire infrastructure or a specific sector of that infrastructure.
 
@@ -259,7 +259,7 @@ To create a source, supply the type of source with the ``type`` option, one or m
 
 ``--exclude-hosts ip_address``
 
-  Optional. Sets the host name, IP address, or IP address range to exclude when running a scan. Follows the same formatting options as ``--hosts`` shown above.
+  Optional. Sets the host name, IP address, or IP address range to exclude when running a scan. Values for this option use the same formatting as the ``--hosts`` option examples.
 
 ``--cred credential``
 
@@ -343,9 +343,9 @@ Scans
 
 Use the ``qpc scan`` command to create, run and manage scans.
 
-A scan contains a set of one or more sources of any type plus additional options that refine how the scan runs, such as the products to omit from the scan and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include network and systems management solution, such as Satellite and vCenter Server, sources in a single scan. When you configure a scan to include multiple sources of different types, for example, a Network source and a Satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results, or a processed deployments report with deduplicated and merged results.
+A scan contains a set of one or more sources of any type plus additional options that refine how the scan runs, such as the products to omit from the scan and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include network and systems management solution, such as Satellite and vCenter Server, sources in a single scan. When you configure a scan to include multiple sources of different types, for example, a Network source and a Satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results for each source type, or a processed deployments report with deduplicated and merged results.
 
-The creation of a scan references the sources, the credentials contained within those sources, and the other options so that the act of running the scan is repeatable. When you run the scan, each instance is saved as a scan job.
+The creation of a scan groups sources, the credentials contained within those sources, and the other options so that the act of running the scan is repeatable. When you run the scan, each instance is saved as a scan job.
 
 Creating and Editing Scans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -359,7 +359,7 @@ Use the ``qpc scan add`` command to create scan objects with one or more sources
 
 ``--max-concurrency=concurrency``
 
-  Optional. Contains the maximum number of parallel system scans. If this value is not provided, the default is ``50``.
+  Optional. Sets the maximum number of parallel system scans. If this value is not provided, the default is ``50``.
 
 ``--disabled-optional-products=products_list``
 
@@ -371,7 +371,7 @@ Use the ``qpc scan add`` command to create scan objects with one or more sources
 
 ``--ext-product-search-dirs=search_dirs_list``
 
-  Optional. Contains a list of absolute paths of directories to search with the extended product search. This option uses the provided list of directories to search for the presence of Red Hat JBoss Enterprise Application Platform (EAP), Red Hat JBoss Fuse, and Red Hat Decision Manager (formerly Red Hat JBoss BRMS).
+  Optional. Contains a list of absolute paths of directories to search with the extended product search. This option uses the provided list of directories to search for the presence of Red Hat JBoss Enterprise Application Platform (JBoss EAP), Red Hat Fuse (formerly Red Hat JBoss Fuse), Red Hat JBoss Web Server (JBoss Web Server), and Red Hat Decision Manager (formerly Red Hat JBoss BRMS).
 
 The information in a scan might change as the structure of the network changes. Use the ``qpc scan edit`` command to edit an existing scan to accommodate those changes.
 
@@ -428,9 +428,9 @@ As the network infrastructure changes, it might be necessary to delete some scan
 Scanning
 --------
 
-Use the ``qpc scan start`` command to create and run a scan job from an existing scan object. This command scans all of the host names or IP addresses that are defined in the supplied sources of the scan object from which the job is created. Each instance of a scan job is assigned a unique *identifier* to identify the scan results, so that the results data can be viewed later.
+Use the ``qpc scan start`` command to create and run a scan job from an existing scan object. This command scans all of the host names or IP addresses that are defined in the supplied sources of the scan object from which the job is created. Each instance of a scan job is assigned a unique numeric *scan job identifier* to identify the scan results, so that the results data can be viewed later. Each instance of a scan job is also assigned a numeric *report identifier* for the generated report data. Because some scan jobs do not result in report generation, scan job identifiers and report identifiers might not match.
 
-**IMPORTANT:** If any ssh-agent connection is set up for a target host, that connection will be used as a fallback connection.
+**IMPORTANT:** If any SSH agent connection is set up for a target host, that connection will be used as a fallback connection.
 
 **qpc scan start --name** *scan_name*
 
@@ -447,7 +447,7 @@ The ``qpc scan job`` command returns the list of scan jobs for a scan object or 
 
 ``--name=name``
 
-  Contains the name of the scan object of which to display the scan jobs. Mutually exclusive with the ``--id`` option.
+  Contains the name of the scan object for which to display the scan jobs. Mutually exclusive with the ``--id`` option.
 
 ``--id=scan_job_identifier``
 
@@ -492,22 +492,22 @@ The ``qpc scan cancel`` command cancels the execution of a scan job. A canceled 
 Reports
 --------
 
-Use the ``qpc report`` command to generate a report from a scan. You can generate a report as JavaScript Object Notation (JSON) format or as comma-separated values (CSV) format. There are two different types of report that you can generate, a *details* report and a *deployments* report.
+Use the ``qpc report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of report that you can retrieve, a *details* report, a *deployments* report, and an *insights* report.
 
 
 Viewing the Details Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report details`` command generates a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, and Satellite scans, as applicable.
+The ``qpc report details`` command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, and Satellite scans, as applicable.
 
 **qpc report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
-  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+  Contains the scan job identifier to use to retrieve the report. Mutually exclusive with the ``--report`` option.
 
 ``--report=report_identifier``
 
-  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to retrieve the report. Mutually exclusive with the ``--scan-job`` option.
 
 ``--json``
 
@@ -519,23 +519,23 @@ The ``qpc report details`` command generates a detailed report that contains the
 
 ``--output-file=path``
 
-  Required. Path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved.
 
 Viewing the Deployments Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report deployments`` command generates a report that contains the processed fingerprints from a scan. A *fingerprint* is the set of system, product, and entitlement facts for a particular physical or virtual machine. A processed fingerprint results from a procedure that merges facts from various sources, and, when possible, deduplicates redundant systems.
+The ``qpc report deployments`` command retrieves a report that contains the processed fingerprints from a scan. A *fingerprint* is the set of system, product, and entitlement facts for a particular physical or virtual machine. A processed fingerprint results from a procedure that merges facts from various sources, and, when possible, deduplicates redundant systems.
 
-For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The generation of a deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine.
+For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine as a single set.
 
 **qpc report deployments (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
-  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+  Contains the scan job identifier to use to retrieve the report. Mutually exclusive with the ``--report`` option.
 
 ``--report=report_identifier``
 
-  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to retrieve the report. Mutually exclusive with the ``--scan-job`` option.
 
 ``--json``
 
@@ -547,104 +547,104 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
 
 ``--output-file=path``
 
-  Required. Path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved.
 
 Viewing the Insights Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report insights`` command generates a report that contains the hosts to be uploaded to the subscription insights service. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
+The ``qpc report insights`` command retrieves a report that contains the hosts to be uploaded to the subscription insights service. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
 
 **qpc report insights (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
-  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+  Contains the scan job identifier to use to retrieve the report. Mutually exclusive with the ``--report`` option.
 
 ``--report=report_identifier``
 
-  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to retrieve the report. Mutually exclusive with the ``--scan-job`` option.
 
 ``--output-file=path``
 
-  Required. Path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved.
 
 
-Downloading all Reports
-~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report download`` command downloads all reports as a tar.gz file.  The report tar.gz file contains both the details and deployments reports in both their JSON and CSV formats.
+Downloading Reports
+~~~~~~~~~~~~~~~~~~~
+The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a tar.gz file.  The report tar.gz file contains the details and deployments reports in both their JSON and CSV formats and the insights report in JSON format.
 
 **qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
-  Contains the scan job identifier for the scan that is used to generate the report. Mutually exclusive with the ``--report`` option.
+  Contains the scan job identifier to use to download the reports. Mutually exclusive with the ``--report`` option.
 
 ``--report=report_identifier``
 
-  Contains the report identifier to retrieve.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to download the reports. Mutually exclusive with the ``--scan-job`` option.
 
 ``--output-file=path``
 
-  Required. Path to a file location where the report data is saved.  File extension must be tar.gz.
+  Required. Sets the path to a file location where the report data is saved. The file extension must be ``tar.gz``.
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report merge`` command returns the identifier of the report that is created. You can use this identifier and the ``qpc report`` command with the ``details`` or ``deployments`` subcommands to generate a report from the merged results.
+The ``qpc report merge`` command merges report data and returns the report identifier of the merged report. You can use this report identifier and the ``qpc report`` command with the ``details`` or ``deployments`` subcommands to retrieve a report from the merged results.
 
 **qpc report merge (--job-ids** *scan_job_identifiers* **|** **--report-ids** *report_identifiers* **|** **--json-files** *json_details_report_files* **|** **--json-directory** *path_to_directory_of_json_files* **)**
 
 ``--job-ids=scan_job_identifiers``
 
-  Contains the scan job identifiers that will be merged.  Mutually exclusive with the ``--report-ids`` option and the ``--json-files`` option.
+  Contains the scan job identifiers to use to merge report data. Mutually exclusive with the ``--report-ids`` option and the ``--json-files`` option.
 
 ``--report-ids=report_identifiers``
 
-  Contains the report identifiers that will be merged.  Mutually exclusive with the ``--job-ids`` option and the ``--json-files`` option.
+  Contains the report identifiers to use to merge report data.  Mutually exclusive with the ``--job-ids`` option and the ``--json-files`` option.
 
 ``--json-files=json_details_report_files``
 
-  Contains the JSON details report files that will be merged.  Mutually exclusive with the ``--job-ids`` option and the ``--report-ids`` option.
+  Contains the JSON details report files to use to merge report data.  Mutually exclusive with the ``--job-ids`` option and the ``--report-ids`` option.
 
 ``--json-directory=path_to_directory_of_json_files``
 
-  A Path to a directory with JSON details report files that will be merged. Mutually exclusive with the ``--job-ids`` and the ``--report-ids`` option.
+  Contains a path to a directory with JSON details report files to use to merge report data. Mutually exclusive with the ``--job-ids`` and the ``--report-ids`` option.
 
-The above commands run an asynchronous job.  The output of the above commands provides a job id that can be used to check the status of the merge job.  To check the status of a merge job, run the following command::
+The ``qpc report merge`` command runs an asynchronous job. The output of this command provides a job ID that you can use to check the status of the merge job. To check the status of a merge job, run the following command, where the example job ID is ``1``::
 
 # qpc report merge-status --job 1
 
-Viewing the status of a Report Merge
+Viewing the Status of a Report Merge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command will return the merge job id, which can be used to access the status of the merge.
+The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command returns a merge job ID that you can use to access the status of the merge.
 
 **qpc report merge-status (--job** *report_job_identifier* **)**
 
 ``--job=report_job_identifier``
 
-  Contains the job identifier that will be used to checked for status of a merge.
+  Contains the job identifier to use to check for the status of a merge.
 
 
 Insights
 --------
 
-Use the ``qpc insights`` command to interact with Red Hat Insights.
+Use the ``qpc insights`` command to interact with Red Hat Insights and its services.
 
 Uploading to Insights
 ~~~~~~~~~~~~~~~~~~~~~
-The ``qpc insights upload`` command can be used to upload a QPC Insights report to Red Hat Insights. You can upload a report to Insights using the associated report identifier or scan job identifier for the scan that is used to generate the report.
+The ``qpc insights upload`` command can be used to upload an insights report to Red Hat Insights and its services. You can upload a report by using the associated report identifier or scan job identifier for the scan that is used to generate the report.
 
 **qpc insights upload (--scan-job** *scan_job_identifier* **|** **--report** *report_identifiers* **|** **--no-gpg)**
 
 ``--scan-job=scan_job_identifier``
 
-  Contains the scan job identifier for the scan that is used to generate the deployments report. Mutually exclusive with the ``--report`` option.
+  Contains the scan job identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--report`` option.
 
 ``--report=report_identifier``
 
-  Contains the report identifier that is used to generate the QPC Insights report.  Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--scan-job`` option.
 
 ``--no-gpg``
 
-  Uploads the QPC Insights report without requiring the presence of GNU Privacy Guard.
+  Optional. Uploads the insights report without requiring the presence of GNU Privacy Guard.
 
 
 Options for All Commands

@@ -492,7 +492,7 @@ The ``qpc scan cancel`` command cancels the execution of a scan job. A canceled 
 Reports
 --------
 
-Use the ``qpc report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of report that you can retrieve, a *details* report, a *deployments* report, and an *insights* report.
+Use the ``qpc report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of reports that you can retrieve, a *details* report, a *deployments* report, and an *insights* report.
 
 
 Viewing the Details Report
@@ -519,7 +519,7 @@ The ``qpc report details`` command retrieves a detailed report that contains the
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report.
 
 Viewing the Deployments Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -547,7 +547,7 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved.  The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report.
 
 Viewing the Insights Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -565,12 +565,12 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved.
+  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.json``.
 
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
-The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a tar.gz file.  The report tar.gz file contains the details and deployments reports in both their JSON and CSV formats and the insights report in JSON format.
+The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats and the insights report in JSON format.
 
 **qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
@@ -584,7 +584,7 @@ The ``qpc report download`` command downloads a set of reports, identified eithe
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved. The file extension must be ``tar.gz``.
+  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -594,11 +594,11 @@ The ``qpc report merge`` command merges report data and returns the report ident
 
 ``--job-ids=scan_job_identifiers``
 
-  Contains the scan job identifiers to use to merge report data. Mutually exclusive with the ``--report-ids`` option and the ``--json-files`` option.
+  Contains the scan job identifiers of the report data that is to be merged. Mutually exclusive with the ``--report-ids`` option and the ``--json-files`` option.
 
 ``--report-ids=report_identifiers``
 
-  Contains the report identifiers to use to merge report data.  Mutually exclusive with the ``--job-ids`` option and the ``--json-files`` option.
+  Contains the report identifiers of the report data that is to be merged.  Mutually exclusive with the ``--job-ids`` option and the ``--json-files`` option.
 
 ``--json-files=json_details_report_files``
 

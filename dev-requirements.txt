@@ -15,7 +15,7 @@ pylint-plugin-utils==0.5
 pyflakes==2.1.1
 
 # Test
-requests_mock==1.5.2
+requests_mock==1.6.0
 tox==3.8.6
 
 # Doc

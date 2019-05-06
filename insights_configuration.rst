@@ -57,8 +57,7 @@ Building with Insights Client on Mac
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 After configuration is setup, you will need to build the Insights client::
 
-    cd ../insights-client
-    sudo sh lay-the-eggs-osx.sh
+    make insights-client
 
 Building with Insights Client on RHEL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -67,7 +66,7 @@ After configuration is setup, you will need to build the Insights client::
     sudo sh lay-the-eggs.sh
 
 Download Insights Core RPM
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++
 Download the last stable version of the Insights core::
 
     curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
@@ -107,6 +106,6 @@ Clean Up
 ^^^^^^^^
 If you make any changes to your configuraiton, Insights client, or Insights core in order to prevent caching issues you will need to run the following commands::
 
-    sudo rm -rf /etc/insights-client/* && sudo rm -rf /var/lib/insights/*
+    make insights-clean
 
 **Note:** After removing these files, you will need to rebuild the Insights client egg & download the Insights core again.

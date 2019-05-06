@@ -38,6 +38,10 @@ You will need to uncomment, add, or modify the following values in the file loca
     cert_verify=False
     auto_update=False
 
+    # Optionally you can add the upload_url to point to the entire path for upload
+    upload_url=https://ci.cloud.paas.upshift.redhat.com/api/ingress/v1/upload
+
+
 **Production Configuration**::
 
     auto_config=False

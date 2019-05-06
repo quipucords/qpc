@@ -31,7 +31,7 @@ You will need to uncomment, add, or modify the following values in the file loca
 **CI Configuration**::
 
     auto_config=False
-    username=username@redhat.com
+    username=username
     password=redhat
     http_timeout=20
     base_url=ci.cloud.paas.upshift.redhat.com/api

@@ -297,9 +297,8 @@ INSIGHTS_TOTAL_INVALID_HOST = 'Report %s contains the following invalid' \
 INSIGHTS_REPORT_NOT_FOUND = 'No Insights report could be found for report id: %s'
 INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
-INSIGHTS_INPUT_JSON_HELP = 'Path to local JSON file containing an Insights report.'
+INSIGHTS_INPUT_GZIP_HELP = 'Path to local tar.gz file containing an Insights report.'
 INSIGHTS_LOCAL_REPORT_NOT = '%s file cannot be found.'
-INSIGHTS_LOCAL_REPORT_NOT_JSON = '%s file does not contain valid JSON.'
 BAD_CORE_VERSION = 'Insights version check failed. Your Insights core ' \
     'version (%s) does not meet the requirements of %s or greater.'
 BAD_CLIENT_VERSION = 'Insights version check failed. Your Insights client' \
@@ -317,11 +316,11 @@ INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
 INSIGHTS_NO_GPG_HELP = 'Upload to Insights without GNU Privacy Guard.'
 DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
 DOWNLOAD_NO_REPORT_FOUND = 'Report %s not found.'
-DOWNLOAD_PATH_HELP = 'The output file\'s name and location. This file is ' \
+DOWNLOAD_PATH_HELP = "The output file's name and location. This file is " \
     'required to be a tar.gz'
 DOWNLOAD_SUCCESSFULLY_WRITTEN = 'Report %s successfully written to %s.'
 DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'
 
 SERVER_TOO_OLD_FOR_CLI = 'The CLI requires a minimum server version of %s.  '\
     'Upgrade your server to %s or greater.  Server is currently at version %s.'
-OUTPUT_FILE_TYPE = 'The output file\'s extension is required to be %s.'
+OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."

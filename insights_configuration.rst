@@ -34,7 +34,7 @@ You will need to uncomment, add, or modify the following values in the file loca
     username=<your_username>
     password=redhat
     http_timeout=20
-    base_url=api.access.ci.itop.redhat.com/r/insights
+    base_url=ci.cloud.paas.upshift.redhat.com/api
     cert_verify=False
     auto_update=False
 
@@ -62,10 +62,11 @@ Download Insights Core RPM
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Download the last stable version of the Insights core::
 
-    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
-    sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
-    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
-    sudo mv last_stable.egg /var/lib/insights/last_stable.egg
+sudo sh lay-the-eggs-osx.sh
+curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
+sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
+sudo mv last_stable.egg /var/lib/insights/last_stable.egg
 
 **Note:** You may need to create the ``/var/lib/insights`` structure.
 

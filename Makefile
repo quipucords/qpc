@@ -7,7 +7,7 @@ PYDIRS	= quipucords
 
 BINDIR  = bin
 
-OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py
+OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"

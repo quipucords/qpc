@@ -31,16 +31,13 @@ You will need to uncomment, add, or modify the following values in the file loca
 **CI Configuration**::
 
     auto_config=False
-    username=<your_username>
+    username=username@redhat.com
     password=redhat
     http_timeout=20
     base_url=ci.cloud.paas.upshift.redhat.com/api
     cert_verify=False
     auto_update=False
-
-    # Optionally you can add the upload_url to point to the entire path for upload
-    upload_url=https://ci.cloud.paas.upshift.redhat.com/api/ingress/v1/upload
-
+    legacy_upload=False
 
 **Production Configuration**::
 
@@ -48,6 +45,13 @@ You will need to uncomment, add, or modify the following values in the file loca
     username=<your_username>
     password=<your_password>
     http_timeout=20
+
+**Optional flags (to workaround issues with client)**::
+
+    # Optionally you can add the upload_url to point to the entire path for upload
+    upload_url=https://ci.cloud.paas.upshift.redhat.com/api/ingress/v1/upload
+
+
 
 Building with Insights Client on Mac
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -66,11 +70,10 @@ Download Insights Core RPM
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Download the last stable version of the Insights core::
 
-sudo sh lay-the-eggs-osx.sh
-curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
-sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
-curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
-sudo mv last_stable.egg /var/lib/insights/last_stable.egg
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
+    sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+    curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
+    sudo mv last_stable.egg /var/lib/insights/last_stable.egg
 
 **Note:** You may need to create the ``/var/lib/insights`` structure.
 

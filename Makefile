@@ -60,3 +60,15 @@ manpage:
 	  --variable=date:'July 17, 2018' \
 	  --variable=footer:'version 1.0.0' \
 	  --variable=header:'QPC Command Line Guide'
+
+insights-client:
+	cd ../insights-client;sudo sh lay-the-eggs-osx.sh
+	curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
+	sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
+	curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg
+	sudo mv last_stable.egg /var/lib/insights/last_stable.egg
+
+
+insights-clean:
+	sudo rm -rf /etc/insights-client/* 
+	sudo rm -rf /var/lib/insights/*

@@ -31,12 +31,13 @@ You will need to uncomment, add, or modify the following values in the file loca
 **CI Configuration**::
 
     auto_config=False
-    username=<your_username>
+    username=username
     password=redhat
     http_timeout=20
-    base_url=api.access.ci.itop.redhat.com/r/insights
+    base_url=ci.cloud.paas.upshift.redhat.com/api
     cert_verify=False
     auto_update=False
+    legacy_upload=False
 
 **Production Configuration**::
 
@@ -45,12 +46,18 @@ You will need to uncomment, add, or modify the following values in the file loca
     password=<your_password>
     http_timeout=20
 
+**Optional flags (to workaround issues with client)**::
+
+    # Optionally you can add the upload_url to point to the entire path for upload
+    upload_url=https://ci.cloud.paas.upshift.redhat.com/api/ingress/v1/upload
+
+
+
 Building with Insights Client on Mac
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 After configuration is setup, you will need to build the Insights client::
 
-    cd ../insights-client
-    sudo sh lay-the-eggs-osx.sh
+    make insights-client
 
 Building with Insights Client on RHEL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,7 +66,7 @@ After configuration is setup, you will need to build the Insights client::
     sudo sh lay-the-eggs.sh
 
 Download Insights Core RPM
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++
 Download the last stable version of the Insights core::
 
     curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
@@ -99,6 +106,6 @@ Clean Up
 ^^^^^^^^
 If you make any changes to your configuraiton, Insights client, or Insights core in order to prevent caching issues you will need to run the following commands::
 
-    sudo rm -rf /etc/insights-client/* && sudo rm -rf /var/lib/insights/*
+    make insights-clean
 
 **Note:** After removing these files, you will need to rebuild the Insights client egg & download the Insights core again.

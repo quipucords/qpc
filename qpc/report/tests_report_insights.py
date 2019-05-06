@@ -10,7 +10,6 @@
 #
 """Test the CLI module."""
 
-import json
 import os
 import sys
 import time
@@ -21,7 +20,6 @@ from io import StringIO  # noqa: I100
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.insights import ReportInsightsCommand
 from qpc.scan import SCAN_JOB_URI
@@ -32,6 +30,7 @@ import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+VERSION = '1.0.0'
 
 
 class ReportInsightsTests(unittest.TestCase):
@@ -44,7 +43,7 @@ class ReportInsightsTests(unittest.TestCase):
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
         self.orig_stderr = sys.stderr
-        self.test_json_filename = 'test_%d.json' % time.time()
+        self.test_tar_gz_filename = 'test_%d.tar.gz' % time.time()
         sys.stderr = HushUpStderr()
 
     def tearDown(self):
@@ -52,7 +51,7 @@ class ReportInsightsTests(unittest.TestCase):
         # Restore stderr
         sys.stderr = self.orig_stderr
         try:
-            os.remove(self.test_json_filename)
+            os.remove(self.test_tar_gz_filename)
         except FileNotFoundError:
             pass
 
@@ -71,7 +70,7 @@ class ReportInsightsTests(unittest.TestCase):
              'hosts': {'00968d16-78b7-4bda-ab7d-668f3c0ef1ee': {
                  'key': 'value'}}}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200,
@@ -82,15 +81,11 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_SUCCESSFULLY_WRITTEN)
-                with open(self.test_json_filename, 'r') as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                self.assertDictEqual(get_report_json_data, file_content_dict)
 
     def test_insights_report_as_json_report_id(self):
         """Testing retreiving insights report as json with report id."""
@@ -104,7 +99,7 @@ class ReportInsightsTests(unittest.TestCase):
              'hosts': {'00968d16-78b7-4bda-ab7d-668f3c0ef1ee': {
                  'key': 'value'}}}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
@@ -113,15 +108,11 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_SUCCESSFULLY_WRITTEN)
-                with open(self.test_json_filename, 'r') as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                self.assertDictEqual(get_report_json_data, file_content_dict)
 
     # Test validation
     def test_insights_report_output_directory(self):
@@ -158,7 +149,7 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -178,7 +169,7 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -195,7 +186,7 @@ class ReportInsightsTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
@@ -204,23 +195,23 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 err_msg = (messages.WRITE_FILE_ERROR %
-                           (self.test_json_filename, ''))
+                           (self.test_tar_gz_filename, ''))
                 self.assertEqual(report_out.getvalue().strip(), err_msg)
 
     def test_insights_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
-        fake_dir = '/cody/is/awesome/insights.json'
+        fake_dir = '/kevan/is/awesome/insights.tar.gz'
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
@@ -236,28 +227,29 @@ class ReportInsightsTests(unittest.TestCase):
                                  (messages.REPORT_DIRECTORY_DOES_NOT_EXIST %
                                   os.path.dirname(fake_dir)))
 
-    def test_insights_nonjson_path(self):
+    def test_insights_tar_path(self):
         """Testing error for nonjson output path."""
-        non_json_dir = '/Users/insights.tar.gz'
+        non_tar_file = '/Users/insights.json'
         report_out = StringIO()
         get_report_url = get_server_location() + \
             REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': VERSION},
                        content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=non_json_dir)
+                             path=non_tar_file)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
-                                 (messages.OUTPUT_FILE_TYPE % '.json'))
+                                 (messages.OUTPUT_FILE_TYPE % 'tar.gz'))
 
     def test_insights_report_id_not_exist(self):
         """Test insights with nonexistent report id."""
@@ -266,7 +258,7 @@ class ReportInsightsTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
@@ -275,7 +267,7 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -294,7 +286,7 @@ class ReportInsightsTests(unittest.TestCase):
             REPORT_URI + '1/insights/'
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         test_dict = dict()
-        test_dict[self.test_json_filename] = get_report_json_data
+        test_dict[self.test_tar_gz_filename] = get_report_json_data
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200,
@@ -305,7 +297,7 @@ class ReportInsightsTests(unittest.TestCase):
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_json_filename)
+                             path=self.test_tar_gz_filename)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)

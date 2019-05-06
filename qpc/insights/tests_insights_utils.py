@@ -44,7 +44,7 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     def test_check_insights_install_no_module(self):
         """Testing error response no modules found."""
-        no_module_return = 'ModuleNotFoundError: No module named \'insights\''
+        no_module_return = "ModuleNotFoundError: No module named 'insights'"
         test = check_insights_install(no_module_return)
         self.assertEqual(test, False)
 

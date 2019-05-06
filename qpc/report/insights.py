@@ -21,7 +21,6 @@ from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (check_extension,
-                       extract_json_from_tar,
                        validate_write_file,
                        write_file)
 
@@ -60,8 +59,8 @@ class ReportInsightsCommand(CliCommand):
 
     def _validate_args(self):
         CliCommand._validate_args(self)
-        self.req_headers = {'Accept': 'application/json+gzip'}
-        check_extension('.json', self.args.path)
+        self.req_headers = {'Accept': 'application/gzip'}
+        check_extension('tar.gz', self.args.path)
 
         try:
             validate_write_file(self.args.path, 'output-file')
@@ -97,11 +96,8 @@ class ReportInsightsCommand(CliCommand):
                 report.INSIGHTS_PATH_SUFFIX)
 
     def _handle_response_success(self):
-        file_content = None
-        file_content = extract_json_from_tar(self.response.content)
-
         try:
-            write_file(self.args.path, file_content)
+            write_file(self.args.path, self.response.content, binary=True)
             print(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))

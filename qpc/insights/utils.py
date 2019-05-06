@@ -67,7 +67,7 @@ class InsightsCommands():
 def check_insights_install(streamdata):
     """Will check stream data for failure clause."""
     failures = ['command not found',
-                'No module named \'insights\'']
+                "No module named 'insights'"]
     for fail in failures:
         if fail in str(streamdata):
             return False

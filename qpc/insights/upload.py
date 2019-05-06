@@ -13,11 +13,11 @@
 
 from __future__ import print_function
 
-import json
 import os
 import subprocess
 import sys
 import time
+from shutil import copyfile
 
 import qpc.insights as insights
 from qpc import messages, scan
@@ -31,20 +31,11 @@ from qpc.insights.utils import (InsightsCommands,
 from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import (create_tar_buffer,
-                       extract_json_from_tar,
-                       validate_write_file,
+from qpc.utils import (validate_write_file,
                        write_file)
 
-# pylint:disable=no-member
+# pylint: disable=no-name-in-module,import-error
 from requests import codes
-
-# pylint: disable=invalid-name
-try:
-    json_exception_class = json.decoder.JSONDecodeError
-except AttributeError:
-    json_exception_class = ValueError
-# pylint: disable=too-few-public-methods
 
 CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
                    'ip_addresses', 'mac_addresses',
@@ -85,6 +76,7 @@ class InsightsUploadCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
+        # pylint: disable=no-member
         CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
                             subparsers.add_parser(self.ACTION), GET,
                             insights.REPORT_URI, [codes.ok])
@@ -95,8 +87,8 @@ class InsightsUploadCommand(CliCommand):
         input_group.add_argument('--scan-job', dest='scan_job_id',
                                  metavar='SCAN_JOB_ID',
                                  help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
-        input_group.add_argument('--json-file', dest='json_file', metavar='JSON_FILE',
-                                 help=_(messages.INSIGHTS_INPUT_JSON_HELP))
+        input_group.add_argument('--input-file', dest='input_file', metavar='INPUT_FILE',
+                                 help=_(messages.INSIGHTS_INPUT_GZIP_HELP))
 
         self.parser.add_argument('--no-gpg', dest='no_gpg', action='store_true',
                                  help=_(messages.INSIGHTS_NO_GPG_HELP))
@@ -164,42 +156,23 @@ class InsightsUploadCommand(CliCommand):
         print(_(messages.INSIGHTS_IS_VERIFIED))
 
         # obtaining the report as tar.gz
-        if self.args.json_file:
+        if self.args.input_file:
             self._obtain_insights_report_from_local_file()
         else:
             self._obtain_insights_report_from_qpc_server()
 
     def _obtain_insights_report_from_local_file(self):
         """Load local report, validate, and write tar.gz."""
-        json_file = self.args.json_file
-        if not os.path.isfile(json_file):
-            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % json_file))
+        input_file = self.args.input_file
+        if not os.path.isfile(input_file):
+            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % input_file))
             sys.exit(1)
 
-        insights_report_dict = None
-        with open(json_file) as insights_report_file:
-            try:
-                insights_report_dict = json.load(insights_report_file)
-            except json_exception_class:
-                print(_(messages.INSIGHTS_LOCAL_REPORT_NOT_JSON % json_file))
-                sys.exit(1)
-
-        # Validate insights report
-        valid, error = self._verify_report_details(insights_report_dict)
-        if not valid:
-            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
+        if 'tar.gz' not in self.args.input_file:
+            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ % input_file))
             sys.exit(1)
 
-        insights_name = 'report_id_%s/%s.%s' % (self.report_id,
-                                                'insights',
-                                                'json')
-        reports_dict = {}
-        reports_dict[insights_name] = insights_report_dict
-        tar_buffer = create_tar_buffer(reports_dict)
-        # write file content to disk
-        write_file(self.tmp_tar_name,
-                   tar_buffer,
-                   True)
+        copyfile(self.args.input_file, self.tmp_tar_name)
 
     def _obtain_insights_report_from_qpc_server(self):
         """Download report, validate, and write tar.gz."""
@@ -232,7 +205,7 @@ class InsightsUploadCommand(CliCommand):
 
         # Request report from QCP server
         print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
-        headers = {'Accept': 'application/json+gzip'}
+        headers = {'Accept': 'application/gzip'}
         report_path = '%s%s%s' % (
             insights.REPORT_URI,
             str(self.report_id),
@@ -249,87 +222,10 @@ class InsightsUploadCommand(CliCommand):
                     self.report_id))
             sys.exit(1)
 
-        # Validate insights report
-        insights_report_dict = extract_json_from_tar(report_response.content,
-                                                     print_pretty=False)
-        valid, error = self._verify_report_details(insights_report_dict)
-        if not valid:
-            print(_(messages.INVALID_REPORT_INSIGHTS_UPLOAD % (self.report_id, error)))
-            sys.exit(1)
-
         # write file content to disk
         write_file(self.tmp_tar_name,
                    report_response.content,
                    True)
-
-    def _verify_report_details(self, insights_report):
-        """
-        Verify that the report contents are a valid insights report.
-
-        :param insights_report: dict containing Insights report
-        :returns: boolean regarding report validity, error (str) if error occurred
-        """
-        # pylint: disable=too-many-locals
-        error = None
-
-        self.report_id = insights_report.get('report_id')
-
-        # validate required keys
-        required_keys = ['report_platform_id',
-                         'report_id',
-                         'report_version',
-                         'report_type',
-                         'hosts']
-        missing_keys = []
-        for key in required_keys:
-            required_key = insights_report.get(key)
-            if not required_key:
-                missing_keys.append(key)
-
-        if missing_keys:
-            missing_keys_str = ', '.join(missing_keys)
-            error = messages.INSIGHTS_REPORT_MISSING_FIELDS % missing_keys_str
-            return False, error
-
-        # validate report type
-        if insights_report['report_type'] != 'insights':
-            error = messages.INSIGHTS_INVALID_REPORT_TYPE % insights_report['report_type']
-            return False, error
-
-        # validate hosts contain canonical facts
-        hosts = insights_report.get('hosts')
-        if not hosts or not isinstance(hosts, dict):
-            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
-            return False, error
-
-        invalid_host_dict_format = False
-        for host_id, host in hosts.items():
-            if not isinstance(host_id, str) or not isinstance(host, dict):
-                invalid_host_dict_format = True
-                break
-
-        if invalid_host_dict_format:
-            error = messages.INSIGHTS_INVALID_HOST_DICT_TYPE
-            return False, error
-
-        valid_hosts, invalid_hosts = verify_report_hosts(hosts)
-        print(_(messages.INSIGHTS_TOTAL_VALID_HOST % (self.report_id,
-                                                      (len(valid_hosts)),
-                                                      str(len(hosts)))))
-        if invalid_hosts:
-            print(_(messages.INSIGHTS_TOTAL_INVALID_HOST % (self.report_id,
-                                                            ', '.join(CANONICAL_FACTS))))
-            for host in invalid_hosts.values():
-                host_name = host.get('name', 'UNKNOWN')
-                host_metadata = host.get('metadata', {})
-                name_metadata = host_metadata.get('name', {})
-                source_name = name_metadata.get('source_name', 'UNKNOWN')
-
-                print(_(messages.INSIGHTS_INVALID_HOST_NAME % (source_name, host_name)))
-        if not valid_hosts:
-            error = messages.INSIGHTS_REPORT_NO_VALID_HOST
-            return False, error
-        return True, error
 
     def _do_command(self):
         """Execute command flow.

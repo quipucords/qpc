@@ -113,7 +113,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=True)
             with redirect_stdout(report_out):
                 nac.main(args)
@@ -141,7 +141,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=True)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -170,7 +170,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with redirect_stdout(report_out):
                 nac.main(args)
@@ -192,7 +192,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -214,7 +214,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -237,7 +237,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -261,7 +261,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -290,7 +290,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -314,7 +314,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -343,7 +343,7 @@ class InsightsUploadCliTests(unittest.TestCase):
             nac = InsightsUploadCommand(SUBPARSER)
             args = Namespace(report_id='1',
                              scan_job_id=None,
-                             gzip_file=None,
+                             input_file=None,
                              no_gpg=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
@@ -406,7 +406,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         nac = InsightsUploadCommand(SUBPARSER)
         args = Namespace(report_id=None,
                          scan_job=None,
-                         gzip_file=self.dest_tar_file,
+                         input_file=self.dest_tar_file,
                          no_gpg=True)
         with redirect_stdout(report_out):
             nac.main(args)
@@ -414,7 +414,7 @@ class InsightsUploadCliTests(unittest.TestCase):
                           report_out.getvalue().strip())
 
     @patch('qpc.insights.upload.subprocess.Popen')
-    def test_insights_upload_invalid_local_json_path(self, subprocess):
+    def test_insights_upload_invalid_local_tar_path(self, subprocess):
         """Testing uploading insights report with invalid path."""
         subprocess.return_value.communicate.side_effect = self.success_effect
         subprocess.return_value.returncode = 0
@@ -422,10 +422,30 @@ class InsightsUploadCliTests(unittest.TestCase):
         nac = InsightsUploadCommand(SUBPARSER)
         args = Namespace(report_id=None,
                          scan_job=None,
-                         gzip_file='your_face_is_a',
+                         input_file='your_face_is_a',
                          no_gpg=True)
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
                 nac.main(args)
         self.assertIn(messages.INSIGHTS_LOCAL_REPORT_NOT % 'your_face_is_a',
+                      report_out.getvalue().strip())
+
+    @patch('qpc.insights.upload.subprocess.Popen')
+    def test_insights_upload_not_tar_extension(self, subprocess):
+        """Testing uploading insights report with invalid file extension."""
+        random_file = '/tmp/insights_random_%s.txt' % (time.strftime('%Y%m%d_%H%M%S'))
+        write_file(random_file, 'not really tar', False)
+
+        subprocess.return_value.communicate.side_effect = self.success_effect
+        subprocess.return_value.returncode = 0
+        report_out = StringIO()
+        nac = InsightsUploadCommand(SUBPARSER)
+        args = Namespace(report_id=None,
+                         scan_job=None,
+                         input_file=random_file,
+                         no_gpg=True)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+        self.assertIn(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ % random_file,
                       report_out.getvalue().strip())

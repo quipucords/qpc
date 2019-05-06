@@ -87,7 +87,7 @@ class InsightsUploadCommand(CliCommand):
         input_group.add_argument('--scan-job', dest='scan_job_id',
                                  metavar='SCAN_JOB_ID',
                                  help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
-        input_group.add_argument('--gzip-file', dest='gzip_file', metavar='GZIP_FILE',
+        input_group.add_argument('--input-file', dest='input_file', metavar='INPUT_FILE',
                                  help=_(messages.INSIGHTS_INPUT_GZIP_HELP))
 
         self.parser.add_argument('--no-gpg', dest='no_gpg', action='store_true',
@@ -156,19 +156,23 @@ class InsightsUploadCommand(CliCommand):
         print(_(messages.INSIGHTS_IS_VERIFIED))
 
         # obtaining the report as tar.gz
-        if self.args.gzip_file:
+        if self.args.input_file:
             self._obtain_insights_report_from_local_file()
         else:
             self._obtain_insights_report_from_qpc_server()
 
     def _obtain_insights_report_from_local_file(self):
         """Load local report, validate, and write tar.gz."""
-        gzip_file = self.args.gzip_file
-        if not os.path.isfile(gzip_file):
-            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % gzip_file))
+        input_file = self.args.input_file
+        if not os.path.isfile(input_file):
+            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % input_file))
             sys.exit(1)
 
-        copyfile(self.args.gzip_file, self.tmp_tar_name)
+        if 'tar.gz' not in self.args.input_file:
+            print(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ % input_file))
+            sys.exit(1)
+
+        copyfile(self.args.input_file, self.tmp_tar_name)
 
     def _obtain_insights_report_from_qpc_server(self):
         """Download report, validate, and write tar.gz."""

@@ -299,6 +299,7 @@ INSIGHTS_REPORT_ID_HELP = 'Report identifier.'
 INSIGHTS_SCAN_JOB_ID_HELP = 'Scan job identifier.'
 INSIGHTS_INPUT_GZIP_HELP = 'Path to local tar.gz file containing an Insights report.'
 INSIGHTS_LOCAL_REPORT_NOT = '%s file cannot be found.'
+INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ = '%s file is not a tar.gz.'
 BAD_CORE_VERSION = 'Insights version check failed. Your Insights core ' \
     'version (%s) does not meet the requirements of %s or greater.'
 BAD_CLIENT_VERSION = 'Insights version check failed. Your Insights client' \

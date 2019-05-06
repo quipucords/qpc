@@ -565,12 +565,12 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.json``.
+  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.
 
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
-The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats and the insights report in JSON format.
+The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
 
 **qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
@@ -641,6 +641,10 @@ The ``qpc insights upload`` command can be used to upload an insights report to 
 ``--report=report_identifier``
 
   Contains the report identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--scan-job`` option.
+
+``--input-file=path to tar.gz containing the Insights report``
+
+  Contains the path to the tar.gz containing the Insights report.
 
 ``--no-gpg``
 

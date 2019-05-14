@@ -50,20 +50,13 @@ The following information contains instructions for installing qpc.
 
 Command Line
 ^^^^^^^^^^^^
-qpc is available for `download <https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc/>`_ from the Fedora COPR.
+To install QPC on RHEL 6 or CentOS 6 run::
 
-1. Enable the EPEL repo for the server. You can find the appropriate architecture and version on the `EPEL wiki <https://fedoraproject.org/wiki/EPEL>`_::
+    yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el6.noarch.rpm
 
-    rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+To install QPC on RHEL 7 or CentOS 7 run::
 
-2. Add the COPR repo to your server. You can find the appropriate architecture and version on the `COPR qpc page <https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc/>`_::
-
-    wget -O /etc/yum.repos.d/group_quipucords-qpc-epel-7.repo \
-    https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc/repo/epel-7/group_quipucords-qpc-epel-7.repo
-
-3. Install the qpc package::
-
-    yum -y install qpc
+    yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el7.noarch.rpm
 
 Command Syntax and Usage
 ------------------------

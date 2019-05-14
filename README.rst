@@ -55,6 +55,7 @@ To install QPC on RHEL 6 or CentOS 6 run::
     yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el6.noarch.rpm
 
 To install QPC on RHEL 7 or CentOS 7 run::
+
     yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el7.noarch.rpm
 
 Command Syntax and Usage

@@ -12,8 +12,6 @@ OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
 	@echo "  help                to show this message"
-	@echo "  all                 to build the client egg and run lint & test-coverage"
-	@echo "  build               to build the client egg"
 	@echo "  install             to install the client egg"
 	@echo "  clean               to remove client egg"
 	@echo "  lint                to run the flake8/pylint linter"
@@ -24,15 +22,11 @@ help:
 	@echo "  insights-client     to setup the insights-client egg"
 	@echo "  insights-clean      to remove the insights-client egg"
 
-all: build lint test-coverage
-
-build: clean
-	$(PYTHON) setup.py build -f
-
 clean:
 	-rm -rf dist/ build/ qpc.egg-info/
 
 install: build
+	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
 lint:

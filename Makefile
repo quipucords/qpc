@@ -12,7 +12,9 @@ OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
 	@echo "  help                to show this message"
-	@echo "  install             to create the client egg"
+	@echo "  all                 to build the client egg and run lint & test-coverage"
+	@echo "  build               to build the client egg"
+	@echo "  install             to install the client egg"
 	@echo "  clean               to remove client egg"
 	@echo "  lint                to run the flake8/pylint linter"
 	@echo "  test                to run unit tests"
@@ -57,7 +59,7 @@ manpage:
 	  --variable=header:'QPC Command Line Guide'
 
 insights-client:
-	cd ../insights-client;sudo sh lay-the-eggs-osx.sh
+	cd ../insights/insights-client;sudo sh lay-the-eggs-osx.sh
 	curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg.asc > last_stable.egg.asc
 	sudo mv last_stable.egg.asc /var/lib/insights/last_stable.egg.asc
 	curl https://api.access.redhat.com/r/insights/v1/static/core/insights-core.egg > last_stable.egg

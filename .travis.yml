@@ -7,9 +7,6 @@ cache: pip
 
 matrix:
   include:
-    - python: 3.4
-      env:
-       - TOX_ENV=py34
     - python: 3.5
       env:
         - TOX_ENV=py35
@@ -24,7 +21,7 @@ addons:
 
 # command to install dependencies
 install:
-  - pip install -U pip==19.1
+  - pip install -U pip
   - pip install -r dev-requirements.txt
   - pip install codecov
 

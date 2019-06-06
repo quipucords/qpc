@@ -216,7 +216,7 @@ class InsightsUploadCommand(CliCommand):
                                   path=report_path,
                                   headers=headers,
                                   payload=None,
-                                  min_server_version=VERSION)
+                                  min_server_version=self.min_server_version)
 
         if report_response.status_code != codes.ok:  # pylint: disable=no-member
             print(_(messages.INSIGHTS_REPORT_NOT_FOUND %

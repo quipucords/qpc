@@ -48,7 +48,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.success_json = {
             'report_id': 1,
             'report_type': 'insights',
-            'report_version': '1.0.0.1b025b8',
+            'report_version': '0.9.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {
@@ -57,7 +57,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.json_missing_hosts = {
             'report_id': 1,
             'report_type': 'insights',
-            'report_version': '1.0.0.1b025b8',
+            'report_version': '0.9.0.1b025b8',
             'status': 'completed',
             'report_platform_id': '5f2cc1fd-ec66-4c67-be1b-171a595ce319',
             'hosts': {}}

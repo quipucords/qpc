@@ -28,7 +28,6 @@ from qpc.insights.utils import (InsightsCommands,
                                 check_successful_upload,
                                 format_subprocess_stderr,
                                 format_upload_success)
-from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (validate_write_file,

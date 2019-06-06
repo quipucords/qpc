@@ -26,8 +26,7 @@ from qpc.report import REPORT_URI
 from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import (DEFAULT_CONFIG, HushUpStderr, redirect_stdout)
-from qpc.utils import (QPC_MIN_SERVER_VERSION,
-                       create_tar_buffer,
+from qpc.utils import (create_tar_buffer,
                        get_server_location,
                        write_server_config)
 
@@ -256,7 +255,7 @@ class ReportDownloadTests(unittest.TestCase):
         get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       headers={'X-Server-Version': QPC_MIN_SERVER_VERSION},
+                       headers={'X-Server-Version': '0.0.45'},
                        json=get_report_json_data)
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
@@ -267,7 +266,7 @@ class ReportDownloadTests(unittest.TestCase):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.SERVER_TOO_OLD_FOR_CLI %
-                                 ('0.0.46', '0.0.46', QPC_MIN_SERVER_VERSION))
+                                 ('0.0.46', '0.0.46', '0.0.45'))
 
     def test_download_bad_file_extension(self):
         """Test download with bad file extension."""

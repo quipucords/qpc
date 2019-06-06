@@ -94,7 +94,8 @@ class InsightsUploadCommand(CliCommand):
                                  help=_(messages.INSIGHTS_NO_GPG_HELP))
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
-        self.min_server_version = VERSION
+        # Don't change this when you upgrade versions
+        self.min_server_version = '0.9.0'
         self.insights_command = None
         self.report_id = None
 

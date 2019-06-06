@@ -17,7 +17,6 @@ import sys
 
 from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
-from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (check_extension,
@@ -54,7 +53,8 @@ class ReportInsightsCommand(CliCommand):
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
                                  help=_(messages.REPORT_PATH_HELP),
                                  required=True)
-        self.min_server_version = VERSION
+        # Don't change this when you upgrade versions
+        self.min_server_version = '0.9.0'
         self.report_id = None
 
     def _validate_args(self):

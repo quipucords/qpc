@@ -28,7 +28,6 @@ from qpc.insights.utils import (InsightsCommands,
                                 check_successful_upload,
                                 format_subprocess_stderr,
                                 format_upload_success)
-from qpc.release import VERSION
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import (validate_write_file,
@@ -94,7 +93,8 @@ class InsightsUploadCommand(CliCommand):
                                  help=_(messages.INSIGHTS_NO_GPG_HELP))
         self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
             time.strftime('%Y%m%d_%H%M%S'))
-        self.min_server_version = VERSION
+        # Don't change this when you upgrade versions
+        self.min_server_version = '0.9.0'
         self.insights_command = None
         self.report_id = None
 
@@ -215,7 +215,7 @@ class InsightsUploadCommand(CliCommand):
                                   path=report_path,
                                   headers=headers,
                                   payload=None,
-                                  min_server_version=VERSION)
+                                  min_server_version=self.min_server_version)
 
         if report_response.status_code != codes.ok:  # pylint: disable=no-member
             print(_(messages.INSIGHTS_REPORT_NOT_FOUND %

@@ -27,7 +27,6 @@ This *README* file contains information about the installation and development o
 - `Command Syntax and Usage`_
 - `Development`_
 - `Issues`_
-- `Changes`_
 - `Authors`_
 - `Contributing`_
 - `Copyright and License`_
@@ -118,11 +117,6 @@ Issues
 To report bugs for qpc `open issues <https://github.com/quipucords/qpc/issues>`_ against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.
 
 
-Changes
--------
-Track and find changes to the tool in `CHANGES <CHANGES.rst>`_.
-
-
 Authors
 -------
 Authorship and current maintainer information can be found in `AUTHORS <AUTHORS.rst>`_.
@@ -135,7 +129,7 @@ See the `CONTRIBUTING <CONTRIBUTING.rst>`_ guide for information about contribut
 
 Copyright and License
 ---------------------
-Copyright 2017-2018, Red Hat, Inc.
+Copyright 2017-2019, Red Hat, Inc.
 
 quipucords is released under the `GNU Public License version 3 <LICENSE>`_
 

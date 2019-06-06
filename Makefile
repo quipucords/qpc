@@ -48,8 +48,8 @@ manpage:
 	pandoc docs/source/man.rst \
 	  --standalone -t man -o build/qpc.1 \
 	  --variable=section:1 \
-	  --variable=date:'July 17, 2018' \
-	  --variable=footer:'version 1.0.0' \
+	  --variable=date:'June 6, 2019' \
+	  --variable=footer:'version 0.9.0' \
 	  --variable=header:'QPC Command Line Guide'
 
 insights-client:

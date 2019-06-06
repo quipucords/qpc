@@ -30,7 +30,7 @@ import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
-VERSION = '0.9.0'
+VERSION = '0.9.1'
 
 
 class ReportInsightsTests(unittest.TestCase):

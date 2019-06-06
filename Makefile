@@ -25,7 +25,7 @@ help:
 clean:
 	-rm -rf dist/ build/ qpc.egg-info/
 
-install: build
+install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
@@ -49,7 +49,7 @@ manpage:
 	  --standalone -t man -o build/qpc.1 \
 	  --variable=section:1 \
 	  --variable=date:'June 6, 2019' \
-	  --variable=footer:'version 0.9.0' \
+	  --variable=footer:'version 0.9.1' \
 	  --variable=header:'QPC Command Line Guide'
 
 insights-client:

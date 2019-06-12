@@ -93,7 +93,7 @@ make test
 ```
 
 # <a name="issues"></a> Issues
-To report bugs for qpc [open issues](https://github.com/quipucords/qpc/issues>) against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.
+To report bugs for qpc [open issues](https://github.com/quipucords/qpc/issues) against this repository in Github. Complete the issue template when opening a new bug to improve investigation and resolution time.
 
 
 # <a name="authors"></a> Authors

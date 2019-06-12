@@ -45,8 +45,7 @@ You should also add tests for any new features and bug fixes.
 quipucords uses [pytest](http://pytest.org/) for testing.
 
 
-Running all tests:
-******************
+### Running Tests
 Run all tests on the current Python interpreter
 ```
 make test

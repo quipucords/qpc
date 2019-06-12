@@ -47,15 +47,14 @@ quipucords uses [pytest](http://pytest.org/) for testing.
 
 Running all tests:
 ******************
-
-.. code-block:: bash
-
-    # Run all tests on the current Python interpreter
-    make tests
-
-    # Run all tests on the current Python with coverage
-    make tests-coverage
-
+Run all tests on the current Python interpreter
+```
+make test
+```
+Run all tests on the current Python with coverage
+```
+make test-coverage
+```
 
 -----
 

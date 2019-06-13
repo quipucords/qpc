@@ -57,7 +57,7 @@ install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 
 %files
 %defattr(-,root,root,-)
-%doc README.rst AUTHORS.rst
+%doc README.md AUTHORS.md
 %{_bindir}/qpc
 %{python3_sitelib}/*
 %{_mandir}/man1/qpc.1.gz

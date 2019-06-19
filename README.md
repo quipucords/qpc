@@ -78,7 +78,7 @@ pip install -r dev-requirements.txt
 ```
 
 ## Developing with Insights Client
-Information on installing and developing with the insights client can be found in [Insights Configuration](insights_configuration.rst).
+Information on installing and developing with the insights client can be found in [Insights Configuration](insights_configuration.md).
 
 
 ## Linting

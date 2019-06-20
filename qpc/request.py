@@ -58,7 +58,8 @@ def handle_general_errors(response, min_server_version):
     if not server_version:
         server_version = QPC_MIN_SERVER_VERSION
 
-    if LooseVersion(server_version) < LooseVersion(min_server_version):
+    if '0.0.0' not in server_version and \
+            LooseVersion(server_version) < LooseVersion(min_server_version):
         print(_(messages.SERVER_TOO_OLD_FOR_CLI %
                 (min_server_version, min_server_version, server_version)))
         sys.exit(1)

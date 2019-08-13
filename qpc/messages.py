@@ -13,7 +13,7 @@
 """CLI messages for translation."""
 
 CRED_NAME_HELP = 'Credential name.'
-CRED_TYPE_HELP = 'Type of credential. Valid values: vcenter, network.'
+CRED_TYPE_HELP = 'Type of credential. Valid values: vcenter, network, satellite.'
 CRED_TYPE_FILTER_HELP = 'Filter for listing credentials by type. Valid '\
     'values: vcenter, network.'
 CRED_USER_HELP = 'User name for authenticating against the target system.'

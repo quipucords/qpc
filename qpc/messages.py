@@ -60,7 +60,7 @@ CRED_BECOME_PASSWORD_HELP = 'The privilege escalation password to be '\
 
 SOURCE_NAME_HELP = 'Source name.'
 SOURCES_NAME_HELP = 'List of source names.'
-SOURCE_TYPE_HELP = 'Type of source. Valid values: vcenter, network.'
+SOURCE_TYPE_HELP = 'Type of source. Valid values: vcenter, network, satellite.'
 SOURCE_HOSTS_HELP = 'IP ranges to scan. Run the "man %s" command for more '\
     'information about supported formats.'
 SOURCE_EXCLUDE_HOSTS_HELP = 'IP ranges to exclude from scan. Only supported '\

@@ -6,6 +6,7 @@ Name
 
 qpc - Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
 
+Test should fail in travis!
 
 Synopsis
 --------

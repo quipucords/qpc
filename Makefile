@@ -8,6 +8,7 @@ PYDIRS	= quipucords
 BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
+MANPAGE_OUTPUT = docs/qpc.1
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
@@ -46,7 +47,7 @@ html:
 manpage:
 	@mkdir -p build
 	pandoc docs/source/man.rst \
-	  --standalone -t man -o build/qpc.1 \
+	  --standalone -t man -o $(MANPAGE_OUTPUT) \
 	  --variable=section:1 \
 	  --variable=date:'June 6, 2019' \
 	  --variable=footer:'version 0.9.1' \

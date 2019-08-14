@@ -48,12 +48,11 @@ QPC is tool for discovery and inspection of an IT environment.
 
 %build
 %{__python3} setup.py build
-make manpage
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
-install -D -p -m 644 build/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
+install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 
 %files
 %defattr(-,root,root,-)

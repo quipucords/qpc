@@ -38,8 +38,6 @@ Requires: python3
 Requires: python3-requests
 %endif
 
-BuildRequires: pandoc
-
 %description
 QPC is tool for discovery and inspection of an IT environment.
 

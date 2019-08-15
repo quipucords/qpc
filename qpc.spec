@@ -13,7 +13,13 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-#Common
+%if 0%{?el6}
+%global pyver 34
+%elif 0%{?el7}
+%global pyver 36
+%else
+%global pyver 3
+%endif
 
 %if "%{dist}" != ".el8"
 BuildRequires: pandoc
@@ -21,25 +27,10 @@ BuildRequires: epel-release
 Requires: epel-release
 %endif
 
-#Build dependent
-%if 0%{?el6}
-BuildRequires: python34-devel
-BuildRequires: python34-setuptools
-Requires: python34
-Requires: python34-requests
-%endif
-%if 0%{?el7}
-BuildRequires: python36-devel
-BuildRequires: python36-setuptools
-Requires: python36
-Requires: python36-requests
-%endif
-%if 0%{?el8}
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-Requires: python3
-Requires: python3-requests
-%endif
+BuildRequires: python%{pyver}-devel
+BuildRequires: python%{pyver}-setuptools
+Requires: python%{pyver}
+Requires: python%{pyver}-requests
 
 %description
 QPC is tool for discovery and inspection of an IT environment.
@@ -61,6 +52,7 @@ tar xvzf pandoc.tar.gz --strip-components 1 -C ~/
 make manpage pandoc=~/bin/pandoc
 %else
 make manpage
+%endif
 install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 
 %files

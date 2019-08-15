@@ -13,24 +13,33 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if 0%{?el6}
-%global pyver 34
-%elif 0%{?el7}
-%global pyver 36
-%else
-%global pyver 3
-%endif
+#Common
+BuildRequires: epel-release
+Requires: epel-release
 
 %if "%{dist}" != ".el8"
 BuildRequires: pandoc
 %endif
 
-BuildRequires: epel-release
-BuildRequires: python%{pyver}-devel
-BuildRequires: python%{pyver}-setuptools
-Requires: epel-release
-Requires: python%{pyver}
-Requires: python%{pyver}-requests
+#Build dependent
+%if 0%{?el6}
+BuildRequires: python34-devel
+BuildRequires: python34-setuptools
+Requires: python34
+Requires: python34-requests
+%endif
+%if 0%{?el7}
+BuildRequires: python36-devel
+BuildRequires: python36-setuptools
+Requires: python36
+Requires: python36-requests
+%endif
+%if 0%{?el7}
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
+Requires: python3
+Requires: python3-requests
+%endif
 
 %description
 QPC is tool for discovery and inspection of an IT environment.

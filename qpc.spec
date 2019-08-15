@@ -13,9 +13,9 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if 0%{?el6}
+%if "%{dist}" != ".el6"
 %global pyver 34
-%elif 0%{?el7}
+%elif "%{dist}" != ".el7"
 %global pyver 36
 %else
 %global pyver 3

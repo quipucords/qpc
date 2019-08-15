@@ -19,7 +19,7 @@ BuildArch: noarch
 %global pyver 36
 %else
 %global pyver 3
-%if
+%endif
 
 %if "%{dist}" != ".el8"
 BuildRequires: pandoc

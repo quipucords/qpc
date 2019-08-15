@@ -13,11 +13,15 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-%if "%{dist}" == ".el6"
+
+
+%if 0%{?el6}
 %global pyver 34
-%elif "%{dist}" == ".el7"
+%endif
+%if 0%{?el7}
 %global pyver 36
-%else
+%endif
+%if 0%{?el8}
 %global pyver 3
 %endif
 

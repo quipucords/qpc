@@ -22,24 +22,22 @@ BuildRequires: pandoc
 %endif
 
 #Build dependent
-%if 0%{?el6}
-BuildRequires: python34-devel
-BuildRequires: python34-setuptools
-Requires: python34
-Requires: python34-requests
-%endif
-%if 0%{?el7}
-BuildRequires: python36-devel
-BuildRequires: python36-setuptools
-Requires: python36
-Requires: python36-requests
-%endif
-%if 0%{?el7}
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-Requires: python3
-Requires: python3-requests
-%endif
+
+# BuildRequires: python34-devel
+# BuildRequires: python34-setuptools
+# Requires: python34
+# Requires: python34-requests
+
+# BuildRequires: python36-devel
+# BuildRequires: python36-setuptools
+# Requires: python36
+# Requires: python36-requests
+
+# BuildRequires: python3-devel
+# BuildRequires: python3-setuptools
+# Requires: python3
+# Requires: python3-requests
+
 
 %description
 QPC is tool for discovery and inspection of an IT environment.

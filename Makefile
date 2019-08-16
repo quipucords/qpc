@@ -4,10 +4,10 @@ PYTHON		= $(shell which python)
 TOPDIR = $(shell pwd)
 DIRS	= test bin locale src
 PYDIRS	= quipucords
-
 BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
+pandoc = pandoc
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
@@ -44,9 +44,8 @@ html:
 	@cd docs; $(MAKE) html
 
 manpage:
-	@mkdir -p build
-	pandoc docs/source/man.rst \
-	  --standalone -t man -o build/qpc.1 \
+	$(pandoc) docs/source/man.rst \
+	  --standalone -t man -o docs/qpc.1 \
 	  --variable=section:1 \
 	  --variable=date:'June 6, 2019' \
 	  --variable=footer:'version 0.9.1' \

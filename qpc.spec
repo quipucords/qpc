@@ -67,8 +67,9 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
-* Fri Jun 6 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.1-1
-- Bump version to 0.9.1 for master branch. <kholdawa@redhat.com>
+* Mon Aug 19 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.1-1
+- Added RHEL 8 support. <cmyers@redhat.com>
+- Fixed help text for satellite source command. <aaiken@redhat.com>
 * Fri Jun 6 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.0-1
 - Add qpc report insights command to qpc. <kholdawa@redhat.com>
 - Update qpc insights upload command to use new QPC Insights report format. <kholdawa@redhat.com>
@@ -77,7 +78,6 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 - Add CLI flag to disable authentication. <kholdawa@redhat.com>
 - Modify spec file for RHEL 7 python36. <kholdawa@redhat.com>
 - Added extension check for file download commands.<kholdawa@redhat.com>
-- Bump version to 0.9.0
 * Wed Jan 23 2019 Ashley Aiken <aaiken@redhat.com> 0.0.46-1
 - Add deployment report verification to qpc insights upload command. <aaiken@redhat.com>
 - Add qpc insights commands. <cmyers@redhat.com>

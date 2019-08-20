@@ -1,5 +1,5 @@
 """File to hold release constants."""
-VERSION = '0.9.1'
+VERSION = '0.9.2'
 AUTHOR = 'QPC Team'
 AUTHOR_EMAIL = 'qpc@redhat.com'
 PKG_NAME = 'qpc'

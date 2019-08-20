@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: qpc
-Version: 0.9.1
+Version: 0.9.2
 Release: 1%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 
@@ -67,6 +67,8 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
+* Tue Aug 20 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.2-1
+- Bump version to 0.9.2 for master branch.
 * Mon Aug 19 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.1-1
 - Added RHEL 8 support. <cmyers@redhat.com>
 - Fixed help text for satellite source command. <aaiken@redhat.com>

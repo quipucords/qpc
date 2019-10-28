@@ -137,7 +137,7 @@ class CLI():
         is_server_logout = is_server_cmd and self.args.action == server.LOGOUT
         is_server_config = is_server_cmd and self.args.action == server.CONFIG
 
-        if is_server_cmd and not is_server_config:
+        if not is_server_config:
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == '':

@@ -19,13 +19,17 @@ from distutils.version import LooseVersion
 from qpc import messages
 from qpc.release import PKG_NAME
 from qpc.translation import _
-from qpc.utils import (QPC_MIN_SERVER_VERSION,
+from qpc.utils import (CONFIG_HOST_KEY,
+                       CONFIG_PORT_KEY,
+                       CONFIG_USE_HTTP,
+                       QPC_MIN_SERVER_VERSION,
                        get_server_location,
                        get_ssl_verify,
                        handle_error_response,
                        log,
                        log_request_info,
-                       read_client_token)
+                       read_client_token,
+                       read_server_config)
 
 import requests
 
@@ -148,7 +152,7 @@ def put(url, payload, headers=None):
     return requests.put(url, json=payload, headers=headers, verify=ssl_verify)
 
 
-# pylint: disable=too-many-arguments, too-many-branches
+# pylint: disable=too-many-arguments, too-many-branches, too-many-locals
 def request(method, path, params=None, payload=None,
             parser=None, headers=None, min_server_version=QPC_MIN_SERVER_VERSION):
     """Create a generic handler for passing to specific request methods.
@@ -204,9 +208,15 @@ def request(method, path, params=None, payload=None,
         if parser is not None:
             parser.print_help()
         sys.exit(1)
-    except requests.exceptions.ConnectionError as conn_err:
-        print(_(CONNECTION_ERROR_MSG))
-        log.error(conn_err)
-        if parser is not None:
-            parser.print_help()
+    except requests.exceptions.ConnectionError:
+        config = read_server_config()
+        if config is not None:
+            protocol = 'https'
+            host = config.get(CONFIG_HOST_KEY)
+            port = config.get(CONFIG_PORT_KEY)
+            if config.get(CONFIG_USE_HTTP):
+                protocol = 'http'
+            log.error(_(CONNECTION_ERROR_MSG % (protocol, host, port)))
+        else:
+            log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
         sys.exit(1)

@@ -217,6 +217,7 @@ def request(method, path, params=None, payload=None,
             if config.get(CONFIG_USE_HTTP):
                 protocol = 'http'
             log.error(_(CONNECTION_ERROR_MSG % (protocol, host, port)))
+            log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
         else:
             log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
         sys.exit(1)

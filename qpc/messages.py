@@ -228,11 +228,6 @@ CONNECTION_ERROR_MSG = 'A connection error occurred while attempting to '\
                        'configured to be contacted via "%s" at host "%s" '\
                        'with port "%s" but is not responding.'
 
-SSL_ERROR_MSG = 'A connection error occurred while attempting to '\
-                'communicate with the server over "https". To troubleshoot '\
-                'this problem, check the configuration and the '\
-                'status of the server.'
-
 READ_FILE_ERROR = 'Error reading from %s: %s.'
 WRITE_FILE_ERROR = 'Error writing to %s: %s.'
 NOT_A_FILE = 'Input %s was not a file.'

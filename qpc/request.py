@@ -43,7 +43,7 @@ DELETE = 'DELETE'
 PUT = 'PUT'
 
 CONNECTION_ERROR_MSG = messages.CONNECTION_ERROR_MSG
-SSL_ERROR_MSG = messages.SSL_ERROR_MSG
+SSL_ERROR_MSG = messages.CONNECTION_ERROR_MSG
 
 # pylint: disable=invalid-name
 try:
@@ -202,13 +202,7 @@ def request(method, path, params=None, payload=None,
             log_request_info(method, log_command,
                              url, result.text, result.status_code)
         return result
-    except requests.exceptions.SSLError as ssl_error:
-        print(_(SSL_ERROR_MSG))
-        log.error(ssl_error)
-        if parser is not None:
-            parser.print_help()
-        sys.exit(1)
-    except requests.exceptions.ConnectionError:
+    except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
         config = read_server_config()
         if config is not None:
             protocol = 'https'

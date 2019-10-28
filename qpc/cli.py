@@ -136,8 +136,9 @@ class CLI():
         is_server_cmd = self.args.subcommand == server.SUBCOMMAND
         is_server_login = is_server_cmd and self.args.action == server.LOGIN
         is_server_logout = is_server_cmd and self.args.action == server.LOGOUT
+        is_server_status = is_server_cmd and self.args.action == server.STATUS
 
-        if not is_server_cmd or is_server_login or is_server_logout:
+        if not is_server_cmd or is_server_login or is_server_logout or is_server_status:
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == '':

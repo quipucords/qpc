@@ -224,9 +224,9 @@ VERBOSITY_HELP = 'Verbose mode. Use up to -vvvv for more verbosity.'
 
 
 CONNECTION_ERROR_MSG = 'A connection error occurred while attempting to '\
-                       'communicate with the server. To troubleshoot '\
-                       'this problem, check the configuration and the '\
-                       'status of the server.'
+                       'communicate with the server. The server has been '\
+                       'configured to be contacted via "%s" at host "%s" '\
+                       'with port "%s" but is not responding.'
 
 SSL_ERROR_MSG = 'A connection error occurred while attempting to '\
                 'communicate with the server over "https". To troubleshoot '\

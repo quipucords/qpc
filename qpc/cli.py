@@ -134,10 +134,10 @@ class CLI():
         self.args = self.parser.parse_args()
         setup_logging(self.args.verbosity)
         is_server_cmd = self.args.subcommand == server.SUBCOMMAND
-        is_server_login = is_server_cmd and self.args.action == server.LOGIN
         is_server_logout = is_server_cmd and self.args.action == server.LOGOUT
+        is_server_config = is_server_cmd and self.args.action == server.CONFIG
 
-        if not is_server_cmd or is_server_login or is_server_logout:
+        if is_server_cmd and not is_server_config:
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == '':

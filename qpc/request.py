@@ -43,7 +43,6 @@ DELETE = 'DELETE'
 PUT = 'PUT'
 
 CONNECTION_ERROR_MSG = messages.CONNECTION_ERROR_MSG
-SSL_ERROR_MSG = messages.CONNECTION_ERROR_MSG
 
 # pylint: disable=invalid-name
 try:

@@ -16,7 +16,7 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.clear import SourceClearCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -57,7 +57,7 @@ class SourceClearCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     ncc.main(args)
-                    self.assertEqual(source_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_clear_source_conn_err(self):
         """Testing the clear source command with a connection error."""

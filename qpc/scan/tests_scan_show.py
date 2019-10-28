@@ -15,7 +15,7 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_URI
 from qpc.scan.show import ScanShowCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -56,7 +56,7 @@ class ScanShowCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_scan_conn_err(self):
         """Testing the show scan command with a connection error."""

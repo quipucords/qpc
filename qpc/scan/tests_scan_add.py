@@ -17,7 +17,7 @@ from io import StringIO
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_URI
 from qpc.scan.add import ScanAddCommand
 from qpc.source import SOURCE_URI
@@ -80,7 +80,7 @@ class ScanAddCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ssc.main(args)
-                    self.assertEqual(scan_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_add_scan_conn_err(self):
         """Testing the add scan command with a connection error."""

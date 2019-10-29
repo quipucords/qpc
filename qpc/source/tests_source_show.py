@@ -15,7 +15,7 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.show import SourceShowCommand
 from qpc.tests_utilities import HushUpStderr, redirect_stdout
@@ -59,7 +59,7 @@ class SourceShowCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     nsc.main(args)
-                    self.assertEqual(source_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_source_conn_err(self):
         """Testing the show source command with a connection error."""

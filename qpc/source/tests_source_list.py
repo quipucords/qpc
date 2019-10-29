@@ -16,7 +16,7 @@ from unittest.mock import ANY, patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
 
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.list import SourceListCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -57,7 +57,7 @@ class SourceListCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     nlc.main(args)
-                    self.assertEqual(source_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_source_conn_err(self):
         """Testing the list source command with a connection error."""

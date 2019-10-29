@@ -19,7 +19,7 @@ from io import StringIO
 from qpc import messages
 from qpc.cli import CLI
 from qpc.cred import CREDENTIAL_URI
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.add import SourceAddCommand
 from qpc.source.utils import validate_port
@@ -177,7 +177,7 @@ class SourceAddCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     nac.main(args)
-                    self.assertEqual(source_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_add_source_conn_err(self):
         """Testing the add source command with a connection error."""

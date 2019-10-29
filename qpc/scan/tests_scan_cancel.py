@@ -16,7 +16,7 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
-from qpc.request import CONNECTION_ERROR_MSG, SSL_ERROR_MSG
+from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_JOB_URI
 from qpc.scan.cancel import ScanCancelCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -57,7 +57,7 @@ class ScanCancelCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(), SSL_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_cancel_scan_conn_err(self):
         """Testing the cancel scan command with a connection error."""

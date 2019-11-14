@@ -48,7 +48,7 @@ manpage:
 	  --standalone -t man -o docs/qpc.1 \
 	  --variable=section:1 \
 	  --variable=date:'June 6, 2019' \
-	  --variable=footer:'version 0.9.2' \
+	  --variable=footer:'version 3' \
 	  --variable=header:'QPC Command Line Guide'
 
 insights-client:

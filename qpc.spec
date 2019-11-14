@@ -67,8 +67,11 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
-* Tue Aug 20 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.2-1
-- Bump version to 0.9.2 for master branch.
+* Thu Nov 14 2019 Ashley Aiken <aaiken@redhat.com> 0.9.2-1
+- Bump version to 0.9.2 for master branch
+- Dependency version updates
+- Improve error handling when server is not configured
+- Improve error handling http connection errors
 * Mon Aug 19 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.1-1
 - Added RHEL 8 support. <cmyers@redhat.com>
 - Fixed help text for satellite source command. <aaiken@redhat.com>

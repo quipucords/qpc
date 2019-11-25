@@ -32,7 +32,8 @@ from qpc.report.commands import (ReportDeploymentsCommand,
                                  ReportDownloadCommand,
                                  ReportInsightsCommand,
                                  ReportMergeCommand,
-                                 ReportMergeStatusCommand)
+                                 ReportMergeStatusCommand,
+                                 ReportValidateCommand)
 from qpc.scan.commands import (ScanAddCommand,
                                ScanCancelCommand,
                                ScanClearCommand,
@@ -109,7 +110,8 @@ class CLI():
                               ReportInsightsCommand,
                               ReportDownloadCommand,
                               ReportMergeCommand,
-                              ReportMergeStatusCommand])
+                              ReportMergeStatusCommand,
+                              ReportValidateCommand])
         self._add_subcommand(insights.SUBCOMMAND,
                              [InsightsUploadCommand])
         ensure_data_dir_exists()

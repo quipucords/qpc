@@ -590,7 +590,7 @@ Validating Reports
 ~~~~~~~~~~~~~~~~~~
 The ``qpc report validate`` command can be used to validate a report against its data integrity hash that is provided when a user downloads a set of reports using the ``qpc report download command``.  This command validates that the report is authentic to what the server produced.
 
-**qpc report validate **--report** *report_file* **--hash** *report_hash*
+**qpc report validate --report** *report_file* **--hash** *report_hash*
 
 ``--report=report_file``
 

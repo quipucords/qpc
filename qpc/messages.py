@@ -177,6 +177,8 @@ REPORT_VALIDATE_JSON = 'Checking files for valid json details report. %s'
 REPORT_VALIDATE_FILE_HELP = 'The path to the report file to be validated against '\
     'an associated hash.'
 REPORT_VALIDATE_HASH_HELP = 'The associated hash to validate the report against.'
+REPORT_VALIDATE_INVALID_JSON = 'Can not validate: %s is not a valid JSON file.'
+REPORT_VALIDATE_ERROR = 'The following error occurred during report validation: %s'
 REPORT_JSON_DIR_FILE_FAILED = 'Failed: %s is not a details report. '\
     'Excluding from merge.'
 REPORT_JSON_MISSING_ATTR = 'Failed: %s is not a details report.'\

@@ -570,7 +570,7 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
-The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
+The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats, as well as a JSON file that contains data integrity hashes for each report.
 
 **qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
@@ -585,6 +585,20 @@ The ``qpc report download`` command downloads a set of reports, identified eithe
 ``--output-file=path``
 
   Required. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.
+
+Validating Reports
+~~~~~~~~~~~~~~~~~~
+The ``qpc report validate`` command can be used to validate a report against its data integrity hash that is provided when a user downloads a set of reports using the ``qpc report download command``.  This command validates that the report is authentic to what the server produced.
+
+**qpc report validate **--report** *report_file* **--hash** *report_hash*
+
+``--report=report_file``
+
+  Contains the path to the report file to verify. This should be a deployments or details report in either JSON or CSV format.
+
+``--hash=report_hash``
+
+  Contains the hash of the report file to verify. This can be found in the downloaded TAR.GZ in a file called ``hash.json``.
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~

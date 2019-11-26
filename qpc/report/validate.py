@@ -86,7 +86,10 @@ class ReportValidateCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        print(json_data)
+        if json_data.get('detail'):
+            print(_(messages.REPORT_VALID % self.args.report_file))
+        else:
+            print(_(messages.REPORT_INVALID % self.args.report_file))
 
     def _handle_response_error(self):
         json_data = self.response.json()

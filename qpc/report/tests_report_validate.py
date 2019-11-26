@@ -77,7 +77,7 @@ class ReportValidateTests(unittest.TestCase):
         """Testing report validate command with report file and hash."""
         report_out = StringIO()
 
-        put_report_data = True
+        put_report_data = {'detail': True}
         put_merge_url = get_server_location() + VALIDATE_URI
         with requests_mock.Mocker() as mocker:
             mocker.put(put_merge_url, status_code=200,
@@ -87,14 +87,14 @@ class ReportValidateTests(unittest.TestCase):
                              report_hash='fooo')
             with redirect_stdout(report_out):
                 rvc.main(args)
-                self.assertEqual(str(put_report_data),
+                self.assertEqual(messages.REPORT_VALID % TMP_DETAILSFILE1[0],
                                  report_out.getvalue().strip())
 
     def test_successful_report_validate_csv(self):
         """Testing report validate command with report file and hash."""
         report_out = StringIO()
 
-        put_report_data = True
+        put_report_data = {'detail': False}
         put_merge_url = get_server_location() + VALIDATE_URI
         with requests_mock.Mocker() as mocker:
             mocker.put(put_merge_url, status_code=200,
@@ -104,7 +104,7 @@ class ReportValidateTests(unittest.TestCase):
                              report_hash='fooo')
             with redirect_stdout(report_out):
                 rvc.main(args)
-                self.assertEqual(str(put_report_data),
+                self.assertEqual(messages.REPORT_INVALID % TMP_NOTJSONFILE[0],
                                  report_out.getvalue().strip())
 
     def test_report_validate_fnf(self):

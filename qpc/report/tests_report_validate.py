@@ -80,7 +80,7 @@ class ReportValidateTests(unittest.TestCase):
         put_report_data = True
         put_merge_url = get_server_location() + VALIDATE_URI
         with requests_mock.Mocker() as mocker:
-            mocker.put(put_merge_url, status_code=201,
+            mocker.put(put_merge_url, status_code=200,
                        json=put_report_data)
             rvc = ReportValidateCommand(SUBPARSER)
             args = Namespace(report_file=TMP_DETAILSFILE1[0],
@@ -97,7 +97,7 @@ class ReportValidateTests(unittest.TestCase):
         put_report_data = True
         put_merge_url = get_server_location() + VALIDATE_URI
         with requests_mock.Mocker() as mocker:
-            mocker.put(put_merge_url, status_code=201,
+            mocker.put(put_merge_url, status_code=200,
                        json=put_report_data)
             rvc = ReportValidateCommand(SUBPARSER)
             args = Namespace(report_file=TMP_NOTJSONFILE[0],

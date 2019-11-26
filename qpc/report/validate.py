@@ -46,7 +46,7 @@ class ReportValidateCommand(CliCommand):
         # pylint: disable=no-member
         CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
                             subparsers.add_parser(self.ACTION), PUT,
-                            report.VALIDATE_URI, [codes.created])
+                            report.VALIDATE_URI, [codes.ok])
         required_args = self.parser.add_argument_group('required arguments')
         required_args.add_argument('--report', dest='report_file',
                                    metavar='REPORT_FILE', default=[],

@@ -46,6 +46,10 @@ class LoginHostCommand(CliCommand):
                                  metavar='USERNAME',
                                  help=_(messages.LOGIN_USER_HELP),
                                  required=False)
+        self.parser.add_argument('--password', dest='password',
+                                 metavar='PASSWORD',
+                                 help=_(messages.LOGIN_PASS_HELP),
+                                 required=False)
         self.username = None
         self.password = None
 
@@ -59,7 +63,10 @@ class LoginHostCommand(CliCommand):
         else:
             self.username = input(_(messages.LOGIN_USERNAME_PROMPT))
 
-        self.password = getpass()
+        if 'password' in self.args and self.args.password:
+            self.password = self.args.password
+        else:
+            self.password = getpass()
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

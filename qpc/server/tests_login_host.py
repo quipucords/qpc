@@ -16,6 +16,7 @@ from unittest.mock import patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
 
+from qpc import messages
 from qpc.server import LOGIN_URI
 from qpc.server.login_host import LoginHostCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -78,7 +79,8 @@ class LoginCliTests(unittest.TestCase):
             do_mock_raw_input.return_value = 'abc'
             with redirect_stdout(server_out):
                 lhc.main(args)
-                self.assertEqual(server_out.getvalue(), 'Login successful.\n')
+                result = server_out.getvalue().rstrip()
+                self.assertEqual(result, messages.LOGIN_SUCCESS)
 
     @patch('builtins.input')
     @patch('getpass._raw_input')
@@ -95,7 +97,8 @@ class LoginCliTests(unittest.TestCase):
             args = Namespace()
             with redirect_stdout(server_out):
                 lhc.main(args)
-                self.assertEqual(server_out.getvalue(), 'Login successful.\n')
+                result = server_out.getvalue().rstrip()
+                self.assertEqual(result, messages.LOGIN_SUCCESS)
 
     def test_no_prompts_with_args(self):
         """Testing no prompts with args passed."""
@@ -108,4 +111,5 @@ class LoginCliTests(unittest.TestCase):
             args = Namespace(username='admin', password='pass')
             with redirect_stdout(server_out):
                 lhc.main(args)
-                self.assertEqual(server_out.getvalue(), 'Login successful.\n')
+                result = server_out.getvalue().rstrip()
+                self.assertEqual(result, messages.LOGIN_SUCCESS)

@@ -215,7 +215,12 @@ REPORT_JSON_DIR_NOT_FOUND = '%s is not a directory'
 REPORT_SUCCESSFULLY_WRITTEN = 'Report written successfully.'
 REPORT_SUCCESSFULLY_MERGED = 'Report merge job %s created. '\
     'To check merge status, run "%s report merge-status --job %s"'
-
+REPORT_UPLOAD_VALIDATE_JSON = 'Checking file for valid json details report. %s'
+REPORT_UPLOAD_FILE_INVALID_JSON = 'Failed: %s is not a JSON details report.'
+REPORT_UPLOAD_JSON_FILE_HELP = 'The path to the details report json file.'
+REPORT_UPLOAD_VALIDATE_JSON = 'Checking %s for valid json details report.'
+REPORT_SUCCESSFULLY_UPLOADED = 'Report %s created.'
+REPORT_FAILED_TO_UPLOADED = 'Report could not be created.  Error: %s'
 DISABLE_OPT_PRODUCTS_HELP = 'The product inspection exclusions. '\
     'Contains the list of products to exclude from inspection. '\
     'Valid values: jboss_eap, jboss_fuse, jboss_brms, jboss_ws.'

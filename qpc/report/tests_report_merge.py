@@ -53,7 +53,7 @@ PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
-class ReportDetailTests(unittest.TestCase):
+class ReportMergeTests(unittest.TestCase):
     """Class for testing the scan show commands for qpc."""
 
     # pylint: disable=invalid-name
@@ -229,6 +229,32 @@ class ReportDetailTests(unittest.TestCase):
         args = Namespace(scan_job_ids=None,
                          json_files=[TMP_DETAILSFILE1[0],
                                      TMP_NOTJSONFILE[0]],
+                         report_ids=None,
+                         json_dir=None)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+
+    def test_detail_merge_error_all_json_files(self):
+        """Testing report merge error with all bad json files."""
+        report_out = StringIO()
+        nac = ReportMergeCommand(SUBPARSER)
+        args = Namespace(scan_job_ids=None,
+                         json_files=[TMP_BADDETAILS1[0],
+                                     TMP_BADDETAILS2[0]],
+                         report_ids=None,
+                         json_dir=None)
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(report_out):
+                nac.main(args)
+
+    def test_detail_merge_only_one_json_file(self):
+        """Testing report merge error with only 1 json file."""
+        report_out = StringIO()
+        nac = ReportMergeCommand(SUBPARSER)
+        args = Namespace(scan_job_ids=None,
+                         json_files=[TMP_BADDETAILS1[0],
+                                     ],
                          report_ids=None,
                          json_dir=None)
         with self.assertRaises(SystemExit):

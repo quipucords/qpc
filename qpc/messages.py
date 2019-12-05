@@ -263,7 +263,10 @@ SERVER_STATUS_FAILURE = 'Unexpected failure occurred when accessing the '\
 STATUS_PATH_HELP = 'Output file location.'
 STATUS_SUCCESSFULLY_WRITTEN = 'Server status written successfully.'
 
-LOGIN_USER_HELP = 'The user name to log in to the server.'
+LOGIN_USER_HELP = 'The user name to log in to the server. If not provided, '\
+    'user will be prompted.'
+LOGIN_PASS_HELP = 'The password to log in to the server. If not provided, '\
+    'user will be prompted.'
 LOGIN_USERNAME_PROMPT = 'User name: '
 LOGIN_SUCCESS = 'Login successful.'
 

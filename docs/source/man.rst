@@ -90,11 +90,15 @@ Logging in to the server
 
 To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token that is used for authentication with any command line interface commands that follow it.
 
-**qpc server login [--username=** *username* **]**A source defines the entity to be inspected, such as a host, subnet, network, or systems management solution such as vCenter Server or Satellite, plus includes one or more credentials to use to access that network or systems management solution during the inspection process.
+**qpc server login [--username=** *username* **] [--password=** *password* **]**
 
 ``--username=username``
 
-  Optional. Sets the user name that is used to log in to the server.
+  Optional. Sets the user name that is used to log in to the server. If omitted, qpc will prompt for the server username.
+
+``--password=password``
+
+  Optional. Sets the password that is used to log in to the server. If omitted, qpc will prompt for the server password.
 
 
 Logging out of the server

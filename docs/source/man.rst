@@ -617,17 +617,6 @@ The ``qpc report merge`` command runs an asynchronous job. The output of this co
 # qpc report merge-status --job 1
 
 
-Manually Reprocessing Reports
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report upload`` command uploads a details report to reprocess it.  This could be useful if a value in the details report caused a system to be excluded.  After modication of the details report, simply run the ``qpc report upload --json-file DETAILS_REPORT_JSON``.
-
-**qpc report upload (--json-file** *json_details_report_file* **)**
-
-``--json-file=json_details_report_file``
-
-  Contains the JSON details report file path to upload for reprocessing.
-
-
 Viewing the Status of a Report Merge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command returns a merge job ID that you can use to access the status of the merge.
@@ -637,6 +626,17 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
 ``--job=report_job_identifier``
 
   Contains the job identifier to use to check for the status of a merge.
+
+
+Manually Reprocessing Reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``qpc report upload`` command uploads a details report to reprocess it.  This could be useful if a value in the details report caused a system to be excluded.  After modication of the details report, simply run the ``qpc report upload --json-file DETAILS_REPORT_JSON``.
+
+**qpc report upload (--json-file** *json_details_report_file* **)**
+
+``--json-file=json_details_report_file``
+
+  Contains the JSON details report file path to upload for reprocessing.
 
 
 Insights

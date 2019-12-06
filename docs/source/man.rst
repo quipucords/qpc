@@ -616,7 +616,6 @@ The ``qpc report merge`` command runs an asynchronous job. The output of this co
 
 # qpc report merge-status --job 1
 
-
 Viewing the Status of a Report Merge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command returns a merge job ID that you can use to access the status of the merge.

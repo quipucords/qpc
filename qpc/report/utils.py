@@ -9,7 +9,7 @@
 # along with this software; if not, see
 # https://www.gnu.org/licenses/gpl-3.0.txt.
 #
-"""ReportUploadCommand is used to upload details JSON."""
+"""Helper functions for processing reports."""
 
 from __future__ import print_function
 

@@ -47,7 +47,7 @@ class ReportUploadCommand(CliCommand):
         # pylint: disable=no-member
         CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
                             subparsers.add_parser(self.ACTION), POST,
-                            report.REPORT_UPLOAD_URI, [codes.created])
+                            report.REPORT_URI, [codes.created])
         self.parser.add_argument('--json-file', dest='json_file',
                                  metavar='JSON_FILE',
                                  help=_(messages.REPORT_UPLOAD_JSON_FILE_HELP),

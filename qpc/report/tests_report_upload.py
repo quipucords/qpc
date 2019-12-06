@@ -12,13 +12,12 @@
 
 import os
 import sys
-import time
 import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
-from qpc.report import REPORT_UPLOAD_URI
+from qpc.report import REPORT_URI
 from qpc.report.upload import ReportUploadCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
@@ -66,7 +65,7 @@ class ReportUploadTests(unittest.TestCase):
         report_out = StringIO()
 
         put_report_data = {'report_id': 1}
-        put_merge_url = get_server_location() + REPORT_UPLOAD_URI
+        put_merge_url = get_server_location() + REPORT_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201,
                         json=put_report_data)
@@ -82,7 +81,7 @@ class ReportUploadTests(unittest.TestCase):
         report_out = StringIO()
 
         put_report_data = {'report_id': 1}
-        put_merge_url = get_server_location() + REPORT_UPLOAD_URI
+        put_merge_url = get_server_location() + REPORT_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201,
                         json=put_report_data)
@@ -100,7 +99,7 @@ class ReportUploadTests(unittest.TestCase):
 
         put_report_data = {
             'error': 'FAILED to create report id=23 - produced no valid fingerprints'}
-        put_merge_url = get_server_location() + REPORT_UPLOAD_URI
+        put_merge_url = get_server_location() + REPORT_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=400,
                         json=put_report_data)

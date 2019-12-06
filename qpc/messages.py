@@ -169,8 +169,7 @@ REPORT_INVALID_JSON_FILE = 'The file %s does not contain a valid json ' \
 REPORT_MISSING_REPORT_VERSION = 'WARNING: '\
     'The file %s is missing report_version.  '\
     'Future releases will not tolerate a missing or invalid report_version.'
-REPORT_INVALID_REPORT_TYPE = 'The file %s contains invalid report type %s.  '\
-    'Only details reports can be merged. Excluding from merge.'
+REPORT_INVALID_REPORT_TYPE = 'The file %s contains invalid report type %s.'
 REPORT_JSON_DIR_NO_FILES = \
     'No files with extension .json found in %s.'
 REPORT_VALIDATE_JSON = 'Checking files for valid json details report. %s'

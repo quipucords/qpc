@@ -627,6 +627,17 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
   Contains the job identifier to use to check for the status of a merge.
 
 
+Manually Reprocessing Reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``qpc report upload`` command uploads a details report to reprocess it.  This could be useful if a value in the details report caused a system to be excluded.  After modication of the details report, simply run the ``qpc report upload --json-file DETAILS_REPORT_JSON``.
+
+**qpc report upload (--json-file** *json_details_report_file* **)**
+
+``--json-file=json_details_report_file``
+
+  Contains the JSON details report file path to upload for reprocessing.
+
+
 Insights
 --------
 

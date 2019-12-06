@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2018 Red Hat, Inc.
+# Copyright (c) 2018-2019 Red Hat, Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -21,6 +21,7 @@ from glob import glob
 from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
+from qpc.report import utils
 from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
@@ -33,15 +34,6 @@ try:
 except AttributeError:
     json_exception_class = ValueError
 # pylint: disable=too-few-public-methods
-
-
-SOURCES_KEY = 'sources'
-FACTS_KEY = 'facts'
-SERVER_ID_KEY = 'server_id'
-REPORT_VERSION_KEY = 'report_version'
-REPORT_TYPE_KEY = 'report_type'
-DEFAULT_REPORT_VERSION = '0.0.44.legacy'
-DETAILS_REPORT_TYPE = 'details'
 
 
 class ReportMergeCommand(CliCommand):
@@ -116,70 +108,15 @@ class ReportMergeCommand(CliCommand):
         print(_(messages.REPORT_VALIDATE_JSON % files))
         all_sources = []
         for file in files:
-            if os.path.isfile(file):
-                details_report = None
-                with open(file) as lint_f:
-                    try:
-                        details_report = json.load(lint_f)
-                    except json_exception_class:
-                        print(_(messages.REPORT_JSON_DIR_FILE_FAILED % file))
-                        continue
-
-                    # validate version type
-                    file_report_version = details_report.get(
-                        REPORT_VERSION_KEY, None)
-                    if not file_report_version:
-                        # warn about old format but continue
-                        print(_(messages.REPORT_MISSING_REPORT_VERSION % file))
-                        file_report_version = DEFAULT_REPORT_VERSION
-
-                    file_report_type = details_report.get(
-                        REPORT_TYPE_KEY, DETAILS_REPORT_TYPE)
-                    if file_report_type != DETAILS_REPORT_TYPE:
-                        # terminate if different from details type
-                        print(_(messages.REPORT_INVALID_REPORT_TYPE %
-                                (file, file_report_type)))
-                        continue
-
-                    # validate sources
-                    sources = details_report.get(SOURCES_KEY, None)
-                    if sources:
-                        has_error = False
-                        for source in sources:
-                            facts = source.get(FACTS_KEY)
-                            server_id = source.get(SERVER_ID_KEY)
-                            if not facts:
-                                print(_(messages.REPORT_JSON_MISSING_ATTR %
-                                        (file, FACTS_KEY)))
-                                has_error = True
-                                break
-                            if not server_id:
-                                print(
-                                    _(messages.REPORT_JSON_MISSING_ATTR %
-                                      (file, SERVER_ID_KEY)))
-                                has_error = True
-                                break
-                            # Add version/type to all sources since merge
-                            source[REPORT_TYPE_KEY] = file_report_type
-                            source[REPORT_VERSION_KEY] = file_report_version
-
-                        if not has_error:
-                            # Source is valid so add it
-                            all_sources += sources
-                            print(_(messages.REPORT_JSON_DIR_FILE_SUCCESS %
-                                    file))
-                    else:
-                        print(_(messages.REPORT_JSON_MISSING_ATTR %
-                                (file, SOURCES_KEY)))
-                        continue
-            else:
-                print(_(messages.FILE_NOT_FOUND % file))
-                sys.exit(1)
+            sources = utils.validate_and_create_json(file)
+            # Source is valid so add it
+            if sources:
+                all_sources += sources
         if all_sources == []:
             print(_(messages.REPORT_JSON_DIR_ALL_FAIL))
             sys.exit(1)
-        self.json = {SOURCES_KEY: all_sources,
-                     REPORT_TYPE_KEY: DETAILS_REPORT_TYPE}
+        self.json = {utils.SOURCES_KEY: all_sources,
+                     utils.REPORT_TYPE_KEY: utils.DETAILS_REPORT_TYPE}
 
     def _merge_json(self):
         """Combine the sources for each json file provided.

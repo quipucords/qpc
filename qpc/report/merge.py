@@ -112,8 +112,6 @@ class ReportMergeCommand(CliCommand):
             # Source is valid so add it
             if sources:
                 all_sources += sources
-                print(_(messages.REPORT_JSON_DIR_FILE_SUCCESS %
-                        file))
         if all_sources == []:
             print(_(messages.REPORT_JSON_DIR_ALL_FAIL))
             sys.exit(1)

@@ -60,6 +60,8 @@ class ReportDetailsCommand(CliCommand):
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
                                  help=_(messages.REPORT_PATH_HELP),
                                  required=True)
+        self.parser.add_argument('--mask', dest='mask', action='store_true',
+                                 help=_(messages.REPORT_MASK_HELP), required=False)
         self.report_id = None
 
     def _validate_args(self):
@@ -71,6 +73,8 @@ class ReportDetailsCommand(CliCommand):
         if self.args.output_csv:
             extension = '.csv'
             self.req_headers = {'Accept': 'text/csv'}
+        if self.args.mask:
+            self.req_params = {'mask': True}
         if extension:
             check_extension(extension, self.args.path)
         try:

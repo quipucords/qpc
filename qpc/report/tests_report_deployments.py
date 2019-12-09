@@ -84,7 +84,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id=None,
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
@@ -112,7 +113,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
@@ -146,7 +148,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id=None,
                              output_json=False,
                              output_csv=True,
-                             path=self.test_csv_filename)
+                             path=self.test_csv_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
@@ -193,7 +196,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              output_json=True,
                              report_id=None,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -215,7 +219,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id=None,
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
                     nac.main(args)
@@ -242,7 +247,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -268,7 +274,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=True,
                              output_csv=False,
-                             path=fake_dir)
+                             path=fake_dir,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -294,7 +301,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=True,
                              output_csv=False,
-                             path=non_json_dir)
+                             path=non_json_dir,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -319,7 +327,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=False,
                              output_csv=True,
-                             path=non_csv_dir)
+                             path=non_csv_dir,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -343,7 +352,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id='1',
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -374,10 +384,40 @@ class ReportDeploymentsTests(unittest.TestCase):
                              report_id=None,
                              output_json=True,
                              output_csv=False,
-                             path=self.test_json_filename)
+                             path=self.test_json_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
                                  1)
+
+    def test_deployments_report_mask(self):
+        """Testing retreiving json deployments report with masked values."""
+        report_out = StringIO()
+
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/' + '?mask=True'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       content=buffer_content)
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_json_filename,
+                             mask=True)
+            with redirect_stdout(report_out):
+                nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.REPORT_SUCCESSFULLY_WRITTEN)
+                with open(self.test_json_filename, 'r') as json_file:
+                    data = json_file.read()
+                    file_content_dict = json.loads(data)
+                self.assertDictEqual(get_report_json_data, file_content_dict)

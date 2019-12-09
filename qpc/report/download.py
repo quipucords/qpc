@@ -52,11 +52,15 @@ class ReportDownloadCommand(CliCommand):
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
                                  help=_(messages.DOWNLOAD_PATH_HELP),
                                  required=True)
+        self.parser.add_argument('--mask', dest='mask', action='store_true',
+                                 help=_(messages.REPORT_MASK_HELP), required=False)
         self.min_server_version = '0.0.46'
         self.report_id = None
 
     def _validate_args(self):
         self.req_headers = {'Accept': 'application/gzip'}
+        if self.args.mask:
+            self.req_params = {'mask': True}
         try:
             validate_write_file(self.args.path, 'output-file')
         except ValueError as error:

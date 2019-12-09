@@ -220,6 +220,8 @@ REPORT_UPLOAD_JSON_FILE_HELP = 'The path to the details report JSON file.'
 REPORT_UPLOAD_VALIDATE_JSON = 'Checking %s for valid JSON details report.'
 REPORT_SUCCESSFULLY_UPLOADED = 'Report %s created.'
 REPORT_FAILED_TO_UPLOADED = 'Report could not be created.  Error: %s'
+REPORT_MASK_HELP = 'Provide this flag in order to mask the sensitive data '\
+    'within the report(s).'
 DISABLE_OPT_PRODUCTS_HELP = 'The product inspection exclusions. '\
     'Contains the list of products to exclude from inspection. '\
     'Valid values: jboss_eap, jboss_fuse, jboss_brms, jboss_ws.'

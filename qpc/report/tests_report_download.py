@@ -80,7 +80,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
@@ -103,7 +104,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
@@ -150,7 +152,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -169,7 +172,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -192,7 +196,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=fake_dir)
+                             path=fake_dir,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -219,7 +224,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -240,7 +246,8 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id=1,
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
@@ -260,13 +267,14 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id=1,
-                             path=self.test_tar_filename)
+                             path=self.test_tar_filename,
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.SERVER_TOO_OLD_FOR_CLI %
-                                 ('0.0.46', '0.0.46', '0.0.45'))
+                                 ('0.9.2', '0.9.2', '0.0.45'))
 
     def test_download_bad_file_extension(self):
         """Test download with bad file extension."""
@@ -284,9 +292,55 @@ class ReportDownloadTests(unittest.TestCase):
             nac = ReportDownloadCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
-                             path='test.json')
+                             path='test.json',
+                             mask=False)
             with redirect_stdout(report_out):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.OUTPUT_FILE_TYPE % 'tar.gz')
+
+    def test_download_report_id_masked(self):
+        """Testing download with report id and mask set to true."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1' + '?mask=True'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_tar_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=200,
+                       headers={'X-Server-Version': VERSION},
+                       content=buffer_content)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path=self.test_tar_filename,
+                             mask=True)
+            with redirect_stdout(report_out):
+                nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
+                                 ('1', self.test_tar_filename))
+
+    def test_download_report_id_428(self):
+        """Test download with nonexistent report id."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=428,
+                       headers={'X-Server-Version': VERSION},
+                       json=get_report_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path=self.test_tar_filename,
+                             mask=False)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_NO_MASK_REPORT % 1)

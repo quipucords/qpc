@@ -60,7 +60,10 @@ class ReportDeploymentsCommand(CliCommand):
         self.parser.add_argument('--output-file', dest='path', metavar='PATH',
                                  help=_(messages.REPORT_PATH_HELP),
                                  required=True)
+        self.parser.add_argument('--mask', dest='mask', action='store_true',
+                                 help=_(messages.REPORT_MASK_HELP), required=False)
         self.report_id = None
+        self.min_server_version = '0.9.2'
 
     def _validate_args(self):
         CliCommand._validate_args(self)
@@ -71,6 +74,8 @@ class ReportDeploymentsCommand(CliCommand):
         if self.args.output_csv:
             extension = '.csv'
             self.req_headers = {'Accept': 'text/csv'}
+        if self.args.mask:
+            self.req_params = {'mask': True}
         if extension:
             check_extension(extension, self.args.path)
 
@@ -124,9 +129,17 @@ class ReportDeploymentsCommand(CliCommand):
 
     def _handle_response_error(self):
         if self.args.report_id is None:
-            print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
-                    self.args.scan_job_id))
+            if self.response.status_code == 428:
+                print(_(messages.REPORT_COULD_NOT_BE_MASKED_SJ) %
+                      self.args.scan_job_id)
+            else:
+                print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
+                        self.args.scan_job_id))
         else:
-            print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
-                    self.args.report_id))
+            if self.response.status_code == 428:
+                print(_(messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID %
+                        self.args.report_id))
+            else:
+                print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID %
+                        self.args.report_id))
         sys.exit(1)

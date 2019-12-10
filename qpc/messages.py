@@ -194,8 +194,12 @@ REPORT_SJ_DOES_NOT_EXIST = \
 REPORT_SJS_DO_NOT_EXIST = 'The following scan jobs do not exist: %s.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ = \
     'No deployments report available for scan job %s.'
+REPORT_COULD_NOT_BE_MASKED_SJ = 'The deployments report could not be '\
+    'masked for scan job %s. To generate a masked report, rerun the scan.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID = \
-    'Deployments report %s does not exist.'
+    'The deployments report %s does not exist.'
+REPORT_COULD_NOT_BE_MASKED_REPORT_ID = 'The deployments report %s could not be '\
+    'masked. To generate a masked report, rerun the scan.'
 REPORT_NO_DETAIL_REPORT_FOR_SJ = \
     'No report detail available for scan job %s.'
 REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID = \
@@ -220,6 +224,8 @@ REPORT_UPLOAD_JSON_FILE_HELP = 'The path to the details report JSON file.'
 REPORT_UPLOAD_VALIDATE_JSON = 'Checking %s for valid JSON details report.'
 REPORT_SUCCESSFULLY_UPLOADED = 'Report %s created.'
 REPORT_FAILED_TO_UPLOADED = 'Report could not be created.  Error: %s'
+REPORT_MASK_HELP = 'Provide this flag in order to mask the sensitive data '\
+    'within the report(s).'
 DISABLE_OPT_PRODUCTS_HELP = 'The product inspection exclusions. '\
     'Contains the list of products to exclude from inspection. '\
     'Valid values: jboss_eap, jboss_fuse, jboss_brms, jboss_ws.'
@@ -319,6 +325,8 @@ INSIGHTS_REQUIRE_SUDO = 'Insights upload command requires sudo access.'
 INSIGHTS_NO_GPG_HELP = 'Upload to Insights without GNU Privacy Guard.'
 DOWNLOAD_NO_REPORT_FOR_SJ = 'No reports available for scan job %s.'
 DOWNLOAD_NO_REPORT_FOUND = 'Report %s not found.'
+DOWNLOAD_NO_MASK_REPORT = 'Report %s could not be masked. To generate a '\
+    'masked report, rerun the scan.'
 DOWNLOAD_PATH_HELP = "The output file's name and location. This file is " \
     'required to be a tar.gz'
 DOWNLOAD_SUCCESSFULLY_WRITTEN = 'Report %s successfully written to %s.'

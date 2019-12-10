@@ -197,8 +197,8 @@ REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ = \
 REPORT_COULD_NOT_BE_MASKED_SJ = 'The deployments report could not be '\
     'masked for scan job %s. To generate a masked report, rerun the scan.'
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID = \
-    'Deployments report %s does not exist.'
-REPORT_COULD_NOT_BE_MASKED_REPORT_ID = 'Deployments report %s could not be '\
+    'The deployments report %s does not exist.'
+REPORT_COULD_NOT_BE_MASKED_REPORT_ID = 'The deployments report %s could not be '\
     'masked. To generate a masked report, rerun the scan.'
 REPORT_NO_DETAIL_REPORT_FOR_SJ = \
     'No report detail available for scan job %s.'

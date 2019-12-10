@@ -17,7 +17,8 @@ from argparse import ArgumentParser, Namespace
 from io import StringIO
 
 from qpc import messages
-from qpc.report import REPORT_URI
+from qpc.release import PKG_NAME
+from qpc.report import ASYNC_MERGE_URI
 from qpc.report.upload import ReportUploadCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
@@ -64,8 +65,8 @@ class ReportUploadTests(unittest.TestCase):
         """Test uploading a good details report."""
         report_out = StringIO()
 
-        put_report_data = {'report_id': 1}
-        put_merge_url = get_server_location() + REPORT_URI
+        put_report_data = {'id': 1}
+        put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201,
                         json=put_report_data)
@@ -73,15 +74,15 @@ class ReportUploadTests(unittest.TestCase):
             args = Namespace(json_file=TMP_GOODDETAILS[0])
             with redirect_stdout(report_out):
                 nac.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_UPLOADED % ('1'),
+                self.assertIn(messages.REPORT_SUCCESSFULLY_UPLOADED % ('1', PKG_NAME, '1'),
                               report_out.getvalue().strip())
 
     def test_upload_bad_details_report(self):
         """Test uploading a bad details report."""
         report_out = StringIO()
 
-        put_report_data = {'report_id': 1}
-        put_merge_url = get_server_location() + REPORT_URI
+        put_report_data = {'id': 1}
+        put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201,
                         json=put_report_data)
@@ -99,7 +100,7 @@ class ReportUploadTests(unittest.TestCase):
 
         put_report_data = {
             'error': 'FAILED to create report id=23 - produced no valid fingerprints'}
-        put_merge_url = get_server_location() + REPORT_URI
+        put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=400,
                         json=put_report_data)

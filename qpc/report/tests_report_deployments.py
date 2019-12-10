@@ -21,6 +21,7 @@ from io import StringIO  # noqa: I100
 
 from qpc import messages
 from qpc.cli import CLI
+from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.scan import SCAN_JOB_URI
@@ -78,7 +79,8 @@ class ReportDeploymentsTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
@@ -107,7 +109,8 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
@@ -142,7 +145,8 @@ class ReportDeploymentsTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=200,
-                       json=get_report_csv_data)
+                       json=get_report_csv_data,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
@@ -241,7 +245,8 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
@@ -346,7 +351,8 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=400,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
@@ -378,7 +384,8 @@ class ReportDeploymentsTests(unittest.TestCase):
             mocker.get(get_scanjob_url, status_code=200,
                        json=get_scanjob_json_data)
             mocker.get(get_report_url, status_code=400,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id='1',
                              report_id=None,
@@ -405,7 +412,8 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200,
-                       content=buffer_content)
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
             nac = ReportDeploymentsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None,
                              report_id='1',
@@ -421,3 +429,87 @@ class ReportDeploymentsTests(unittest.TestCase):
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_report_json_data, file_content_dict)
+
+    def test_deployments_masked_sj_428(self):
+        """Deployments report retrieved from sj returns 428."""
+        report_out = StringIO()
+
+        get_scanjob_url = get_server_location() + \
+            SCAN_JOB_URI + '1'
+        get_scanjob_json_data = {'id': 1, 'report_id': 1}
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_scanjob_url, status_code=200,
+                       json=get_scanjob_json_data)
+            mocker.get(get_report_url, status_code=428,
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id='1',
+                             report_id=None,
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_json_filename,
+                             mask=True)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.REPORT_COULD_NOT_BE_MASKED_SJ %
+                                 1)
+
+    def test_deployments_masked_report_428(self):
+        """Deployments report retrieved from report returns 428."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/' + '?mask=True'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        test_dict = dict()
+        test_dict[self.test_json_filename] = get_report_json_data
+        buffer_content = create_tar_buffer(test_dict)
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=428,
+                       content=buffer_content,
+                       headers={'X-Server-Version': VERSION})
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_json_filename,
+                             mask=True)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                err = (messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID %
+                       1)
+                self.assertEqual(report_out.getvalue().strip(), err)
+
+    def test_deployments_old_version(self):
+        """Test too old server version."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1/deployments/'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=400,
+                       headers={'X-Server-Version': '0.0.45'},
+                       json=get_report_json_data)
+            nac = ReportDeploymentsCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             output_json=True,
+                             output_csv=False,
+                             path=self.test_json_filename,
+                             mask=False)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.SERVER_TOO_OLD_FOR_CLI %
+                                 ('0.9.2', '0.9.2', '0.0.45'))

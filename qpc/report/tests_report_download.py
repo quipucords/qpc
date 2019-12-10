@@ -274,7 +274,7 @@ class ReportDownloadTests(unittest.TestCase):
                     nac.main(args)
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.SERVER_TOO_OLD_FOR_CLI %
-                                 ('0.0.46', '0.0.46', '0.0.45'))
+                                 ('0.9.2', '0.9.2', '0.0.45'))
 
     def test_download_bad_file_extension(self):
         """Test download with bad file extension."""
@@ -323,3 +323,24 @@ class ReportDownloadTests(unittest.TestCase):
                 self.assertEqual(report_out.getvalue().strip(),
                                  messages.DOWNLOAD_SUCCESSFULLY_WRITTEN %
                                  ('1', self.test_tar_filename))
+
+    def test_download_report_id_428(self):
+        """Test download with nonexistent report id."""
+        report_out = StringIO()
+        get_report_url = get_server_location() + \
+            REPORT_URI + '1'
+        get_report_json_data = {'id': 1, 'report': [{'key': 'value'}]}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_report_url, status_code=428,
+                       headers={'X-Server-Version': VERSION},
+                       json=get_report_json_data)
+            nac = ReportDownloadCommand(SUBPARSER)
+            args = Namespace(scan_job_id=None,
+                             report_id='1',
+                             path=self.test_tar_filename,
+                             mask=False)
+            with redirect_stdout(report_out):
+                with self.assertRaises(SystemExit):
+                    nac.main(args)
+                self.assertEqual(report_out.getvalue().strip(),
+                                 messages.DOWNLOAD_NO_MASK_REPORT % 1)

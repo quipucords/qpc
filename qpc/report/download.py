@@ -54,7 +54,7 @@ class ReportDownloadCommand(CliCommand):
                                  required=True)
         self.parser.add_argument('--mask', dest='mask', action='store_true',
                                  help=_(messages.REPORT_MASK_HELP), required=False)
-        self.min_server_version = '0.0.46'
+        self.min_server_version = '0.9.2'
         self.report_id = None
 
     def _validate_args(self):
@@ -103,6 +103,10 @@ class ReportDownloadCommand(CliCommand):
             sys.exit(1)
 
     def _handle_response_error(self):
-        print(_(messages.DOWNLOAD_NO_REPORT_FOUND %
-                self.args.report_id))
+        if self.response.status_code == 428:
+            print(_(messages.DOWNLOAD_NO_MASK_REPORT) %
+                  self.args.report_id)
+        else:
+            print(_(messages.DOWNLOAD_NO_REPORT_FOUND %
+                    self.args.report_id))
         sys.exit(1)

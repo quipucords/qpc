@@ -42,7 +42,7 @@ CONFIG_REQUIRE_TOKEN = 'require_token'
 
 LOG_LEVEL_INFO = 0
 
-QPC_MIN_SERVER_VERSION = '0.0.46'
+QPC_MIN_SERVER_VERSION = '0.9.0'
 
 # pylint: disable=invalid-name
 logging.captureWarnings(True)

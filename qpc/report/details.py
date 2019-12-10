@@ -63,6 +63,7 @@ class ReportDetailsCommand(CliCommand):
         self.parser.add_argument('--mask', dest='mask', action='store_true',
                                  help=_(messages.REPORT_MASK_HELP), required=False)
         self.report_id = None
+        self.min_server_version = '0.9.2'
 
     def _validate_args(self):
         CliCommand._validate_args(self)

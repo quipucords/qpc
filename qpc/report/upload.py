@@ -18,6 +18,7 @@ import sys
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
+from qpc.release import PKG_NAME
 from qpc.report import utils
 from qpc.request import POST
 from qpc.translation import _
@@ -47,7 +48,7 @@ class ReportUploadCommand(CliCommand):
         # pylint: disable=no-member
         CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
                             subparsers.add_parser(self.ACTION), POST,
-                            report.REPORT_URI, [codes.created])
+                            report.ASYNC_MERGE_URI, [codes.created])
         self.parser.add_argument('--json-file', dest='json_file',
                                  metavar='JSON_FILE',
                                  help=_(messages.REPORT_UPLOAD_JSON_FILE_HELP),
@@ -82,8 +83,11 @@ class ReportUploadCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        print(_(messages.REPORT_SUCCESSFULLY_UPLOADED % (
-            json_data.get('report_id'))))
+        if json_data.get('id'):
+            print(_(messages.REPORT_SUCCESSFULLY_UPLOADED % (
+                json_data.get('id'),
+                PKG_NAME,
+                json_data.get('id'))))
 
     def _handle_response_error(self):
         json_data = self.response.json()

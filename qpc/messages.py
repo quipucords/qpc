@@ -222,7 +222,8 @@ REPORT_UPLOAD_VALIDATE_JSON = 'Checking file for valid JSON details report. %s'
 REPORT_UPLOAD_FILE_INVALID_JSON = 'Failed: %s is not a JSON details report.'
 REPORT_UPLOAD_JSON_FILE_HELP = 'The path to the details report JSON file.'
 REPORT_UPLOAD_VALIDATE_JSON = 'Checking %s for valid JSON details report.'
-REPORT_SUCCESSFULLY_UPLOADED = 'Report %s created.'
+REPORT_SUCCESSFULLY_UPLOADED = 'Report uploaded. Job %s created. '\
+    'To check processing status, run "%s scan job --id %s"'
 REPORT_FAILED_TO_UPLOADED = 'Report could not be created.  Error: %s'
 REPORT_MASK_HELP = 'Provide this flag in order to mask the sensitive data '\
     'within the report(s).'

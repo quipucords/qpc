@@ -67,7 +67,7 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
-* Thu Nov 14 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.3-1
+* Wed Dec 11 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.3-1
 - Bump version to 0.9.3 for master branch. <kholdawa@redhat.com>
 - Added password arg to server login. <cmyers@redhat.com>
 - Expose endpoint to upload a details report. <kholdawa@redhat.com>

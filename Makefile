@@ -18,7 +18,6 @@ help:
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
-	@echo "  html                to build the docs"
 	@echo "  insights-client     to setup the insights-client egg"
 	@echo "  insights-clean      to remove the insights-client egg"
 
@@ -39,9 +38,6 @@ test-coverage:
 	coverage run -m unittest discover qpc/ -v
 	coverage report -m --omit $(OMIT_PATTERNS)
 	echo $(OMIT_PATTERNS)
-
-html:
-	@cd docs; $(MAKE) html
 
 manpage:
 	$(pandoc) docs/source/man.rst \

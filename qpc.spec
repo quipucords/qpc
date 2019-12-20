@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: qpc
-Version: 0.9.3
+Version: 0.9.4
 Release: 1%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 
@@ -67,6 +67,8 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
+* Fri Dec 13 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.4-1
+- Change master branch version to 0.9.4. <kholdawa@redhat.com>
 * Wed Dec 11 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.3-1
 - Bump version to 0.9.3 for master branch. <kholdawa@redhat.com>
 - Added password arg to server login. <cmyers@redhat.com>

@@ -19,7 +19,7 @@ requests_mock==1.9.3
 tox==3.24.3
 
 # Doc
-pandoc==1.0.2
+pandoc==1.1.0
 
 # Editor
 autopep8==1.5

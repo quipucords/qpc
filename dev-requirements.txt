@@ -16,7 +16,7 @@ pyflakes==2.3.1
 
 # Test
 requests_mock==1.9.3
-tox==3.14.5
+tox==3.24.4
 
 # Doc
 pandoc==1.0.2

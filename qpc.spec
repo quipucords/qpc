@@ -1,4 +1,4 @@
-%{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "import site; print(site.getsitepackages()[0])")}
 
 Name: qpc
 Version: 0.9.4
@@ -8,33 +8,25 @@ Summary: A tool for discovery and inspection of an IT environment.
 Group: Applications/Internet
 License: GPLv3
 URL: http://github.com/quipucords/qpc
-Source0: http://github.com/quipucords/qpc/archive/copr.tar.gz
+Source0: http://github.com/quipucords/qpc/archive/refs/heads/master.zip
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
 
-
-
-%if 0%{?el6}
-%global pyver 34
-%endif
 %if 0%{?el7}
 %global pyver 36
-%endif
-%if 0%{?el8}
+%else
 %global pyver 3
 %endif
 
-%if "%{dist}" != ".el8"
+BuildRequires: make
 BuildRequires: pandoc
-BuildRequires: epel-release
-Requires: epel-release
-%endif
 
 BuildRequires: python%{pyver}-devel
 BuildRequires: python%{pyver}-setuptools
 Requires: python%{pyver}
 Requires: python%{pyver}-requests
+
 
 %description
 QPC is tool for discovery and inspection of an IT environment.
@@ -50,13 +42,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
 
 # Manpage
-%if "%{dist}" == ".el8"
-curl -k -SL https://github.com/jgm/pandoc/releases/download/2.7.3/pandoc-2.7.3-linux.tar.gz -o pandoc.tar.gz
-tar xvzf pandoc.tar.gz --strip-components 1 -C ~/
-make manpage pandoc=~/bin/pandoc
-%else
 make manpage
-%endif
 install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 
 %files
@@ -82,7 +68,7 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 * Mon Aug 19 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.1-1
 - Added RHEL 8 support. <cmyers@redhat.com>
 - Fixed help text for satellite source command. <aaiken@redhat.com>
-* Fri Jun 6 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.0-1
+* Thu Jun 6 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.0-1
 - Add qpc report insights command to qpc. <kholdawa@redhat.com>
 - Update qpc insights upload command to use new QPC Insights report format. <kholdawa@redhat.com>
 - Remove deprecated CLI summary/detail commands. <cmyers@redhat.com>

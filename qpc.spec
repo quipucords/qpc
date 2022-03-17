@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "import site; print(site.getsitepackages()[0])")}
 
 Name: qpc
-Version: 0.9.4
+Version: 0.10.0
 Release: 1%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 
@@ -21,7 +21,6 @@ BuildArch: noarch
 
 BuildRequires: make
 BuildRequires: pandoc
-
 BuildRequires: python%{pyver}-devel
 BuildRequires: python%{pyver}-setuptools
 Requires: python%{pyver}
@@ -53,6 +52,10 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
+* Thu Mar 17 2022 Nicole Aragao <naragao@redhat.com> 0.10.0
+- Drop support for Python < 3.6
+- Update libraries
+- Extends supported Python versions from 3.6 to 3.9
 * Fri Dec 13 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.4-1
 - Change master branch version to 0.9.4. <kholdawa@redhat.com>
 * Wed Dec 11 2019 Kevan Holdaway <kholdawa@redhat.com> 0.9.3-1

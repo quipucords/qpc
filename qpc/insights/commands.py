@@ -10,7 +10,9 @@
 #
 
 """Commands for import organization."""
+
 from qpc.insights.configure import InsightsConfigureCommand
+from qpc.insights.login import InsightsAddLoginCommand
 
 # flake8: noqa
 # pylint: disable=unused-import

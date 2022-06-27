@@ -25,7 +25,8 @@ from qpc.cred.commands import (CredAddCommand,
                                CredEditCommand,
                                CredListCommand,
                                CredShowCommand,)
-from qpc.insights.commands import (InsightsUploadCommand)
+from qpc.insights.commands import (InsightsConfigureCommand,
+                                   InsightsUploadCommand)
 from qpc.release import (PKG_NAME, VERSION)
 from qpc.report.commands import (ReportDeploymentsCommand,
                                  ReportDetailsCommand,
@@ -113,7 +114,8 @@ class CLI():
                               ReportMergeStatusCommand,
                               ReportUploadCommand])
         self._add_subcommand(insights.SUBCOMMAND,
-                             [InsightsUploadCommand])
+                             [InsightsConfigureCommand,
+                              InsightsUploadCommand])
         ensure_data_dir_exists()
         ensure_config_dir_exists()
 

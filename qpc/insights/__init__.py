@@ -11,8 +11,9 @@
 #
 """Constants for the Insights commands."""
 
-SUBCOMMAND = 'insights'
-UPLOAD = 'upload'
+SUBCOMMAND = "insights"
+UPLOAD = "upload"
+CONFIG = "config"
 
 REPORT_URI = '/api/v1/reports/'
 INSIGHTS_PATH_SUFFIX = '/insights/'

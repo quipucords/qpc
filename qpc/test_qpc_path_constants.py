@@ -14,19 +14,24 @@ import pytest
 from qpc.utils import (
     CONFIG_DIR,
     DATA_DIR,
+    INSIGHTS_CONFIG,
     QPC_CLIENT_TOKEN,
     QPC_LOG,
     QPC_SERVER_CONFIG,
 )
 
 
-@pytest.mark.parametrize("path_constant", (
-    CONFIG_DIR,
-    DATA_DIR,
-    QPC_CLIENT_TOKEN,
-    QPC_LOG,
-    QPC_SERVER_CONFIG,
-))
+@pytest.mark.parametrize(
+    "path_constant",
+    (
+        CONFIG_DIR,
+        DATA_DIR,
+        INSIGHTS_CONFIG,
+        QPC_CLIENT_TOKEN,
+        QPC_LOG,
+        QPC_SERVER_CONFIG,
+    ),
+)
 def test_path_constant_is_patched(path_constant):
     """
     Ensure path constants are set to None if imported directly.

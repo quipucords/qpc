@@ -33,12 +33,23 @@ DATA_DIR = os.path.join(DATA_HOME, QPC_PATH)
 QPC_LOG = os.path.join(DATA_DIR, 'qpc.log')
 QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, 'server.config')
 QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, 'client_token')
+INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, 'insights.config')
 
 CONFIG_HOST_KEY = 'host'
 CONFIG_PORT_KEY = 'port'
 CONFIG_USE_HTTP = 'use_http'
 CONFIG_SSL_VERIFY = 'ssl_verify'
 CONFIG_REQUIRE_TOKEN = 'require_token'
+
+DEFAULT_HOST_INSIGHTS_CONFIG = "console.redhat.com"
+DEFAULT_PORT_INSIGHTS_CONFIG = 443
+DEFAULT_USE_HTTP_INSIGHTS_CONFIG = False
+
+DEFAULT_INSIGHTS_CONFIG = {
+    CONFIG_HOST_KEY: DEFAULT_HOST_INSIGHTS_CONFIG,
+    CONFIG_PORT_KEY: DEFAULT_PORT_INSIGHTS_CONFIG,
+    CONFIG_USE_HTTP: DEFAULT_USE_HTTP_INSIGHTS_CONFIG,
+}
 
 LOG_LEVEL_INFO = 0
 
@@ -124,6 +135,23 @@ def read_require_auth():
     return config.get(CONFIG_REQUIRE_TOKEN)
 
 
+def read_insights_config():
+    """Retrieve insights configuration.
+
+    :returns: The validated dictionary with configuration
+    """
+    if not os.path.exists(INSIGHTS_CONFIG):
+        return DEFAULT_INSIGHTS_CONFIG
+
+    with open(INSIGHTS_CONFIG, encoding="utf-8") as insights_config_file:
+        try:
+            config = json.load(insights_config_file)
+        except exception_class:
+            return DEFAULT_INSIGHTS_CONFIG
+    insights_config = dict(DEFAULT_INSIGHTS_CONFIG, **config)
+    return insights_config
+
+
 def read_server_config():
     """Retrieve configuration for sonar server.
 
@@ -200,15 +228,32 @@ def read_server_config():
                 CONFIG_REQUIRE_TOKEN: require_token}
 
 
+def write_config(config_file_path, config_dict):
+    """Write configuration to config file.
+
+    :param config_dict: dict containing configuration info
+    :param config_file_path: path to configuration file
+    """
+    ensure_config_dir_exists()
+
+    with open(config_file_path, "w", encoding="utf-8") as config_file:
+        json.dump(config_dict, config_file, indent=4)
+
+
 def write_server_config(server_config):
     """Write server configuration to server.config.
 
     :param server_config: dict containing server configuration
     """
-    ensure_config_dir_exists()
+    write_config(QPC_SERVER_CONFIG, server_config)
 
-    with open(QPC_SERVER_CONFIG, 'w') as configFile:
-        json.dump(server_config, configFile, indent=4)
+
+def write_insights_config(insights_config):
+    """Write insights configuration to insights.config.
+
+    :param insights_config: dict containing insights configuration
+    """
+    write_config(INSIGHTS_CONFIG, insights_config)
 
 
 def write_client_token(client_token):

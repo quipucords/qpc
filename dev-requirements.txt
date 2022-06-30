@@ -16,6 +16,8 @@ pylint-plugin-utils==0.6
 pyflakes==2.1.1
 
 # Test
+pytest
+pytest-cov
 requests_mock==1.7.0
 tox==3.14.5
 

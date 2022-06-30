@@ -1,0 +1,14 @@
+[build-system]
+requires = [
+    "setuptools", 
+    "wheel",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "qpc"
+python_files = [
+    "tests.py",
+    "test_*.py",
+    "*_tests.py",
+    "tests_*.py",
+]

@@ -15,10 +15,10 @@ import sys
 import unittest
 from argparse import ArgumentParser, Namespace
 
+from qpc import utils
 from qpc.server import LOGOUT_URI
 from qpc.server.logout_host import LogoutHostCommand
 from qpc.tests_utilities import HushUpStderr
-from qpc.utils import QPC_CLIENT_TOKEN, get_server_location
 
 import requests_mock
 
@@ -36,6 +36,7 @@ class LogoutTests(unittest.TestCase):
         # nosetests command.
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
+        utils.write_server_config({'host': '127.0.0.1', 'port': 8000, 'use_http': True})
 
     def tearDown(self):
         """Remove test case setup."""
@@ -44,10 +45,10 @@ class LogoutTests(unittest.TestCase):
 
     def test_success_logout(self):
         """Testing the logout server green path."""
-        url = get_server_location() + LOGOUT_URI
+        url = utils.get_server_location() + LOGOUT_URI
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200)
             lhc = LogoutHostCommand(SUBPARSER)
             args = Namespace()
             lhc.main(args)
-            self.assertFalse(os.path.exists(QPC_CLIENT_TOKEN))
+            self.assertFalse(os.path.exists(utils.QPC_CLIENT_TOKEN))

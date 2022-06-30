@@ -9,6 +9,8 @@
 #
 """pytest configuration file."""
 
+from unittest import mock
+
 import pytest
 
 QPC_PATH_CONSTANTS = (
@@ -26,3 +28,17 @@ def mock_path_constants(tmp_path, monkeypatch):
     for path in QPC_PATH_CONSTANTS:
         monkeypatch.setattr(f"qpc.utils.{path}", str(tmp_path / path))
 
+
+def _set_path_constants_to_none():
+    """Set qpc path constants to None."""
+    for constant in QPC_PATH_CONSTANTS:
+        mocker = mock.patch(f"qpc.utils.{constant}", None)
+        mocker.start()
+
+
+def pytest_collection(session):
+    """pytest collection hook.
+    
+    This function runs before collecting tests.
+    """
+    _set_path_constants_to_none()

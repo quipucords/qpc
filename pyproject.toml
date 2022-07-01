@@ -4,6 +4,13 @@ requires = [
     "wheel",
 ]
 
+[tool.flakeheaven]
+base = "https://raw.githubusercontent.com/quipucords/linting/main/base-flakeheaven.toml"
+baseline = ".flakeheaven-baseline"
+
+[tool.pylint.master]
+load-plugins = ["pylint_pytest"]
+
 [tool.pytest.ini_options]
 pythonpath = "qpc"
 python_files = [

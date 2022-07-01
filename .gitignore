@@ -119,3 +119,6 @@ db.sqlite3-journal
 # node
 node_modules
 package-lock.json
+
+# asdf
+.tool-versions

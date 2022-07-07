@@ -3,11 +3,10 @@
 """A setuptools-based script for installing qpc."""
 import os
 import sys
-import json
 
 from setuptools import find_packages, setup
-from qpc.release import (VERSION, AUTHOR, AUTHOR_EMAIL,
-                         PKG_NAME, BIN_SCRIPT, URL)
+
+from qpc.release import AUTHOR, AUTHOR_EMAIL, BIN_SCRIPT, PKG_NAME, URL, VERSION
 
 BASE_QPC_DIR = os.path.abspath(
     os.path.normpath(

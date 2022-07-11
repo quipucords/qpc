@@ -30,10 +30,10 @@ CONFIG_HOME = os.path.expanduser(CONFIG_HOME_PATH)
 DATA_HOME = os.path.expanduser(DATA_HOME_PATH)
 CONFIG_DIR = os.path.join(CONFIG_HOME, QPC_PATH)
 DATA_DIR = os.path.join(DATA_HOME, QPC_PATH)
-QPC_LOG = os.path.join(DATA_DIR, 'qpc.log')
-QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, 'server.config')
-QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, 'client_token')
-INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, 'insights.config')
+QPC_LOG = os.path.join(DATA_DIR, "qpc.log")
+QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, "server.config")
+QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, "client_token")
+INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, "insights.config")
 
 CONFIG_HOST_KEY = 'host'
 CONFIG_PORT_KEY = 'port'

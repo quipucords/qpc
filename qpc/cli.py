@@ -16,51 +16,60 @@ from __future__ import print_function
 import sys
 from argparse import ArgumentParser
 
-
-from qpc import (cred, insights,
-                 messages, report,
-                 scan, server, source)
-from qpc.cred.commands import (CredAddCommand,
-                               CredClearCommand,
-                               CredEditCommand,
-                               CredListCommand,
-                               CredShowCommand,)
-from qpc.insights.commands import (InsightsUploadCommand)
-from qpc.release import (PKG_NAME, VERSION)
-from qpc.report.commands import (ReportDeploymentsCommand,
-                                 ReportDetailsCommand,
-                                 ReportDownloadCommand,
-                                 ReportInsightsCommand,
-                                 ReportMergeCommand,
-                                 ReportMergeStatusCommand,
-                                 ReportUploadCommand)
-from qpc.scan.commands import (ScanAddCommand,
-                               ScanCancelCommand,
-                               ScanClearCommand,
-                               ScanEditCommand,
-                               ScanJobCommand,
-                               ScanListCommand,
-                               ScanPauseCommand,
-                               ScanRestartCommand,
-                               ScanShowCommand,
-                               ScanStartCommand)
-from qpc.server.commands import (ConfigureHostCommand,
-                                 LoginHostCommand,
-                                 LogoutHostCommand,
-                                 ServerStatusCommand)
-from qpc.source.commands import (SourceAddCommand,
-                                 SourceClearCommand,
-                                 SourceEditCommand,
-                                 SourceListCommand,
-                                 SourceShowCommand)
+from qpc import cred, insights, messages, report, scan, server, source
+from qpc.cred.commands import (
+    CredAddCommand,
+    CredClearCommand,
+    CredEditCommand,
+    CredListCommand,
+    CredShowCommand,
+)
+from qpc.insights.commands import InsightsConfigureCommand, InsightsUploadCommand
+from qpc.release import PKG_NAME, VERSION
+from qpc.report.commands import (
+    ReportDeploymentsCommand,
+    ReportDetailsCommand,
+    ReportDownloadCommand,
+    ReportInsightsCommand,
+    ReportMergeCommand,
+    ReportMergeStatusCommand,
+    ReportUploadCommand,
+)
+from qpc.scan.commands import (
+    ScanAddCommand,
+    ScanCancelCommand,
+    ScanClearCommand,
+    ScanEditCommand,
+    ScanJobCommand,
+    ScanListCommand,
+    ScanPauseCommand,
+    ScanRestartCommand,
+    ScanShowCommand,
+    ScanStartCommand,
+)
+from qpc.server.commands import (
+    ConfigureHostCommand,
+    LoginHostCommand,
+    LogoutHostCommand,
+    ServerStatusCommand,
+)
+from qpc.source.commands import (
+    SourceAddCommand,
+    SourceClearCommand,
+    SourceEditCommand,
+    SourceListCommand,
+    SourceShowCommand,
+)
 from qpc.translation import _
-from qpc.utils import (ensure_config_dir_exists,
-                       ensure_data_dir_exists,
-                       get_server_location,
-                       log,
-                       read_client_token,
-                       read_require_auth,
-                       setup_logging)
+from qpc.utils import (
+    ensure_config_dir_exists,
+    ensure_data_dir_exists,
+    get_server_location,
+    log,
+    read_client_token,
+    read_require_auth,
+    setup_logging,
+)
 
 
 # pylint: disable=too-few-public-methods
@@ -98,22 +107,36 @@ class CLI():
                               SourceShowCommand, SourceClearCommand,
                               SourceEditCommand])
 
-        self._add_subcommand(scan.SUBCOMMAND,
-                             [ScanAddCommand, ScanStartCommand,
-                              ScanListCommand, ScanShowCommand,
-                              ScanPauseCommand, ScanCancelCommand,
-                              ScanRestartCommand, ScanEditCommand,
-                              ScanClearCommand, ScanJobCommand])
-        self._add_subcommand(report.SUBCOMMAND,
-                             [ReportDeploymentsCommand,
-                              ReportDetailsCommand,
-                              ReportInsightsCommand,
-                              ReportDownloadCommand,
-                              ReportMergeCommand,
-                              ReportMergeStatusCommand,
-                              ReportUploadCommand])
-        self._add_subcommand(insights.SUBCOMMAND,
-                             [InsightsUploadCommand])
+        self._add_subcommand(
+            scan.SUBCOMMAND,
+            [
+                ScanAddCommand,
+                ScanStartCommand,
+                ScanListCommand,
+                ScanShowCommand,
+                ScanPauseCommand,
+                ScanCancelCommand,
+                ScanRestartCommand,
+                ScanEditCommand,
+                ScanClearCommand,
+                ScanJobCommand,
+            ],
+        )
+        self._add_subcommand(
+            report.SUBCOMMAND,
+            [
+                ReportDeploymentsCommand,
+                ReportDetailsCommand,
+                ReportInsightsCommand,
+                ReportDownloadCommand,
+                ReportMergeCommand,
+                ReportMergeStatusCommand,
+                ReportUploadCommand,
+            ],
+        )
+        self._add_subcommand(
+            insights.SUBCOMMAND, [InsightsConfigureCommand, InsightsUploadCommand]
+        )
         ensure_data_dir_exists()
         ensure_config_dir_exists()
 

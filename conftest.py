@@ -16,6 +16,7 @@ import pytest
 QPC_PATH_CONSTANTS = (
     "CONFIG_DIR",
     "DATA_DIR",
+    "INSIGHTS_CONFIG",
     "QPC_CLIENT_TOKEN",
     "QPC_LOG",
     "QPC_SERVER_CONFIG",

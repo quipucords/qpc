@@ -336,3 +336,8 @@ DOWNLOAD_SJ_DOES_NOT_EXIST = 'Scan Job %s does not exist.'
 SERVER_TOO_OLD_FOR_CLI = 'The CLI requires a minimum server version of %s.  '\
     'Upgrade your server to %s or greater.  Server is currently at version %s.'
 OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."
+INSIGHTS_CONFIG_HOST_HELP = "Host or IP address."
+INSIGHTS_CONFIG_PORT_HELP = "Port number."
+INSIGHTS_CONFIG_SUCCESS = (
+    "Insights configuration was successfully added. Captured values: %s"
+)

@@ -14,6 +14,7 @@
 SUBCOMMAND = "insights"
 UPLOAD = "upload"
 CONFIG = "config"
+ADD_LOGIN = "add_login"
 
 REPORT_URI = '/api/v1/reports/'
 INSIGHTS_PATH_SUFFIX = '/insights/'

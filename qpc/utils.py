@@ -34,12 +34,16 @@ QPC_LOG = os.path.join(DATA_DIR, "qpc.log")
 QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, "server.config")
 QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, "client_token")
 INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, "insights.config")
+INSIGHTS_LOGIN_CONFIG = os.path.join(CONFIG_DIR, "insights_login_config")
 
 CONFIG_HOST_KEY = 'host'
 CONFIG_PORT_KEY = 'port'
 CONFIG_USE_HTTP = 'use_http'
 CONFIG_SSL_VERIFY = 'ssl_verify'
 CONFIG_REQUIRE_TOKEN = 'require_token'
+
+INSIGHTS_CONFIG_USERNAME_KEY = "username"
+INSIGHTS_CONFIG_PASSWORD_KEY = "password"
 
 DEFAULT_HOST_INSIGHTS_CONFIG = "console.redhat.com"
 DEFAULT_PORT_INSIGHTS_CONFIG = 443
@@ -248,12 +252,44 @@ def write_server_config(server_config):
     write_config(QPC_SERVER_CONFIG, server_config)
 
 
+def write_insights_login_config(login_config):
+    """Write insights login configuration to insights_login_config.
+
+    :param login_config: dict containing insights login configuration
+    """
+    write_config(INSIGHTS_LOGIN_CONFIG, login_config)
+
+
 def write_insights_config(insights_config):
     """Write insights configuration to insights.config.
 
     :param insights_config: dict containing insights configuration
     """
     write_config(INSIGHTS_CONFIG, insights_config)
+
+
+def read_insights_login_config():
+    """Retrieve insights login configuration.
+
+    :returns: The validated dictionary with configuration
+    """
+    if not os.path.exists(INSIGHTS_LOGIN_CONFIG):
+        log.error("Insights login config was not found.")
+        return None
+
+    with open(INSIGHTS_LOGIN_CONFIG, encoding="utf-8") as insights_login_config_file:
+        try:
+            config = json.load(insights_login_config_file)
+        except exception_class:
+            return None
+
+    username = config.get(INSIGHTS_CONFIG_USERNAME_KEY)
+    password = config.get(INSIGHTS_CONFIG_PASSWORD_KEY)
+
+    return {
+        INSIGHTS_CONFIG_USERNAME_KEY: username,
+        INSIGHTS_CONFIG_PASSWORD_KEY: password,
+    }
 
 
 def write_client_token(client_token):

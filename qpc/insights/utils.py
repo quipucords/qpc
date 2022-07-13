@@ -145,3 +145,16 @@ def validate_host(arg):
     if host_re.search(arg) is None:
         raise ArgumentTypeError(f"Host value {arg} should be a valid hostname")
     return arg
+
+
+def validate_username_and_password(arg):
+    """Validate password and username syntax.
+
+    :param arg: a string
+    :returns: The validated argument
+    :raises: ArgumentTypeError, if argument is invalid
+    """
+    argument_re = re.compile(r"^\S+$")
+    if argument_re.search(arg) is None:
+        raise ArgumentTypeError("The argument value is invalid.")
+    return arg

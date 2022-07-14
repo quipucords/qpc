@@ -16,7 +16,7 @@ from qpc.insights.http import InsightsClient
 
 @mock.patch("requests.Session.request")
 @pytest.mark.parametrize(
-    "base_url, method, url, result",
+    "base_url, method, url, full_url",
     [
         (
             "https://testconsole.redhat.com",
@@ -39,21 +39,19 @@ from qpc.insights.http import InsightsClient
     ],
 )
 def test_request_joins_url_with_base_url(
-    request_session_mocker, base_url, method, url, result
+    request_session_mocker, base_url, method, url, full_url
 ):
     """Test if urljoin is performed successfully."""
-    insights_client_session = InsightsClient(
-        base_url=base_url, auth=("username", "pass")
-    )
+    insights_client_session = InsightsClient(base_url=base_url)
 
     insights_client_session.request(method, url)
 
-    request_session_mocker.assert_called_with(method, result)
+    request_session_mocker.assert_called_with(method, full_url)
 
 
 @mock.patch("requests.Session.request")
 @pytest.mark.parametrize(
-    "base_url, url, args, result",
+    "base_url, url, args, full_url",
     [
         (
             "https://testconsole.redhat.com",
@@ -80,13 +78,17 @@ def test_extra_args_are_passed_to_request(
     base_url,
     url,
     args,
-    result,
+    full_url,
 ):
     """Test if parent class receives all args passed."""
-    insights_client_session = InsightsClient(
-        base_url=base_url, auth=("username", "pass")
-    )
+    insights_client_session = InsightsClient(base_url=base_url)
 
     insights_client_session.request("post", url, args)
 
-    request_session_mocker.assert_called_with("post", result, args)
+    request_session_mocker.assert_called_with("post", full_url, args)
+
+
+def test_auth():
+    """Test if auth is being passed with the right parameters."""
+    client = InsightsClient(auth=("test-username", "test-password"))
+    assert client.auth == ("test-username", "test-password")

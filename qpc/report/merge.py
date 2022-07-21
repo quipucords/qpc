@@ -134,7 +134,9 @@ class ReportMergeCommand(CliCommand):
 
         :returns Json containing the sources of each file.
         """
-        path = self.args.json_dir[0]
+        path = self.args.json_dir
+        if isinstance(path, list):
+            path = path[0]
         if os.path.isdir(path) is not True:
             print(_(messages.REPORT_JSON_DIR_NOT_FOUND % path))
             sys.exit(1)

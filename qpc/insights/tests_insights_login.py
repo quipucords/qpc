@@ -1,14 +1,21 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2017-2018 Red Hat, Inc.
+#
+# This software is licensed to you under the GNU General Public License,
+# version 3 (GPLv3). There is NO WARRANTY for this software, express or
+# implied, including the implied warranties of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
+# along with this software; if not, see
+# https://www.gnu.org/licenses/gpl-3.0.txt.
+#
 """Test the CLI module."""
 
 import sys
 import unittest
 
 from qpc.cli import CLI
-from qpc.utils import (
-    read_insights_login_config,
-    write_insights_login_config,
-    write_server_config,
-)
+from qpc.utils import read_insights_login_config, write_server_config
 
 
 class InsightsAddLoginTests(unittest.TestCase):
@@ -75,7 +82,6 @@ class InsightsAddLoginTests(unittest.TestCase):
 
     def test_run_command_no_config(self):
         """Test running command without config."""
-        write_insights_login_config({})
         sys.argv = ["/bin/qpc", "insights", "add_login"]
         with self.assertRaises(SystemExit):
             CLI().main()

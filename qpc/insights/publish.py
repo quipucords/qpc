@@ -16,6 +16,7 @@ from pathlib import Path
 
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
+from qpc.exceptions import QPCError
 from qpc.insights.http import InsightsClient
 from qpc.translation import _
 from qpc.utils import read_insights_config, read_insights_login_config
@@ -125,4 +126,8 @@ class InsightsPublishCommand(CliCommand):
         Sub-commands define this method to perform the required action once
         all options have been verified.
         """
-        self._publish_to_ingress()
+        try:
+            self._publish_to_ingress()
+        except QPCError as err:
+            log.error(_(err.message))
+            SystemExit(1)

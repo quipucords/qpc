@@ -25,6 +25,7 @@ BuildRequires: python%{pyver}-devel
 BuildRequires: python%{pyver}-setuptools
 Requires: python%{pyver}
 Requires: python%{pyver}-requests
+Requires: python%{pyver}-cryptography
 
 
 %description

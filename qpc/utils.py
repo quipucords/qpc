@@ -20,7 +20,10 @@ import os
 import sys
 import tarfile
 
+from cryptography.fernet import Fernet, InvalidToken
+
 from qpc import messages
+from qpc.insights.exceptions import QPCEncryptionKeyError, QPCLoginConfigError
 from qpc.translation import _ as t
 
 QPC_PATH = 'qpc'
@@ -35,6 +38,8 @@ QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, "server.config")
 QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, "client_token")
 INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, "insights.config")
 INSIGHTS_LOGIN_CONFIG = os.path.join(CONFIG_DIR, "insights_login_config")
+
+INSIGHTS_ENCRYPTION = os.path.join(DATA_DIR, "insights_encryption")
 
 CONFIG_HOST_KEY = 'host'
 CONFIG_PORT_KEY = 'port'
@@ -257,6 +262,8 @@ def write_insights_login_config(login_config):
 
     :param login_config: dict containing insights login configuration
     """
+    encrypted_password = encrypt_password(login_config["password"])
+    login_config["password"] = encrypted_password
     write_config(INSIGHTS_LOGIN_CONFIG, login_config)
 
 
@@ -274,17 +281,19 @@ def read_insights_login_config():
     :returns: The validated dictionary with configuration
     """
     if not os.path.exists(INSIGHTS_LOGIN_CONFIG):
-        log.error("Insights login config was not found.")
-        return None
+        raise QPCLoginConfigError("Insights login config was not found.")
 
     with open(INSIGHTS_LOGIN_CONFIG, encoding="utf-8") as insights_login_config_file:
         try:
             config = json.load(insights_login_config_file)
-        except exception_class:
-            return None
+        except exception_class as exc:
+            raise QPCLoginConfigError(
+                f"Unable to load {INSIGHTS_LOGIN_CONFIG} file."
+            ) from exc
 
-    username = config.get(INSIGHTS_CONFIG_USERNAME_KEY)
-    password = config.get(INSIGHTS_CONFIG_PASSWORD_KEY)
+    username = config[INSIGHTS_CONFIG_USERNAME_KEY]
+    encrypted_password = config[INSIGHTS_CONFIG_PASSWORD_KEY]
+    password = decrypt_password(encrypted_password)
 
     return {
         INSIGHTS_CONFIG_USERNAME_KEY: username,
@@ -520,3 +529,52 @@ def check_extension(extension, path):
     if extension not in path:
         print(t(messages.OUTPUT_FILE_TYPE % extension))
         sys.exit(1)
+
+
+def write_encryption_key_if_non_existent():
+    """Generate encryption key.
+
+    Key will be generated only once and saved at INSIGHTS_ENCRYPTION file,
+    the function will check its existence every time it is called
+    """
+    if not os.path.exists(INSIGHTS_ENCRYPTION):
+        key = Fernet.generate_key()
+        with open(INSIGHTS_ENCRYPTION, "wb") as key_file:
+            key_file.write(key)
+            os.chmod(INSIGHTS_ENCRYPTION, 0o600)
+
+
+def load_encryption_key():
+    """Load encryption from insights_encryption file."""
+    stats = os.stat(INSIGHTS_ENCRYPTION)
+    if oct(stats.st_mode).endswith("00"):
+        return open(INSIGHTS_ENCRYPTION, "rb").read()
+
+    raise QPCEncryptionKeyError(
+        "There was a problem while trying to load the password encryption key."
+    )
+
+
+def encrypt_password(password):
+    """Encrypt password before saving it to insights_login_config file."""
+    write_encryption_key_if_non_existent()
+    key = load_encryption_key()
+
+    encryption_algorithm = Fernet(key)
+
+    encrypted_password = encryption_algorithm.encrypt(password.encode())
+    return encrypted_password.decode()
+
+
+def decrypt_password(password):
+    """Retrieve password from login config file and decrypt it."""
+    key = load_encryption_key()
+    encryption_algorithm = Fernet(key)
+
+    try:
+        decrypted_password = encryption_algorithm.decrypt(password.encode())
+    except InvalidToken as exc:
+        raise QPCEncryptionKeyError(
+            "There was a problem while decrypting your password."
+        ) from exc
+    return decrypted_password.decode()

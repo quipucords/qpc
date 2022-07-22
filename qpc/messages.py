@@ -346,3 +346,16 @@ INSIGHTS_CONFIG_PORT_HELP = "Port number."
 INSIGHTS_CONFIG_SUCCESS = (
     "Insights configuration was successfully added. Captured values: %s"
 )
+INSIGHTS_PUBLISH_SUCCESSFUL = "The report was successfully published."
+INSIGHTS_PUBLISH_AUTH_ERROR = (
+    "The request you tried to make was unauthorized, "
+    "please check your insights credentials."
+)
+INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR = (
+    "The server encountered an unexpected condition"
+    " that prevented it from fulfilling the request."
+)
+INSIGHTS_PUBLISH_NOT_FOUND_ERROR = (
+    "The server is either unavailable or the page couldn't be found."
+    " Check your insights configuration."
+)

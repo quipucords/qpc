@@ -27,6 +27,7 @@ from qpc.cred.commands import (
 from qpc.insights.commands import (
     InsightsAddLoginCommand,
     InsightsConfigureCommand,
+    InsightsPublishCommand,
     InsightsUploadCommand,
 )
 from qpc.release import PKG_NAME, VERSION
@@ -144,6 +145,7 @@ class CLI():
                 InsightsConfigureCommand,
                 InsightsUploadCommand,
                 InsightsAddLoginCommand,
+                InsightsPublishCommand,
             ],
         )
 

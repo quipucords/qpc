@@ -335,23 +335,22 @@ def setup_logging(verbosity):
     :param verbosity: verbosity level, as measured in -v's on the command line.
         Can be None for default.
     """
+    log_prefix = "%(asctime)s - %(name)s - %(levelname)s"
+
     if verbosity == LOG_LEVEL_INFO:
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
+        log_prefix += "- %(funcName)s:%(lineno)d"
 
+    log_fmt = f"{log_prefix} - %(message)s"
     # Using basicConfig here means that all log messages, even
     # those not coming from qpc, will go to the log file
-    logging.basicConfig(filename=QPC_LOG, format='%(asctime)s - %(name)s - '
-                                                 '%(levelname)s - %(message)s')
-    # but we only adjust the log level for the 'qpc' logger.
-    log.setLevel(log_level)
-    # the StreamHandler sends warnings and above to stdout, but
-    # only for messages going to the 'qpc' logger, i.e. QPC
-    # output.
-    stderr_handler = logging.StreamHandler()
-    stderr_handler.setLevel(logging.ERROR)
-    log.addHandler(stderr_handler)
+    logging.basicConfig(filename=QPC_LOG, format=log_fmt, level=log_level)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter(log_fmt))
+    stream_handler.setLevel(log_level)
+    log.addHandler(stream_handler)
 
 
 def log_request_info(method, command, url, response_json, response_code):

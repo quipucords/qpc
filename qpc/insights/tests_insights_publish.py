@@ -103,6 +103,7 @@ class TestInsightsPublishCommand:
         caplog,
     ):
         """Testing if--input-file will accept files with inappropriate extensions."""
+        caplog.set_level("INFO")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -116,6 +117,7 @@ class TestInsightsPublishCommand:
 
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
         """Testing if insights publish --input-file will accept dir as file."""
+        caplog.set_level("INFO")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -136,6 +138,7 @@ class TestInsightsPublishCommand:
         requests_mock,
     ):
         """Testing insights publish --input-file green path."""
+        caplog.set_level("INFO")
         requests_mock.post(
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=202,
@@ -169,6 +172,7 @@ class TestInsightsPublishCommand:
         log_message,
     ):
         """Testing insights publish with several errors."""
+        caplog.set_level("ERROR")
         requests_mock.post(
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=status_code,

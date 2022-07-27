@@ -359,3 +359,4 @@ INSIGHTS_PUBLISH_NOT_FOUND_ERROR = (
     "The server is either unavailable or the page couldn't be found."
     " Check your insights configuration."
 )
+INSIGHTS_PUBLISH_RESPONSE = "Response from insights: %s"

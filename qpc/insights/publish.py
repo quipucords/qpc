@@ -108,7 +108,7 @@ class InsightsPublishCommand(CliCommand):
     def _make_publish_request(self, session_client, url, files):
         """Make insights client request and log status code."""
         response = session_client.post(url=url, files=files)
-
+        log.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
         if response.ok:
             log.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
         elif response.status_code == 401:

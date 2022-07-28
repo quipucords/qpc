@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "import site; print(site.getsitepackages()[0])")}
 
 Name: qpc
-Version: 0.10.0
+Version: 1.0.0
 Release: 1%{?dist}
 Summary: A tool for discovery and inspection of an IT environment.
 
@@ -53,6 +53,9 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %{_mandir}/man1/qpc.1.gz
 
 %changelog
+* Wed Jul 27 2022 Nicole Aragao <naragao@redhat.com> 1.0.0
+- Add Insights config, add_login and publish subcommands
+- Deprecate insights upload command
 * Thu Mar 17 2022 Nicole Aragao <naragao@redhat.com> 0.10.0
 - Drop support for Python < 3.6
 - Update libraries

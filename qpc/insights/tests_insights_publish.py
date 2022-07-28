@@ -10,6 +10,7 @@
 """Test the CLI module."""
 
 import sys
+import tarfile
 import tempfile
 from unittest import mock
 
@@ -78,14 +79,61 @@ def inapropriate_payload_file():
     tmp_file.close()
 
 
+def _create_report_tarball(tmp_path, filenames):
+    tarball_path = tmp_path / "report.tar.gz"
+    with tarfile.open(tarball_path, "w") as tarball:
+        for filename in filenames:
+            payload = tmp_path / filename
+            payload.parent.mkdir(exist_ok=True)
+            payload.touch()
+            tarball.add(payload, filename)
+    return tarball_path
+
+
 @pytest.fixture
-def payload_file():
+def payload_file(tmp_path):
     """Temp file with .tar.gz extension for testing purposes."""
-    tmp_file = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
-        suffix=".tar.gz"
+    yield _create_report_tarball(
+        tmp_path, ["report_1/metadata.json", "report_1/asdf.json"]
     )
-    yield tmp_file
-    tmp_file.close()
+
+
+@pytest.fixture
+def payload_without_metadata(tmp_path):
+    """Imcomplete payload for testing."""
+    yield _create_report_tarball(
+        tmp_path, ["report_1/qwert.json", "report_1/asdf.json"]
+    )
+
+
+@pytest.fixture
+def payload_with_non_json_file(tmp_path):
+    """Payload with unexpected file."""
+    yield _create_report_tarball(
+        tmp_path, ["report_1/deployments.csv", "report_1/metadata.json"]
+    )
+
+
+@pytest.fixture
+def empty_payload(tmp_path):
+    """Payload without content."""
+    yield _create_report_tarball(tmp_path, [])
+
+
+@pytest.fixture
+def unexpected_payload(tmp_path):
+    """Payload unexpected content."""
+    yield _create_report_tarball(
+        tmp_path, ["report_1/metadata.json", "report_2/asdf.json"]
+    )
+
+
+@pytest.fixture
+def non_tarball_payload(tmp_path):
+    """Return a non tarball file with tar.gz extension."""
+    payload = tmp_path / "report.tar.gz"
+    payload.touch()
+    yield payload
 
 
 class TestInsightsPublishCommand:
@@ -103,6 +151,7 @@ class TestInsightsPublishCommand:
         caplog,
     ):
         """Testing if--input-file will accept files with inappropriate extensions."""
+        caplog.set_level("INFO")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -112,10 +161,15 @@ class TestInsightsPublishCommand:
         ]
         with pytest.raises(SystemExit):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ
+        assert (
+            caplog.messages[-1]
+            == messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ
+            % inapropriate_payload_file.name
+        )
 
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
         """Testing if insights publish --input-file will accept dir as file."""
+        caplog.set_level("INFO")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -125,7 +179,7 @@ class TestInsightsPublishCommand:
         ]
         with pytest.raises(SystemExit):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT
+        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT % tmp_path.name
 
     def test_insights_publish_successful(  # pylint: disable=too-many-arguments
         self,
@@ -136,6 +190,7 @@ class TestInsightsPublishCommand:
         requests_mock,
     ):
         """Testing insights publish --input-file green path."""
+        caplog.set_level("INFO")
         requests_mock.post(
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=202,
@@ -145,7 +200,7 @@ class TestInsightsPublishCommand:
             "insights",
             "publish",
             "--input-file",
-            payload_file.name,
+            str(payload_file),
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.INSIGHTS_PUBLISH_SUCCESSFUL
@@ -169,6 +224,7 @@ class TestInsightsPublishCommand:
         log_message,
     ):
         """Testing insights publish with several errors."""
+        caplog.set_level("ERROR")
         requests_mock.post(
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=status_code,
@@ -178,7 +234,46 @@ class TestInsightsPublishCommand:
             "insights",
             "publish",
             "--input-file",
-            payload_file.name,
+            str(payload_file),
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        assert caplog.messages[-1] == log_message
+
+    @pytest.mark.parametrize(
+        "payload,log_message",
+        [
+            (
+                pytest.lazy_fixture("empty_payload"),
+                messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER,
+            ),
+            (
+                pytest.lazy_fixture("payload_with_non_json_file"),
+                messages.INSIGHTS_REPORT_CONTENT_NOT_JSON,
+            ),
+            (
+                pytest.lazy_fixture("payload_without_metadata"),
+                messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA,
+            ),
+            (
+                pytest.lazy_fixture("unexpected_payload"),
+                messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
+            ),
+            (
+                pytest.lazy_fixture("non_tarball_payload"),
+                messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
+            ),
+        ],
+    )
+    def test_invalid_payload_file(self, payload, caplog, log_message):
+        """Test invalid tar.gz payloads."""
+        caplog.set_level("INFO")
+        sys.argv = [
+            "/bin/qpc",
+            "insights",
+            "publish",
+            "--input-file",
+            str(payload),
         ]
         with pytest.raises(SystemExit):
             CLI().main()

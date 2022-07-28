@@ -11,6 +11,7 @@
 
 import os
 import sys
+import tarfile
 from logging import getLogger
 from pathlib import Path
 
@@ -52,14 +53,64 @@ class InsightsPublishCommand(CliCommand):
         )
 
     def _validate_insights_report_name(self):
-        """Load local report and validate tar.gz."""
+        """Validate if report file exists and its file extension (tar.gz)."""
         input_file = self.args.input_file
         if not os.path.isfile(input_file):
-            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT))
+            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
         if "tar.gz" not in self.args.input_file:
-            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ))
+            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
+
+    def _validate_insights_report_content(self):
+        """Check if report tarball contains the expected json files."""
+        filenames = self._get_filenames()
+
+        if len(filenames) < 2:
+            log.error(_(messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER))
+            raise SystemExit(1)
+
+        top_folder, filenames = self._separate_top_folder(filenames)
+
+        if f"{top_folder}/metadata.json" not in filenames:
+            log.error(_(messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA))
+            raise SystemExit(1)
+
+        for filename in filenames:
+            self._validate_filename(top_folder, filename)
+
+    def _get_filenames(self):
+        try:
+            with tarfile.open(self.args.input_file) as tarball:
+                filenames = sorted(tarball.getnames())
+        except tarfile.ReadError as err:
+            log.exception(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            raise SystemExit(1) from err
+        return filenames
+
+    def _is_top_folder(self, top_folder):
+        expected_top_folder_parent = Path(".")
+        return top_folder.parent == expected_top_folder_parent
+
+    def _separate_top_folder(self, filenames):
+        top_folder = Path(filenames[0])
+        if self._is_top_folder(top_folder) and len(filenames) >= 3:
+            filenames = filenames[1:]
+        elif self._is_top_folder(top_folder.parent):
+            top_folder = top_folder.parent
+        else:
+            log.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            raise SystemExit(1)
+        return top_folder, filenames
+
+    def _validate_filename(self, top_folder, filename):
+        filepath = Path(filename)
+        if filepath.parent != top_folder:
+            log.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            raise SystemExit(1)
+        if filepath.suffix != ".json":
+            log.error(_(messages.INSIGHTS_REPORT_CONTENT_NOT_JSON))
+            raise SystemExit(1)
 
     def _remove_file_extension(self):
         file_name = Path(self.args.input_file).stem
@@ -67,6 +118,7 @@ class InsightsPublishCommand(CliCommand):
 
     def _publish_to_ingress(self):
         self._validate_insights_report_name()
+        self._validate_insights_report_content()
 
         base_url = self._get_base_url()
 
@@ -108,7 +160,7 @@ class InsightsPublishCommand(CliCommand):
     def _make_publish_request(self, session_client, url, files):
         """Make insights client request and log status code."""
         response = session_client.post(url=url, files=files)
-
+        log.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
         if response.ok:
             log.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
         elif response.status_code == 401:

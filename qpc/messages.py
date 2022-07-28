@@ -359,3 +359,18 @@ INSIGHTS_PUBLISH_NOT_FOUND_ERROR = (
     "The server is either unavailable or the page couldn't be found."
     " Check your insights configuration."
 )
+INSIGHTS_PUBLISH_RESPONSE = "Response from insights: %s"
+
+_INVALID_PREFIX = "Payload file is not valid, due to:"
+INSIGHTS_REPORT_CONTENT_MIN_NUMBER = (
+    f"{_INVALID_PREFIX} Insights report should contain at least 2 files."
+)
+INSIGHTS_REPORT_CONTENT_MISSING_METADATA = (
+    f"{_INVALID_PREFIX} Insights report is missing metadata.json file."
+)
+INSIGHTS_REPORT_CONTENT_NOT_JSON = (
+    f"{_INVALID_PREFIX} Insights report should contain only json files."
+)
+INSIGHTS_REPORT_CONTENT_UNEXPECTED = (
+    f"{_INVALID_PREFIX} Insights report tarball contains an unexpected file structure."
+)

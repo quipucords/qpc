@@ -37,6 +37,10 @@ SUBPARSER = PARSER.add_subparsers(dest='subcommand')
 
 
 # pylint: disable=too-many-public-methods,protected-access
+@unittest.skip(
+    "Upload subcommand is temporarily disable to "
+    "prevent user's confusion with the publish command."
+)
 class InsightsUploadCliTests(unittest.TestCase):
     """Class for testing the scan job commands for qpc."""
 

@@ -161,7 +161,11 @@ class TestInsightsPublishCommand:
         ]
         with pytest.raises(SystemExit):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ
+        assert (
+            caplog.messages[-1]
+            == messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ
+            % inapropriate_payload_file.name
+        )
 
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
         """Testing if insights publish --input-file will accept dir as file."""
@@ -175,7 +179,7 @@ class TestInsightsPublishCommand:
         ]
         with pytest.raises(SystemExit):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT
+        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT % tmp_path.name
 
     def test_insights_publish_successful(  # pylint: disable=too-many-arguments
         self,

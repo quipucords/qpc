@@ -53,13 +53,13 @@ class InsightsPublishCommand(CliCommand):
         )
 
     def _validate_insights_report_name(self):
-        """Load local report and validate tar.gz."""
+        """Validate if report file exists and its file extension (tar.gz)."""
         input_file = self.args.input_file
         if not os.path.isfile(input_file):
-            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT))
+            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
         if "tar.gz" not in self.args.input_file:
-            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ))
+            log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
 
     def _validate_insights_report_content(self):

@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 import tarfile
+from collections import defaultdict
 
 from cryptography.fernet import Fernet, InvalidToken
 
@@ -333,15 +334,18 @@ def setup_logging(verbosity):
     Must be run after ensure_data_dir_exists().
 
     :param verbosity: verbosity level, as measured in -v's on the command line.
-        Can be None for default.
+        Should be an integer.
     """
+    # using default dict so any value (supposedly) higher than 1 will map to DEBUG
+    # e.g calling qpc -vv would be the same as qpc -vvvvvvvvvvv
+    verbosity_map = defaultdict(
+        lambda: logging.DEBUG,
+        {0: logging.ERROR, 1: logging.INFO},
+    )
+    log_level = verbosity_map[verbosity]
     log_prefix = "%(asctime)s - %(name)s - %(levelname)s"
-
-    if verbosity == LOG_LEVEL_INFO:
-        log_level = logging.INFO
-    else:
-        log_level = logging.DEBUG
-        log_prefix += "- %(funcName)s:%(lineno)d"
+    if log_level == logging.DEBUG:
+        log_prefix += " - [%(funcName)s] - %(pathname)s:%(lineno)d"
 
     log_fmt = f"{log_prefix} - %(message)s"
     # Using basicConfig here means that all log messages, even

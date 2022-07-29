@@ -379,7 +379,7 @@ def log_args(args):
     :param args: the arguments provided to the qpc command
     """
     message = 'Args: "%s"'
-    log.info(message, args)
+    log.debug(message, args)
 
 
 def handle_error_response(response):

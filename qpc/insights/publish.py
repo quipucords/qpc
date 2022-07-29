@@ -163,6 +163,7 @@ class InsightsPublishCommand(CliCommand):
         log.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
         if response.ok:
             log.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
+            print(response.text)
         elif response.status_code == 401:
             log.error(_(messages.INSIGHTS_PUBLISH_AUTH_ERROR))
         elif response.status_code == 404:

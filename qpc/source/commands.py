@@ -13,7 +13,7 @@
 # flake8: noqa
 # pylint: disable=unused-import
 from qpc.source.add import SourceAddCommand
-from qpc.source.list import SourceListCommand
-from qpc.source.show import SourceShowCommand
 from qpc.source.clear import SourceClearCommand
 from qpc.source.edit import SourceEditCommand
+from qpc.source.list import SourceListCommand
+from qpc.source.show import SourceShowCommand

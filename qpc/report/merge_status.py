@@ -15,14 +15,14 @@ from __future__ import print_function
 
 import sys
 
+from requests import codes
+
 import qpc.report as report
 from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
 from qpc.request import GET
 from qpc.translation import _
-
-from requests import codes
 
 
 # pylint: disable=too-few-public-methods

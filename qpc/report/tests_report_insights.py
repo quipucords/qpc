@@ -14,9 +14,11 @@ import os
 import sys
 import time
 import unittest
-from unittest.mock import patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
+from unittest.mock import patch
+
+import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
@@ -25,8 +27,6 @@ from qpc.report.insights import ReportInsightsCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import create_tar_buffer, get_server_location, write_server_config
-
-import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest="subcommand")

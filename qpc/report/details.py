@@ -15,6 +15,8 @@ from __future__ import print_function
 
 import sys
 
+from requests import codes
+
 from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
@@ -25,8 +27,6 @@ from qpc.utils import (
     validate_write_file,
     write_file,
 )
-
-from requests import codes
 
 
 # pylint: disable=too-few-public-methods

@@ -12,9 +12,12 @@
 
 import sys
 import unittest
-from unittest.mock import ANY, patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
+from unittest.mock import ANY, patch
+
+import requests
+import requests_mock
 
 from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
@@ -22,10 +25,6 @@ from qpc.scan import SCAN_URI
 from qpc.scan.list import ScanListCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
-
-import requests
-
-import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest="subcommand")

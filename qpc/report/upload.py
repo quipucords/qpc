@@ -16,14 +16,14 @@ from __future__ import print_function
 import json
 import sys
 
+from requests import codes
+
 from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
 from qpc.report import utils
 from qpc.request import POST
 from qpc.translation import _
-
-from requests import codes
 
 # pylint: disable=invalid-name
 try:

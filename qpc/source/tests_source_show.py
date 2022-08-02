@@ -15,15 +15,14 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import requests
+import requests_mock
+
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.show import SourceShowCommand
 from qpc.tests_utilities import HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
-
-import requests
-
-import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest="subcommand")

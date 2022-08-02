@@ -16,6 +16,9 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import requests
+import requests_mock
+
 from qpc import messages
 from qpc.cli import CLI
 from qpc.cred import CREDENTIAL_URI
@@ -24,10 +27,6 @@ from qpc.source import SOURCE_URI
 from qpc.source.edit import SourceEditCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, read_in_file, write_server_config
-
-import requests
-
-import requests_mock
 
 TMP_HOSTFILE = "/tmp/testhostsfile"
 PARSER = ArgumentParser()

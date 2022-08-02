@@ -18,6 +18,8 @@ import os
 import sys
 from glob import glob
 
+from requests import codes
+
 from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
@@ -25,8 +27,6 @@ from qpc.report import utils
 from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
-
-from requests import codes
 
 # pylint: disable=invalid-name
 try:

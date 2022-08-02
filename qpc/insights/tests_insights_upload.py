@@ -15,9 +15,11 @@ import os
 import sys
 import time
 import unittest
-from unittest.mock import patch
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
+from unittest.mock import patch
+
+import requests_mock
 
 from qpc import messages
 from qpc.insights import CLIENT_VERSION, CORE_VERSION, REPORT_URI
@@ -31,8 +33,6 @@ from qpc.utils import (
     write_file,
     write_server_config,
 )
-
-import requests_mock
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest="subcommand")

@@ -16,14 +16,14 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import requests_mock
+
 from qpc import messages
 from qpc.release import PKG_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.upload import ReportUploadCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
-
-import requests_mock
 
 TMP_BADDETAILS1 = (
     "/tmp/testbaddetailsreport_source.json",

@@ -17,6 +17,8 @@ import sys
 # pylint: disable=no-name-in-module,import-error
 from distutils.version import LooseVersion
 
+import requests
+
 from qpc import messages
 from qpc.release import PKG_NAME
 from qpc.translation import _
@@ -33,9 +35,6 @@ from qpc.utils import (
     read_client_token,
     read_server_config,
 )
-
-import requests
-
 
 # Need to determine how we get this information; config file at install?
 

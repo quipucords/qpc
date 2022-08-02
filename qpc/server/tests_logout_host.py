@@ -15,13 +15,12 @@ import sys
 import unittest
 from argparse import ArgumentParser, Namespace
 
+import requests_mock
+
 from qpc import utils
 from qpc.server import LOGOUT_URI
 from qpc.server.logout_host import LogoutHostCommand
 from qpc.tests_utilities import HushUpStderr
-
-import requests_mock
-
 
 PARSER = ArgumentParser()
 SUBPARSER = PARSER.add_subparsers(dest="subcommand")

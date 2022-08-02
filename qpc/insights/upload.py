@@ -19,7 +19,10 @@ import sys
 import time
 from shutil import copyfile
 
-import qpc.insights as insights
+# pylint: disable=no-name-in-module,import-error
+from requests import codes
+
+from qpc import insights
 from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.insights.utils import (
@@ -33,9 +36,6 @@ from qpc.insights.utils import (
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import validate_write_file, write_file
-
-# pylint: disable=no-name-in-module,import-error
-from requests import codes
 
 CANONICAL_FACTS = [
     "bios_uuid",

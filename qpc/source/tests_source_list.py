@@ -27,7 +27,7 @@ import requests
 import requests_mock
 
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class SourceListCliTests(unittest.TestCase):
@@ -70,55 +70,48 @@ class SourceListCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     nlc.main(args)
-                    self.assertEqual(source_out.getvalue(),
-                                     CONNECTION_ERROR_MSG)
+                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_source_internal_err(self):
         """Testing the list source command with an internal error."""
         source_out = StringIO()
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=500, json={'error': ['Server Error']})
+            mocker.get(url, status_code=500, json={"error": ["Server Error"]})
             nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
                     nlc.main(args)
-                    self.assertEqual(source_out.getvalue(), 'Server Error')
+                    self.assertEqual(source_out.getvalue(), "Server Error")
 
     def test_list_source_empty(self):
         """Testing the list source command successfully with empty data."""
         source_out = StringIO()
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=200, json={'count': 0})
+            mocker.get(url, status_code=200, json={"count": 0})
             nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with redirect_stdout(source_out):
                 nlc.main(args)
-                self.assertEqual(source_out.getvalue(),
-                                 'No sources exist yet.\n')
+                self.assertEqual(source_out.getvalue(), "No sources exist yet.\n")
 
-    @patch('builtins.input', return_value='yes')
+    @patch("builtins.input", return_value="yes")
     def test_list_source_data(self, b_input):
         """Testing the list source command successfully with stubbed data."""
         source_out = StringIO()
         url = get_server_location() + SOURCE_URI
-        source_entry = {'id': 1, 'name': 'source1',
-                        'hosts': ['1.2.3.4'],
-                        'credentials': [{'id': 1, 'name': 'cred1'}]}
+        source_entry = {
+            "id": 1,
+            "name": "source1",
+            "hosts": ["1.2.3.4"],
+            "credentials": [{"id": 1, "name": "cred1"}],
+        }
         results = [source_entry]
-        next_link = 'http://127.0.0.1:8000/api/v1/sources/?page=2'
-        data = {
-            'count': 1,
-            'next': next_link,
-            'results': results
-        }
-        data2 = {
-            'count': 1,
-            'next': None,
-            'results': results
-        }
+        next_link = "http://127.0.0.1:8000/api/v1/sources/?page=2"
+        data = {"count": 1, "next": next_link, "results": results}
+        data2 = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(next_link, status_code=200, json=data2)
@@ -126,31 +119,41 @@ class SourceListCliTests(unittest.TestCase):
             args = Namespace()
             with redirect_stdout(source_out):
                 nlc.main(args)
-                expected = '[{"credentials":[{"id":1,"name":"cred1"}],' \
+                expected = (
+                    '[{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1"}]'
-                self.assertEqual(source_out.getvalue().replace('\n', '')
-                                 .replace(' ', '').strip(),
-                                 expected + expected)
+                )
+                self.assertEqual(
+                    source_out.getvalue().replace("\n", "").replace(" ", "").strip(),
+                    expected + expected,
+                )
                 b_input.assert_called_with(ANY)
 
     def test_list_filtered_source_data(self):
         """Testing the list source with filter by source_type."""
         source_out = StringIO()
         url = get_server_location() + SOURCE_URI
-        source_entry = {'id': 1, 'name': 'source1',
-                        'source_type': 'network',
-                        'hosts': ['1.2.3.4'],
-                        'credentials': [{'id': 1, 'name': 'cred1'}]}
+        source_entry = {
+            "id": 1,
+            "name": "source1",
+            "source_type": "network",
+            "hosts": ["1.2.3.4"],
+            "credentials": [{"id": 1, "name": "cred1"}],
+        }
         results = [source_entry]
-        data = {'count': 1, 'results': results}
+        data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             nlc = SourceListCommand(SUBPARSER)
-            args = Namespace(type='network')
+            args = Namespace(type="network")
             with redirect_stdout(source_out):
                 nlc.main(args)
-                expected = '[{"credentials":[{"id":1,"name":"cred1"}],' \
-                    '"hosts":["1.2.3.4"],"id":1,"name":"source1",'\
+                expected = (
+                    '[{"credentials":[{"id":1,"name":"cred1"}],'
+                    '"hosts":["1.2.3.4"],"id":1,"name":"source1",'
                     '"source_type":"network"}]'
-                self.assertEqual(source_out.getvalue().replace('\n', '')
-                                 .replace(' ', '').strip(), expected)
+                )
+                self.assertEqual(
+                    source_out.getvalue().replace("\n", "").replace(" ", "").strip(),
+                    expected,
+                )

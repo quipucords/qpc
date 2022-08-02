@@ -46,13 +46,22 @@ class ReportUploadCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), POST,
-                            report.ASYNC_MERGE_URI, [codes.created])
-        self.parser.add_argument('--json-file', dest='json_file',
-                                 metavar='JSON_FILE',
-                                 help=_(messages.REPORT_UPLOAD_JSON_FILE_HELP),
-                                 required=True)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            POST,
+            report.ASYNC_MERGE_URI,
+            [codes.created],
+        )
+        self.parser.add_argument(
+            "--json-file",
+            dest="json_file",
+            metavar="JSON_FILE",
+            help=_(messages.REPORT_UPLOAD_JSON_FILE_HELP),
+            required=True,
+        )
         self.json = None
 
     def _validate_create_json(self, file):
@@ -65,8 +74,10 @@ class ReportUploadCommand(CliCommand):
         if not sources:
             print(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON) % file)
             sys.exit(1)
-        self.json = {utils.SOURCES_KEY: sources,
-                     utils.REPORT_TYPE_KEY: utils.DETAILS_REPORT_TYPE}
+        self.json = {
+            utils.SOURCES_KEY: sources,
+            utils.REPORT_TYPE_KEY: utils.DETAILS_REPORT_TYPE,
+        }
 
     def _validate_args(self):
         CliCommand._validate_args(self)
@@ -83,13 +94,15 @@ class ReportUploadCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        if json_data.get('id'):
-            print(_(messages.REPORT_SUCCESSFULLY_UPLOADED % (
-                json_data.get('id'),
-                PKG_NAME,
-                json_data.get('id'))))
+        if json_data.get("id"):
+            print(
+                _(
+                    messages.REPORT_SUCCESSFULLY_UPLOADED
+                    % (json_data.get("id"), PKG_NAME, json_data.get("id"))
+                )
+            )
 
     def _handle_response_error(self):
         json_data = self.response.json()
-        print(_(messages.REPORT_FAILED_TO_UPLOADED) % json_data.get('error'))
+        print(_(messages.REPORT_FAILED_TO_UPLOADED) % json_data.get("error"))
         sys.exit(1)

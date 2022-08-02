@@ -41,7 +41,7 @@ def _set_path_constants_to_none():
 
 def pytest_collection(session):
     """pytest collection hook.
-    
+
     This function runs before collecting tests.
     """
     _set_path_constants_to_none()

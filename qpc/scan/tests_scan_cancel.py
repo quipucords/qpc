@@ -27,7 +27,7 @@ import requests
 import requests_mock
 
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ScanCancelCliTests(unittest.TestCase):
@@ -49,11 +49,11 @@ class ScanCancelCliTests(unittest.TestCase):
     def test_cancel_scan_ssl_err(self):
         """Testing the cancel scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/cancel/'
+        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.SSLError)
             nsc = ScanCancelCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
@@ -62,39 +62,38 @@ class ScanCancelCliTests(unittest.TestCase):
     def test_cancel_scan_conn_err(self):
         """Testing the cancel scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/cancel/'
+        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
             nsc = ScanCancelCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(),
-                                     CONNECTION_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_cancel_scan_internal_err(self):
         """Testing the cancel scan command with an internal error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/cancel/'
+        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
-            mocker.put(url, status_code=500, json={'error': ['Server Error']})
+            mocker.put(url, status_code=500, json={"error": ["Server Error"]})
             nsc = ScanCancelCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(), 'Server Error')
+                    self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_cancel_scan_data(self):
         """Testing the cancel scan command successfully with stubbed data."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/cancel/'
+        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
             nsc = ScanCancelCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with redirect_stdout(scan_out):
                 nsc.main(args)
-                expected = messages.SCAN_CANCELED % '1' + '\n'
+                expected = messages.SCAN_CANCELED % "1" + "\n"
                 self.assertEqual(scan_out.getvalue(), expected)

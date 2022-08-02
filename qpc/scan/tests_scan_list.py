@@ -28,7 +28,7 @@ import requests
 import requests_mock
 
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ScanListCliTests(unittest.TestCase):
@@ -71,57 +71,49 @@ class ScanListCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     slc.main(args)
-                    self.assertEqual(scan_out.getvalue(),
-                                     CONNECTION_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_scan_internal_err(self):
         """Testing the list scan command with an internal error."""
         scan_out = StringIO()
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=500, json={'error': ['Server Error']})
+            mocker.get(url, status_code=500, json={"error": ["Server Error"]})
             slc = ScanListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     slc.main(args)
-                    self.assertEqual(scan_out.getvalue(), 'Server Error')
+                    self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_list_scan_empty(self):
         """Testing the list scan command successfully with empty data."""
         scan_out = StringIO()
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=200, json={'count': 0})
+            mocker.get(url, status_code=200, json={"count": 0})
             slc = ScanListCommand(SUBPARSER)
             args = Namespace()
             with redirect_stdout(scan_out):
                 slc.main(args)
-                self.assertEqual(scan_out.getvalue(),
-                                 messages.SCAN_LIST_NO_SCANS + '\n')
+                self.assertEqual(
+                    scan_out.getvalue(), messages.SCAN_LIST_NO_SCANS + "\n"
+                )
 
-    @patch('builtins.input', return_value='yes')
+    @patch("builtins.input", return_value="yes")
     def test_list_scan_data(self, b_input):
         """Testing the list scan command successfully with stubbed data."""
         scan_out = StringIO()
         url = get_server_location() + SCAN_URI
-        scan_entry = {'id': 1,
-                      'scan_type': 'inspect',
-                      'source': {
-                          'id': 1,
-                          'name': 'scan1'}}
+        scan_entry = {
+            "id": 1,
+            "scan_type": "inspect",
+            "source": {"id": 1, "name": "scan1"},
+        }
         results = [scan_entry]
-        next_link = get_server_location() + SCAN_URI + '?page=2'
-        data = {
-            'count': 1,
-            'next': next_link,
-            'results': results
-        }
-        data2 = {
-            'count': 1,
-            'next': None,
-            'results': results
-        }
+        next_link = get_server_location() + SCAN_URI + "?page=2"
+        data = {"count": 1, "next": next_link, "results": results}
+        data2 = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(next_link, status_code=200, json=data2)
@@ -129,37 +121,40 @@ class ScanListCliTests(unittest.TestCase):
             args = Namespace()
             with redirect_stdout(scan_out):
                 slc.main(args)
-                expected = '[{"id":1,"scan_type":"inspect"' \
-                           ',"source":{"id":1,"name":"scan1"}'\
-                           '}]'
-                self.assertEqual(scan_out.getvalue().replace('\n', '')
-                                 .replace(' ', '').strip(),
-                                 expected + expected)
+                expected = (
+                    '[{"id":1,"scan_type":"inspect"'
+                    ',"source":{"id":1,"name":"scan1"}'
+                    "}]"
+                )
+                self.assertEqual(
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
+                    expected + expected,
+                )
                 b_input.assert_called_with(ANY)
 
     def test_list_filter_type(self):
         """Testing the list scan with filter by type."""
         scan_out = StringIO()
         url = get_server_location() + SCAN_URI
-        scan_entry = {'id': 1,
-                      'scan_type': 'inspect',
-                      'source': {
-                          'id': 1,
-                          'name': 'scan1'}}
-        results = [scan_entry]
-        data = {
-            'count': 1,
-            'next': None,
-            'results': results
+        scan_entry = {
+            "id": 1,
+            "scan_type": "inspect",
+            "source": {"id": 1, "name": "scan1"},
         }
+        results = [scan_entry]
+        data = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             slc = ScanListCommand(SUBPARSER)
-            args = Namespace(type='inspect')
+            args = Namespace(type="inspect")
             with redirect_stdout(scan_out):
                 slc.main(args)
-                expected = '[{"id":1,"scan_type":"inspect"' \
-                           ',"source":{"id":1,"name":"scan1"}'\
-                           '}]'
-                self.assertEqual(scan_out.getvalue().replace('\n', '')
-                                 .replace(' ', '').strip(), expected)
+                expected = (
+                    '[{"id":1,"scan_type":"inspect"'
+                    ',"source":{"id":1,"name":"scan1"}'
+                    "}]"
+                )
+                self.assertEqual(
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
+                    expected,
+                )

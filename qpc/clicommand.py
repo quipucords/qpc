@@ -16,18 +16,15 @@ from __future__ import print_function
 import sys
 
 from qpc.request import request
-from qpc.utils import (QPC_MIN_SERVER_VERSION,
-                       handle_error_response,
-                       log_args)
+from qpc.utils import QPC_MIN_SERVER_VERSION, handle_error_response, log_args
 
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes
-class CliCommand():
+class CliCommand:
     """Base class for all sub-commands."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, subcommand, action, parser, req_method, req_path,
-                 success_codes):
+    def __init__(self, subcommand, action, parser, req_method, req_path, success_codes):
         """Create cli command base object."""
         self.subcommand = subcommand
         self.action = action
@@ -74,13 +71,15 @@ class CliCommand():
         """
         self._build_req_params()
         self._build_data()
-        self.response = request(method=self.req_method,
-                                path=self.req_path,
-                                params=self.req_params,
-                                payload=self.req_payload,
-                                headers=self.req_headers,
-                                parser=self.parser,
-                                min_server_version=self.min_server_version)
+        self.response = request(
+            method=self.req_method,
+            path=self.req_path,
+            params=self.req_params,
+            payload=self.req_payload,
+            headers=self.req_headers,
+            parser=self.parser,
+            min_server_version=self.min_server_version,
+        )
 
         # pylint: disable=no-member
         if self.response.status_code not in self.success_codes:

@@ -38,28 +38,41 @@ class ScanShowCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            scan.SCAN_URI, [codes.ok])
-        self.parser.add_argument('--name', dest='name', metavar='NAME',
-                                 help=_(messages.SCAN_NAME_HELP),
-                                 required=True)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            scan.SCAN_URI,
+            [codes.ok],
+        )
+        self.parser.add_argument(
+            "--name",
+            dest="name",
+            metavar="NAME",
+            help=_(messages.SCAN_NAME_HELP),
+            required=True,
+        )
 
     def _validate_args(self):
         CliCommand._validate_args(self)
         found = False
-        response = request(parser=self.parser, method=GET,
-                           path=scan.SCAN_URI,
-                           params={'name': self.args.name},
-                           payload=None)
+        response = request(
+            parser=self.parser,
+            method=GET,
+            path=scan.SCAN_URI,
+            params={"name": self.args.name},
+            payload=None,
+        )
         if response.status_code == codes.ok:  # pylint: disable=no-member
             json_data = response.json()
-            count = json_data.get('count', 0)
-            results = json_data.get('results', [])
+            count = json_data.get("count", 0)
+            results = json_data.get("results", [])
             if count >= 1:
                 for result in results:
-                    if result['name'] == self.args.name:
-                        self.req_path = self.req_path + str(result['id']) + '/'
+                    if result["name"] == self.args.name:
+                        self.req_path = self.req_path + str(result["id"]) + "/"
                         found = True
             if not found or count == 0:
                 print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))

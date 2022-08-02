@@ -11,17 +11,17 @@
 #
 """Constants for the Report commands."""
 
-SUBCOMMAND = 'report'
+SUBCOMMAND = "report"
 
-DETAILS = 'details'
-DEPLOYMENTS = 'deployments'
-INSIGHTS = 'insights'
-MERGE = 'merge'
-UPLOAD = 'upload'
-MERGE_STATUS = 'merge-status'
-DOWNLOAD = 'download'
-REPORT_URI = '/api/v1/reports/'
-DETAILS_PATH_SUFFIX = '/details/'
-DEPLOYMENTS_PATH_SUFFIX = '/deployments/'
-INSIGHTS_PATH_SUFFIX = '/insights/'
-ASYNC_MERGE_URI = '/api/v1/reports/merge/jobs/'
+DETAILS = "details"
+DEPLOYMENTS = "deployments"
+INSIGHTS = "insights"
+MERGE = "merge"
+UPLOAD = "upload"
+MERGE_STATUS = "merge-status"
+DOWNLOAD = "download"
+REPORT_URI = "/api/v1/reports/"
+DETAILS_PATH_SUFFIX = "/details/"
+DEPLOYMENTS_PATH_SUFFIX = "/deployments/"
+INSIGHTS_PATH_SUFFIX = "/insights/"
+ASYNC_MERGE_URI = "/api/v1/reports/merge/jobs/"

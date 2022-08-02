@@ -19,9 +19,7 @@ from qpc import messages, server
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import (pretty_print,
-                       validate_write_file,
-                       write_file)
+from qpc.utils import pretty_print, validate_write_file, write_file
 
 from requests import codes
 
@@ -39,18 +37,28 @@ class ServerStatusCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            server.STATUS_URI, [codes.ok])
-        self.parser.add_argument('--output-file', dest='path', metavar='PATH',
-                                 help=_(messages.STATUS_PATH_HELP),
-                                 required=False)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            server.STATUS_URI,
+            [codes.ok],
+        )
+        self.parser.add_argument(
+            "--output-file",
+            dest="path",
+            metavar="PATH",
+            help=_(messages.STATUS_PATH_HELP),
+            required=False,
+        )
 
     def _validate_args(self):
         CliCommand._validate_args(self)
         if self.args.path:
             try:
-                validate_write_file(self.args.path, 'output-file')
+                validate_write_file(self.args.path, "output-file")
             except ValueError as error:
                 print(error)
                 sys.exit(1)

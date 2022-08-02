@@ -35,9 +35,15 @@ class LogoutHostCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), PUT,
-                            server.LOGOUT_URI, [codes.ok])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            PUT,
+            server.LOGOUT_URI,
+            [codes.ok],
+        )
 
     def _handle_response_success(self):
         """Remove the client token."""

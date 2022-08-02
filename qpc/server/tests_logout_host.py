@@ -24,7 +24,7 @@ import requests_mock
 
 
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class LogoutTests(unittest.TestCase):
@@ -36,7 +36,7 @@ class LogoutTests(unittest.TestCase):
         # nosetests command.
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
-        utils.write_server_config({'host': '127.0.0.1', 'port': 8000, 'use_http': True})
+        utils.write_server_config({"host": "127.0.0.1", "port": 8000, "use_http": True})
 
     def tearDown(self):
         """Remove test case setup."""

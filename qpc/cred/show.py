@@ -39,21 +39,31 @@ class CredShowCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            credential.CREDENTIAL_URI, [codes.ok])
-        self.parser.add_argument('--name', dest='name', metavar='NAME',
-                                 help=_(messages.CRED_NAME_HELP),
-                                 required=True)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            credential.CREDENTIAL_URI,
+            [codes.ok],
+        )
+        self.parser.add_argument(
+            "--name",
+            dest="name",
+            metavar="NAME",
+            help=_(messages.CRED_NAME_HELP),
+            required=True,
+        )
 
     def _build_req_params(self):
-        self.req_params = {'name': self.args.name}
+        self.req_params = {"name": self.args.name}
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        count = json_data.get('count', 0)
+        count = json_data.get("count", 0)
         if count == 1:
-            cred_entry = json_data.get('results')[0]
+            cred_entry = json_data.get("results")[0]
             data = pretty_print(cred_entry)
             print(data)
         else:

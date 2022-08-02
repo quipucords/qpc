@@ -1,0 +1,5 @@
+# fully addopt black and isort to the codebase
+19c245d27ddd5ca3479cede374ee3f37636f0021
+5005b954d63c0a82d196c55326b843678d9c722f
+# to ignore these commits on blames, run locally
+# git config blame.ignoreRevsFile .git-blame-ignore-revs

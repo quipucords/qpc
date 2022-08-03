@@ -1,4 +1,0 @@
-# Include Locked Server Requirements
-
-requests==2.23.0
-cryptography==37.0.4

@@ -352,7 +352,11 @@ def setup_logging(verbosity):
     # those not coming from qpc, will go to the log file
     logging.basicConfig(filename=QPC_LOG, format=log_fmt, level=log_level)
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(logging.Formatter(log_fmt))
+    if log_level == logging.DEBUG:
+        # changing log format was breaking camayoc tests. let's add this extra logging
+        # information only when the user actually requests for more logs.
+        # (at least until we add an option controlling the log format)
+        stream_handler.setFormatter(logging.Formatter(log_fmt))
     stream_handler.setLevel(log_level)
     log.addHandler(stream_handler)
 

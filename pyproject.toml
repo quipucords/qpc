@@ -4,6 +4,11 @@ version = "1.0.0"
 description = ""
 authors = ["QPC Team <quipucords@redhat.com>"]
 license = "GPLv3"
+exclude = [
+    "**/test_*.py",
+    "**/*_tests.py",
+    "**/tests_*.py",
+]
 
 [tool.poetry.scripts]
 qpc = 'qpc.__main__:main'

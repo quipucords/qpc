@@ -5,6 +5,9 @@ description = ""
 authors = ["QPC Team <quipucords@redhat.com>"]
 license = "GPLv3"
 
+[tool.poetry.scripts]
+qpc = 'qpc.__main__:main'
+
 [tool.poetry.dependencies]
 python = "^3.7"
 requests = ">=2.28.1"

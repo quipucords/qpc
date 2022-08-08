@@ -6,7 +6,7 @@ import sys
 
 from setuptools import find_packages, setup
 
-from qpc.release import AUTHOR, AUTHOR_EMAIL, BIN_SCRIPT, PKG_NAME, URL, VERSION
+from qpc.release import AUTHOR, AUTHOR_EMAIL, ENTRYPOINT, PKG_NAME, URL, VERSION
 
 BASE_QPC_DIR = os.path.abspath(
     os.path.normpath(
@@ -27,8 +27,6 @@ setup(
     packages=find_packages(exclude=['test*.py']),
     package_data={'': ['LICENSE']},
     url=URL,
-    scripts=[
-        BIN_SCRIPT,
-    ],
-    zip_safe=False
+    entry_points={"console_scripts": [ENTRYPOINT]},
+    zip_safe=False,
 )

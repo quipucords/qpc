@@ -52,8 +52,12 @@ def test_password_encryption_with_key_modified(insights_login_file: Path):
     # recreate encryption key
     Path(utils.INSIGHTS_ENCRYPTION).unlink()
     write_encryption_key_if_non_existent()
-    with pytest.raises(QPCEncryptionKeyError):
+    with pytest.raises(QPCEncryptionKeyError) as encryption_error:
         read_insights_login_config()
+    assert (
+        str(encryption_error.value)
+        == "There was a problem while decrypting your password."
+    )
 
 
 def test_insights_encryption_file_is_created():
@@ -79,8 +83,12 @@ def test_if_key_is_loaded_with_wrong_permissions():
     write_encryption_key_if_non_existent()
     os.chmod(utils.INSIGHTS_ENCRYPTION, 0o777)
 
-    with pytest.raises(QPCEncryptionKeyError):
+    with pytest.raises(QPCEncryptionKeyError) as encryption_error:
         load_encryption_key()
+    assert (
+        str(encryption_error.value)
+        == "There was a problem while trying to load the password encryption key."
+    )
 
 
 def test_if_key_is_loaded_with_appropriate_permissions():

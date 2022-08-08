@@ -28,8 +28,9 @@ from qpc.insights.utils import validate_host, validate_username_and_password
 )
 def test_invalid_host_should_not_be_validated(argument):
     """Ensure invalid hosts are not validated."""
-    with pytest.raises(ArgumentTypeError):
+    with pytest.raises(ArgumentTypeError) as error:
         validate_host(argument)
+    assert str(error.value) == f"Host value {argument} should be a valid hostname"
 
 
 @pytest.mark.parametrize(
@@ -57,8 +58,9 @@ def test_valid_host_should_be_returned(argument):
 )
 def test_invalid_passwords_and_usernames_should_not_be_validated(argument):
     """Ensure invalid passwords and usernames are not validated."""
-    with pytest.raises(ArgumentTypeError):
+    with pytest.raises(ArgumentTypeError) as error:
         validate_username_and_password(argument)
+    assert str(error.value) == "The argument value is invalid."
 
 
 @pytest.mark.parametrize(

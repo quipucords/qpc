@@ -374,3 +374,5 @@ INSIGHTS_REPORT_CONTENT_NOT_JSON = (
 INSIGHTS_REPORT_CONTENT_UNEXPECTED = (
     f"{_INVALID_PREFIX} Insights report tarball contains an unexpected file structure."
 )
+INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL = "The report was successfully downloaded."
+INSIGHTS_REPORT_DOWNLOAD_ERROR = "There was a problem while downloading your report."

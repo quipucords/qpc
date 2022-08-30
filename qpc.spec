@@ -8,7 +8,8 @@ Summary: A tool for discovery and inspection of an IT environment.
 Group: Applications/Internet
 License: GPLv3
 URL: http://github.com/quipucords/qpc
-Source0: http://github.com/quipucords/qpc/archive/refs/heads/master.zip
+# tito build --tag qpc-$VERSION-$RELEASE --tgz
+Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch: noarch
@@ -48,6 +49,8 @@ install -D -p -m 644 docs/qpc.1 $RPM_BUILD_ROOT%{_mandir}/man1/qpc.1
 %files
 %defattr(-,root,root,-)
 %doc README.md AUTHORS.md
+%{_bindir}/qpc
+# /usr/bin/qpc
 %{python3_sitelib}/*
 %{_mandir}/man1/qpc.1.gz
 

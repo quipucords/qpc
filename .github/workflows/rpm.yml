@@ -1,0 +1,30 @@
+name: RPM CI
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: "Check RPM construction"
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+
+    steps:
+      - name: Base setup
+        run: |
+          dnf --setopt install_weak_deps=False install -y \
+              dnf-plugins-core \
+              git-core \
+              rpmlint \
+              tito \
+              make \
+              pandoc \
+              python-devel
+      - uses: actions/checkout@v3
+      - name: Mark git dirs safe
+        run: git config --global --add safe.directory '*'
+      - name: Tito test
+        run: tito build --test --rpm --offline
+      - name: rpmlint
+        run: rpmlint qpc.spec

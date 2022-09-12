@@ -190,7 +190,7 @@ class ReportMergeCommand(CliCommand):
                 PKG_NAME,
                 json_data.get('id'))))
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         json_data = self.response.json()
         reports = json_data.get('reports')
         if reports:

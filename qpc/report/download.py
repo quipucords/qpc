@@ -102,7 +102,7 @@ class ReportDownloadCommand(CliCommand):
             print(err_msg)
             sys.exit(1)
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.response.status_code == 428:
             print(_(messages.DOWNLOAD_NO_MASK_REPORT) %
                   self.args.report_id)

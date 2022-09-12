@@ -71,6 +71,6 @@ class ServerStatusCommand(CliCommand):
         else:
             print(status)
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         print(_(messages.SERVER_STATUS_FAILURE))
         sys.exit(1)

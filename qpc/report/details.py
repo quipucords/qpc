@@ -126,7 +126,7 @@ class ReportDetailsCommand(CliCommand):
             print(err_msg)
             sys.exit(1)
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.args.report_id is None:
             print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ %
                     self.args.scan_job_id))

@@ -58,6 +58,6 @@ class ReportMergeStatusCommand(CliCommand):
                                                   PKG_NAME,
                                                   json_data.get('report_id'))))
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         print(_(messages.MERGE_JOB_ID_NOT_FOUND % self.args.job_id))
         sys.exit(1)

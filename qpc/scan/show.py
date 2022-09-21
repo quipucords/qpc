@@ -70,6 +70,6 @@ class ScanShowCommand(CliCommand):
         data = pretty_print(json_data)
         print(data)
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))
         sys.exit(1)

@@ -89,7 +89,7 @@ class ReportUploadCommand(CliCommand):
                 PKG_NAME,
                 json_data.get('id'))))
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         json_data = self.response.json()
         print(_(messages.REPORT_FAILED_TO_UPLOADED) % json_data.get('error'))
         sys.exit(1)

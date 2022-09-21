@@ -127,7 +127,7 @@ class ReportDeploymentsCommand(CliCommand):
             print(err_msg)
             sys.exit(1)
 
-    def _handle_response_error(self):
+    def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.args.report_id is None:
             if self.response.status_code == 428:
                 print(_(messages.REPORT_COULD_NOT_BE_MASKED_SJ) %

@@ -14,11 +14,14 @@ import sys
 import tarfile
 from logging import getLogger
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
 from qpc.exceptions import QPCError
 from qpc.insights.http import InsightsClient
+from qpc.request import GET
+from qpc.request import request as qpc_request
 from qpc.translation import _
 from qpc.utils import read_insights_config, read_insights_login_config
 
@@ -44,27 +47,33 @@ class InsightsPublishCommand(CliCommand):
             None,
             [],
         )
-        self.parser.add_argument(
+        id_group = self.parser.add_mutually_exclusive_group(required=True)
+        id_group.add_argument(
             "--input-file",
             dest="input_file",
             metavar="INPUT_FILE",
             help=_(messages.INSIGHTS_INPUT_GZIP_HELP),
-            required=True,
+        )
+        id_group.add_argument(
+            "--report",
+            dest="report",
+            type=int,
+            metavar="REPORT",
+            help=_(messages.REPORT_REPORT_ID_HELP),
         )
 
-    def _validate_insights_report_name(self):
+    def _validate_insights_report_name(self, input_file):
         """Validate if report file exists and its file extension (tar.gz)."""
-        input_file = self.args.input_file
         if not os.path.isfile(input_file):
             log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
-        if "tar.gz" not in self.args.input_file:
+        if "tar.gz" not in input_file:
             log.info(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
 
-    def _validate_insights_report_content(self):
+    def _validate_insights_report_content(self, input_file):
         """Check if report tarball contains the expected json files."""
-        filenames = self._get_filenames()
+        filenames = self._get_filenames(input_file)
 
         if len(filenames) < 2:
             log.error(_(messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER))
@@ -79,9 +88,9 @@ class InsightsPublishCommand(CliCommand):
         for filename in filenames:
             self._validate_filename(top_folder, filename)
 
-    def _get_filenames(self):
+    def _get_filenames(self, input_file):
         try:
-            with tarfile.open(self.args.input_file) as tarball:
+            with tarfile.open(input_file) as tarball:
                 filenames = sorted(tarball.getnames())
         except tarfile.ReadError as err:
             log.exception(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
@@ -112,13 +121,17 @@ class InsightsPublishCommand(CliCommand):
             log.error(_(messages.INSIGHTS_REPORT_CONTENT_NOT_JSON))
             raise SystemExit(1)
 
-    def _remove_file_extension(self):
-        file_name = Path(self.args.input_file).stem
+    def _remove_file_extension(self, input_file):
+        file_name = Path(input_file).stem
         return file_name.replace(".tar", "")
 
     def _publish_to_ingress(self):
-        self._validate_insights_report_name()
-        self._validate_insights_report_content()
+        if self.args.input_file:
+            input_file = self.args.input_file
+        else:
+            input_file = self._download_insights_report()
+        self._validate_insights_report_name(input_file)
+        self._validate_insights_report_content(input_file)
 
         base_url = self._get_base_url()
 
@@ -127,22 +140,57 @@ class InsightsPublishCommand(CliCommand):
 
         insights_client = InsightsClient(base_url=base_url, auth=auth)
         file_to_be_uploaded = open(  # pylint: disable=consider-using-with
-            f"{self.args.input_file}", "rb"
+            input_file, "rb"
         )
-        filename_without_extensions = self._remove_file_extension()
+        filename_without_extensions = self._remove_file_extension(input_file)
         files = {
             "file": (
-                f"{filename_without_extensions}",
+                filename_without_extensions,
                 file_to_be_uploaded,
-                f"{insights.CONTENT_TYPE}",
+                insights.CONTENT_TYPE,
             )
         }
         successfully_submitted = self._make_publish_request(
             insights_client, insights.INGRESS_REPORT_URI, files
         )
         file_to_be_uploaded.close()
+
+        if not self.args.input_file:
+            # remove temporarily downloaded insights report
+            os.remove(input_file)
+
         if not successfully_submitted:
             raise SystemExit(1)
+
+    def _handle_response_error(self, response):  # pylint: disable=signature-differs
+        if response.status_code == 404:
+            log.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report)
+            sys.exit(1)
+        return super()._handle_response_error(response)
+
+    def _download_insights_report(self):
+        path = (
+            insights.REPORT_URI + str(self.args.report) + insights.INSIGHTS_PATH_SUFFIX
+        )
+
+        response = qpc_request(
+            method=GET,
+            path=path,
+            headers={"Accept": "application/gzip"},
+        )
+
+        if not response.ok:
+            self._handle_response_error(response)
+
+        log.info(_(messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL))
+
+        output_file = NamedTemporaryFile(  # pylint: disable=consider-using-with
+            suffix=".tar.gz", delete=False
+        )
+        output_file_path = Path(output_file.name)
+        output_file_path.write_bytes(response.content)
+
+        return output_file.name
 
     def _get_base_url(self):
         insights_config = read_insights_config()

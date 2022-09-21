@@ -57,9 +57,9 @@ class CliCommand():
         """Sub-commands can define to construct request payload."""
         pass
 
-    def _handle_response_error(self):
+    def _handle_response_error(self, response=None):
         """Sub-commands can override this method to perform error handling."""
-        handle_error_response(self.response)
+        handle_error_response(response or self.response)
         sys.exit(1)
 
     def _handle_response_success(self):

@@ -9,6 +9,7 @@
 #
 """pytest configuration file."""
 
+# pylint: disable=import-outside-toplevel
 from unittest import mock
 
 import pytest
@@ -45,3 +46,23 @@ def pytest_collection(session):
     This function runs before collecting tests.
     """
     _set_path_constants_to_none()
+
+
+@pytest.fixture
+def server_config():
+    """
+    Create server config with require_token set to False.
+
+    Since all cli commands require qpc config and qpc login to be executed,
+    require_token must be False, to avoid passing login info
+    """
+    from qpc.utils import write_server_config
+
+    return write_server_config(
+        {
+            "host": "127.0.0.1",
+            "port": 8000,
+            "use_http": True,
+            "require_token": False,
+        }
+    )

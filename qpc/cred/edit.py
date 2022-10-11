@@ -69,6 +69,9 @@ class CredEditCommand(CliCommand):
         self.parser.add_argument('--become-password', dest='become_password',
                                  action='store_true',
                                  help=_(messages.CRED_BECOME_PASSWORD_HELP))
+        self.parser.add_argument("--token", dest="token",
+                                action="store_true",
+                                help=_(messages.CRED_TOKEN_HELP))
         self.cred_type = None
 
     def _validate_args(self):
@@ -77,7 +80,7 @@ class CredEditCommand(CliCommand):
         if not(self.args.username or self.args.password or
                self.args.filename or self.args.ssh_passphrase or
                self.args.become_method or self.args.become_user or
-               self.args.become_password):
+               self.args.become_password or self.args.token):
             print(_(messages.CRED_EDIT_NO_ARGS % (self.args.name)))
             self.parser.print_help()
             sys.exit(1)

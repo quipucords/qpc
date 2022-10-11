@@ -41,45 +41,78 @@ class CredAddCommand(CliCommand):
                             subparsers.add_parser(self.ACTION), POST,
                             credential.CREDENTIAL_URI, [codes.created])
 
-        self.parser.add_argument('--name', dest='name', metavar='NAME',
-                                 help=_(messages.CRED_NAME_HELP),
-                                 required=True)
-        self.parser.add_argument('--type', dest='type',
-                                 choices=[credential.NETWORK_CRED_TYPE,
-                                          credential.VCENTER_CRED_TYPE,
-                                          credential.SATELLITE_CRED_TYPE,
-                                          credential.OPENSHIFT_CRED_TYPE],
-                                 metavar='TYPE',
-                                 help=_(messages.CRED_TYPE_HELP),
-                                 type=str.lower,
-                                 required=True)
-        self.parser.add_argument('--username', dest='username',
-                                 metavar='USERNAME',
-                                 help=_(messages.CRED_USER_HELP),
-                                 required=False)
+        self.parser.add_argument(
+            "--name",
+            dest="name",
+            metavar="NAME",
+            help=_(messages.CRED_NAME_HELP),
+            required=True,
+        )
+        self.parser.add_argument(
+            "--type",
+            dest="type",
+            choices=[
+                credential.NETWORK_CRED_TYPE,
+                credential.VCENTER_CRED_TYPE,
+                credential.SATELLITE_CRED_TYPE,
+                credential.OPENSHIFT_CRED_TYPE,
+            ],
+            metavar="TYPE",
+            help=_(messages.CRED_TYPE_HELP),
+            type=str.lower,
+            required=True,
+        )
+        self.parser.add_argument(
+            "--username",
+            dest="username",
+            metavar="USERNAME",
+            help=_(messages.CRED_USER_HELP),
+            required=False,
+        )
         group = self.parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('--password', dest='password',
-                           action='store_true',
-                           help=_(messages.CRED_PWD_HELP))
-        group.add_argument('--sshkeyfile', dest='filename',
-                           metavar='FILENAME',
-                           help=_(messages.CRED_SSH_HELP))
-        group.add_argument("--token", dest="token",
-                           action="store_true",
-                           help=_(messages.CRED_TOKEN_HELP))
-        self.parser.add_argument('--sshpassphrase', dest='ssh_passphrase',
-                                 action='store_true',
-                                 help=_(messages.CRED_SSH_PSPH_HELP))
-        self.parser.add_argument('--become-method', dest='become_method',
-                                 choices=credential.BECOME_CHOICES,
-                                 metavar='BECOME_METHOD',
-                                 help=_(messages.CRED_BECOME_METHOD_HELP))
-        self.parser.add_argument('--become-user', dest='become_user',
-                                 metavar='BECOME_USER',
-                                 help=_(messages.CRED_BECOME_USER_HELP))
-        self.parser.add_argument('--become-password', dest='become_password',
-                                 action='store_true',
-                                 help=_(messages.CRED_BECOME_PASSWORD_HELP))
+        group.add_argument(
+            "--password",
+            dest="password",
+            action="store_true",
+            help=_(messages.CRED_PWD_HELP),
+        )
+        group.add_argument(
+            "--sshkeyfile",
+            dest="filename",
+            metavar="FILENAME",
+            help=_(messages.CRED_SSH_HELP),
+        )
+        group.add_argument(
+            "--token",
+            dest="token",
+            action="store_true",
+            help=_(messages.CRED_TOKEN_HELP),
+        )
+        self.parser.add_argument(
+            "--sshpassphrase",
+            dest="ssh_passphrase",
+            action="store_true",
+            help=_(messages.CRED_SSH_PSPH_HELP),
+        )
+        self.parser.add_argument(
+            "--become-method",
+            dest="become_method",
+            choices=credential.BECOME_CHOICES,
+            metavar="BECOME_METHOD",
+            help=_(messages.CRED_BECOME_METHOD_HELP),
+        )
+        self.parser.add_argument(
+            "--become-user",
+            dest="become_user",
+            metavar="BECOME_USER",
+            help=_(messages.CRED_BECOME_USER_HELP),
+        )
+        self.parser.add_argument(
+            "--become-password",
+            dest="become_password",
+            action="store_true",
+            help=_(messages.CRED_BECOME_PASSWORD_HELP),
+        )
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

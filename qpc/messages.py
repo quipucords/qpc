@@ -247,6 +247,7 @@ FILE_NOT_FOUND = 'Input %s was not found.'
 VALIDATE_SSHKEY = 'The file path provided, %s, could not be found on the '\
     'system. Provide a valid path for the "--sshkeyfile" argument.'
 
+PROMPT_INPUT = "Provide a valid input."
 CONN_PASSWORD = 'Provide a connection password.'
 SUDO_PASSWORD = 'Provide a password for sudo.'
 SSH_PASSPHRASE = 'Provide a passphrase for the SSH keyfile.'

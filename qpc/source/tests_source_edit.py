@@ -226,7 +226,7 @@ class SourceEditCliTests(unittest.TestCase):
         cred_data = {'count': 1, 'results': cred_results}
         results = [{'id': 1, 'name': 'source1', 'hosts': ['1.2.3.4'],
                     'credentials': [{'id': 2, 'name': 'cred2'}],
-                    'disable_ssl': 'true'}]
+                    'disable_ssl': "false"}]
         source_data = {'count': 1, 'results': results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)

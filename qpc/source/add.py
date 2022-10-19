@@ -40,52 +40,96 @@ class SourceAddCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), POST,
-                            source.SOURCE_URI, [codes.created])
-        self.parser.add_argument('--name', dest='name', metavar='NAME',
-                                 help=_(messages.SOURCE_NAME_HELP),
-                                 required=True)
-        self.parser.add_argument('--type', dest='type',
-                                 choices=[source.NETWORK_SOURCE_TYPE,
-                                          source.VCENTER_SOURCE_TYPE,
-                                          source.SATELLITE_SOURCE_TYPE],
-                                 metavar='TYPE',
-                                 help=_(messages.SOURCE_TYPE_HELP),
-                                 required=True)
-        self.parser.add_argument('--hosts', dest='hosts', nargs='+',
-                                 metavar='HOSTS', default=[],
-                                 help=_(messages.SOURCE_HOSTS_HELP % PKG_NAME),
-                                 required=True)
-        self.parser.add_argument('--exclude-hosts', dest='exclude_hosts',
-                                 nargs='+', metavar='EXCLUDE_HOSTS',
-                                 help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP % PKG_NAME),
-                                 required=False)
-        self.parser.add_argument('--cred', dest='cred',
-                                 metavar='CRED',
-                                 nargs='+', default=[],
-                                 help=_(messages.SOURCE_CREDS_HELP),
-                                 required=True)
-        self.parser.add_argument('--port', dest='port',
-                                 metavar='PORT', type=validate_port,
-                                 help=_(messages.SOURCE_PORT_HELP),
-                                 required=False)
-        self.parser.add_argument('--ssl-cert-verify', dest='ssl_cert_verify',
-                                 choices=source.BOOLEAN_CHOICES,
-                                 help=_(messages.SOURCE_SSL_CERT_HELP),
-                                 required=False)
-        self.parser.add_argument('--ssl-protocol', dest='ssl_protocol',
-                                 choices=source.VALID_SSL_PROTOCOLS,
-                                 help=_(messages.SOURCE_SSL_PROTOCOL_HELP),
-                                 required=False)
-        self.parser.add_argument('--disable-ssl', dest='disable_ssl',
-                                 choices=source.BOOLEAN_CHOICES,
-                                 help=_(messages.SOURCE_SSL_DISABLE_HELP),
-                                 required=False)
-        self.parser.add_argument('--use-paramiko', dest='use_paramiko',
-                                 choices=source.BOOLEAN_CHOICES,
-                                 help=_(messages.SOURCE_PARAMIKO_HELP),
-                                 required=False)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            POST,
+            source.SOURCE_URI,
+            [codes.created],
+        )
+        self.parser.add_argument(
+            "--name",
+            dest="name",
+            metavar="NAME",
+            help=_(messages.SOURCE_NAME_HELP),
+            required=True,
+        )
+        self.parser.add_argument(
+            "--type",
+            dest="type",
+            choices=[
+                source.NETWORK_SOURCE_TYPE,
+                source.VCENTER_SOURCE_TYPE,
+                source.SATELLITE_SOURCE_TYPE,
+            ],
+            metavar="TYPE",
+            help=_(messages.SOURCE_TYPE_HELP),
+            required=True,
+        )
+        self.parser.add_argument(
+            "--hosts",
+            dest="hosts",
+            nargs="+",
+            metavar="HOSTS",
+            default=[],
+            help=_(messages.SOURCE_HOSTS_HELP % PKG_NAME),
+            required=True,
+        )
+        self.parser.add_argument(
+            "--exclude-hosts",
+            dest="exclude_hosts",
+            nargs="+",
+            metavar="EXCLUDE_HOSTS",
+            help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP % PKG_NAME),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--cred",
+            dest="cred",
+            metavar="CRED",
+            nargs="+",
+            default=[],
+            help=_(messages.SOURCE_CREDS_HELP),
+            required=True,
+        )
+        self.parser.add_argument(
+            "--port",
+            dest="port",
+            metavar="PORT",
+            type=validate_port,
+            help=_(messages.SOURCE_PORT_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--ssl-cert-verify",
+            dest="ssl_cert_verify",
+            choices=source.BOOLEAN_CHOICES,
+            help=_(messages.SOURCE_SSL_CERT_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--ssl-protocol",
+            dest="ssl_protocol",
+            choices=source.VALID_SSL_PROTOCOLS,
+            help=_(messages.SOURCE_SSL_PROTOCOL_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--disable-ssl",
+            dest="disable_ssl",
+            choices=source.BOOLEAN_CHOICES,
+            help=_(messages.SOURCE_SSL_DISABLE_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--use-paramiko",
+            dest="use_paramiko",
+            choices=source.BOOLEAN_CHOICES,
+            help=_(messages.SOURCE_PARAMIKO_HELP),
+            required=False,
+        )
 
     def _validate_args(self):
         CliCommand._validate_args(self)

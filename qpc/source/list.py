@@ -56,6 +56,7 @@ class SourceListCommand(CliCommand):
                 source.SATELLITE_SOURCE_TYPE,
             ],
             metavar="TYPE",
+            type=str.lower,
             help=_(messages.SOURCE_TYPE_FILTER_HELP),
             required=False,
         )

@@ -65,6 +65,7 @@ class SourceAddCommand(CliCommand):
                 source.SATELLITE_SOURCE_TYPE,
             ],
             metavar="TYPE",
+            type=str.lower,
             help=_(messages.SOURCE_TYPE_HELP),
             required=True,
         )
@@ -106,6 +107,7 @@ class SourceAddCommand(CliCommand):
             "--ssl-cert-verify",
             dest="ssl_cert_verify",
             choices=source.BOOLEAN_CHOICES,
+            type=str.lower,
             help=_(messages.SOURCE_SSL_CERT_HELP),
             required=False,
         )
@@ -120,6 +122,7 @@ class SourceAddCommand(CliCommand):
             "--disable-ssl",
             dest="disable_ssl",
             choices=source.BOOLEAN_CHOICES,
+            type=str.lower,
             help=_(messages.SOURCE_SSL_DISABLE_HELP),
             required=False,
         )

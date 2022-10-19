@@ -63,6 +63,7 @@ class SourceAddCommand(CliCommand):
                 source.NETWORK_SOURCE_TYPE,
                 source.VCENTER_SOURCE_TYPE,
                 source.SATELLITE_SOURCE_TYPE,
+                source.OPENSHIFT_SOURCE_TYPE,
             ],
             metavar="TYPE",
             type=str.lower,

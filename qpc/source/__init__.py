@@ -21,6 +21,7 @@ CLEAR = 'clear'
 NETWORK_SOURCE_TYPE = 'network'
 VCENTER_SOURCE_TYPE = 'vcenter'
 SATELLITE_SOURCE_TYPE = 'satellite'
+OPENSHIFT_SOURCE_TYPE = "openshift"
 
 SOURCE_URI = '/api/v1/sources/'
 

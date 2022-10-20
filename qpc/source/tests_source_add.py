@@ -417,9 +417,13 @@ class SourceAddCliTests(unittest.TestCase):
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
             nac = SourceAddCommand(SUBPARSER)
-            args = Namespace(name='source1', cred=['cred1'],
-                             hosts=['1.2.3.4'], type='vcenter',
-                             ssl_cert_verify='false')
+            args = Namespace(
+                name="source1",
+                cred=["cred1"],
+                hosts=["1.2.3.4"],
+                type="satellite",
+                ssl_cert_verify="false",
+            )
             with redirect_stdout(source_out):
                 nac.main(args)
                 self.assertEqual(source_out.getvalue(),

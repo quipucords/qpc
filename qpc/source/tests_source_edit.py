@@ -217,17 +217,23 @@ class SourceEditCliTests(unittest.TestCase):
     def test_edit_disable_ssl(self):
         """Testing that you can edit the disable-ssl arg successfully."""
         source_out = StringIO()
-        url_get_cred = get_server_location() + CREDENTIAL_URI + \
-            '?name=credential1'
-        url_get_source = get_server_location() + SOURCE_URI + '?name=source1'
-        url_patch = get_server_location() + SOURCE_URI + '1/'
-        cred_results = [{'id': 1, 'name': 'credential1', 'username': 'root',
-                         'password': '********'}]
-        cred_data = {'count': 1, 'results': cred_results}
-        results = [{'id': 1, 'name': 'source1', 'hosts': ['1.2.3.4'],
-                    'credentials': [{'id': 2, 'name': 'cred2'}],
-                    'disable_ssl': 'true'}]
-        source_data = {'count': 1, 'results': results}
+        url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
+        url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
+        url_patch = get_server_location() + SOURCE_URI + "1/"
+        cred_results = [
+            {"id": 1, "name": "credential1", "username": "root", "password": "********"}
+        ]
+        cred_data = {"count": 1, "results": cred_results}
+        results = [
+            {
+                "id": 1,
+                "name": "source1",
+                "hosts": ["1.2.3.4"],
+                "credentials": [{"id": 2, "name": "cred2"}],
+                "disable_ssl": "false",
+            }
+        ]
+        source_data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)

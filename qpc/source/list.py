@@ -38,16 +38,29 @@ class SourceListCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            source.SOURCE_URI, [codes.ok])
-        self.parser.add_argument('--type', dest='type',
-                                 choices=[source.NETWORK_SOURCE_TYPE,
-                                          source.VCENTER_SOURCE_TYPE,
-                                          source.SATELLITE_SOURCE_TYPE],
-                                 metavar='TYPE',
-                                 help=_(messages.SOURCE_TYPE_FILTER_HELP),
-                                 required=False)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            source.SOURCE_URI,
+            [codes.ok],
+        )
+        self.parser.add_argument(
+            "--type",
+            dest="type",
+            choices=[
+                source.NETWORK_SOURCE_TYPE,
+                source.VCENTER_SOURCE_TYPE,
+                source.SATELLITE_SOURCE_TYPE,
+                source.OPENSHIFT_SOURCE_TYPE,
+            ],
+            metavar="TYPE",
+            type=str.lower,
+            help=_(messages.SOURCE_TYPE_FILTER_HELP),
+            required=False,
+        )
 
     def _build_req_params(self):
         """Add filter by source_type query param."""

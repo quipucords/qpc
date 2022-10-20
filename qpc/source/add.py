@@ -11,8 +11,6 @@
 #
 """SourceAddCommand is used to add sources for system scans."""
 
-from __future__ import print_function
-
 import sys
 
 from qpc import cred, messages, source
@@ -26,7 +24,6 @@ from qpc.utils import read_in_file
 from requests import codes
 
 
-# pylint: disable=too-few-public-methods
 class SourceAddCommand(CliCommand):
     """Defines the add command.
 
@@ -39,15 +36,13 @@ class SourceAddCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
-        CliCommand.__init__(
-            self,
+        super().__init__(
             self.SUBCOMMAND,
             self.ACTION,
             subparsers.add_parser(self.ACTION),
             POST,
             source.SOURCE_URI,
-            [codes.created],
+            [codes.created],  # pylint: disable=no-member
         )
         self.parser.add_argument(
             "--name",

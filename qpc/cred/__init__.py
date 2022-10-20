@@ -22,6 +22,7 @@ CLEAR = 'clear'
 NETWORK_CRED_TYPE = 'network'
 VCENTER_CRED_TYPE = 'vcenter'
 SATELLITE_CRED_TYPE = 'satellite'
+OPENSHIFT_CRED_TYPE = "openshift"
 
 BECOME_SUDO = 'sudo'
 BECOME_SU = 'su'

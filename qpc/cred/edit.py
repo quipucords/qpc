@@ -50,34 +50,64 @@ class CredEditCommand(CliCommand):
                                  help=_(messages.CRED_USER_HELP),
                                  required=False)
         group = self.parser.add_mutually_exclusive_group(required=False)
-        group.add_argument('--password', dest='password',
-                           action='store_true',
-                           help=_(messages.CRED_PWD_HELP))
-        group.add_argument('--sshkeyfile', dest='filename',
-                           metavar='FILENAME',
-                           help=_(messages.CRED_SSH_HELP))
-        self.parser.add_argument('--sshpassphrase', dest='ssh_passphrase',
-                                 action='store_true',
-                                 help=_(messages.CRED_SSH_PSPH_HELP))
-        self.parser.add_argument('--become-method', dest='become_method',
-                                 choices=credential.BECOME_CHOICES,
-                                 metavar='BECOME_METHOD',
-                                 help=_(messages.CRED_BECOME_METHOD_HELP))
-        self.parser.add_argument('--become-user', dest='become_user',
-                                 metavar='BECOME_USER',
-                                 help=_(messages.CRED_BECOME_USER_HELP))
-        self.parser.add_argument('--become-password', dest='become_password',
-                                 action='store_true',
-                                 help=_(messages.CRED_BECOME_PASSWORD_HELP))
+        group.add_argument(
+            "--password",
+            dest="password",
+            action="store_true",
+            help=_(messages.CRED_PWD_HELP),
+        )
+        group.add_argument(
+            "--sshkeyfile",
+            dest="filename",
+            metavar="FILENAME",
+            help=_(messages.CRED_SSH_HELP),
+        )
+        self.parser.add_argument(
+            "--sshpassphrase",
+            dest="ssh_passphrase",
+            action="store_true",
+            help=_(messages.CRED_SSH_PSPH_HELP),
+        )
+        self.parser.add_argument(
+            "--become-method",
+            dest="become_method",
+            choices=credential.BECOME_CHOICES,
+            metavar="BECOME_METHOD",
+            help=_(messages.CRED_BECOME_METHOD_HELP),
+        )
+        self.parser.add_argument(
+            "--become-user",
+            dest="become_user",
+            metavar="BECOME_USER",
+            help=_(messages.CRED_BECOME_USER_HELP),
+        )
+        self.parser.add_argument(
+            "--become-password",
+            dest="become_password",
+            action="store_true",
+            help=_(messages.CRED_BECOME_PASSWORD_HELP),
+        )
+        self.parser.add_argument(
+            "--token",
+            dest="token",
+            action="store_true",
+            help=_(messages.CRED_TOKEN_HELP),
+        )
         self.cred_type = None
 
     def _validate_args(self):
         CliCommand._validate_args(self)
 
-        if not(self.args.username or self.args.password or
-               self.args.filename or self.args.ssh_passphrase or
-               self.args.become_method or self.args.become_user or
-               self.args.become_password):
+        if not (
+            self.args.username
+            or self.args.password
+            or self.args.filename
+            or self.args.ssh_passphrase
+            or self.args.become_method
+            or self.args.become_user
+            or self.args.become_password
+            or self.args.token
+        ):
             print(_(messages.CRED_EDIT_NO_ARGS % (self.args.name)))
             self.parser.print_help()
             sys.exit(1)

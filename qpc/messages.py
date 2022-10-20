@@ -57,6 +57,7 @@ CRED_BECOME_USER_HELP = 'The user to become when running a privileged '\
     'command during network scan.'
 CRED_BECOME_PASSWORD_HELP = 'The privilege escalation password to be '\
     'used when running a network scan.'
+CRED_TOKEN_HELP = "OpenShift token."
 
 SOURCE_NAME_HELP = 'Source name.'
 SOURCES_NAME_HELP = 'List of source names.'
@@ -247,11 +248,13 @@ FILE_NOT_FOUND = 'Input %s was not found.'
 VALIDATE_SSHKEY = 'The file path provided, %s, could not be found on the '\
     'system. Provide a valid path for the "--sshkeyfile" argument.'
 
+PROMPT_INPUT = "Provide a valid input."
 CONN_PASSWORD = 'Provide a connection password.'
 SUDO_PASSWORD = 'Provide a password for sudo.'
 SSH_PASSPHRASE = 'Provide a passphrase for the SSH keyfile.'
 BECOME_PASSWORD = 'Provide a privilege escalation password to be used when '\
     'running a network scan.'
+OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication."
 
 MERGE_JOB_ID_NOT_FOUND = 'Report merge job %s not found.'
 MERGE_JOB_ID_STATUS = 'Report merge job %s is %s.'

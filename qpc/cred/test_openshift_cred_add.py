@@ -1,0 +1,149 @@
+# Copyright (c) 2022 Red Hat, Inc.
+#
+# This software is licensed to you under the GNU General Public License,
+# version 3 (GPLv3). There is NO WARRANTY for this software, express or
+# implied, including the implied warranties of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
+# along with this software; if not, see
+# https://www.gnu.org/licenses/gpl-3.0.txt.
+#
+"""Test openshift cred add in CLI."""
+import sys
+
+import pytest
+
+from qpc import messages
+from qpc.cli import CLI
+from qpc.cred import CREDENTIAL_URI, OPENSHIFT_CRED_TYPE
+from qpc.utils import get_server_location
+
+
+class TestOpenShiftAddCredential:
+    """Class for testing OpenShift add credential."""
+
+    @pytest.mark.parametrize(
+        "status_code,err_log_message",
+        [
+            (401, "qpc server login"),
+            (500, "An internal server error occurred."),
+        ],
+    )
+    def test_add_returning_error(  # pylint: disable=too-many-arguments
+        self,
+        capsys,
+        requests_mock,
+        openshift_token_input,
+        status_code,
+        err_log_message,
+    ):
+        """Test openshift cred add with several errors."""
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.post(url, status_code=status_code)
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_credential",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+            "--token",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == messages.OPENSHIFT_TOKEN + "\n"
+        assert err_log_message in err
+
+    def test_add_no_type(
+        self,
+        capsys,
+        openshift_token_input,
+    ):
+        """Test openshift cred add no type."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_credential",
+            "--token",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert (
+            "qpc cred add: error: the following arguments are required: --type" in err
+        )
+
+    def test_add_no_token(
+        self,
+        capsys,
+    ):
+        """Test openshift cred add no token."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_credential",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "one of the arguments --password --sshkeyfile --token is required" in err
+
+    def test_add_no_name(
+        self,
+        capsys,
+        openshift_token_input,
+    ):
+        """Test openshift cred add no name."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+            "--token",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "the following arguments are required: --name" in err
+
+    @pytest.mark.parametrize("cred_type", ["OPENSHIFT", "openshift", "OpenShiFt"])
+    def test_add_green_path(
+        self,
+        capsys,
+        requests_mock,
+        openshift_token_input,
+        cred_type,
+    ):
+        """Test openshift cred add green path."""
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.post(url, status_code=201)
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_credential",
+            "--type",
+            cred_type,
+            "--token",
+        ]
+        CLI().main()
+        out, err = capsys.readouterr()
+        assert out == (
+            messages.OPENSHIFT_TOKEN
+            + "\n"
+            + messages.CRED_ADDED % "openshift_credential"
+            + "\n"
+        )
+        assert err == ""

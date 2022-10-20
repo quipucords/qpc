@@ -14,9 +14,19 @@
 from __future__ import print_function
 
 from getpass import getpass
+from logging import getLogger
 
 from qpc import messages
 from qpc.translation import _
+
+log = getLogger("qpc")
+
+
+def check_if_prompt_is_not_empty(pass_prompt):
+    """Validate user prompt."""
+    if not pass_prompt:
+        log.error(_(messages.PROMPT_INPUT))
+        raise SystemExit(2)
 
 
 def get_password(args, req_payload, add_none=True):
@@ -30,21 +40,31 @@ def get_password(args, req_payload, add_none=True):
     if 'password' in args and args.password:
         print(_(messages.CONN_PASSWORD))
         pass_prompt = getpass()
-        req_payload['password'] = pass_prompt or None
+        check_if_prompt_is_not_empty(pass_prompt)
+        req_payload["password"] = pass_prompt
     elif add_none:
         req_payload['password'] = None
     if 'ssh_passphrase' in args and args.ssh_passphrase:
         print(_(messages.SSH_PASSPHRASE))
         pass_prompt = getpass()
-        req_payload['ssh_passphrase'] = pass_prompt or None
+        check_if_prompt_is_not_empty(pass_prompt)
+        req_payload["ssh_passphrase"] = pass_prompt
     elif add_none:
         req_payload['ssh_passphrase'] = None
     if 'become_password' in args and args.become_password:
         print(_(messages.BECOME_PASSWORD))
         pass_prompt = getpass()
-        req_payload['become_password'] = pass_prompt or None
+        check_if_prompt_is_not_empty(pass_prompt)
+        req_payload["become_password"] = pass_prompt
     elif add_none:
         req_payload['become_password'] = None
+    if getattr(args, "token", None):
+        print(_(messages.OPENSHIFT_TOKEN))
+        token_prompt = getpass()
+        check_if_prompt_is_not_empty(token_prompt)
+        req_payload["auth_token"] = token_prompt
+    elif add_none:
+        req_payload["auth_token"] = None
 
     return req_payload
 

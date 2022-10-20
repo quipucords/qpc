@@ -39,16 +39,28 @@ class CredListCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            credential.CREDENTIAL_URI, [codes.ok])
-        self.parser.add_argument('--type', dest='type',
-                                 choices=[credential.NETWORK_CRED_TYPE,
-                                          credential.VCENTER_CRED_TYPE,
-                                          credential.SATELLITE_CRED_TYPE],
-                                 metavar='TYPE',
-                                 help=_(messages.CRED_TYPE_FILTER_HELP),
-                                 required=False)
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            credential.CREDENTIAL_URI,
+            [codes.ok],
+        )
+        self.parser.add_argument(
+            "--type",
+            dest="type",
+            choices=[
+                credential.NETWORK_CRED_TYPE,
+                credential.VCENTER_CRED_TYPE,
+                credential.SATELLITE_CRED_TYPE,
+                credential.OPENSHIFT_CRED_TYPE,
+            ],
+            metavar="TYPE",
+            help=_(messages.CRED_TYPE_FILTER_HELP),
+            required=False,
+        )
 
     def _build_req_params(self):
         """Add filter by cred_type query param."""

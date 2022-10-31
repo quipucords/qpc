@@ -13,6 +13,7 @@ import sys
 
 import pytest
 
+from qpc import messages
 from qpc.cli import CLI
 from qpc.utils import read_insights_login_config
 
@@ -84,8 +85,11 @@ class TestInsightsAddLogin:
         assert out == ""
         assert expected_error in err
 
-    def test_success_add_insights_login_config(self):
+    def test_success_add_insights_login_config(
+        self, insights_login_password_input, caplog
+    ):
         """Testing insights login config green path."""
+        caplog.set_level("INFO")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -93,9 +97,9 @@ class TestInsightsAddLogin:
             "--username",
             "insights-test-user",
             "--password",
-            "insights-test-password",
         ]
         CLI().main()
+        assert caplog.messages[-1] == messages.INSIGHTS_LOGIN_CONFIG_SUCCESS
         config = read_insights_login_config()
         assert config["username"] == "insights-test-user"
         assert config["password"] == "insights-test-password"

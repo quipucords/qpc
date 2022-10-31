@@ -15,8 +15,9 @@ from __future__ import print_function
 
 import re
 from argparse import ArgumentTypeError
+
 # pylint: disable=no-name-in-module,import-error
-from distutils.version import LooseVersion
+from distutils.version import LooseVersion  # noqa:I202
 from getpass import getpass
 
 from qpc import messages

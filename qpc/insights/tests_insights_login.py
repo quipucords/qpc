@@ -10,57 +10,79 @@
 """Test the CLI module."""
 
 import sys
-import unittest
+
+import pytest
 
 from qpc.cli import CLI
-from qpc.utils import read_insights_login_config, write_server_config
+from qpc.utils import read_insights_login_config
 
 
-class InsightsAddLoginTests(unittest.TestCase):
+class TestInsightsAddLogin:
     """Class for testing insights add login command."""
 
-    def setUp(self):
-        """Create test setup."""
-        # All cli commands require qpc config and qpc login to be executed,
-        # require_token must be False, so we don't have to pass login info
-        write_server_config(
-            {
-                "host": "127.0.0.1",
-                "port": 8000,
-                "use_http": True,
-                "require_token": False,
-            }
-        )
-
-    def test_insight_login_req_args_err(self):
+    def test_insight_login_req_args_err(self, capsys):
         """Testing if insights add-login command requires args."""
         sys.argv = ["/bin/qpc", "insights", "add_login"]
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             CLI().main()
+        out, err = capsys.readouterr()
+        expected_error = (
+            "error: the following arguments are required: --username, --password"
+        )
+        assert out == ""
+        assert expected_error in err
 
-    def test_insights_config_bad_username(self):
+    def test_insights_config_bad_username(self, capsys):
         """Testing insights configure when receiving bad username."""
-        sys.argv = ["/bin/qpc", "insights", "add-login", "--username", None]
-        with self.assertRaises(SystemExit):
+        sys.argv = ["/bin/qpc", "insights", "add_login", "--username", None]
+        with pytest.raises(SystemExit):
             CLI().main()
+        out, err = capsys.readouterr()
+        expected_error = "invalid validate_username_and_password value: None"
+        assert out == ""
+        assert expected_error in err
 
-    def test_insights_config_empty_username(self):
-        """Testing insights configure when receiving bad username."""
-        sys.argv = ["/bin/qpc", "insights", "add-login", "--username", ""]
-        with self.assertRaises(SystemExit):
+    def test_insights_config_empty_username(self, capsys):
+        """Testing insights configure when receiving empty username."""
+        sys.argv = ["/bin/qpc", "insights", "add_login", "--username", ""]
+        with pytest.raises(SystemExit):
             CLI().main()
+        out, err = capsys.readouterr()
+        expected_error = "error: argument --username: The argument value is invalid."
+        assert out == ""
+        assert expected_error in err
 
     def test_insights_config_bad_password(self):
-        """Testing insights configure when receiving bad username."""
-        sys.argv = ["/bin/qpc", "insights", "add-login", "--password", None]
-        with self.assertRaises(SystemExit):
+        """Testing insights configure when receiving bad password."""
+        sys.argv = [
+            "/bin/qpc",
+            "insights",
+            "add_login",
+            "--username",
+            "test_username",
+            "--password",
+            None,
+        ]
+        with pytest.raises(TypeError):
             CLI().main()
 
-    def test_insights_config_empty_password(self):
-        """Testing insights configure when receiving bad username."""
-        sys.argv = ["/bin/qpc", "insights", "add-login", "--password", ""]
-        with self.assertRaises(SystemExit):
+    def test_insights_config_empty_password(self, capsys):
+        """Testing insights configure when receiving empty password."""
+        sys.argv = [
+            "/bin/qpc",
+            "insights",
+            "add_login",
+            "--username",
+            "test-username",
+            "--password",
+            "",
+        ]
+        with pytest.raises(SystemExit):
             CLI().main()
+        out, err = capsys.readouterr()
+        expected_error = "qpc: error: unrecognized arguments: "
+        assert out == ""
+        assert expected_error in err
 
     def test_success_add_insights_login_config(self):
         """Testing insights login config green path."""
@@ -75,11 +97,11 @@ class InsightsAddLoginTests(unittest.TestCase):
         ]
         CLI().main()
         config = read_insights_login_config()
-        self.assertEqual(config["username"], "insights-test-user")
-        self.assertEqual(config["password"], "insights-test-password")
+        assert config["username"] == "insights-test-user"
+        assert config["password"] == "insights-test-password"
 
     def test_run_command_no_config(self):
         """Test running command without config."""
         sys.argv = ["/bin/qpc", "insights", "add_login"]
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             CLI().main()

@@ -18,15 +18,9 @@ from logging import getLogger
 
 from qpc import messages
 from qpc.translation import _
+from qpc.utils import check_if_prompt_is_not_empty
 
 log = getLogger("qpc")
-
-
-def check_if_prompt_is_not_empty(pass_prompt):
-    """Validate user prompt."""
-    if not pass_prompt:
-        log.error(_(messages.PROMPT_INPUT))
-        raise SystemExit(2)
 
 
 def get_password(args, req_payload, add_none=True):

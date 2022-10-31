@@ -585,3 +585,10 @@ def decrypt_password(password):
             "There was a problem while decrypting your password."
         ) from exc
     return decrypted_password.decode()
+
+
+def check_if_prompt_is_not_empty(pass_prompt):
+    """Validate user prompt."""
+    if not pass_prompt:
+        log.error(t(messages.PROMPT_INPUT))
+        raise SystemExit(2)

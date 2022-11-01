@@ -59,8 +59,7 @@ def get_password(args, req_payload, add_none=True):
     elif add_none:
         req_payload['become_password'] = None
     if getattr(args, "token", None):
-        print(_(messages.OPENSHIFT_TOKEN))
-        token_prompt = getpass()
+        token_prompt = getpass(messages.OPENSHIFT_TOKEN)
         check_if_prompt_is_not_empty(token_prompt)
         req_payload["auth_token"] = token_prompt
     elif add_none:

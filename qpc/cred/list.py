@@ -58,6 +58,7 @@ class CredListCommand(CliCommand):
                 credential.OPENSHIFT_CRED_TYPE,
             ],
             metavar="TYPE",
+            type=str.lower,
             help=_(messages.CRED_TYPE_FILTER_HELP),
             required=False,
         )

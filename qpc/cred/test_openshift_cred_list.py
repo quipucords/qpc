@@ -45,13 +45,7 @@ class TestOpenShiftListCredential:
         results = [openshift_cred_1, openshift_cred_2]
         data = {"count": 2, "results": results}
         requests_mock.get(url, status_code=200, json=data)
-        sys.argv = [
-            "/bin/qpc",
-            "cred",
-            "list",
-            "--type",
-            OPENSHIFT_CRED_TYPE,
-        ]
+        sys.argv = ["/bin/qpc", "cred", "list", "--type", ocp_cred_type]
         CLI().main()
         expected_dict = [
             {

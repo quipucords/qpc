@@ -11,6 +11,8 @@
 import json
 import sys
 
+import pytest
+
 from qpc.cli import CLI
 from qpc.cred import CREDENTIAL_URI, OPENSHIFT_CRED_TYPE
 from qpc.utils import get_server_location
@@ -19,10 +21,12 @@ from qpc.utils import get_server_location
 class TestOpenShiftListCredential:
     """Class for testing OpenShift list credential."""
 
+    @pytest.mark.parametrize("ocp_cred_type", ("OPENSHIFT", "openshift", "OPENshift"))
     def test_list_filtered_cred_data(
         self,
         capsys,
         requests_mock,
+        ocp_cred_type,
     ):
         """Test if cred list returns ocp creds."""
         url = get_server_location() + CREDENTIAL_URI
@@ -41,13 +45,7 @@ class TestOpenShiftListCredential:
         results = [openshift_cred_1, openshift_cred_2]
         data = {"count": 2, "results": results}
         requests_mock.get(url, status_code=200, json=data)
-        sys.argv = [
-            "/bin/qpc",
-            "cred",
-            "list",
-            "--type",
-            OPENSHIFT_CRED_TYPE,
-        ]
+        sys.argv = ["/bin/qpc", "cred", "list", "--type", ocp_cred_type]
         CLI().main()
         expected_dict = [
             {

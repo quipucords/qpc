@@ -254,7 +254,7 @@ SUDO_PASSWORD = 'Provide a password for sudo.'
 SSH_PASSPHRASE = 'Provide a passphrase for the SSH keyfile.'
 BECOME_PASSWORD = 'Provide a privilege escalation password to be used when '\
     'running a network scan.'
-OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication."
+OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication.\nToken: "
 
 MERGE_JOB_ID_NOT_FOUND = 'Report merge job %s not found.'
 MERGE_JOB_ID_STATUS = 'Report merge job %s is %s.'

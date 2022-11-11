@@ -51,12 +51,7 @@ class TestOpenShiftEditCredential:
         ]
         CLI().main()
         out, err = capsys.readouterr()
-        assert out == (
-            messages.OPENSHIFT_TOKEN
-            + "\n"
-            + messages.CRED_UPDATED % "openshift_cred"
-            + "\n"
-        )
+        assert out == (messages.CRED_UPDATED % "openshift_cred" + "\n")
         assert err == ""
 
     def test_edit_green_path(
@@ -89,12 +84,7 @@ class TestOpenShiftEditCredential:
         ]
         CLI().main()
         out, err = capsys.readouterr()
-        assert out == (
-            messages.OPENSHIFT_TOKEN
-            + "\n"
-            + messages.CRED_UPDATED % "openshift_cred_2"
-            + "\n"
-        )
+        assert out == (messages.CRED_UPDATED % "openshift_cred_2" + "\n")
         assert err == ""
 
     @pytest.mark.parametrize(

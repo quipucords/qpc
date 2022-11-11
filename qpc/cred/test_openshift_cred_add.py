@@ -52,7 +52,7 @@ class TestOpenShiftAddCredential:
         with pytest.raises(SystemExit):
             CLI().main()
         out, err = capsys.readouterr()
-        assert out == messages.OPENSHIFT_TOKEN + "\n"
+        assert out == ""
         assert err_log_message in err
 
     def test_add_no_type(
@@ -140,10 +140,5 @@ class TestOpenShiftAddCredential:
         ]
         CLI().main()
         out, err = capsys.readouterr()
-        assert out == (
-            messages.OPENSHIFT_TOKEN
-            + "\n"
-            + messages.CRED_ADDED % "openshift_credential"
-            + "\n"
-        )
+        assert out == (messages.CRED_ADDED % "openshift_credential" + "\n")
         assert err == ""

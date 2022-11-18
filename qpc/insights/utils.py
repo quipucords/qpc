@@ -17,10 +17,12 @@ import re
 from argparse import ArgumentTypeError
 
 # pylint: disable=no-name-in-module,import-error
-from distutils.version import LooseVersion
+from distutils.version import LooseVersion  # noqa:I202
+from getpass import getpass
 
 from qpc import messages
 from qpc.translation import _
+from qpc.utils import check_if_prompt_is_not_empty
 
 
 class InsightsCommands():
@@ -158,3 +160,19 @@ def validate_username_and_password(arg):
     if argument_re.search(arg) is None:
         raise ArgumentTypeError("The argument value is invalid.")
     return arg
+
+
+def build_insights_login_config_dict(args):
+    """Construct login config dict from command line arguments.
+
+    :param args: the command line arguments
+    :returns: insights login config dict
+    """
+    config_dict = {}
+    config_dict["username"] = args.username
+    if getattr(args, "password", None):
+        password_prompt = getpass(messages.INSIGHTS_LOGIN_PASSWORD)
+        check_if_prompt_is_not_empty(password_prompt)
+        validate_username_and_password(password_prompt)
+        config_dict["password"] = password_prompt
+    return config_dict

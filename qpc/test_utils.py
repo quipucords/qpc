@@ -10,8 +10,8 @@
 """Test qpc cred utils."""
 import pytest
 
-from qpc.cred.utils import check_if_prompt_is_not_empty
 from qpc.messages import PROMPT_INPUT
+from qpc.utils import check_if_prompt_is_not_empty
 
 
 @pytest.mark.parametrize("pass_prompt", ["", None])

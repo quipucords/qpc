@@ -341,6 +341,7 @@ SERVER_TOO_OLD_FOR_CLI = 'The CLI requires a minimum server version of %s.  '\
 OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."
 INSIGHTS_ADD_USERNAME_USER_HELP = "The username used to log in to insights."
 INSIGHTS_ADD_PASS_USER_HELP = "The password used to log in to insights."
+INSIGHTS_LOGIN_PASSWORD = "Provide a password for insights authentication: "
 INSIGHTS_LOGIN_CONFIG_SUCCESS = (
     "Insights username and password were successfully saved."
 )

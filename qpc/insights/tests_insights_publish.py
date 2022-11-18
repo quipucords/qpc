@@ -20,25 +20,6 @@ from qpc import messages
 from qpc.cli import CLI
 from qpc.insights import INGRESS_REPORT_URI, INSIGHTS_PATH_SUFFIX, REPORT_URI
 from qpc.insights.publish import InsightsPublishCommand
-from qpc.utils import write_server_config
-
-
-@pytest.fixture(autouse=True)
-def _setup_server_config_file():
-    """
-    Create server config with require_token set to False.
-
-    Since all cli commands require qpc config and qpc login to be executed,
-    require_token must be False, to avoid passing login info
-    """
-    return write_server_config(
-        {
-            "host": "127.0.0.1",
-            "port": 8000,
-            "use_http": True,
-            "require_token": False,
-        }
-    )
 
 
 @pytest.fixture

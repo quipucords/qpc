@@ -16,7 +16,10 @@ from logging import getLogger
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
 from qpc.exceptions import QPCError
-from qpc.insights.utils import validate_username_and_password
+from qpc.insights.utils import (
+    build_insights_login_config_dict,
+    validate_username_and_password,
+)
 from qpc.translation import _
 from qpc.utils import write_insights_login_config
 
@@ -54,18 +57,14 @@ class InsightsAddLoginCommand(CliCommand):
         self.parser.add_argument(
             "--password",
             dest="password",
-            type=validate_username_and_password,
-            metavar="PASSWORD",
             help=_(messages.INSIGHTS_ADD_PASS_USER_HELP),
+            action="store_true",
             required=True,
         )
 
     def _do_command(self):
         """Persist insights login configuration."""
-        login_config = {
-            "username": self.args.username,
-            "password": self.args.password,
-        }
+        login_config = build_insights_login_config_dict(self.args)
         try:
             write_insights_login_config(login_config)
         except QPCError as err:

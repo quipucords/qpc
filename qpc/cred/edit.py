@@ -57,6 +57,12 @@ class CredEditCommand(CliCommand):
             help=_(messages.CRED_PWD_HELP),
         )
         group.add_argument(
+            "--token",
+            dest="token",
+            action="store_true",
+            help=_(messages.CRED_TOKEN_HELP),
+        )
+        group.add_argument(
             "--sshkeyfile",
             dest="filename",
             metavar="FILENAME",
@@ -86,12 +92,6 @@ class CredEditCommand(CliCommand):
             dest="become_password",
             action="store_true",
             help=_(messages.CRED_BECOME_PASSWORD_HELP),
-        )
-        self.parser.add_argument(
-            "--token",
-            dest="token",
-            action="store_true",
-            help=_(messages.CRED_TOKEN_HELP),
         )
         self.cred_type = None
 

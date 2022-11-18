@@ -184,3 +184,44 @@ class TestOpenShiftEditCredential:
         out, err = capsys.readouterr()
         assert out == ""
         assert "error: unrecognized arguments: --type satellite" in err
+
+    def test_edit_with_token_and_password_as_args(
+        self,
+        capsys,
+    ):
+        """Test openshift cred edit with password and token args."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "edit",
+            "--name",
+            "openshift_cred",
+            "--password",
+            "--token",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "argument --token: not allowed with argument --password" in err
+
+    def test_edit_with_token_and_sshkeyfile_as_args(
+        self,
+        capsys,
+    ):
+        """Test openshift cred edit with token and sshkeyfile args."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "edit",
+            "--name",
+            "openshift_cred",
+            "--sshkeyfile",
+            "mock_path/test.pem",
+            "--token",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert "argument --token: not allowed with argument --sshkeyfile" in err

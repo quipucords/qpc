@@ -18,6 +18,8 @@ import os
 import sys
 from glob import glob
 
+from requests import codes
+
 from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
@@ -25,8 +27,6 @@ from qpc.report import utils
 from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
-
-from requests import codes
 
 # pylint: disable=invalid-name
 try:
@@ -49,21 +49,46 @@ class ReportMergeCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), PUT,
-                            report.ASYNC_MERGE_URI, [codes.created])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            PUT,
+            report.ASYNC_MERGE_URI,
+            [codes.created],
+        )
         group = self.parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('--job-ids', dest='scan_job_ids', nargs='+',
-                           metavar='SCAN_JOB_IDS', default=[],
-                           help=_(messages.REPORT_SCAN_JOB_IDS_HELP))
-        group.add_argument('--report-ids', dest='report_ids', nargs='+',
-                           metavar='REPORT_IDS', default=[],
-                           help=_(messages.REPORT_REPORT_IDS_HELP))
-        group.add_argument('--json-files', dest='json_files', nargs='+',
-                           metavar='JSON_FILES', default=[],
-                           help=_(messages.REPORT_JSON_FILE_HELP))
-        group.add_argument('--json-directory', dest='json_dir', nargs='+',
-                           help=_(messages.REPORT_JSON_DIR_HELP))
+        group.add_argument(
+            "--job-ids",
+            dest="scan_job_ids",
+            nargs="+",
+            metavar="SCAN_JOB_IDS",
+            default=[],
+            help=_(messages.REPORT_SCAN_JOB_IDS_HELP),
+        )
+        group.add_argument(
+            "--report-ids",
+            dest="report_ids",
+            nargs="+",
+            metavar="REPORT_IDS",
+            default=[],
+            help=_(messages.REPORT_REPORT_IDS_HELP),
+        )
+        group.add_argument(
+            "--json-files",
+            dest="json_files",
+            nargs="+",
+            metavar="JSON_FILES",
+            default=[],
+            help=_(messages.REPORT_JSON_FILE_HELP),
+        )
+        group.add_argument(
+            "--json-directory",
+            dest="json_dir",
+            nargs="+",
+            help=_(messages.REPORT_JSON_DIR_HELP),
+        )
         self.json = None
         self.report_ids = None
 
@@ -79,14 +104,13 @@ class ReportMergeCommand(CliCommand):
         report_not_found = []
         for scan_job_id in set(self.args.scan_job_ids):
             # check for existence of scan_job
-            path = SCAN_JOB_URI + str(scan_job_id) + '/'
-            response = request(parser=self.parser, method=GET,
-                               path=path,
-                               params=None,
-                               payload=None)
+            path = SCAN_JOB_URI + str(scan_job_id) + "/"
+            response = request(
+                parser=self.parser, method=GET, path=path, params=None, payload=None
+            )
             if response.status_code == codes.ok:  # pylint: disable=no-member
                 json_data = response.json()
-                report_id = json_data.get('report_id', None)
+                report_id = json_data.get("report_id", None)
                 if report_id:
                     report_ids.append(report_id)
                 else:
@@ -115,8 +139,10 @@ class ReportMergeCommand(CliCommand):
         if all_sources == []:
             print(_(messages.REPORT_JSON_DIR_ALL_FAIL))
             sys.exit(1)
-        self.json = {utils.SOURCES_KEY: all_sources,
-                     utils.REPORT_TYPE_KEY: utils.DETAILS_REPORT_TYPE}
+        self.json = {
+            utils.SOURCES_KEY: all_sources,
+            utils.REPORT_TYPE_KEY: utils.DETAILS_REPORT_TYPE,
+        }
 
     def _merge_json(self):
         """Combine the sources for each json file provided.
@@ -140,7 +166,7 @@ class ReportMergeCommand(CliCommand):
         if os.path.isdir(path) is not True:
             print(_(messages.REPORT_JSON_DIR_NOT_FOUND % path))
             sys.exit(1)
-        json_files = glob(os.path.join(path, '*.json'))
+        json_files = glob(os.path.join(path, "*.json"))
         if json_files == []:
             print(_(messages.REPORT_JSON_DIR_NO_FILES % path))
             sys.exit(1)
@@ -151,14 +177,17 @@ class ReportMergeCommand(CliCommand):
         report_ids = []
         if self.args.scan_job_ids:
             # check for existence of jobs & get report ids
-            not_found, report_ids, job_not_found, report_not_found = \
-                self._get_report_ids()
+            (
+                not_found,
+                report_ids,
+                job_not_found,
+                report_not_found,
+            ) = self._get_report_ids()
             if not_found is True:
                 if job_not_found:
                     print(_(messages.REPORT_SJS_DO_NOT_EXIST % job_not_found))
                 if report_not_found:
-                    print(_(messages.REPORTS_REPORTS_DO_NOT_EXIST %
-                            report_not_found))
+                    print(_(messages.REPORTS_REPORTS_DO_NOT_EXIST % report_not_found))
                 sys.exit(1)
         elif self.args.report_ids:
             report_ids = self.args.report_ids
@@ -179,24 +208,26 @@ class ReportMergeCommand(CliCommand):
         else:
             self.req_method = PUT
             self.req_payload = {
-                'reports': self.report_ids,
+                "reports": self.report_ids,
             }
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        if json_data.get('id'):
-            print(_(messages.REPORT_SUCCESSFULLY_MERGED % (
-                json_data.get('id'),
-                PKG_NAME,
-                json_data.get('id'))))
+        if json_data.get("id"):
+            print(
+                _(
+                    messages.REPORT_SUCCESSFULLY_MERGED
+                    % (json_data.get("id"), PKG_NAME, json_data.get("id"))
+                )
+            )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         json_data = self.response.json()
-        reports = json_data.get('reports')
+        reports = json_data.get("reports")
         if reports:
-            print(json_data.get('reports')[0])
+            print(json_data.get("reports")[0])
             sys.exit(1)
 
-        print('No reports found.  Error json: ')
+        print("No reports found.  Error json: ")
         print(json_data)
         sys.exit(1)

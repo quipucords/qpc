@@ -19,26 +19,33 @@ import sys
 import time
 from shutil import copyfile
 
-import qpc.insights as insights
-from qpc import messages, scan
-from qpc.clicommand import CliCommand
-from qpc.insights.utils import (InsightsCommands,
-                                check_insights_install,
-                                check_insights_version,
-                                check_successful_upload,
-                                format_subprocess_stderr,
-                                format_upload_success)
-from qpc.request import GET, request
-from qpc.translation import _
-from qpc.utils import (validate_write_file,
-                       write_file)
-
 # pylint: disable=no-name-in-module,import-error
 from requests import codes
 
-CANONICAL_FACTS = ['bios_uuid', 'etc_machine_id', 'insights_client_id',
-                   'ip_addresses', 'mac_addresses',
-                   'subscription_manager_id', 'vm_uuid']
+import qpc.insights as insights
+from qpc import messages, scan
+from qpc.clicommand import CliCommand
+from qpc.insights.utils import (
+    InsightsCommands,
+    check_insights_install,
+    check_insights_version,
+    check_successful_upload,
+    format_subprocess_stderr,
+    format_upload_success,
+)
+from qpc.request import GET, request
+from qpc.translation import _
+from qpc.utils import validate_write_file, write_file
+
+CANONICAL_FACTS = [
+    "bios_uuid",
+    "etc_machine_id",
+    "insights_client_id",
+    "ip_addresses",
+    "mac_addresses",
+    "subscription_manager_id",
+    "vm_uuid",
+]
 
 
 def verify_report_hosts(hosts):
@@ -76,63 +83,88 @@ class InsightsUploadCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            insights.REPORT_URI, [codes.ok])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            insights.REPORT_URI,
+            [codes.ok],
+        )
         input_group = self.parser.add_mutually_exclusive_group(required=True)
-        input_group.add_argument('--report', dest='report_id',
-                                 metavar='REPORT_ID',
-                                 help=_(messages.INSIGHTS_REPORT_ID_HELP))
-        input_group.add_argument('--scan-job', dest='scan_job_id',
-                                 metavar='SCAN_JOB_ID',
-                                 help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP))
-        input_group.add_argument('--input-file', dest='input_file', metavar='INPUT_FILE',
-                                 help=_(messages.INSIGHTS_INPUT_GZIP_HELP))
+        input_group.add_argument(
+            "--report",
+            dest="report_id",
+            metavar="REPORT_ID",
+            help=_(messages.INSIGHTS_REPORT_ID_HELP),
+        )
+        input_group.add_argument(
+            "--scan-job",
+            dest="scan_job_id",
+            metavar="SCAN_JOB_ID",
+            help=_(messages.INSIGHTS_SCAN_JOB_ID_HELP),
+        )
+        input_group.add_argument(
+            "--input-file",
+            dest="input_file",
+            metavar="INPUT_FILE",
+            help=_(messages.INSIGHTS_INPUT_GZIP_HELP),
+        )
 
-        self.parser.add_argument('--no-gpg', dest='no_gpg', action='store_true',
-                                 help=_(messages.INSIGHTS_NO_GPG_HELP))
-        self.tmp_tar_name = '/tmp/insights_tmp_%s.tar.gz' % (
-            time.strftime('%Y%m%d_%H%M%S'))
+        self.parser.add_argument(
+            "--no-gpg",
+            dest="no_gpg",
+            action="store_true",
+            help=_(messages.INSIGHTS_NO_GPG_HELP),
+        )
+        self.tmp_tar_name = "/tmp/insights_tmp_%s.tar.gz" % (
+            time.strftime("%Y%m%d_%H%M%S")
+        )
         # Don't change this when you upgrade versions
-        self.min_server_version = '0.9.0'
+        self.min_server_version = "0.9.0"
         self.insights_command = None
         self.report_id = None
 
     def _check_insights_install(self):
         connection_test_command = self.insights_command.test_connection()
-        process = subprocess.Popen(connection_test_command,
-                                   stderr=subprocess.PIPE)
+        process = subprocess.Popen(connection_test_command, stderr=subprocess.PIPE)
         streamdata = format_subprocess_stderr(process)
         install_check = check_insights_install(streamdata)
         if not install_check:
-            print(_(messages.BAD_INSIGHTS_INSTALL %
-                    (' '.join(connection_test_command))))
+            print(
+                _(messages.BAD_INSIGHTS_INSTALL % (" ".join(connection_test_command)))
+            )
             sys.exit(1)
 
     def _check_insights_version(self):
         version_command = self.insights_command.version()
-        process = subprocess.Popen(version_command,
-                                   stderr=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            version_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
-        version_check = check_insights_version(streamdata,
-                                               insights.CLIENT_VERSION,
-                                               insights.CORE_VERSION)
-        if not version_check['results'] or code != 0:
-            if 'client' in version_check.keys():
-                print(_(messages.BAD_CLIENT_VERSION %
-                        (version_check['client'],
-                         insights.CLIENT_VERSION)))
-            if 'core' in version_check.keys():
-                print(_(messages.BAD_CORE_VERSION %
-                        (version_check['core'],
-                         insights.CORE_VERSION)))
-            if 'error' in version_check.keys():
-                print(_(messages.ERROR_INSIGHTS_VERSION %
-                        (version_check['error'])))
-            print(_(messages.CHECK_VERSION %
-                    (' '.join(version_command))))
+        version_check = check_insights_version(
+            streamdata, insights.CLIENT_VERSION, insights.CORE_VERSION
+        )
+        if not version_check["results"] or code != 0:
+            if "client" in version_check.keys():
+                print(
+                    _(
+                        messages.BAD_CLIENT_VERSION
+                        % (version_check["client"], insights.CLIENT_VERSION)
+                    )
+                )
+            if "core" in version_check.keys():
+                print(
+                    _(
+                        messages.BAD_CORE_VERSION
+                        % (version_check["core"], insights.CORE_VERSION)
+                    )
+                )
+            if "error" in version_check.keys():
+                print(_(messages.ERROR_INSIGHTS_VERSION % (version_check["error"])))
+            print(_(messages.CHECK_VERSION % (" ".join(version_command))))
             sys.exit(1)
 
     def _validate_args(self):
@@ -141,7 +173,7 @@ class InsightsUploadCommand(CliCommand):
 
         # Validate target report output location
         try:
-            validate_write_file(self.tmp_tar_name, 'tmp_tar_name')
+            validate_write_file(self.tmp_tar_name, "tmp_tar_name")
         except ValueError:
             print(_(messages.INSIGHTS_TMP_ERROR % self.tmp_tar_name))
             sys.exit(1)
@@ -168,7 +200,7 @@ class InsightsUploadCommand(CliCommand):
             print(_(messages.INSIGHTS_LOCAL_REPORT_NOT % input_file))
             sys.exit(1)
 
-        if 'tar.gz' not in self.args.input_file:
+        if "tar.gz" not in self.args.input_file:
             print(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ % input_file))
             sys.exit(1)
 
@@ -180,52 +212,60 @@ class InsightsUploadCommand(CliCommand):
         self.report_id = None
         if self.args.report_id is None:
             # Make request to convert scan_job_id to self.report_id
-            scan_job_response = request(parser=self.parser, method=GET,
-                                        path='%s%s' % (scan.SCAN_JOB_URI,
-                                                       self.args.scan_job_id),
-                                        payload=None)
+            scan_job_response = request(
+                parser=self.parser,
+                method=GET,
+                path="%s%s" % (scan.SCAN_JOB_URI, self.args.scan_job_id),
+                payload=None,
+            )
             if scan_job_response.status_code == codes.ok:  # pylint: disable=no-member
                 json_data = scan_job_response.json()
-                self.report_id = json_data.get('report_id')
+                self.report_id = json_data.get("report_id")
                 if self.report_id is None:
-                    print(_(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ %
-                            self.args.scan_job_id))
+                    print(
+                        _(
+                            messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ
+                            % self.args.scan_job_id
+                        )
+                    )
                     sys.exit(1)
             else:
-                print(_(messages.REPORT_SJ_DOES_NOT_EXIST %
-                        self.args.scan_job_id))
+                print(_(messages.REPORT_SJ_DOES_NOT_EXIST % self.args.scan_job_id))
                 sys.exit(1)
 
             # Log report ID that was obtained from scanjob
-            print(_(messages.INSIGHTS_SCAN_JOB_ID_PRODUCED %
-                    (self.args.scan_job_id,
-                     self.report_id)))
+            print(
+                _(
+                    messages.INSIGHTS_SCAN_JOB_ID_PRODUCED
+                    % (self.args.scan_job_id, self.report_id)
+                )
+            )
         else:
             self.report_id = self.args.report_id
 
         # Request report from QCP server
         print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
-        headers = {'Accept': 'application/gzip'}
-        report_path = '%s%s%s' % (
+        headers = {"Accept": "application/gzip"}
+        report_path = "%s%s%s" % (
             insights.REPORT_URI,
             str(self.report_id),
-            insights.INSIGHTS_PATH_SUFFIX)
-        report_response = request(parser=self.parser,
-                                  method=GET,
-                                  path=report_path,
-                                  headers=headers,
-                                  payload=None,
-                                  min_server_version=self.min_server_version)
+            insights.INSIGHTS_PATH_SUFFIX,
+        )
+        report_response = request(
+            parser=self.parser,
+            method=GET,
+            path=report_path,
+            headers=headers,
+            payload=None,
+            min_server_version=self.min_server_version,
+        )
 
         if report_response.status_code != codes.ok:  # pylint: disable=no-member
-            print(_(messages.INSIGHTS_REPORT_NOT_FOUND %
-                    self.report_id))
+            print(_(messages.INSIGHTS_REPORT_NOT_FOUND % self.report_id))
             sys.exit(1)
 
         # write file content to disk
-        write_file(self.tmp_tar_name,
-                   report_response.content,
-                   True)
+        write_file(self.tmp_tar_name, report_response.content, True)
 
     def _do_command(self):
         """Execute command flow.
@@ -244,7 +284,12 @@ class InsightsUploadCommand(CliCommand):
         report_check = check_successful_upload(streamdata)
         print(_(messages.INSIGHTS_UPLOAD_REPORT % self.report_id))
         if not report_check or code != 0:
-            print(_(messages.BAD_INSIGHTS_UPLOAD % (self.report_id, (' '.join(upload_command)))))
+            print(
+                _(
+                    messages.BAD_INSIGHTS_UPLOAD
+                    % (self.report_id, (" ".join(upload_command)))
+                )
+            )
             os.remove(self.tmp_tar_name)
             sys.exit(1)
 

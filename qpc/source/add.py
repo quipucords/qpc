@@ -13,6 +13,8 @@
 
 import sys
 
+from requests import codes
+
 from qpc import cred, messages, source
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
@@ -20,8 +22,6 @@ from qpc.request import GET, POST, request
 from qpc.source.utils import build_source_payload, validate_port
 from qpc.translation import _
 from qpc.utils import read_in_file
-
-from requests import codes
 
 
 class SourceAddCommand(CliCommand):
@@ -133,46 +133,53 @@ class SourceAddCommand(CliCommand):
     def _validate_args(self):
         CliCommand._validate_args(self)
 
-        if ('hosts' in self.args and self.args.hosts and
-                len(self.args.hosts) == 1):
+        if "hosts" in self.args and self.args.hosts and len(self.args.hosts) == 1:
             # check if a file and read in values
             try:
                 self.args.hosts = read_in_file(self.args.hosts[0])
             except ValueError:
                 pass
 
-        if ('exclude_hosts' in self.args and self.args.exclude_hosts and
-                len(self.args.exclude_hosts) == 1):
+        if (
+            "exclude_hosts" in self.args
+            and self.args.exclude_hosts
+            and len(self.args.exclude_hosts) == 1
+        ):
             # check if a file and read in values
             try:
-                self.args.exclude_hosts = \
-                    read_in_file(self.args.exclude_hosts[0])
+                self.args.exclude_hosts = read_in_file(self.args.exclude_hosts[0])
             except ValueError:
                 pass
 
         # check for valid cred values
-        cred_list = ','.join(self.args.cred)
-        response = request(parser=self.parser, method=GET,
-                           path=cred.CREDENTIAL_URI,
-                           params={'name': cred_list},
-                           payload=None)
+        cred_list = ",".join(self.args.cred)
+        response = request(
+            parser=self.parser,
+            method=GET,
+            path=cred.CREDENTIAL_URI,
+            params={"name": cred_list},
+            payload=None,
+        )
         if response.status_code == codes.ok:  # pylint: disable=no-member
             json_data = response.json()
-            count = json_data.get('count', 0)
-            results = json_data.get('results', [])
+            count = json_data.get("count", 0)
+            results = json_data.get("results", [])
             if count == len(self.args.cred):
                 self.args.credentials = []
-                results_by_name_dict = {cred['name']: cred for cred in results}
+                results_by_name_dict = {cred["name"]: cred for cred in results}
                 for cred_name in self.args.cred:
-                    self.args.credentials.append(
-                        results_by_name_dict[cred_name]['id'])
+                    self.args.credentials.append(results_by_name_dict[cred_name]["id"])
             else:
                 for cred_entry in results:
-                    cred_name = cred_entry['name']
+                    cred_name = cred_entry["name"]
                     self.args.cred.remove(cred_name)
-                not_found_str = ','.join(self.args.cred)
-                print(_(messages.SOURCE_ADD_CREDS_NOT_FOUND %
-                        (not_found_str, self.args.name)))
+                not_found_str = ",".join(self.args.cred)
+                print(
+                    _(
+                        messages.SOURCE_ADD_CREDS_NOT_FOUND
+                        % (not_found_str, self.args.name)
+                    )
+                )
                 sys.exit(1)
         else:
             print(_(messages.SOURCE_ADD_CRED_PROCESS_ERR % self.args.name))

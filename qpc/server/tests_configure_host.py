@@ -36,73 +36,94 @@ class ConfigureHostTests(unittest.TestCase):
         """Remove test case setup."""
         # Reset server config to default ip/port
         config_out = StringIO()
-        sys.argv = ['/bin/qpc', 'server', 'config',
-                    '--host', '127.0.0.1', '--port', str(DEFAULT_PORT)]
+        sys.argv = [
+            "/bin/qpc",
+            "server",
+            "config",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            str(DEFAULT_PORT),
+        ]
 
         with redirect_stdout(config_out):
             CLI().main()
             config = read_server_config()
-            self.assertEqual(config['host'], '127.0.0.1')
-            self.assertEqual(config['port'], DEFAULT_PORT)
-            self.assertEqual(config_out.getvalue(),
-                             messages.SERVER_CONFIG_SUCCESS % ('https',
-                                                               '127.0.0.1',
-                                                               str(DEFAULT_PORT)) + '\n')
+            self.assertEqual(config["host"], "127.0.0.1")
+            self.assertEqual(config["port"], DEFAULT_PORT)
+            self.assertEqual(
+                config_out.getvalue(),
+                messages.SERVER_CONFIG_SUCCESS
+                % ("https", "127.0.0.1", str(DEFAULT_PORT))
+                + "\n",
+            )
         # Restore stderr
         sys.stderr = self.orig_stderr
 
     def test_config_host_req_args_err(self):
         """Testing the configure server requires host arg."""
         with self.assertRaises(SystemExit):
-            sys.argv = ['/bin/qpc', 'server', 'config']
+            sys.argv = ["/bin/qpc", "server", "config"]
             CLI().main()
 
     def test_config_host_alpha_port_err(self):
         """Testing the configure server requires bad port."""
         with self.assertRaises(SystemExit):
-            sys.argv = ['/bin/qpc', 'server', 'config',
-                        '--host', '127.0.0.1', '--port', 'abc']
+            sys.argv = [
+                "/bin/qpc",
+                "server",
+                "config",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "abc",
+            ]
             CLI().main()
 
     def test_success_config_server(self):
         """Testing the configure server green path."""
         config_out = StringIO()
-        sys.argv = ['/bin/qpc', 'server', 'config',
-                    '--host', '127.0.0.1', '--port', '8005']
+        sys.argv = [
+            "/bin/qpc",
+            "server",
+            "config",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8005",
+        ]
         with redirect_stdout(config_out):
             CLI().main()
             config = read_server_config()
-            self.assertEqual(config['host'], '127.0.0.1')
-            self.assertEqual(config['port'], 8005)
-            self.assertEqual(config_out.getvalue(),
-                             messages.SERVER_CONFIG_SUCCESS % ('https',
-                                                               '127.0.0.1',
-                                                               '8005') + '\n')
+            self.assertEqual(config["host"], "127.0.0.1")
+            self.assertEqual(config["port"], 8005)
+            self.assertEqual(
+                config_out.getvalue(),
+                messages.SERVER_CONFIG_SUCCESS % ("https", "127.0.0.1", "8005") + "\n",
+            )
 
     def test_config_server_default_port(self):
         """Testing the configure server default port."""
-        sys.argv = ['/bin/qpc', 'server', 'config',
-                    '--host', '127.0.0.1']
+        sys.argv = ["/bin/qpc", "server", "config", "--host", "127.0.0.1"]
         CLI().main()
         config = read_server_config()
-        self.assertEqual(config['host'], '127.0.0.1')
-        self.assertEqual(config['port'], DEFAULT_PORT)
+        self.assertEqual(config["host"], "127.0.0.1")
+        self.assertEqual(config["port"], DEFAULT_PORT)
 
     def test_invalid_configuration(self):
         """Test reading bad JSON on cli start."""
         write_server_config({})
 
-        sys.argv = ['/bin/qpc', 'server', 'config',
-                    '--host', '127.0.0.1']
+        sys.argv = ["/bin/qpc", "server", "config", "--host", "127.0.0.1"]
         CLI().main()
         config = read_server_config()
-        self.assertEqual(config['host'], '127.0.0.1')
-        self.assertEqual(config['port'], DEFAULT_PORT)
+        self.assertEqual(config["host"], "127.0.0.1")
+        self.assertEqual(config["port"], DEFAULT_PORT)
 
     def test_run_command_no_config(self):
         """Test running command without config."""
         write_server_config({})
 
         with self.assertRaises(SystemExit):
-            sys.argv = ['/bin/qpc', 'cred']
+            sys.argv = ["/bin/qpc", "cred"]
             CLI().main()

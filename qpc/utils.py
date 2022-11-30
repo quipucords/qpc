@@ -27,9 +27,9 @@ from qpc import messages
 from qpc.insights.exceptions import QPCEncryptionKeyError, QPCLoginConfigError
 from qpc.translation import _ as t
 
-QPC_PATH = 'qpc'
-CONFIG_HOME_PATH = '~/.config/'
-DATA_HOME_PATH = '~/.local/share/'
+QPC_PATH = "qpc"
+CONFIG_HOME_PATH = "~/.config/"
+DATA_HOME_PATH = "~/.local/share/"
 CONFIG_HOME = os.path.expanduser(CONFIG_HOME_PATH)
 DATA_HOME = os.path.expanduser(DATA_HOME_PATH)
 CONFIG_DIR = os.path.join(CONFIG_HOME, QPC_PATH)
@@ -42,11 +42,11 @@ INSIGHTS_LOGIN_CONFIG = os.path.join(CONFIG_DIR, "insights_login_config")
 
 INSIGHTS_ENCRYPTION = os.path.join(DATA_DIR, "insights_encryption")
 
-CONFIG_HOST_KEY = 'host'
-CONFIG_PORT_KEY = 'port'
-CONFIG_USE_HTTP = 'use_http'
-CONFIG_SSL_VERIFY = 'ssl_verify'
-CONFIG_REQUIRE_TOKEN = 'require_token'
+CONFIG_HOST_KEY = "host"
+CONFIG_PORT_KEY = "port"
+CONFIG_USE_HTTP = "use_http"
+CONFIG_SSL_VERIFY = "ssl_verify"
+CONFIG_REQUIRE_TOKEN = "require_token"
 
 INSIGHTS_CONFIG_USERNAME_KEY = "username"
 INSIGHTS_CONFIG_PASSWORD_KEY = "password"
@@ -63,11 +63,11 @@ DEFAULT_INSIGHTS_CONFIG = {
 
 LOG_LEVEL_INFO = 0
 
-QPC_MIN_SERVER_VERSION = '0.9.0'
+QPC_MIN_SERVER_VERSION = "0.9.0"
 
 # pylint: disable=invalid-name
 logging.captureWarnings(True)
-log = logging.getLogger('qpc')
+log = logging.getLogger("qpc")
 
 
 def ensure_config_dir_exists():
@@ -99,12 +99,13 @@ def get_server_location():
         return None
 
     use_http = config.get(CONFIG_USE_HTTP, False)
-    protocol = 'https'
+    protocol = "https"
     if use_http:
-        protocol = 'http'
+        protocol = "http"
 
-    server_location = '{}://{}:{}'.format(
-        protocol, config[CONFIG_HOST_KEY], config[CONFIG_PORT_KEY])
+    server_location = "{}://{}:{}".format(
+        protocol, config[CONFIG_HOST_KEY], config[CONFIG_PORT_KEY]
+    )
     return server_location
 
 
@@ -126,7 +127,7 @@ def read_client_token():
     with open(QPC_CLIENT_TOKEN) as client_token_file:
         try:
             token_json = json.load(client_token_file)
-            token = token_json.get('token')
+            token = token_json.get("token")
         except exception_class:
             pass
 
@@ -169,8 +170,7 @@ def read_server_config():
     """
     # pylint: disable=too-many-return-statements
     if not os.path.exists(QPC_SERVER_CONFIG):
-        log.error('Server config %s was not found.',
-                  QPC_SERVER_CONFIG)
+        log.error("Server config %s was not found.", QPC_SERVER_CONFIG)
         return None
 
     with open(QPC_SERVER_CONFIG) as server_config_file:
@@ -185,20 +185,26 @@ def read_server_config():
         ssl_verify = config.get(CONFIG_SSL_VERIFY, False)
         require_token = config.get(CONFIG_REQUIRE_TOKEN)
 
-        host_empty = host is None or host == ''
-        port_empty = port is None or port == ''
+        host_empty = host is None or host == ""
+        port_empty = port is None or port == ""
 
         if host_empty or port_empty:
             return None
 
         if not isinstance(host, str):
-            log.error('Server config %s has invalid value for host %s',
-                      QPC_SERVER_CONFIG, host)
+            log.error(
+                "Server config %s has invalid value for host %s",
+                QPC_SERVER_CONFIG,
+                host,
+            )
             return None
 
         if not isinstance(port, int):
-            log.error('Server config %s has invalid value for port %s',
-                      QPC_SERVER_CONFIG, port)
+            log.error(
+                "Server config %s has invalid value for port %s",
+                QPC_SERVER_CONFIG,
+                port,
+            )
             return None
 
         if use_http is None:
@@ -208,34 +214,52 @@ def read_server_config():
             require_token = True
 
         if not isinstance(use_http, bool):
-            log.error('Server config %s has invalid value for use_http %s',
-                      QPC_SERVER_CONFIG, use_http)
+            log.error(
+                "Server config %s has invalid value for use_http %s",
+                QPC_SERVER_CONFIG,
+                use_http,
+            )
             return None
 
         if not isinstance(require_token, bool):
-            log.error('Server config %s has invalid value for require_token %s',
-                      QPC_SERVER_CONFIG, require_token)
+            log.error(
+                "Server config %s has invalid value for require_token %s",
+                QPC_SERVER_CONFIG,
+                require_token,
+            )
             return None
 
-        if (ssl_verify is not None and
-                not isinstance(ssl_verify, bool) and
-                not isinstance(ssl_verify, str)):
-            log.error('Server config %s has invalid value for ssl_verify %s',
-                      QPC_SERVER_CONFIG, ssl_verify)
+        if (
+            ssl_verify is not None
+            and not isinstance(ssl_verify, bool)
+            and not isinstance(ssl_verify, str)
+        ):
+            log.error(
+                "Server config %s has invalid value for ssl_verify %s",
+                QPC_SERVER_CONFIG,
+                ssl_verify,
+            )
             return None
 
-        if (ssl_verify is not None and
-                isinstance(ssl_verify, str) and
-                not os.path.exists(ssl_verify)):
-            log.error('Server config %s has invalid path for ssl_verify %s',
-                      QPC_SERVER_CONFIG, ssl_verify)
+        if (
+            ssl_verify is not None
+            and isinstance(ssl_verify, str)
+            and not os.path.exists(ssl_verify)
+        ):
+            log.error(
+                "Server config %s has invalid path for ssl_verify %s",
+                QPC_SERVER_CONFIG,
+                ssl_verify,
+            )
             return None
 
-        return {CONFIG_HOST_KEY: host,
-                CONFIG_PORT_KEY: port,
-                CONFIG_USE_HTTP: use_http,
-                CONFIG_SSL_VERIFY: ssl_verify,
-                CONFIG_REQUIRE_TOKEN: require_token}
+        return {
+            CONFIG_HOST_KEY: host,
+            CONFIG_PORT_KEY: port,
+            CONFIG_USE_HTTP: use_http,
+            CONFIG_SSL_VERIFY: ssl_verify,
+            CONFIG_REQUIRE_TOKEN: require_token,
+        }
 
 
 def write_config(config_file_path, config_dict):
@@ -309,7 +333,7 @@ def write_client_token(client_token):
     """
     ensure_config_dir_exists()
 
-    with open(QPC_CLIENT_TOKEN, 'w') as configFile:
+    with open(QPC_CLIENT_TOKEN, "w") as configFile:
         json.dump(client_token, configFile)
 
 
@@ -371,10 +395,10 @@ def log_request_info(method, command, url, response_json, response_code):
     :param response_json: the response returned from the request
     :param response_code: the status code being returned (ie. 200)
     """
-    message = 'Method: "%s", Command: "%s", URL: "%s", '\
-              'Response: "%s", Status Code: "%s'
-    log.info(message, method, command, url,
-             response_json, response_code)
+    message = (
+        'Method: "%s", Command: "%s", URL: "%s", ' 'Response: "%s", Status Code: "%s'
+    )
+    log.info(message, method, command, url, response_json, response_code)
 
 
 def log_args(args):
@@ -395,24 +419,24 @@ def handle_error_response(response):
     try:
         response_data = response.json()
         if isinstance(response_data, str):
-            log.error('Error: %s', str(response_data))
+            log.error("Error: %s", str(response_data))
         if isinstance(response_data, dict):
             for err_key, err_cases in response_data.items():
-                error_context = 'Error'
-                if err_key not in ['non_field_errors', 'detail', 'options']:
+                error_context = "Error"
+                if err_key not in ["non_field_errors", "detail", "options"]:
                     error_context = err_key
                 if isinstance(err_cases, str):
-                    log.error('%s: %s', error_context, err_cases)
+                    log.error("%s: %s", error_context, err_cases)
                 elif isinstance(err_cases, dict):
-                    log.error('%s: %s', error_context, err_cases)
+                    log.error("%s: %s", error_context, err_cases)
                 else:
                     for err_msg in err_cases:
-                        log.error('%s: %s', error_context, err_msg)
+                        log.error("%s: %s", error_context, err_msg)
         elif isinstance(response_data, list):
             for err in response_data:
-                log.error('Error: %s', err)
+                log.error("Error: %s", err)
         else:
-            log.error('Error: %s', str(response_data))
+            log.error("Error: %s", str(response_data))
     except exception_class:
         pass
 
@@ -423,8 +447,7 @@ def pretty_print(json_data):
     :param json_data: the json data to pretty print
     :returns: the pretty print string of the json data
     """
-    return json.dumps(json_data, sort_keys=True, indent=4,
-                      separators=(',', ': '))
+    return json.dumps(json_data, sort_keys=True, indent=4, separators=(",", ": "))
 
 
 # Read in a file and make it a list
@@ -440,7 +463,7 @@ def read_in_file(filename):
     # pylint: disable=no-else-return
     if os.path.isfile(input_path):
         try:
-            with open(input_path, 'r') as in_file:
+            with open(input_path, "r") as in_file:
                 result = in_file.read().splitlines()
         except EnvironmentError as err:
             err_msg = t(messages.READ_FILE_ERROR % (input_path, err))
@@ -460,16 +483,14 @@ def validate_write_file(filename, param_name):
     """
     input_path = os.path.expanduser(os.path.expandvars(filename))
     if not input_path:
-        raise ValueError(
-            t(messages.REPORT_OUTPUT_CANNOT_BE_EMPTY % param_name))
+        raise ValueError(t(messages.REPORT_OUTPUT_CANNOT_BE_EMPTY % param_name))
     if os.path.isdir(input_path):
         raise ValueError(
-            t(messages.REPORT_OUTPUT_IS_A_DIRECTORY %
-              (param_name, input_path)))
+            t(messages.REPORT_OUTPUT_IS_A_DIRECTORY % (param_name, input_path))
+        )
     directory = os.path.dirname(input_path)
     if directory and not os.path.exists(directory):
-        raise ValueError(
-            t(messages.REPORT_DIRECTORY_DOES_NOT_EXIST % directory))
+        raise ValueError(t(messages.REPORT_DIRECTORY_DOES_NOT_EXIST % directory))
 
 
 def write_file(filename, content, binary=False):
@@ -481,9 +502,9 @@ def write_file(filename, content, binary=False):
     """
     result = None
     input_path = os.path.expanduser(os.path.expandvars(filename))
-    mode = 'w'
+    mode = "w"
     if binary:
-        mode = 'wb'
+        mode = "wb"
     with open(input_path, mode) as out_file:
         out_file.write(content)
     return result
@@ -496,10 +517,10 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
     :param print_pretty: Boolean to determine whether to return pretty
         print json (str) or normal json
     """
-    tar = tarfile.open(fileobj=io.BytesIO(fileobj_content), mode='r:gz')
+    tar = tarfile.open(fileobj=io.BytesIO(fileobj_content), mode="r:gz")
     json_file = tar.getmembers()[0]
     tar_info = tar.extractfile(json_file)
-    json_data = json.loads(tar_info.read().decode('utf-8'))
+    json_data = json.loads(tar_info.read().decode("utf-8"))
     if print_pretty:
         return pretty_print(json_data)
     return json_data
@@ -508,21 +529,20 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
 def create_tar_buffer(files_data):
     """Generate a file buffer based off a dictionary."""
     if not isinstance(files_data, (dict,)):
-        print('ERROR: files_data is not a dict')
+        print("ERROR: files_data is not a dict")
         return None
     if not all(isinstance(v, (str, dict)) for v in files_data.values()):
-        print('ERROR: Not correct structure for tar')
+        print("ERROR: Not correct structure for tar")
         return None
     tar_buffer = io.BytesIO()
-    with tarfile.open(fileobj=tar_buffer, mode='w:gz') as tar_file:
+    with tarfile.open(fileobj=tar_buffer, mode="w:gz") as tar_file:
         for file_name, file_content in files_data.items():
-            if file_name.endswith('json'):
-                file_buffer = \
-                    io.BytesIO(json.dumps(file_content).encode('utf-8'))
-            elif file_name.endswith('csv'):
-                file_buffer = io.BytesIO(file_content.encode('utf-8'))
+            if file_name.endswith("json"):
+                file_buffer = io.BytesIO(json.dumps(file_content).encode("utf-8"))
+            elif file_name.endswith("csv"):
+                file_buffer = io.BytesIO(file_content.encode("utf-8"))
             else:
-                print('ERROR: unknown file extension')
+                print("ERROR: unknown file extension")
                 return None
             info = tarfile.TarInfo(name=file_name)
             info.size = len(file_buffer.getvalue())

@@ -15,9 +15,9 @@
 
 import gettext
 
-T = gettext.translation('qpc', 'locale', fallback=True)
+T = gettext.translation("qpc", "locale", fallback=True)
 
-if hasattr(T, 'ugettext'):
+if hasattr(T, "ugettext"):
     # pylint: disable=no-member
     _ = T.ugettext
 else:

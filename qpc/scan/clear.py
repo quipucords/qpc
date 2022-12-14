@@ -15,13 +15,13 @@ from __future__ import print_function
 
 import sys
 
+from requests import codes
+
 from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.request import DELETE, GET, request
 from qpc.translation import _
 from qpc.utils import handle_error_response
-
-from requests import codes
 
 
 # pylint: disable=too-few-public-methods
@@ -37,24 +37,35 @@ class ScanClearCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), GET,
-                            scan.SCAN_URI, [codes.ok])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            GET,
+            scan.SCAN_URI,
+            [codes.ok],
+        )
         group = self.parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('--name', dest='name', metavar='NAME',
-                           help=_(messages.SCAN_NAME_HELP))
-        group.add_argument('--all', dest='all', action='store_true',
-                           help=_(messages.SCAN_CLEAR_ALL_HELP))
+        group.add_argument(
+            "--name", dest="name", metavar="NAME", help=_(messages.SCAN_NAME_HELP)
+        )
+        group.add_argument(
+            "--all",
+            dest="all",
+            action="store_true",
+            help=_(messages.SCAN_CLEAR_ALL_HELP),
+        )
 
     def _build_req_params(self):
         if self.args.name:
-            self.req_params = {'name': self.args.name}
+            self.req_params = {"name": self.args.name}
 
     def _delete_entry(self, scan_entry, print_out=True):
         deleted = False
-        delete_uri = scan.SCAN_URI + str(scan_entry['id']) + '/'
+        delete_uri = scan.SCAN_URI + str(scan_entry["id"]) + "/"
         response = request(DELETE, delete_uri, parser=self.parser)
-        name = scan_entry['name']
+        name = scan_entry["name"]
         # pylint: disable=no-member
         if response.status_code == codes.no_content:
             deleted = True
@@ -69,8 +80,8 @@ class ScanClearCommand(CliCommand):
     # pylint: disable=too-many-branches
     def _handle_response_success(self):
         json_data = self.response.json()
-        count = json_data.get('count', 0)
-        results = json_data.get('results', [])
+        count = json_data.get("count", 0)
+        results = json_data.get("results", [])
         if self.args.name and count == 0:
             print(_(messages.SCAN_NOT_FOUND % self.args.name))
             sys.exit(1)
@@ -81,7 +92,7 @@ class ScanClearCommand(CliCommand):
                 sys.exit(1)
         elif self.args.name and count > 1:
             for result in results:
-                if result['name'] == self.args.name:
+                if result["name"] == self.args.name:
                     if self._delete_entry(result) is False:
                         sys.exit(1)
         elif count == 0:
@@ -90,12 +101,12 @@ class ScanClearCommand(CliCommand):
         else:
             # remove all scan entries
             remove_error = []
-            next_link = json_data.get('next')
+            next_link = json_data.get("next")
             for entry in results:
                 if self._delete_entry(entry, print_out=False) is False:
-                    remove_error.append(entry['id'])
+                    remove_error.append(entry["id"])
             if remove_error != []:
-                scan_err = ','.join(str(remove_error))
+                scan_err = ",".join(str(remove_error))
                 print(_(messages.SCAN_PARTIAL_REMOVE % scan_err))
                 sys.exit(1)
             else:

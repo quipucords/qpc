@@ -13,34 +13,36 @@
 
 import json
 import sys
+
 # pylint: disable=no-name-in-module,import-error
 from distutils.version import LooseVersion
+
+import requests
 
 from qpc import messages
 from qpc.release import PKG_NAME
 from qpc.translation import _
-from qpc.utils import (CONFIG_HOST_KEY,
-                       CONFIG_PORT_KEY,
-                       CONFIG_USE_HTTP,
-                       QPC_MIN_SERVER_VERSION,
-                       get_server_location,
-                       get_ssl_verify,
-                       handle_error_response,
-                       log,
-                       log_request_info,
-                       read_client_token,
-                       read_server_config)
-
-import requests
-
+from qpc.utils import (
+    CONFIG_HOST_KEY,
+    CONFIG_PORT_KEY,
+    CONFIG_USE_HTTP,
+    QPC_MIN_SERVER_VERSION,
+    get_server_location,
+    get_ssl_verify,
+    handle_error_response,
+    log,
+    log_request_info,
+    read_client_token,
+    read_server_config,
+)
 
 # Need to determine how we get this information; config file at install?
 
-POST = 'POST'
-GET = 'GET'
-PATCH = 'PATCH'
-DELETE = 'DELETE'
-PUT = 'PUT'
+POST = "POST"
+GET = "GET"
+PATCH = "PATCH"
+DELETE = "DELETE"
+PUT = "PUT"
 
 CONNECTION_ERROR_MSG = messages.CONNECTION_ERROR_MSG
 
@@ -57,17 +59,22 @@ def handle_general_errors(response, min_server_version):
     :param response: The response object.
     :returns: The response object.
     """
-    server_version = response.headers.get('X-Server-Version')
+    server_version = response.headers.get("X-Server-Version")
     if not server_version:
         server_version = QPC_MIN_SERVER_VERSION
 
-    if '0.0.0' not in server_version and \
-            LooseVersion(server_version) < LooseVersion(min_server_version):
-        print(_(messages.SERVER_TOO_OLD_FOR_CLI %
-                (min_server_version, min_server_version, server_version)))
+    if "0.0.0" not in server_version and LooseVersion(server_version) < LooseVersion(
+        min_server_version
+    ):
+        print(
+            _(
+                messages.SERVER_TOO_OLD_FOR_CLI
+                % (min_server_version, min_server_version, server_version)
+            )
+        )
         sys.exit(1)
 
-    token_expired = {'detail': 'Token has expired'}
+    token_expired = {"detail": "Token has expired"}
     response_data = None
     try:
         response_data = response.json()
@@ -78,8 +85,7 @@ def handle_general_errors(response, min_server_version):
         handle_error_response(response)
         log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
-    elif (response.status_code == 400 and
-          response_data == token_expired):
+    elif response.status_code == 400 and response_data == token_expired:
         handle_error_response(response)
         log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
         sys.exit(1)
@@ -124,8 +130,7 @@ def patch(url, payload, headers=None):
     :returns: reponse object
     """
     ssl_verify = get_ssl_verify()
-    return requests.patch(url, json=payload, headers=headers,
-                          verify=ssl_verify)
+    return requests.patch(url, json=payload, headers=headers, verify=ssl_verify)
 
 
 def delete(url, headers=None):
@@ -152,8 +157,15 @@ def put(url, payload, headers=None):
 
 
 # pylint: disable=too-many-arguments, too-many-branches, too-many-locals
-def request(method, path, params=None, payload=None,
-            parser=None, headers=None, min_server_version=QPC_MIN_SERVER_VERSION):
+def request(
+    method,
+    path,
+    params=None,
+    payload=None,
+    parser=None,
+    headers=None,
+    min_server_version=QPC_MIN_SERVER_VERSION,
+):
     """Create a generic handler for passing to specific request methods.
 
     :param method: the request method to execute
@@ -177,38 +189,46 @@ def request(method, path, params=None, payload=None,
     if headers:
         req_headers.update(headers)
     if token:
-        req_headers['Authorization'] = 'Token {}'.format(token)
+        req_headers["Authorization"] = "Token {}".format(token)
 
     try:
         if method == POST:
-            result = handle_general_errors(post(url, payload, req_headers), min_server_version)
+            result = handle_general_errors(
+                post(url, payload, req_headers), min_server_version
+            )
         elif method == GET:
-            result = handle_general_errors(get(url, params, req_headers), min_server_version)
+            result = handle_general_errors(
+                get(url, params, req_headers), min_server_version
+            )
         elif method == PATCH:
-            result = handle_general_errors(patch(url, payload, req_headers), min_server_version)
+            result = handle_general_errors(
+                patch(url, payload, req_headers), min_server_version
+            )
         elif method == DELETE:
             result = handle_general_errors(delete(url, req_headers), min_server_version)
         elif method == PUT:
-            result = handle_general_errors(put(url, payload, req_headers), min_server_version)
+            result = handle_general_errors(
+                put(url, payload, req_headers), min_server_version
+            )
         else:
-            log.error('Unsupported request method %s', method)
+            log.error("Unsupported request method %s", method)
             parser.print_help()
             sys.exit(1)
         try:
-            log_request_info(method, log_command,
-                             url, result.json(), result.status_code)
+            log_request_info(
+                method, log_command, url, result.json(), result.status_code
+            )
         except ValueError:
-            log_request_info(method, log_command,
-                             url, result.text, result.status_code)
+            log_request_info(method, log_command, url, result.text, result.status_code)
         return result
     except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
         config = read_server_config()
         if config is not None:
-            protocol = 'https'
+            protocol = "https"
             host = config.get(CONFIG_HOST_KEY)
             port = config.get(CONFIG_PORT_KEY)
             if config.get(CONFIG_USE_HTTP):
-                protocol = 'http'
+                protocol = "http"
             log.error(_(CONNECTION_ERROR_MSG % (protocol, host, port)))
             log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
         else:

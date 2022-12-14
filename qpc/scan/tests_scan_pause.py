@@ -15,6 +15,9 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import requests
+import requests_mock
+
 from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_JOB_URI
@@ -22,12 +25,8 @@ from qpc.scan.pause import ScanPauseCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-import requests
-
-import requests_mock
-
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ScanPauseCliTests(unittest.TestCase):
@@ -49,11 +48,11 @@ class ScanPauseCliTests(unittest.TestCase):
     def test_pause_scan_ssl_err(self):
         """Testing the pause scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/pause/'
+        url = get_server_location() + SCAN_JOB_URI + "1/pause/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.SSLError)
             nsc = ScanPauseCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
@@ -62,39 +61,38 @@ class ScanPauseCliTests(unittest.TestCase):
     def test_pause_scan_conn_err(self):
         """Testing the pause scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/pause/'
+        url = get_server_location() + SCAN_JOB_URI + "1/pause/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
             nsc = ScanPauseCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(),
-                                     CONNECTION_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_pause_scan_internal_err(self):
         """Testing the pause scan command with an internal error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/pause/'
+        url = get_server_location() + SCAN_JOB_URI + "1/pause/"
         with requests_mock.Mocker() as mocker:
-            mocker.put(url, status_code=500, json={'error': ['Server Error']})
+            mocker.put(url, status_code=500, json={"error": ["Server Error"]})
             nsc = ScanPauseCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     nsc.main(args)
-                    self.assertEqual(scan_out.getvalue(), 'Server Error')
+                    self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_pause_scan_data(self):
         """Testing the pause scan command successfully with stubbed data."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + '1/pause/'
+        url = get_server_location() + SCAN_JOB_URI + "1/pause/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
             nsc = ScanPauseCommand(SUBPARSER)
-            args = Namespace(id='1')
+            args = Namespace(id="1")
             with redirect_stdout(scan_out):
                 nsc.main(args)
-                expected = messages.SCAN_PAUSED % '1' + '\n'
+                expected = messages.SCAN_PAUSED % "1" + "\n"
                 self.assertEqual(scan_out.getvalue(), expected)

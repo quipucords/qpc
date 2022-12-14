@@ -15,16 +15,15 @@ import sys
 import unittest
 from argparse import ArgumentParser, Namespace
 
+import requests_mock
+
 from qpc import utils
 from qpc.server import LOGOUT_URI
 from qpc.server.logout_host import LogoutHostCommand
 from qpc.tests_utilities import HushUpStderr
 
-import requests_mock
-
-
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class LogoutTests(unittest.TestCase):
@@ -36,7 +35,7 @@ class LogoutTests(unittest.TestCase):
         # nosetests command.
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
-        utils.write_server_config({'host': '127.0.0.1', 'port': 8000, 'use_http': True})
+        utils.write_server_config({"host": "127.0.0.1", "port": 8000, "use_http": True})
 
     def tearDown(self):
         """Remove test case setup."""

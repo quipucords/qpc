@@ -15,13 +15,13 @@ from __future__ import print_function
 
 from getpass import getpass
 
+from requests import codes
+
 from qpc import messages, server
 from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.translation import _
 from qpc.utils import delete_client_token, write_client_token
-
-from requests import codes
 
 
 # pylint: disable=too-few-public-methods
@@ -38,18 +38,30 @@ class LoginHostCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), POST,
-                            server.LOGIN_URI, [codes.ok])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            POST,
+            server.LOGIN_URI,
+            [codes.ok],
+        )
 
-        self.parser.add_argument('--username', dest='username',
-                                 metavar='USERNAME',
-                                 help=_(messages.LOGIN_USER_HELP),
-                                 required=False)
-        self.parser.add_argument('--password', dest='password',
-                                 metavar='PASSWORD',
-                                 help=_(messages.LOGIN_PASS_HELP),
-                                 required=False)
+        self.parser.add_argument(
+            "--username",
+            dest="username",
+            metavar="USERNAME",
+            help=_(messages.LOGIN_USER_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--password",
+            dest="password",
+            metavar="PASSWORD",
+            help=_(messages.LOGIN_PASS_HELP),
+            required=False,
+        )
         self.username = None
         self.password = None
 
@@ -57,13 +69,13 @@ class LoginHostCommand(CliCommand):
         CliCommand._validate_args(self)
 
         delete_client_token()
-        if 'username' in self.args and self.args.username:
+        if "username" in self.args and self.args.username:
             # check for file existence on system
             self.username = self.args.username
         else:
             self.username = input(_(messages.LOGIN_USERNAME_PROMPT))
 
-        if 'password' in self.args and self.args.password:
+        if "password" in self.args and self.args.password:
             self.password = self.args.password
         else:
             self.password = getpass()
@@ -73,8 +85,7 @@ class LoginHostCommand(CliCommand):
 
         :returns: a dictionary representing the credential being added
         """
-        self.req_payload = {'username': self.username,
-                            'password': self.password}
+        self.req_payload = {"username": self.username, "password": self.password}
 
     def _handle_response_success(self):
         json_data = self.response.json()

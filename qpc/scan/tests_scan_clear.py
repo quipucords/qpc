@@ -17,6 +17,9 @@ import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import requests
+import requests_mock
+
 from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_URI
@@ -24,12 +27,8 @@ from qpc.scan.clear import ScanClearCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-import requests
-
-import requests_mock
-
 PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest='subcommand')
+SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ScanClearCliTests(unittest.TestCase):
@@ -51,11 +50,11 @@ class ScanClearCliTests(unittest.TestCase):
     def test_clear_scan_ssl_err(self):
         """Testing the clear scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_URI + '?name=scan1'
+        url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
@@ -64,43 +63,43 @@ class ScanClearCliTests(unittest.TestCase):
     def test_clear_scan_conn_err(self):
         """Testing the clear scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_URI + '?name=scan1'
+        url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
-                    self.assertEqual(scan_out.getvalue(),
-                                     CONNECTION_ERROR_MSG)
+                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_clear_scan_internal_err(self):
         """Testing the clear scan command with an internal error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_URI + '?name=scan1'
+        url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=500, json={'error': ['Server Error']})
+            mocker.get(url, status_code=500, json={"error": ["Server Error"]})
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
-                    self.assertEqual(scan_out.getvalue(), 'Server Error')
+                    self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_clear_scan_empty(self):
         """Testing the clear scan command successfully with empty data."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_URI + '?name=scan1'
+        url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=200, json={'count': 0})
+            mocker.get(url, status_code=200, json={"count": 0})
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
-                    self.assertEqual(scan_out.getvalue(),
-                                     'scan "scan1" was not found\n')
+                    self.assertEqual(
+                        scan_out.getvalue(), 'scan "scan1" was not found\n'
+                    )
 
     def test_clear_by_name(self):
         """Testing the clear scan command.
@@ -108,19 +107,19 @@ class ScanClearCliTests(unittest.TestCase):
         Successfully with stubbed data when specifying a name
         """
         scan_out = StringIO()
-        get_url = get_server_location() + SCAN_URI + '?name=scan1'
-        delete_url = get_server_location() + SCAN_URI + '1/'
-        scan_entry = {'id': 1, 'name': 'scan1', 'sources': ['source1']}
+        get_url = get_server_location() + SCAN_URI + "?name=scan1"
+        delete_url = get_server_location() + SCAN_URI + "1/"
+        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
         results = [scan_entry]
-        data = {'count': 1, 'results': results}
+        data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=204)
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with redirect_stdout(scan_out):
                 ncc.main(args)
-                expected = messages.SCAN_REMOVED % 'scan1' + '\n'
+                expected = messages.SCAN_REMOVED % "scan1" + "\n"
                 self.assertEqual(scan_out.getvalue(), expected)
 
     def test_clear_by_name_err(self):
@@ -129,17 +128,17 @@ class ScanClearCliTests(unittest.TestCase):
         With stubbed data when specifying a name with an error response
         """
         scan_out = StringIO()
-        get_url = get_server_location() + SCAN_URI + '?name=scan1'
-        delete_url = get_server_location() + SCAN_URI + '1/'
-        scan_entry = {'id': 1, 'name': 'scan1', 'sources': ['source1']}
+        get_url = get_server_location() + SCAN_URI + "?name=scan1"
+        delete_url = get_server_location() + SCAN_URI + "1/"
+        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
         results = [scan_entry]
-        data = {'count': 1, 'results': results}
-        err_data = {'error': ['Server Error']}
+        data = {"count": 1, "results": results}
+        err_data = {"error": ["Server Error"]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=500, json=err_data)
             ncc = ScanClearCommand(SUBPARSER)
-            args = Namespace(name='scan1')
+            args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
@@ -154,13 +153,13 @@ class ScanClearCliTests(unittest.TestCase):
         scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json={'count': 0})
+            mocker.get(get_url, status_code=200, json={"count": 0})
             ncc = ScanClearCommand(SUBPARSER)
             args = Namespace(name=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
-                    expected = 'No scans exist to be removed\n'
+                    expected = "No scans exist to be removed\n"
                     self.assertEqual(scan_out.getvalue(), expected)
 
     def test_clear_all_with_error(self):
@@ -170,13 +169,13 @@ class ScanClearCliTests(unittest.TestCase):
         """
         scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI
-        delete_url = get_server_location() + SCAN_URI + '1/'
-        delete_url2 = get_server_location() + SCAN_URI + '2/'
-        scan_entry = {'id': 1, 'name': 'scan1', 'sources': ['source1']}
-        scan_entry2 = {'id': 2, 'name': 'scan2', 'sources': ['source1']}
+        delete_url = get_server_location() + SCAN_URI + "1/"
+        delete_url2 = get_server_location() + SCAN_URI + "2/"
+        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
+        scan_entry2 = {"id": 2, "name": "scan2", "sources": ["source1"]}
         results = [scan_entry, scan_entry2]
-        data = {'count': 2, 'results': results}
-        err_data = {'error': ['Server Error']}
+        data = {"count": 2, "results": results}
+        err_data = {"error": ["Server Error"]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=500, json=err_data)
@@ -186,21 +185,23 @@ class ScanClearCliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
                     ncc.main(args)
-                    expected = 'Some scans were removed, however and' \
-                               ' error occurred removing the following' \
-                               ' credentials:'
+                    expected = (
+                        "Some scans were removed, however and"
+                        " error occurred removing the following"
+                        " credentials:"
+                    )
                     self.assertTrue(expected in scan_out.getvalue())
 
     def test_clear_all(self):
         """Testing the clear scan command successfully with stubbed data."""
         scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI
-        delete_url = get_server_location() + SCAN_URI + '1/'
-        delete_url2 = get_server_location() + SCAN_URI + '2/'
-        scan_entry = {'id': 1, 'name': 'scan1', 'sources': ['source1']}
-        scan_entry2 = {'id': 2, 'name': 'scan2', 'sources': ['source1']}
+        delete_url = get_server_location() + SCAN_URI + "1/"
+        delete_url2 = get_server_location() + SCAN_URI + "2/"
+        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
+        scan_entry2 = {"id": 2, "name": "scan2", "sources": ["source1"]}
         results = [scan_entry, scan_entry2]
-        data = {'count': 2, 'results': results}
+        data = {"count": 2, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=204)
@@ -209,5 +210,5 @@ class ScanClearCliTests(unittest.TestCase):
             args = Namespace(name=None)
             with redirect_stdout(scan_out):
                 ncc.main(args)
-                expected = messages.SCAN_CLEAR_ALL_SUCCESS + '\n'
+                expected = messages.SCAN_CLEAR_ALL_SUCCESS + "\n"
                 self.assertEqual(scan_out.getvalue(), expected)

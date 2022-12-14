@@ -13,14 +13,14 @@
 
 from __future__ import print_function
 
+from requests import codes
+
 import qpc.cred as credential
 from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.cred.utils import build_credential_payload
 from qpc.request import POST
 from qpc.translation import _
-
-from requests import codes
 
 
 # pylint: disable=too-few-public-methods
@@ -37,9 +37,15 @@ class CredAddCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(self, self.SUBCOMMAND, self.ACTION,
-                            subparsers.add_parser(self.ACTION), POST,
-                            credential.CREDENTIAL_URI, [codes.created])
+        CliCommand.__init__(
+            self,
+            self.SUBCOMMAND,
+            self.ACTION,
+            subparsers.add_parser(self.ACTION),
+            POST,
+            credential.CREDENTIAL_URI,
+            [codes.created],
+        )
 
         self.parser.add_argument(
             "--name",

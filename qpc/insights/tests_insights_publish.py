@@ -152,7 +152,7 @@ class TestInsightsPublishCommand:
         caplog,
     ):
         """Testing if--input-file will accept files with inappropriate extensions."""
-        caplog.set_level("INFO")
+        caplog.set_level("ERROR")
         sys.argv = [
             "/bin/qpc",
             "insights",
@@ -170,7 +170,7 @@ class TestInsightsPublishCommand:
 
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
         """Testing if insights publish --input-file will accept dir as file."""
-        caplog.set_level("INFO")
+        caplog.set_level("ERROR")
         sys.argv = [
             "/bin/qpc",
             "insights",

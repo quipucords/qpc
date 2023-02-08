@@ -40,12 +40,7 @@ class SourceListCommand(CliCommand):
         self.parser.add_argument(
             "--type",
             dest="type",
-            choices=[
-                source.NETWORK_SOURCE_TYPE,
-                source.VCENTER_SOURCE_TYPE,
-                source.SATELLITE_SOURCE_TYPE,
-                source.OPENSHIFT_SOURCE_TYPE,
-            ],
+            choices=source.SOURCE_TYPE_CHOICES,
             metavar="TYPE",
             type=str.lower,
             help=_(messages.SOURCE_TYPE_FILTER_HELP),

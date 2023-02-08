@@ -9,6 +9,7 @@ from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.cred.utils import build_credential_payload
 from qpc.request import POST
+from qpc.source import SOURCE_TYPE_CHOICES
 from qpc.translation import _
 
 logger = getLogger(__name__)
@@ -48,12 +49,7 @@ class CredAddCommand(CliCommand):
         self.parser.add_argument(
             "--type",
             dest="type",
-            choices=[
-                credential.NETWORK_CRED_TYPE,
-                credential.VCENTER_CRED_TYPE,
-                credential.SATELLITE_CRED_TYPE,
-                credential.OPENSHIFT_CRED_TYPE,
-            ],
+            choices=SOURCE_TYPE_CHOICES,
             metavar="TYPE",
             help=_(messages.CRED_TYPE_HELP),
             type=str.lower,

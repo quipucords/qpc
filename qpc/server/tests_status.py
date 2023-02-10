@@ -73,7 +73,7 @@ class ServerStatusTests(unittest.TestCase):
                 self.assertEqual(
                     status_out.getvalue().strip(), messages.STATUS_SUCCESSFULLY_WRITTEN
                 )
-                with open(self.test_json_filename, "r") as json_file:
+                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_status_json_data, file_content_dict)

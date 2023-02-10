@@ -93,7 +93,7 @@ class ReportDetailsTests(unittest.TestCase):
                 self.assertEqual(
                     report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
                 )
-                with open(self.test_json_filename, "r") as json_file:
+                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_report_json_data, file_content_dict)
@@ -127,7 +127,7 @@ class ReportDetailsTests(unittest.TestCase):
                 self.assertEqual(
                     report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
                 )
-                with open(self.test_json_filename, "r") as json_file:
+                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_report_json_data, file_content_dict)
@@ -166,7 +166,7 @@ class ReportDetailsTests(unittest.TestCase):
                 self.assertEqual(
                     report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
                 )
-                with open(self.test_csv_filename, "r") as json_file:
+                with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                     print(file_content_dict)
@@ -459,7 +459,7 @@ class ReportDetailsTests(unittest.TestCase):
                 self.assertEqual(
                     report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
                 )
-                with open(self.test_csv_filename, "r") as json_file:
+                with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                     print(file_content_dict)

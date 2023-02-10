@@ -49,7 +49,7 @@ class CredentialAddCliTests(unittest.TestCase):
         sys.stderr = HushUpStderr()
         if os.path.isfile(TMP_KEY):
             os.remove(TMP_KEY)
-        with open(TMP_KEY, "w") as test_sshkey:
+        with open(TMP_KEY, "w", encoding="utf-8") as test_sshkey:
             test_sshkey.write("fake ssh keyfile.")
 
     def tearDown(self):

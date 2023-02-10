@@ -47,7 +47,7 @@ class SourceAddCliTests(unittest.TestCase):
         sys.stderr = HushUpStderr()
         if os.path.isfile(TMP_HOSTFILE):
             os.remove(TMP_HOSTFILE)
-        with open(TMP_HOSTFILE, "w") as test_hostfile:
+        with open(TMP_HOSTFILE, "w", encoding="utf-8") as test_hostfile:
             test_hostfile.write("1.2.3.4\n")
             test_hostfile.write("1.2.3.[1:10]\n")
 

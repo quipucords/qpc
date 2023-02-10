@@ -14,7 +14,10 @@ help:
 	@echo "  help                to show this message"
 	@echo "  install             to install the client egg"
 	@echo "  clean               to remove client egg"
-	@echo "  lint                to run the flake8/pylint linter"
+	@echo "  lint                to run all linters"
+	@echo "  lint-isort          to run the isort import order checker"
+	@echo "  lint-flake8         to run the flake8 linter"
+	@echo "  lint-black          to run the black format checker"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
@@ -31,8 +34,17 @@ install:
 lint:
 	tox -e lint
 
+lint-isort:
+	tox -e lint-isort
+
+lint-flake8:
+	tox -e lint-flake8
+
+lint-black:
+	tox -e lint-black
+
 test:
-	tox -e py36
+	tox -e py39
 
 test-coverage:
 	coverage run -m unittest discover qpc/ -v

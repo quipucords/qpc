@@ -120,17 +120,15 @@ class ReportDetailsCommand(CliCommand):
             response = request(
                 parser=self.parser,
                 method=GET,
-                path="%s%s" % (scan.SCAN_JOB_URI, self.args.scan_job_id),
+                path=f"{scan.SCAN_JOB_URI}{self.args.scan_job_id}",
                 payload=None,
             )
             if response.status_code == codes.ok:  # pylint: disable=no-member
                 json_data = response.json()
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
-                    self.req_path = "%s%s%s" % (
-                        self.req_path,
-                        self.report_id,
-                        report.DETAILS_PATH_SUFFIX,
+                    self.req_path = (
+                        f"{self.req_path}{self.report_id}{report.DETAILS_PATH_SUFFIX}"
                     )
                 else:
                     print(
@@ -145,10 +143,8 @@ class ReportDetailsCommand(CliCommand):
                 sys.exit(1)
         else:
             self.report_id = self.args.report_id
-            self.req_path = "%s%s%s" % (
-                self.req_path,
-                self.report_id,
-                report.DETAILS_PATH_SUFFIX,
+            self.req_path = (
+                f"{self.req_path}{self.report_id}{report.DETAILS_PATH_SUFFIX}"
             )
 
     def _handle_response_success(self):

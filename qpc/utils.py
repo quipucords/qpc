@@ -103,8 +103,8 @@ def get_server_location():
     if use_http:
         protocol = "http"
 
-    server_location = "{}://{}:{}".format(
-        protocol, config[CONFIG_HOST_KEY], config[CONFIG_PORT_KEY]
+    server_location = (
+        f"{protocol}://{config[CONFIG_HOST_KEY]}:{config[CONFIG_PORT_KEY]}"
     )
     return server_location
 

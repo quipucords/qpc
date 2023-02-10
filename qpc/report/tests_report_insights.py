@@ -43,7 +43,7 @@ class ReportInsightsTests(unittest.TestCase):
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
         self.orig_stderr = sys.stderr
-        self.test_tar_gz_filename = "test_%d.tar.gz" % time.time()
+        self.test_tar_gz_filename = f"test_{time.time():.0f}.tar.gz"
         sys.stderr = HushUpStderr()
 
     def tearDown(self):
@@ -56,7 +56,7 @@ class ReportInsightsTests(unittest.TestCase):
             pass
 
     def test_insights_report_as_json(self):
-        """Testing retreiving insights report as json."""
+        """Testing retrieving insights report as json."""
         report_out = StringIO()
 
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"

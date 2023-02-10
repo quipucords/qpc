@@ -91,14 +91,14 @@ class ReportDownloadCommand(CliCommand):
             response = request(
                 parser=self.parser,
                 method=GET,
-                path="%s%s" % (scan.SCAN_JOB_URI, self.args.scan_job_id),
+                path=f"{scan.SCAN_JOB_URI}{self.args.scan_job_id}",
                 payload=None,
             )
             if response.status_code == codes.ok:  # pylint: disable=no-member
                 json_data = response.json()
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
-                    self.req_path = "%s%s" % (self.req_path, self.report_id)
+                    self.req_path = f"{self.req_path}{self.report_id}"
                 else:
                     print(_(messages.DOWNLOAD_NO_REPORT_FOR_SJ % self.args.scan_job_id))
                     sys.exit(1)
@@ -107,7 +107,7 @@ class ReportDownloadCommand(CliCommand):
                 sys.exit(1)
         else:
             self.report_id = self.args.report_id
-            self.req_path = "%s%s" % (self.req_path, self.report_id)
+            self.req_path = f"{self.req_path}{self.report_id}"
 
     def _handle_response_success(self):
         file_content = self.response.content

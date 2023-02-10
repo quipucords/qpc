@@ -44,7 +44,7 @@ class ReportDownloadTests(unittest.TestCase):
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
         self.orig_stderr = sys.stderr
-        self.test_tar_filename = "test_%d.tar.gz" % time.time()
+        self.test_tar_filename = f"test_{time.time():.0f}.tar.gz"
         sys.stderr = HushUpStderr()
 
     def tearDown(self):

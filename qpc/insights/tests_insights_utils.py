@@ -51,10 +51,10 @@ class InsightsUploadCliTests(unittest.TestCase):
         self.assertEqual(test, False)
 
     def test_check_insights_version_failed(self):
-        """Testing failed response with out of date client versions."""
+        """Testing failed response with out-of-date client versions."""
         old_versions = ["3.0.0-4", "3.0.2-2", "3.0.1-5"]
         for version in old_versions:
-            streamdata = "Client: %s\nCore: 3.0.8-1" % version
+            streamdata = f"Client: {version}\nCore: 3.0.8-1"
             result = check_insights_version(streamdata, "3.0.3-1", "3.0.8")
             self.assertIn("client", result.keys())
 
@@ -62,7 +62,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         """Testing success response with new client versions."""
         new_versions = ["3.0.0-4", "3.0.2-2", "3.0.1-5", "3.0.3-1"]
         for version in new_versions:
-            streamdata = "Client: %s\nCore: 3.0.8-1" % version
+            streamdata = f"Client: {version}\nCore: 3.0.8-1"
             result = check_insights_version(streamdata, "3.0.0-4", "3.0.8")
             self.assertNotIn("client", result.keys())
 

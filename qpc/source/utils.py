@@ -28,14 +28,14 @@ def validate_port(arg):
             arg = int(arg)
         except ValueError:
             raise ArgumentTypeError(
-                "Port value %s"
+                f"Port value {arg}"
                 " should be a positive integer"
-                " in the valid range (0-65535)" % arg
+                " in the valid range (0-65535)"
             )
     elif not isinstance(arg, int):
         raise ArgumentTypeError(
-            "Port value %s should be a positive integer"
-            " in the valid range (0-65535)" % arg
+            f"Port value {arg} should be a positive integer"
+            " in the valid range (0-65535)"
         )
 
     # We need to support both system and user ports (see
@@ -43,8 +43,8 @@ def validate_port(arg):
     # know how the user will have configured their system.
     if arg < 0 or arg > 65535:
         raise ArgumentTypeError(
-            "Port value %s should be a positive integer"
-            " in the valid range (0-65535)" % arg
+            f"Port value {arg} should be a positive integer"
+            " in the valid range (0-65535)"
         )
 
     return arg

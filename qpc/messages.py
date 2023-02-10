@@ -15,12 +15,12 @@
 CRED_NAME_HELP = "Credential name."
 CRED_TYPE_HELP = "Type of credential. Valid values: vcenter, network, satellite."
 CRED_TYPE_FILTER_HELP = (
-    "Filter for listing credentials by type. Valid " "values: vcenter, network."
+    "Filter for listing credentials by type. Valid values: vcenter, network."
 )
 CRED_USER_HELP = "User name for authenticating against the target system."
 CRED_PWD_HELP = "Password for authenticating against the target system."
 CRED_SSH_HELP = "File that contains the SSH key."
-CRED_SSH_PSPH_HELP = "SSH passphrase for authenticating against the target " "system."
+CRED_SSH_PSPH_HELP = "SSH passphrase for authenticating against the target system."
 CRED_SUDO_HELP = "Password for running sudo."
 CRED_CLEAR_ALL_HELP = "Remove all credentials."
 
@@ -41,15 +41,15 @@ CRED_PARTIAL_REMOVE = (
 CRED_CLEAR_ALL_SUCCESS = "All credentials were removed."
 
 CRED_TYPE_REQUIRED = (
-    "The --type option is required. The value must be set " "to vcenter or network."
+    "The --type option is required. The value must be set to vcenter or network."
 )
-CRED_VC_PWD_AND_USERNAME = "vCenter Server requires both a user name and " "a password."
+CRED_VC_PWD_AND_USERNAME = "vCenter Server requires both a user name and a password."
 CRED_VC_EDIT_PWD_OR_USERNAME = (
     "You must update either the user name or the "
     "password for the vCenter Server credential."
 )
 CRED_VC_KEY_FILE_NOT_ALLOWED = (
-    "vCenter Server cannot use a sudo password, " "SSH keyfile, or SSH passphrase."
+    "vCenter Server cannot use a sudo password, SSH keyfile, or SSH passphrase."
 )
 CRED_EDIT_NO_ARGS = 'No arguments were provided to edit credential "%s".'
 CRED_DOES_NOT_EXIST = 'Credential "%s" does not exist.'
@@ -63,10 +63,10 @@ CRED_BECOME_METHOD_HELP = (
     "ksu, runas."
 )
 CRED_BECOME_USER_HELP = (
-    "The user to become when running a privileged " "command during network scan."
+    "The user to become when running a privileged command during network scan."
 )
 CRED_BECOME_PASSWORD_HELP = (
-    "The privilege escalation password to be " "used when running a network scan."
+    "The privilege escalation password to be used when running a network scan."
 )
 CRED_TOKEN_HELP = "OpenShift token."
 
@@ -88,7 +88,7 @@ SOURCE_PORT_HELP = (
     "network default is 22, vcenter default is 443."
 )
 SOURCE_PARAMIKO_HELP = (
-    "Set Ansible connection method to paramiko." "default connection method is ssh."
+    "Set Ansible connection method to paramiko. default connection method is ssh."
 )
 SOURCE_SSL_CERT_HELP = (
     "If true, the SSL certificate will"
@@ -102,7 +102,7 @@ SOURCE_SSL_PROTOCOL_HELP = (
     "Not valid for network sources."
 )
 SOURCE_SSL_DISABLE_HELP = (
-    "Disable SSL usage during a connection. " "Not valid for network sources."
+    "Disable SSL usage during a connection. Not valid for network sources."
 )
 SOURCE_ADD_CREDS_NOT_FOUND = (
     "An error occurred while processing the "
@@ -145,7 +145,7 @@ SOURCE_EDIT_CRED_PROCESS_ERR = (
 SOURCE_UPDATED = 'Source "%s" was updated.'
 SOURCE_LIST_NO_SOURCES = "No sources exist yet."
 SOURCE_TYPE_FILTER_HELP = (
-    "Filter for listing sources by type. Valid " "values: vcenter, network."
+    "Filter for listing sources by type. Valid values: vcenter, network."
 )
 
 
@@ -155,13 +155,13 @@ SCAN_UPDATED = 'Scan "%s" was updated.'
 SCAN_ID_HELP = "Scan identifier."
 SCAN_JOB_ID_HELP = "Scan job identifier."
 SCAN_TYPE_FILTER_HELP = (
-    "Filter for listing scan jobs by type. Valid " "values: connect, inspect."
+    "Filter for listing scan jobs by type. Valid values: connect, inspect."
 )
 SCAN_STATUS_FILTER_HELP = (
     "Filter for listing scan jobs by status. Valid "
     "values: created, pending, running, paused, canceled, completed, failed."
 )
-SCAN_MAX_CONCURRENCY_HELP = "Maximum number of concurrent scans; " "default is 25."
+SCAN_MAX_CONCURRENCY_HELP = "Maximum number of concurrent scans; default is 25."
 SCAN_RESULTS_HELP = "View results of the specified scan."
 SCAN_DOES_NOT_EXIST = 'Scan "%s" does not exist.'
 SCAN_JOB_DOES_NOT_EXIST = 'Scan job "%s" does not exist.'
@@ -202,20 +202,16 @@ SCAN_ENABLED_PRODUCT_HELP = (
     "Valid values: jboss_eap, jboss_fuse, jboss_brms, jboss_ws."
 )
 SCAN_EXT_SEARCH_DIRS_HELP = (
-    "A list of fully-qualified paths to search for extended product " "search."
+    "A list of fully-qualified paths to search for extended product search."
 )
 REPORT_JSON_FILE_HELP = (
-    "A list of files that contain the json details " "reports to merge."
+    "A list of files that contain the json details reports to merge."
 )
 REPORT_JSON_DIR_HELP = (
-    "The path to a directory that contain files of json " "details reports to merge"
+    "The path to a directory that contain files of json details reports to merge"
 )
-REPORT_JSON_FILES_HELP = (
-    "At least two json details report files are " "required to merge."
-)
-REPORT_INVALID_JSON_FILE = (
-    "The file %s does not contain a valid json " "details report."
-)
+REPORT_JSON_FILES_HELP = "At least two json details report files are required to merge."
+REPORT_INVALID_JSON_FILE = "The file %s does not contain a valid json details report."
 REPORT_MISSING_REPORT_VERSION = (
     "WARNING: "
     "The file %s is missing report_version.  "
@@ -225,14 +221,14 @@ REPORT_INVALID_REPORT_TYPE = "The file %s contains invalid report type %s."
 REPORT_JSON_DIR_NO_FILES = "No files with extension .json found in %s."
 REPORT_VALIDATE_JSON = "Checking files for valid json details report. %s"
 REPORT_JSON_DIR_FILE_FAILED = (
-    "Failed: %s is not a details report. " "Excluding from merge."
+    "Failed: %s is not a details report. Excluding from merge."
 )
 REPORT_JSON_MISSING_ATTR = (
-    "Failed: %s is not a details report." " Missing %s. Excluding from merge."
+    "Failed: %s is not a details report. Missing %s. Excluding from merge."
 )
 REPORT_JSON_DIR_FILE_SUCCESS = "Success: %s is a valid details report."
 REPORT_JSON_DIR_ALL_FAIL = "No details reports were found."
-REPORTS_REPORTS_DO_NOT_EXIST = "The following scan jobs did not produce " "reports: %s."
+REPORTS_REPORTS_DO_NOT_EXIST = "The following scan jobs did not produce reports: %s."
 REPORT_SCAN_JOB_ID_HELP = "Scan job identifier."
 REPORT_JOB_ID_HELP = "Merge report job identifier"
 REPORT_REPORT_ID_HELP = "Report identifier."
@@ -277,7 +273,7 @@ REPORT_SUCCESSFULLY_UPLOADED = (
 )
 REPORT_FAILED_TO_UPLOADED = "Report could not be created.  Error: %s"
 REPORT_MASK_HELP = (
-    "Provide this flag in order to mask the sensitive data " "within the report(s)."
+    "Provide this flag in order to mask the sensitive data within the report(s)."
 )
 DISABLE_OPT_PRODUCTS_HELP = (
     "The product inspection exclusions. "
@@ -310,7 +306,7 @@ CONN_PASSWORD = "Provide a connection password."
 SUDO_PASSWORD = "Provide a password for sudo."
 SSH_PASSPHRASE = "Provide a passphrase for the SSH keyfile."
 BECOME_PASSWORD = (
-    "Provide a privilege escalation password to be used when " "running a network scan."
+    "Provide a privilege escalation password to be used when running a network scan."
 )
 OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication.\nToken: "
 
@@ -328,7 +324,7 @@ SERVER_LOGIN_REQUIRED = "Log in using the command below: \n$ %s server login"
 SERVER_CONFIG_HOST_HELP = "Host or IP address for the server."
 SERVER_CONFIG_PORT_HELP = "Port number for the server; the default is 9443."
 SERVER_CONFIG_SSL_CERT_HELP = (
-    "File path to the SSL certificate " "to use for verification."
+    "File path to the SSL certificate to use for verification."
 )
 SERVER_CONFIG_SUCCESS = (
     "Server connectivity was successfully configured. "
@@ -339,16 +335,16 @@ SERVER_INTERNAL_ERROR = (
     "information, see the server log file."
 )
 SERVER_STATUS_FAILURE = (
-    "Unexpected failure occurred when accessing the " "status endpoint."
+    "Unexpected failure occurred when accessing the status endpoint."
 )
 STATUS_PATH_HELP = "Output file location."
 STATUS_SUCCESSFULLY_WRITTEN = "Server status written successfully."
 
 LOGIN_USER_HELP = (
-    "The user name to log in to the server. If not provided, " "user will be prompted."
+    "The user name to log in to the server. If not provided, user will be prompted."
 )
 LOGIN_PASS_HELP = (
-    "The password to log in to the server. If not provided, " "user will be prompted."
+    "The password to log in to the server. If not provided, user will be prompted."
 )
 LOGIN_USERNAME_PROMPT = "User name: "
 LOGIN_SUCCESS = "Login successful."
@@ -366,15 +362,15 @@ BAD_INSIGHTS_UPLOAD = (
     ' Attempted to upload report with command "%s"'
 )
 INVALID_REPORT_INSIGHTS_UPLOAD = (
-    "Not attempting to upload report %s to Insights" " because %s"
+    "Not attempting to upload report %s to Insights because %s"
 )
 INSIGHTS_REPORT_MISSING_FIELDS = "the report is missing required fields: %s."
 INSIGHTS_INVALID_REPORT_TYPE = (
-    "the report has an invalid report_type: %s." " Must be an Insights report."
+    "the report has an invalid report_type: %s. Must be an Insights report."
 )
 INSIGHTS_REPORT_NO_VALID_HOST = "the report did not contain any valid hosts."
 INSIGHTS_INVALID_HOST_NAME = (
-    'Host produced by source "%s" from system' ' "%s" is missing all canonical facts.'
+    'Host produced by source "%s" from system "%s" is missing all canonical facts.'
 )
 INSIGHTS_INVALID_HOST_DICT_TYPE = (
     "hosts must be a dictionary that is not empty.  "
@@ -401,7 +397,7 @@ BAD_CLIENT_VERSION = (
     "version (%s) does not meet the requirements of %s or greater."
 )
 CHECK_VERSION = (
-    "You can check your Insights version with this Insights " "client command: (%s)."
+    "You can check your Insights version with this Insights client command: (%s)."
 )
 ERROR_INSIGHTS_VERSION = (
     "An error occurred while trying to retrieve the Insights versions. %s"
@@ -418,10 +414,10 @@ INSIGHTS_NO_GPG_HELP = "Upload to Insights without GNU Privacy Guard."
 DOWNLOAD_NO_REPORT_FOR_SJ = "No reports available for scan job %s."
 DOWNLOAD_NO_REPORT_FOUND = "Report %s not found."
 DOWNLOAD_NO_MASK_REPORT = (
-    "Report %s could not be masked. To generate a " "masked report, rerun the scan."
+    "Report %s could not be masked. To generate a masked report, rerun the scan."
 )
 DOWNLOAD_PATH_HELP = (
-    "The output file's name and location. This file is " "required to be a tar.gz"
+    "The output file's name and location. This file is required to be a tar.gz"
 )
 DOWNLOAD_SUCCESSFULLY_WRITTEN = "Report %s successfully written to %s."
 DOWNLOAD_SJ_DOES_NOT_EXIST = "Scan Job %s does not exist."

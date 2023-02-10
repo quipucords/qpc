@@ -74,7 +74,7 @@ class ReportMergeStatusTests(unittest.TestCase):
                 nac.main(args)
                 result1 = messages.MERGE_JOB_ID_STATUS % ("1", "completed")
                 result2 = messages.DISPLAY_REPORT_ID % ("10", PKG_NAME, "10")
-                result = "%s\n%s" % (result1, result2)
+                result = f"{result1}\n{result2}"
                 self.assertEqual(result, report_out.getvalue().strip())
 
     def test_job_id_not_exist(self):

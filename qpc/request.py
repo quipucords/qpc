@@ -189,7 +189,7 @@ def request(
     if headers:
         req_headers.update(headers)
     if token:
-        req_headers["Authorization"] = "Token {}".format(token)
+        req_headers["Authorization"] = f"Token {token}"
 
     try:
         if method == POST:

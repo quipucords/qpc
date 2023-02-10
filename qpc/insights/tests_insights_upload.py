@@ -79,17 +79,15 @@ class InsightsUploadCliTests(unittest.TestCase):
             (None, b"Uploading Insights data.\nSuccessfully uploaded report for.\n"),
         ]  # noqa: E501
 
-        self.tmp_tar_file = "/tmp/insights_tmp_%s.tar.gz" % (
-            time.strftime("%Y%m%d_%H%M%S")
-        )
+        self.tmp_tar_file = f"/tmp/insights_tmp_{time.strftime('%Y%m%d_%H%M%S')}.tar.gz"
         write_file(self.tmp_tar_file, json.dumps(self.success_json), False)
-        self.dest_tar_file = "/tmp/insights_dest_%s.tar.gz" % (
-            time.strftime("%Y%m%d_%H%M%S")
+        self.dest_tar_file = (
+            f"/tmp/insights_dest_{time.strftime('%Y%m%d_%H%M%S')}.tar.gz"
         )
         write_file(self.dest_tar_file, json.dumps(self.success_json), False)
 
-        self.tmp_invalid_insights_json = "/tmp/insights_invalid_tmp_%s.json" % (
-            time.strftime("%Y%m%d_%H%M%S")
+        self.tmp_invalid_insights_json = (
+            f"/tmp/insights_invalid_tmp_{time.strftime('%Y%m%d_%H%M%S')}.json"
         )
         write_file(
             self.tmp_invalid_insights_json, json.dumps(self.json_missing_hosts), False
@@ -139,7 +137,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         # pylint:disable=line-too-long
         failed_effect = [
             (None, b""),
-            (("Client: %s\nCore: %s\n" % (CLIENT_VERSION, CORE_VERSION)).encode(), b""),
+            (f"Client: {CLIENT_VERSION}\nCore: {CORE_VERSION}\n".encode(), b""),
             (None, b"failed to upload"),
         ]  # noqa: E501
         subprocess.return_value.communicate.side_effect = failed_effect
@@ -299,7 +297,7 @@ class InsightsUploadCliTests(unittest.TestCase):
         # pylint:disable=line-too-long
         subprocess.return_value.communicate.side_effect = [
             (None, b""),
-            (("Client: %s\nCore: %s\n" % (CLIENT_VERSION, CORE_VERSION)).encode(), b""),
+            (f"Client: {CLIENT_VERSION}\nCore: {CORE_VERSION}\n".encode(), b""),
             (None, b"Unknown Response"),
         ]  # noqa: E501
         subprocess.return_value.returncode = 0
@@ -485,7 +483,7 @@ class InsightsUploadCliTests(unittest.TestCase):
     @patch("qpc.insights.upload.subprocess.Popen")
     def test_insights_upload_not_tar_extension(self, subprocess):
         """Testing uploading insights report with invalid file extension."""
-        random_file = "/tmp/insights_random_%s.txt" % (time.strftime("%Y%m%d_%H%M%S"))
+        random_file = f"/tmp/insights_random_{time.strftime('%Y%m%d_%H%M%S')}.txt"
         write_file(random_file, "not really tar", False)
 
         subprocess.return_value.communicate.side_effect = self.success_effect

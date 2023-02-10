@@ -118,9 +118,7 @@ class InsightsUploadCommand(CliCommand):
             action="store_true",
             help=_(messages.INSIGHTS_NO_GPG_HELP),
         )
-        self.tmp_tar_name = "/tmp/insights_tmp_%s.tar.gz" % (
-            time.strftime("%Y%m%d_%H%M%S")
-        )
+        self.tmp_tar_name = f"/tmp/insights_tmp_{time.strftime('%Y%m%d_%H%M%S')}.tar.gz"
         # Don't change this when you upgrade versions
         self.min_server_version = "0.9.0"
         self.insights_command = None
@@ -215,7 +213,7 @@ class InsightsUploadCommand(CliCommand):
             scan_job_response = request(
                 parser=self.parser,
                 method=GET,
-                path="%s%s" % (scan.SCAN_JOB_URI, self.args.scan_job_id),
+                path=f"{scan.SCAN_JOB_URI}{self.args.scan_job_id}",
                 payload=None,
             )
             if scan_job_response.status_code == codes.ok:  # pylint: disable=no-member
@@ -246,10 +244,8 @@ class InsightsUploadCommand(CliCommand):
         # Request report from QCP server
         print(_(messages.INSIGHTS_RETRIEVE_REPORT % self.report_id))
         headers = {"Accept": "application/gzip"}
-        report_path = "%s%s%s" % (
-            insights.REPORT_URI,
-            str(self.report_id),
-            insights.INSIGHTS_PATH_SUFFIX,
+        report_path = (
+            f"{insights.REPORT_URI}{str(self.report_id)}{insights.INSIGHTS_PATH_SUFFIX}"
         )
         report_response = request(
             parser=self.parser,

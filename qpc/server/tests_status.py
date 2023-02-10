@@ -42,7 +42,7 @@ class ServerStatusTests(unittest.TestCase):
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
         self.orig_stderr = sys.stderr
-        self.test_json_filename = "test_%d.json" % time.time()
+        self.test_json_filename = f"test_{time.time():.0f}.json"
         sys.stderr = HushUpStderr()
 
     def tearDown(self):

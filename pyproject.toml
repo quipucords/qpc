@@ -43,10 +43,6 @@ tox-gh-actions = "^3.0.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.darker]
-revision = "3b5eec564b42ab8f4c152a93144dae33e85bc175"
-isort = true
-
 [tool.flakeheaven]
 base = "https://raw.githubusercontent.com/quipucords/linting/main/base-flakeheaven.toml"
 

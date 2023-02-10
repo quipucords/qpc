@@ -100,7 +100,7 @@ class SourceClearCommand(CliCommand):
             for entry in results:
                 if self._delete_entry(entry, print_out=False) is False:
                     remove_error.append(entry["name"])
-            if remove_error != []:
+            if remove_error:
                 cred_err = ",".join(remove_error)
                 print(_(messages.SOURCE_PARTIAL_REMOVE % cred_err))
                 sys.exit(1)

@@ -515,13 +515,13 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
     :param print_pretty: Boolean to determine whether to return pretty
         print json (str) or normal json
     """
-    tar = tarfile.open(fileobj=io.BytesIO(fileobj_content), mode="r:gz")
-    json_file = tar.getmembers()[0]
-    tar_info = tar.extractfile(json_file)
-    json_data = json.loads(tar_info.read().decode("utf-8"))
-    if print_pretty:
-        return pretty_print(json_data)
-    return json_data
+    with tarfile.open(fileobj=io.BytesIO(fileobj_content), mode="r:gz") as tar:
+        json_file = tar.getmembers()[0]
+        tar_info = tar.extractfile(json_file)
+        json_data = json.loads(tar_info.read().decode("utf-8"))
+        if print_pretty:
+            return pretty_print(json_data)
+        return json_data
 
 
 def create_tar_buffer(files_data):

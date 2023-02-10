@@ -22,8 +22,7 @@ from shutil import copyfile
 # pylint: disable=no-name-in-module,import-error
 from requests import codes
 
-import qpc.insights as insights
-from qpc import messages, scan
+from qpc import insights, messages, scan
 from qpc.clicommand import CliCommand
 from qpc.insights.utils import (
     InsightsCommands,
@@ -126,41 +125,48 @@ class InsightsUploadCommand(CliCommand):
 
     def _check_insights_install(self):
         connection_test_command = self.insights_command.test_connection()
-        process = subprocess.Popen(connection_test_command, stderr=subprocess.PIPE)
-        streamdata = format_subprocess_stderr(process)
-        install_check = check_insights_install(streamdata)
-        if not install_check:
-            print(
-                _(messages.BAD_INSIGHTS_INSTALL % (" ".join(connection_test_command)))
-            )
-            sys.exit(1)
+        with subprocess.Popen(
+            connection_test_command, stderr=subprocess.PIPE
+        ) as process:
+            streamdata = format_subprocess_stderr(process)
+            install_check = check_insights_install(streamdata)
+            if not install_check:
+                print(
+                    _(
+                        messages.BAD_INSIGHTS_INSTALL
+                        % (" ".join(connection_test_command))
+                    )
+                )
+                sys.exit(1)
 
     def _check_insights_version(self):
         version_command = self.insights_command.version()
+        # pylint: disable=consider-using-with
         process = subprocess.Popen(
             version_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
+        # pylint: enable=consider-using-with
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
         version_check = check_insights_version(
             streamdata, insights.CLIENT_VERSION, insights.CORE_VERSION
         )
         if not version_check["results"] or code != 0:
-            if "client" in version_check.keys():
+            if "client" in version_check:
                 print(
                     _(
                         messages.BAD_CLIENT_VERSION
                         % (version_check["client"], insights.CLIENT_VERSION)
                     )
                 )
-            if "core" in version_check.keys():
+            if "core" in version_check:
                 print(
                     _(
                         messages.BAD_CORE_VERSION
                         % (version_check["core"], insights.CORE_VERSION)
                     )
                 )
-            if "error" in version_check.keys():
+            if "error" in version_check:
                 print(_(messages.ERROR_INSIGHTS_VERSION % (version_check["error"])))
             print(_(messages.CHECK_VERSION % (" ".join(version_command))))
             sys.exit(1)
@@ -274,7 +280,9 @@ class InsightsUploadCommand(CliCommand):
 
     def _upload_to_insights(self):
         upload_command = self.insights_command.upload(self.tmp_tar_name)
+        # pylint: disable=consider-using-with
         process = subprocess.Popen(upload_command, stderr=subprocess.PIPE)
+        # pylint: enable=consider-using-with
         streamdata = format_subprocess_stderr(process)
         code = process.returncode
         report_check = check_successful_upload(streamdata)

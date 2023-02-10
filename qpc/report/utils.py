@@ -47,7 +47,7 @@ def validate_and_create_json(file):
     sources = None
     if os.path.isfile(file):
         details_report = None
-        with open(file) as details_file:
+        with open(file, encoding="utf-8") as details_file:
             try:
                 details_report = json.load(details_file)
             except json_exception_class:

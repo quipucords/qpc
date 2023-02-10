@@ -186,8 +186,6 @@ def build_scan_payload(
     if hasattr(args, "max_concurrency") and args.max_concurrency:
         if options is None:
             options = {"max_concurrency": args.max_concurrency}
-        else:
-            options["max_concurrency"] = args.max_concurrency
     if hasattr(args, "disabled_optional_products") and (
         args.disabled_optional_products or args.disabled_optional_products == []
     ):

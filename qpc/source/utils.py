@@ -26,12 +26,12 @@ def validate_port(arg):
     if isinstance(arg, str):
         try:
             arg = int(arg)
-        except ValueError:
+        except ValueError as exception:
             raise ArgumentTypeError(
                 f"Port value {arg}"
                 " should be a positive integer"
                 " in the valid range (0-65535)"
-            )
+            ) from exception
     elif not isinstance(arg, int):
         raise ArgumentTypeError(
             f"Port value {arg} should be a positive integer"

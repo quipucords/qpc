@@ -128,7 +128,11 @@ class ReportDeploymentsCommand(CliCommand):
                 json_data = response.json()
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
-                    self.req_path = f"{self.req_path}{self.report_id}{report.DEPLOYMENTS_PATH_SUFFIX}"
+                    self.req_path = (
+                        f"{self.req_path}"
+                        f"{self.report_id}"
+                        f"{report.DEPLOYMENTS_PATH_SUFFIX}"
+                    )
                 else:
                     print(
                         _(

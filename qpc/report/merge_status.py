@@ -17,8 +17,7 @@ import sys
 
 from requests import codes
 
-import qpc.report as report
-from qpc import messages
+from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
 from qpc.request import GET

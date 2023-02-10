@@ -40,7 +40,7 @@ def _set_path_constants_to_none():
         mocker.start()
 
 
-def pytest_collection(session):
+def pytest_collection(session):  # pylint: disable=unused-argument
     """pytest collection hook.
 
     This function runs before collecting tests.

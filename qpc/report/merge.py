@@ -167,7 +167,7 @@ class ReportMergeCommand(CliCommand):
             print(_(messages.REPORT_JSON_DIR_NOT_FOUND % path))
             sys.exit(1)
         json_files = glob(os.path.join(path, "*.json"))
-        if json_files == []:
+        if not json_files:
             print(_(messages.REPORT_JSON_DIR_NO_FILES % path))
             sys.exit(1)
         self._validate_create_json(json_files)

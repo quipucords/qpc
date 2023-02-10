@@ -105,7 +105,7 @@ class ScanClearCommand(CliCommand):
             for entry in results:
                 if self._delete_entry(entry, print_out=False) is False:
                     remove_error.append(entry["id"])
-            if remove_error != []:
+            if remove_error:
                 scan_err = ",".join(str(remove_error))
                 print(_(messages.SCAN_PARTIAL_REMOVE % scan_err))
                 sys.exit(1)

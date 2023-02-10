@@ -91,7 +91,7 @@ class ReportMergeTests(unittest.TestCase):
         for file in JSON_FILES_LIST:
             if os.path.isfile(file[0]):
                 os.remove(file[0])
-            with open(file[0], "w") as test_file:
+            with open(file[0], "w", encoding="utf-8") as test_file:
                 test_file.write(file[1])
 
     def tearDown(self):

@@ -25,11 +25,9 @@ class InsightsUploadCliTests(unittest.TestCase):
 
     def setUp(self):
         """Create test setup."""
-        pass
 
     def tearDown(self):
         """Remove test setup."""
-        pass
 
     def test_check_insights_install(self):
         """Testing if insights is installed correctly."""

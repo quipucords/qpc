@@ -110,7 +110,7 @@ class CredentialShowCliTests(unittest.TestCase):
             with redirect_stdout(cred_out):
                 csc.main(args)
                 expected = (
-                    '{"id":1,"name":"cred1","password":"********",' '"username":"root"}'
+                    '{"id":1,"name":"cred1","password":"********","username":"root"}'
                 )
                 self.assertEqual(
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip(),

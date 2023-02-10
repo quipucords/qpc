@@ -395,9 +395,7 @@ def log_request_info(method, command, url, response_json, response_code):
     :param response_json: the response returned from the request
     :param response_code: the status code being returned (ie. 200)
     """
-    message = (
-        'Method: "%s", Command: "%s", URL: "%s", ' 'Response: "%s", Status Code: "%s'
-    )
+    message = 'Method: "%s", Command: "%s", URL: "%s", Response: "%s", Status Code: "%s'
     log.info(message, method, command, url, response_json, response_code)
 
 

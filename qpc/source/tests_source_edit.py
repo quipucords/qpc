@@ -65,7 +65,7 @@ class SourceEditCliTests(unittest.TestCase):
                 CLI().main()
                 self.assertEqual(
                     source_out.getvalue(),
-                    "No arguments provided to edit " "source source1",
+                    "No arguments provided to edit source source1",
                 )
 
     def test_edit_process_file(self):

@@ -54,7 +54,7 @@ class SourceEditCliTests(unittest.TestCase):
                 sys.argv = ["/bin/qpc", "scan", "edit", "--name", "scan1"]
                 CLI().main()
                 self.assertEqual(
-                    source_out.getvalue(), "No arguments provided to edit " "scan scan1"
+                    source_out.getvalue(), "No arguments provided to edit scan scan1"
                 )
 
     def test_edit_scan_none(self):

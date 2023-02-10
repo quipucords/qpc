@@ -63,8 +63,7 @@ class ReportDownloadTests(unittest.TestCase):
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict["test.json"] = get_report_json_data
+        test_dict = {"test.json": get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
 
         with requests_mock.Mocker() as mocker:
@@ -92,8 +91,7 @@ class ReportDownloadTests(unittest.TestCase):
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict[self.test_tar_filename] = get_report_json_data
+        test_dict = {self.test_tar_filename: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -190,8 +188,7 @@ class ReportDownloadTests(unittest.TestCase):
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict[self.test_tar_filename] = get_report_json_data
+        test_dict = {self.test_tar_filename: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
@@ -216,8 +213,7 @@ class ReportDownloadTests(unittest.TestCase):
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict[self.test_tar_filename] = get_report_json_data
+        test_dict = {self.test_tar_filename: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -288,8 +284,7 @@ class ReportDownloadTests(unittest.TestCase):
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict[self.test_tar_filename] = get_report_json_data
+        test_dict = {self.test_tar_filename: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -314,8 +309,7 @@ class ReportDownloadTests(unittest.TestCase):
         report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1" + "?mask=True"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = dict()
-        test_dict[self.test_tar_filename] = get_report_json_data
+        test_dict = {self.test_tar_filename: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(

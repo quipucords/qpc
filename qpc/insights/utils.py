@@ -84,9 +84,8 @@ def check_successful_upload(streamdata):
 
 def check_insights_version(streamdata, required_client, required_core):
     """Will check versions in streamdata to match requirements."""
-    check = dict()
-    stream_info = dict()
-    check["results"] = True
+    check = {"results": True}
+    stream_info = {}
     required_types = ["client", "core"]
     for value in streamdata.split("\n"):
         try:

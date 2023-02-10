@@ -124,7 +124,7 @@ def read_client_token():
         return None
 
     token = None
-    with open(QPC_CLIENT_TOKEN) as client_token_file:
+    with open(QPC_CLIENT_TOKEN, encoding="utf-8") as client_token_file:
         try:
             token_json = json.load(client_token_file)
             token = token_json.get("token")
@@ -173,7 +173,7 @@ def read_server_config():
         log.error("Server config %s was not found.", QPC_SERVER_CONFIG)
         return None
 
-    with open(QPC_SERVER_CONFIG) as server_config_file:
+    with open(QPC_SERVER_CONFIG, encoding="utf-8") as server_config_file:
         try:
             config = json.load(server_config_file)
         except exception_class:
@@ -333,7 +333,7 @@ def write_client_token(client_token):
     """
     ensure_config_dir_exists()
 
-    with open(QPC_CLIENT_TOKEN, "w") as configFile:
+    with open(QPC_CLIENT_TOKEN, "w", encoding="utf-8") as configFile:
         json.dump(client_token, configFile)
 
 
@@ -463,7 +463,7 @@ def read_in_file(filename):
     # pylint: disable=no-else-return
     if os.path.isfile(input_path):
         try:
-            with open(input_path, "r") as in_file:
+            with open(input_path, "r", encoding="utf-8") as in_file:
                 result = in_file.read().splitlines()
         except EnvironmentError as err:
             err_msg = t(messages.READ_FILE_ERROR % (input_path, err))
@@ -505,7 +505,7 @@ def write_file(filename, content, binary=False):
     mode = "w"
     if binary:
         mode = "wb"
-    with open(input_path, mode) as out_file:
+    with open(input_path, mode) as out_file:  # pylint: disable=unspecified-encoding
         out_file.write(content)
     return result
 

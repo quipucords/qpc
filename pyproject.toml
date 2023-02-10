@@ -21,7 +21,6 @@ cryptography = ">=37.0.4"
 [tool.poetry.group.dev.dependencies]
 coverage = ">=6.4.2"
 black = ">=22.6.0"
-darker = ">=1.5.0"
 flake8 = "*"
 flake8-docstrings = ">=1.6.0"
 flake8-quotes = ">=3.3.1"
@@ -50,7 +49,6 @@ isort = true
 
 [tool.flakeheaven]
 base = "https://raw.githubusercontent.com/quipucords/linting/main/base-flakeheaven.toml"
-baseline = ".flakeheaven-baseline"
 
 [tool.isort]
 profile = "black"

@@ -342,34 +342,12 @@ files = [
 cffi = ">=1.12"
 
 [package.extras]
-docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx_rtd_theme"]
+docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
 docstest = ["pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
 pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
-sdist = ["setuptools_rust (>=0.11.4)"]
+sdist = ["setuptools-rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
-
-[[package]]
-name = "darker"
-version = "1.5.0"
-description = "Apply Black formatting only in regions changed since last commit"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "darker-1.5.0-py3-none-any.whl", hash = "sha256:effd451a364d603578c9df569cc4ab72900b4bb3ffb7b918160ff559ef8af892"},
-    {file = "darker-1.5.0.tar.gz", hash = "sha256:a23a917b9abee0725ba68da5f564ed25dd4e63eab6dc5a43d9e2f88b7c19899e"},
-]
-
-[package.dependencies]
-black = ">=21.5b1"
-toml = ">=0.10.0"
-
-[package.extras]
-color = ["Pygments (>=2.4.0)"]
-isort = ["isort (>=5.0.1)"]
-release = ["airium (>=0.2.3)", "click (>=8.0.0)", "defusedxml (>=0.7.1)", "requests-cache (>=0.7)"]
-test = ["airium (>=0.2.3)", "bandit (>=1.7.1)", "black (>=21.7b1)", "codespell (>=2.1.0)", "defusedxml (>=0.7.1)", "flake8 (<4)", "flake8-2020 (>=1.6.1)", "flake8-bugbear (>=22.1.11)", "flake8-comprehensions (>=3.7.0)", "mypy (>=0.940)", "pygments", "pylint", "pytest (>=6.2.0)", "pytest-darker", "pytest-flake8 (>=1.0.6)", "pytest-isort (>=1.1.0)", "pytest-kwparametrize (>=0.0.3)", "pytest-mypy", "pyupgrade (>=2.31.0)", "regex (>=2021.4.4)", "requests-cache (>=0.7)", "ruamel.yaml (>=0.17.21)", "safety (>=1.10.3)", "twine (>=2.0.0)", "types-requests (>=2.27.9)", "types-toml (>=0.10.4)", "wheel (>=0.21.0)"]
 
 [[package]]
 name = "dill"
@@ -1174,4 +1152,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a435a322b827c7ad7274cc582ec78ce107c6c25ffd4d8b2e659863b3808bf39b"
+content-hash = "749b2292deb79b4e539927e3ade0b79b6292563716ae26d06fb3bd9fb0e1abbe"

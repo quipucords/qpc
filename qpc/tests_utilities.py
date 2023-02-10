@@ -22,7 +22,6 @@ class HushUpStderr:
 
     def write(self, stream):
         """Ignore standard error output."""
-        pass
 
 
 @contextlib.contextmanager

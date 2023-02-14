@@ -10,8 +10,7 @@
 #
 
 """Commands for import organization."""
-# flake8: noqa
-# pylint: disable=unused-import
+
 from qpc.source.add import SourceAddCommand
 from qpc.source.clear import SourceClearCommand
 from qpc.source.edit import SourceEditCommand

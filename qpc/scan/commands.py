@@ -10,8 +10,7 @@
 #
 
 """Commands for import organization."""
-# flake8: noqa
-# pylint: disable=unused-import
+
 from qpc.scan.add import ScanAddCommand
 from qpc.scan.cancel import ScanCancelCommand
 from qpc.scan.clear import ScanClearCommand

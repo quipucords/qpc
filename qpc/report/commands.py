@@ -10,8 +10,7 @@
 #
 
 """Commands for import organization."""
-# flake8: noqa
-# pylint: disable=unused-import
+
 from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.report.details import ReportDetailsCommand
 from qpc.report.download import ReportDownloadCommand

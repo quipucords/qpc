@@ -18,6 +18,7 @@ help:
 	@echo "  lint-isort          to run the isort import order checker"
 	@echo "  lint-flake8         to run the flake8 linter"
 	@echo "  lint-black          to run the black format checker"
+	@echo "  lint-docs           to run rstcheck against docs"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
@@ -42,6 +43,9 @@ lint-flake8:
 
 lint-black:
 	tox -e lint-black
+
+lint-docs:
+	poetry run rstcheck docs/source/man.rst
 
 test:
 	tox -e py39

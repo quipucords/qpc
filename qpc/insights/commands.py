@@ -14,7 +14,3 @@
 from qpc.insights.configure import InsightsConfigureCommand
 from qpc.insights.login import InsightsAddLoginCommand
 from qpc.insights.publish import InsightsPublishCommand
-
-# flake8: noqa
-# pylint: disable=unused-import
-from qpc.insights.upload import InsightsUploadCommand

@@ -61,10 +61,6 @@ poetry installed, just run the following to install the project:
 poetry install
 ```
 
-## Developing with Insights Client
-Information on installing and developing with the insights client can be found in [Insights Configuration](insights_configuration.md).
-
-
 ## Linting
 To lint changes that are made to the source code, run the following command::
 ```

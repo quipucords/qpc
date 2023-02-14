@@ -659,23 +659,15 @@ Uploading to Insights
 ~~~~~~~~~~~~~~~~~~~~~
 The ``qpc insights upload`` command can be used to upload an insights report to Red Hat Insights and its services. You can upload a report by using the associated report identifier or scan job identifier for the scan that is used to generate the report.
 
-**qpc insights upload (--scan-job** *scan_job_identifier* **| --report** *report_identifiers* **| --input-file** *path_to_tar_gz* **) [--no-gpg]**
-
-``--scan-job=scan_job_identifier``
-
-  Contains the scan job identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--report`` option.
+**qpc insights publish (--report** *report_identifiers* **| --input-file** *path_to_tar_gz* )
 
 ``--report=report_identifier``
 
-  Contains the report identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--scan-job`` option.
+  Contains the report identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--input-file`` option.
 
 ``--input-file=path to tar.gz containing the Insights report``
 
-  Contains the path to the tar.gz containing the Insights report.
-
-``--no-gpg``
-
-  Optional. Uploads the insights report without requiring the presence of GNU Privacy Guard.
+  Contains the path to the tar.gz containing the Insights report. Mutually exclusive with ``--report`` option.
 
 
 Options for All Commands

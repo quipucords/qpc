@@ -8,7 +8,7 @@
 
 
 # qpc - RPM command line tool for quipucords
-qpc is the RPM command line tool for quipucords. To learn more about quipucords visit the [GitHub page](https://github.com/quipucords/qpc/). Documentation for qpc is available through [readthedocs](https://qpc.readthedocs.io/en/latest/).
+qpc is the RPM command line tool for quipucords. To learn more about quipucords visit [qpc man page](docs/source/man.rst).
 
 # Overview
 This *README* file contains information about the installation and development of qpc, as well as instructions about where to find basic usage, known issues, and best practices information.
@@ -30,19 +30,12 @@ Before installing qpc on a system, review the following guidelines about install
  * The user account that qpc uses for the SSH connection into the target systems must have adequate permissions to run commands and read certain files, such as privilege escalation required for the `systemctl` command.
  * The user account that qpc uses for a machine requires an sh shell or a similar shell. For example, the shell *cannot* be a /sbin/nologin or /bin/false shell.
 
-The Python packages that are required for running qpc on a system can be found in the `dev-requirements.txt` file. The Python packages that are required to build and test qpc from source can be found in the `requirements.txt` and `dev-requirements.txt` files.
+The Python packages that are required for running qpc on a system can be found in the `pyyproject.toml` and `poetry.lock` file under "main" group. Development packages are under "dev" group.
 
 #  <a name="installation"></a> Installation
-The following information contains instructions for installing qpc.
-
-To install QPC on RHEL 6 or CentOS 6 run:
 ```
-yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el6.noarch.rpm
-```
-
-To install QPC on RHEL 7 or CentOS 7 run:
-```
-yum install https://github.com/quipucords/qpc/releases/latest/download/qpc.el7.noarch.rpm
+dnf copr enable @quipucords/qpc 
+dnf install qpc
 ```
 
 # <a name="commands"></a> Command Syntax and Usage
@@ -59,22 +52,13 @@ git clone git@github.com:quipucords/qpc.git
 qpc currently supports Python 3.6. If you do not have Python on your system, follow these [instructions](https://www.python.org/downloads/>).
 
 
-## Setting Up a Virtual Environment
-Developing inside a virtual environment is recommended. Add desired environment variables to the `.env` file before creating your virtual environment.  You can copy `.env.example` to get started.
+## Installation with development dependencies
 
-On Mac run the following command to set up a virtual environment:
-```
-brew install pipenv
-pipenv shell
-pip install -r dev-requirements.txt
-```
+This project uses poetry to manage python dependencies and virtual environment. Having
+poetry installed, just run the following to install the project:
 
-On Linux run the following command to set up a virtual environment:
 ```
-sudo yum install python-tools (or dnf for Fedora)
-pip3 install pipenv
-pipenv shell
-pip install -r dev-requirements.txt
+poetry install
 ```
 
 ## Developing with Insights Client

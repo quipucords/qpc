@@ -1,7 +1,5 @@
 """QPC Command Line utilities."""
 
-from __future__ import print_function
-
 import io
 import json
 import logging
@@ -56,7 +54,7 @@ QPC_MIN_SERVER_VERSION = "0.9.0"
 
 # pylint: disable=invalid-name
 logging.captureWarnings(True)
-log = logging.getLogger("qpc")
+logger = logging.getLogger(__name__)
 
 
 def ensure_config_dir_exists():
@@ -159,7 +157,7 @@ def read_server_config():
     """
     # pylint: disable=too-many-return-statements
     if not os.path.exists(QPC_SERVER_CONFIG):
-        log.error("Server config %s was not found.", QPC_SERVER_CONFIG)
+        logger.error("Server config %s was not found.", QPC_SERVER_CONFIG)
         return None
 
     with open(QPC_SERVER_CONFIG, encoding="utf-8") as server_config_file:
@@ -181,7 +179,7 @@ def read_server_config():
             return None
 
         if not isinstance(host, str):
-            log.error(
+            logger.error(
                 "Server config %s has invalid value for host %s",
                 QPC_SERVER_CONFIG,
                 host,
@@ -189,7 +187,7 @@ def read_server_config():
             return None
 
         if not isinstance(port, int):
-            log.error(
+            logger.error(
                 "Server config %s has invalid value for port %s",
                 QPC_SERVER_CONFIG,
                 port,
@@ -203,7 +201,7 @@ def read_server_config():
             require_token = True
 
         if not isinstance(use_http, bool):
-            log.error(
+            logger.error(
                 "Server config %s has invalid value for use_http %s",
                 QPC_SERVER_CONFIG,
                 use_http,
@@ -211,7 +209,7 @@ def read_server_config():
             return None
 
         if not isinstance(require_token, bool):
-            log.error(
+            logger.error(
                 "Server config %s has invalid value for require_token %s",
                 QPC_SERVER_CONFIG,
                 require_token,
@@ -223,7 +221,7 @@ def read_server_config():
             and not isinstance(ssl_verify, bool)
             and not isinstance(ssl_verify, str)
         ):
-            log.error(
+            logger.error(
                 "Server config %s has invalid value for ssl_verify %s",
                 QPC_SERVER_CONFIG,
                 ssl_verify,
@@ -235,7 +233,7 @@ def read_server_config():
             and isinstance(ssl_verify, str)
             and not os.path.exists(ssl_verify)
         ):
-            log.error(
+            logger.error(
                 "Server config %s has invalid path for ssl_verify %s",
                 QPC_SERVER_CONFIG,
                 ssl_verify,
@@ -371,7 +369,7 @@ def setup_logging(verbosity):
         # (at least until we add an option controlling the log format)
         stream_handler.setFormatter(logging.Formatter(log_fmt))
     stream_handler.setLevel(log_level)
-    log.addHandler(stream_handler)
+    logger.addHandler(stream_handler)
 
 
 def log_request_info(method, command, url, response_json, response_code):
@@ -385,7 +383,7 @@ def log_request_info(method, command, url, response_json, response_code):
     :param response_code: the status code being returned (ie. 200)
     """
     message = 'Method: "%s", Command: "%s", URL: "%s", Response: "%s", Status Code: "%s'
-    log.info(message, method, command, url, response_json, response_code)
+    logger.info(message, method, command, url, response_json, response_code)
 
 
 def log_args(args):
@@ -394,7 +392,7 @@ def log_args(args):
     :param args: the arguments provided to the qpc command
     """
     message = 'Args: "%s"'
-    log.debug(message, args)
+    logger.debug(message, args)
 
 
 def handle_error_response(response):
@@ -406,24 +404,24 @@ def handle_error_response(response):
     try:
         response_data = response.json()
         if isinstance(response_data, str):
-            log.error("Error: %s", str(response_data))
+            logger.error("Error: %s", str(response_data))
         if isinstance(response_data, dict):
             for err_key, err_cases in response_data.items():
                 error_context = "Error"
                 if err_key not in ["non_field_errors", "detail", "options"]:
                     error_context = err_key
                 if isinstance(err_cases, str):
-                    log.error("%s: %s", error_context, err_cases)
+                    logger.error("%s: %s", error_context, err_cases)
                 elif isinstance(err_cases, dict):
-                    log.error("%s: %s", error_context, err_cases)
+                    logger.error("%s: %s", error_context, err_cases)
                 else:
                     for err_msg in err_cases:
-                        log.error("%s: %s", error_context, err_msg)
+                        logger.error("%s: %s", error_context, err_msg)
         elif isinstance(response_data, list):
             for err in response_data:
-                log.error("Error: %s", err)
+                logger.error("Error: %s", err)
         else:
-            log.error("Error: %s", str(response_data))
+            logger.error("Error: %s", str(response_data))
     except exception_class:
         pass
 
@@ -453,8 +451,9 @@ def read_in_file(filename):
             with open(input_path, "r", encoding="utf-8") as in_file:
                 result = in_file.read().splitlines()
         except EnvironmentError as err:
-            err_msg = t(messages.READ_FILE_ERROR % (input_path, err))
-            log.error(err_msg)
+            logger.error(
+                t(messages.READ_FILE_ERROR), {"path": input_path, "error": err}
+            )
         return result
     else:
         raise ValueError(t(messages.NOT_A_FILE % input_path))
@@ -519,10 +518,10 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
 def create_tar_buffer(files_data):
     """Generate a file buffer based off a dictionary."""
     if not isinstance(files_data, (dict,)):
-        print("ERROR: files_data is not a dict")
+        logger.error(messages.CREATE_TAR_ERROR_FILE)
         return None
     if not all(isinstance(v, (str, dict)) for v in files_data.values()):
-        print("ERROR: Not correct structure for tar")
+        logger.error(messages.CREATE_TAR_ERROR_INCORRECT_STRUCTURE)
         return None
     tar_buffer = io.BytesIO()
     with tarfile.open(fileobj=tar_buffer, mode="w:gz") as tar_file:
@@ -532,7 +531,7 @@ def create_tar_buffer(files_data):
             elif file_name.endswith("csv"):
                 file_buffer = io.BytesIO(file_content.encode("utf-8"))
             else:
-                print("ERROR: unknown file extension")
+                logger.error(messages.UNKNOWN_FILE_EXTENSION)
                 return None
             info = tarfile.TarInfo(name=file_name)
             info.size = len(file_buffer.getvalue())
@@ -546,7 +545,7 @@ def check_extension(extension, path):
     if path is None:
         return
     if extension not in path:
-        print(t(messages.OUTPUT_FILE_TYPE % extension))
+        logger.error(t(messages.OUTPUT_FILE_TYPE), extension)
         sys.exit(1)
 
 
@@ -602,5 +601,5 @@ def decrypt_password(password):
 def check_if_prompt_is_not_empty(pass_prompt):
     """Validate user prompt."""
     if not pass_prompt:
-        log.error(t(messages.PROMPT_INPUT))
+        logger.error(t(messages.PROMPT_INPUT))
         raise SystemExit(2)

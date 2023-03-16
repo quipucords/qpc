@@ -1,6 +1,6 @@
 """CredAddCommand is used to add authentication credentials."""
 
-from __future__ import print_function
+from logging import getLogger
 
 from requests import codes
 
@@ -10,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.cred.utils import build_credential_payload
 from qpc.request import POST
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -117,4 +119,4 @@ class CredAddCommand(CliCommand):
         self.req_payload = build_credential_payload(self.args, self.args.type)
 
     def _handle_response_success(self):
-        print(_(messages.CRED_ADDED % self.args.name))
+        logger.info(_(messages.CRED_ADDED), self.args.name)

@@ -1,8 +1,7 @@
 """LoginHostCommand is used to login with username and password."""
 
-from __future__ import print_function
-
 from getpass import getpass
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.translation import _
 from qpc.utils import delete_client_token, write_client_token
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -79,4 +80,4 @@ class LoginHostCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         write_client_token(json_data)
-        print(_(messages.LOGIN_SUCCESS))
+        logger.info(_(messages.LOGIN_SUCCESS))

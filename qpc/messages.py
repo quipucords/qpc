@@ -95,7 +95,7 @@ SOURCE_SSL_DISABLE_HELP = (
 SOURCE_ADD_CREDS_NOT_FOUND = (
     "An error occurred while processing the "
     '"--cred" input values. References for the following credential '
-    'could not be found: %s. Failed to add source "%s". '
+    'could not be found: %(reference)s. Failed to add source "%(source)s". '
     "For more information, see the server log file."
 )
 SOURCE_ADD_CRED_PROCESS_ERR = (
@@ -122,7 +122,7 @@ SOURCE_DOES_NOT_EXIST = 'Source "%s" does not exist.'
 SOURCE_EDIT_CREDS_NOT_FOUND = (
     "An error occurred while processing the "
     '"--cred" input values. References for the following credential '
-    'could not be found: %s. Failed to edit source "%s". For more '
+    'could not be found: %(reference)s. Failed to edit source "%(source)s". For more '
     "information, see the server log file."
 )
 SOURCE_EDIT_CRED_PROCESS_ERR = (
@@ -205,14 +205,16 @@ REPORT_MISSING_REPORT_VERSION = (
     "The file %s is missing report_version.  "
     "Future releases will not tolerate a missing or invalid report_version."
 )
-REPORT_INVALID_REPORT_TYPE = "The file %s contains invalid report type %s."
+REPORT_INVALID_REPORT_TYPE = (
+    "The file %(file)s contains invalid report type %(report_type)s."
+)
 REPORT_JSON_DIR_NO_FILES = "No files with extension .json found in %s."
 REPORT_VALIDATE_JSON = "Checking files for valid json details report. %s"
 REPORT_JSON_DIR_FILE_FAILED = (
     "Failed: %s is not a details report. Excluding from merge."
 )
 REPORT_JSON_MISSING_ATTR = (
-    "Failed: %s is not a details report. Missing %s. Excluding from merge."
+    "Failed: %(file)s is not a details report. Missing %(key)s. Excluding from merge."
 )
 REPORT_JSON_DIR_FILE_SUCCESS = "Success: %s is a valid details report."
 REPORT_JSON_DIR_ALL_FAIL = "No details reports were found."
@@ -248,16 +250,16 @@ REPORT_DIRECTORY_DOES_NOT_EXIST = "The directory %s does not exist.  Cannot writ
 REPORT_JSON_DIR_NOT_FOUND = "%s is not a directory"
 REPORT_SUCCESSFULLY_WRITTEN = "Report written successfully."
 REPORT_SUCCESSFULLY_MERGED = (
-    "Report merge job %s created. "
-    'To check merge status, run "%s report merge-status --job %s"'
+    "Report merge job %(id)s created. "
+    'To check merge status, run "%(pkg_name)s report merge-status --job %(id)s"'
 )
 REPORT_UPLOAD_VALIDATE_JSON = "Checking file for valid JSON details report. %s"
 REPORT_UPLOAD_FILE_INVALID_JSON = "Failed: %s is not a JSON details report."
 REPORT_UPLOAD_JSON_FILE_HELP = "The path to the details report JSON file."
 REPORT_UPLOAD_VALIDATE_JSON = "Checking %s for valid JSON details report."
 REPORT_SUCCESSFULLY_UPLOADED = (
-    "Report uploaded. Job %s created. "
-    'To check processing status, run "%s scan job --id %s"'
+    "Report uploaded. Job %(id)s created. "
+    'To check processing status, run "%(pkg_name)s scan job --id %(id)s"'
 )
 REPORT_FAILED_TO_UPLOADED = "Report could not be created.  Error: %s"
 REPORT_MASK_HELP = (
@@ -275,12 +277,12 @@ VERBOSITY_HELP = "Verbose mode. Use up to -vvvv for more verbosity."
 CONNECTION_ERROR_MSG = (
     "A connection error occurred while attempting to "
     "communicate with the server. The server has been "
-    'configured to be contacted via "%s" at host "%s" '
-    'with port "%s" but is not responding.'
+    'configured to be contacted via "%(protocol)s" at host "%(host)s" '
+    'with port "%(port)s" but is not responding.'
 )
 
-READ_FILE_ERROR = "Error reading from %s: %s."
-WRITE_FILE_ERROR = "Error writing to %s: %s."
+READ_FILE_ERROR = "Error reading from %(path)s: %(error)s."
+WRITE_FILE_ERROR = "Error writing to %(path)s: %(error)s."
 NOT_A_FILE = "Input %s was not a file."
 FILE_NOT_FOUND = "Input %s was not found."
 
@@ -299,10 +301,12 @@ BECOME_PASSWORD = (
 OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication.\nToken: "
 
 MERGE_JOB_ID_NOT_FOUND = "Report merge job %s not found."
-MERGE_JOB_ID_STATUS = "Report merge job %s is %s."
+MERGE_JOB_ID_STATUS = "Report merge job %(job_id)s is %(status)s."
+MERGE_ERROR = "No reports found. Error json: %s"
 DISPLAY_REPORT_ID = (
-    'Created merge report with id: "%s". To download report, run "%s report'
-    ' deployments --report %s --csv --output-file temp.csv"'
+    'Created merge report with id: "%(report_id)s".'
+    ' To download report, run "%(pkg_name)s report'
+    ' deployments --report %(report_id)s --csv --output-file temp.csv"'
 )
 SERVER_CONFIG_REQUIRED = (
     "Configure server using command below: \n$ %s server"
@@ -316,7 +320,8 @@ SERVER_CONFIG_SSL_CERT_HELP = (
 )
 SERVER_CONFIG_SUCCESS = (
     "Server connectivity was successfully configured. "
-    'The server will be contacted via "%s" at host "%s" with port "%s".'
+    'The server will be contacted via "%(protocol)s" at host "%(host)s"'
+    ' with port "%(port)s".'
 )
 SERVER_INTERNAL_ERROR = (
     "An internal server error occurred. For more "
@@ -407,12 +412,13 @@ DOWNLOAD_NO_MASK_REPORT = (
 DOWNLOAD_PATH_HELP = (
     "The output file's name and location. This file is required to be a tar.gz"
 )
-DOWNLOAD_SUCCESSFULLY_WRITTEN = "Report %s successfully written to %s."
+DOWNLOAD_SUCCESSFULLY_WRITTEN = "Report %(report)s successfully written to %(path)s."
 DOWNLOAD_SJ_DOES_NOT_EXIST = "Scan Job %s does not exist."
 
 SERVER_TOO_OLD_FOR_CLI = (
-    "The CLI requires a minimum server version of %s.  "
-    "Upgrade your server to %s or greater.  Server is currently at version %s."
+    "The CLI requires a minimum server version of %(min_version)s.  "
+    "Upgrade your server to %(min_version)s or greater.  "
+    "Server is currently at version %(current_version)s."
 )
 OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."
 INSIGHTS_ADD_USERNAME_USER_HELP = "The username used to log in to insights."
@@ -456,3 +462,7 @@ INSIGHTS_REPORT_CONTENT_UNEXPECTED = (
 )
 INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL = "The report was successfully downloaded."
 INSIGHTS_REPORT_DOWNLOAD_ERROR = "There was a problem while downloading your report."
+
+CREATE_TAR_ERROR_FILE = "ERROR: files_data is not a dict"
+CREATE_TAR_ERROR_INCORRECT_STRUCTURE = "ERROR: Not correct structure for tar"
+UNKNOWN_FILE_EXTENSION = "ERROR: unknown file extension"

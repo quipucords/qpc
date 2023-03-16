@@ -54,18 +54,22 @@ class ReportMergeStatusTests(unittest.TestCase):
             "end_time": "time",
             "systems_fingerprint_count": 0,
         }
-        report_out = StringIO()
 
         with requests_mock.Mocker() as mocker:
             mocker.get(self.url + "1/", status_code=200, json=good_json)
             nac = ReportMergeStatusCommand(SUBPARSER)
             args = Namespace(job_id="1")
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                result1 = messages.MERGE_JOB_ID_STATUS % ("1", "completed")
-                result2 = messages.DISPLAY_REPORT_ID % ("10", PKG_NAME, "10")
-                result = f"{result1}\n{result2}"
-                self.assertEqual(result, report_out.getvalue().strip())
+                result1 = messages.MERGE_JOB_ID_STATUS % {
+                    "job_id": "1", "status": "completed"
+                }
+                result2 = messages.DISPLAY_REPORT_ID % {
+                    "report_id": "10",
+                    "pkg_name": PKG_NAME,
+                }
+                self.assertIn(result1, log.output[-2])
+                self.assertIn(result2, log.output[-1])
 
     def test_job_id_not_exist(self):
         """Test the job command with an invalid ID."""

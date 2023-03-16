@@ -12,7 +12,7 @@ from qpc.insights.utils import (
 from qpc.translation import _
 from qpc.utils import write_insights_login_config
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 class InsightsAddLoginCommand(CliCommand):
@@ -57,6 +57,6 @@ class InsightsAddLoginCommand(CliCommand):
         try:
             write_insights_login_config(login_config)
         except QPCError as err:
-            log.error(_(err.message))
+            logger.error(_(err.message))
             SystemExit(1)
-        log.info(_(messages.INSIGHTS_LOGIN_CONFIG_SUCCESS))
+        logger.info(_(messages.INSIGHTS_LOGIN_CONFIG_SUCCESS))

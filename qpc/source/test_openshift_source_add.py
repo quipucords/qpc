@@ -14,9 +14,10 @@ class TestOpenShiftAddSource:
 
     @pytest.mark.parametrize("ocp_source_type", ["openshift", "OPENSHIFT", "OpenShift"])
     def test_add_green_path(
-        self, capsys, ocp_credential_mock, requests_mock, ocp_source_type
+        self, caplog, ocp_credential_mock, requests_mock, ocp_source_type
     ):
         """Test ocp source add green path."""
+        caplog.set_level("INFO")
         url = get_server_location() + SOURCE_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -33,17 +34,16 @@ class TestOpenShiftAddSource:
             "[1.2.3.4]",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == messages.SOURCE_ADDED % "ocp_source_1" + "\n"
-        assert err == ""
+        assert caplog.messages[-1] == messages.SOURCE_ADDED % "ocp_source_1"
 
     @pytest.mark.parametrize(
         "ssl_cert_verify_values", ["false", "False", "FALSE", "FaLsE"]
     )
     def test_add_no_ssl_cert(
-        self, capsys, ocp_credential_mock, requests_mock, ssl_cert_verify_values
+        self, caplog, ocp_credential_mock, requests_mock, ssl_cert_verify_values
     ):
         """Test ocp add source w/ ssl_cert_verify=false."""
+        caplog.set_level("INFO")
         url = get_server_location() + SOURCE_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -62,15 +62,14 @@ class TestOpenShiftAddSource:
             ssl_cert_verify_values,
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == messages.SOURCE_ADDED % "ocp_source_1" + "\n"
-        assert err == ""
+        assert caplog.messages[-1] == messages.SOURCE_ADDED % "ocp_source_1"
 
     @pytest.mark.parametrize("disable_ssl_values", ["false", "False", "FALSE", "FaLsE"])
     def test_add_with_ssl_params(
-        self, capsys, ocp_credential_mock, requests_mock, disable_ssl_values
+        self, caplog, ocp_credential_mock, requests_mock, disable_ssl_values
     ):
         """Test ocp add source w/ ssl_cert_verify=false."""
+        caplog.set_level("INFO")
         url = get_server_location() + SOURCE_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -95,9 +94,7 @@ class TestOpenShiftAddSource:
             "200",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == messages.SOURCE_ADDED % "ocp_source_1" + "\n"
-        assert err == ""
+        assert caplog.messages[-1] == messages.SOURCE_ADDED % "ocp_source_1"
 
     def test_add_with_unknown_ssl_param(self, capsys, ocp_credential_mock):
         """Test ocp add source w/ unknown ssl param."""

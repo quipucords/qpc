@@ -1,8 +1,7 @@
 """ReportMergeStatusCommand is used to show job merge information."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.release import PKG_NAME
 from qpc.request import GET
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -48,20 +49,19 @@ class ReportMergeStatusCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        print(
-            _(
-                messages.MERGE_JOB_ID_STATUS
-                % (self.args.job_id, json_data.get("status").lower())
-            )
+        logger.info(
+            _(messages.MERGE_JOB_ID_STATUS),
+            {"job_id": self.args.job_id, "status": json_data.get("status").lower()}
         )
         if json_data.get("report_id"):
-            print(
-                _(
-                    messages.DISPLAY_REPORT_ID
-                    % (json_data.get("report_id"), PKG_NAME, json_data.get("report_id"))
-                )
+            logger.info(
+                _(messages.DISPLAY_REPORT_ID),
+                {
+                    "report_id": json_data.get("report_id"),
+                    "pkg_name": PKG_NAME,
+                }
             )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
-        print(_(messages.MERGE_JOB_ID_NOT_FOUND % self.args.job_id))
+        logger.error(_(messages.MERGE_JOB_ID_NOT_FOUND), self.args.job_id)
         sys.exit(1)

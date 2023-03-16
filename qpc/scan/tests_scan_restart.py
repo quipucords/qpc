@@ -76,13 +76,12 @@ class ScanRestartCliTests(unittest.TestCase):
 
     def test_restart_scan_data(self):
         """Testing the restart scan command successfully with stubbed data."""
-        scan_out = StringIO()
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
             nsc = ScanRestartCommand(SUBPARSER)
             args = Namespace(id="1")
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 nsc.main(args)
-                expected = messages.SCAN_RESTARTED % "1" + "\n"
-                self.assertEqual(scan_out.getvalue(), expected)
+                expected_message = messages.SCAN_RESTARTED % "1"
+                self.assertIn(expected_message, log.output[-1])

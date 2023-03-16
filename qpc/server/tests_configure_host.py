@@ -2,11 +2,10 @@
 
 import sys
 import unittest
-from io import StringIO
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.tests_utilities import HushUpStderr, redirect_stdout
+from qpc.tests_utilities import HushUpStderr
 from qpc.utils import read_server_config, write_server_config
 
 DEFAULT_PORT = 9443
@@ -25,7 +24,6 @@ class ConfigureHostTests(unittest.TestCase):
     def tearDown(self):
         """Remove test case setup."""
         # Reset server config to default ip/port
-        config_out = StringIO()
         sys.argv = [
             "/bin/qpc",
             "server",
@@ -36,17 +34,15 @@ class ConfigureHostTests(unittest.TestCase):
             str(DEFAULT_PORT),
         ]
 
-        with redirect_stdout(config_out):
+        with self.assertLogs(level="INFO") as log:
             CLI().main()
             config = read_server_config()
             self.assertEqual(config["host"], "127.0.0.1")
             self.assertEqual(config["port"], DEFAULT_PORT)
-            self.assertEqual(
-                config_out.getvalue(),
-                messages.SERVER_CONFIG_SUCCESS
-                % ("https", "127.0.0.1", str(DEFAULT_PORT))
-                + "\n",
-            )
+            expected_message = messages.SERVER_CONFIG_SUCCESS % {
+                "protocol": "https", "host": "127.0.0.1", "port": str(DEFAULT_PORT)
+            }
+            self.assertIn(expected_message, log.output[-1])
         # Restore stderr
         sys.stderr = self.orig_stderr
 
@@ -72,7 +68,6 @@ class ConfigureHostTests(unittest.TestCase):
 
     def test_success_config_server(self):
         """Testing the configure server green path."""
-        config_out = StringIO()
         sys.argv = [
             "/bin/qpc",
             "server",
@@ -82,15 +77,15 @@ class ConfigureHostTests(unittest.TestCase):
             "--port",
             "8005",
         ]
-        with redirect_stdout(config_out):
+        with self.assertLogs(level="INFO") as log:
             CLI().main()
             config = read_server_config()
             self.assertEqual(config["host"], "127.0.0.1")
             self.assertEqual(config["port"], 8005)
-            self.assertEqual(
-                config_out.getvalue(),
-                messages.SERVER_CONFIG_SUCCESS % ("https", "127.0.0.1", "8005") + "\n",
-            )
+            expected_message = messages.SERVER_CONFIG_SUCCESS % {
+                "protocol": "https", "host": "127.0.0.1", "port": "8005"
+            }
+            self.assertIn(expected_message, log.output[-1])
 
     def test_config_server_default_port(self):
         """Testing the configure server default port."""

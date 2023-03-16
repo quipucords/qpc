@@ -1,8 +1,7 @@
 """CredEditCommand is used to edit credentials."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -12,6 +11,8 @@ from qpc.clicommand import CliCommand
 from qpc.cred.utils import build_credential_payload
 from qpc.request import GET, PATCH, request
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -110,7 +111,7 @@ class CredEditCommand(CliCommand):
             or self.args.become_password
             or self.args.token
         ):
-            print(_(messages.CRED_EDIT_NO_ARGS % (self.args.name)))
+            logger.error(_(messages.CRED_EDIT_NO_ARGS), self.args.name)
             self.parser.print_help()
             sys.exit(1)
 
@@ -130,10 +131,10 @@ class CredEditCommand(CliCommand):
                 self.cred_type = cred_entry["cred_type"]
                 self.req_path = self.req_path + str(cred_entry["id"]) + "/"
             else:
-                print(_(messages.CRED_DOES_NOT_EXIST % self.args.name))
+                logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)
                 sys.exit(1)
         else:
-            print(_(messages.CRED_DOES_NOT_EXIST % self.args.name))
+            logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)
 
     def _build_data(self):
@@ -146,4 +147,4 @@ class CredEditCommand(CliCommand):
         )
 
     def _handle_response_success(self):
-        print(_(messages.CRED_UPDATED % self.args.name))
+        logger.info(_(messages.CRED_UPDATED), self.args.name)

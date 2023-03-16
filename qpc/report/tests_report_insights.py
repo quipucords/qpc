@@ -180,13 +180,14 @@ class ReportInsightsTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = messages.WRITE_FILE_ERROR % (self.test_tar_gz_filename, "")
+                err_msg = messages.WRITE_FILE_ERROR % {
+                    "path": self.test_tar_gz_filename, "error": ""
+                }
                 self.assertIn(err_msg, log.output[0])
 
     def test_insights_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
         fake_dir = "/kevan/is/awesome/insights.tar.gz"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_tar_gz_filename: get_report_json_data}
@@ -195,21 +196,17 @@ class ReportInsightsTests(unittest.TestCase):
             mocker.get(get_report_url, status_code=200, content=buffer_content)
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None, report_id="1", path=fake_dir)
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    (
-                        messages.REPORT_DIRECTORY_DOES_NOT_EXIST
-                        % os.path.dirname(fake_dir)
-                    ),
+                err_msg = (
+                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(fake_dir)
                 )
+                self.assertIn(err_msg, log.output[0])
 
     def test_insights_tar_path(self):
         """Testing error for nonjson output path."""
         non_tar_file = "/Users/insights.json"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_tar_gz_filename: get_report_json_data}
@@ -223,17 +220,14 @@ class ReportInsightsTests(unittest.TestCase):
             )
             nac = ReportInsightsCommand(SUBPARSER)
             args = Namespace(scan_job_id=None, report_id="1", path=non_tar_file)
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    (messages.OUTPUT_FILE_TYPE % "tar.gz"),
-                )
+                err_msg = messages.OUTPUT_FILE_TYPE % "tar.gz"
+                self.assertIn(err_msg, log.output[0])
 
     def test_insights_report_id_not_exist(self):
         """Test insights with nonexistent report id."""
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_tar_gz_filename: get_report_json_data}
@@ -249,16 +243,14 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err = messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID % 1
-                self.assertEqual(report_out.getvalue().strip(), err)
+                err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_insights_report_error_scan_job(self):
         """Testing error with scan job id."""
-        report_out = StringIO()
-
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
@@ -277,13 +269,11 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1,
-                )
+                err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1
+                self.assertIn(err_msg, log.output[0])
 
 
 def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):

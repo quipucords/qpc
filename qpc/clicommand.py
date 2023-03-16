@@ -1,7 +1,5 @@
 """Base CLI Command Class."""
 
-from __future__ import print_function
-
 import sys
 
 from qpc.request import request

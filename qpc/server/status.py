@@ -1,8 +1,7 @@
 """ServerStatusCommand is used to show the server status."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print, validate_write_file, write_file
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -49,7 +50,7 @@ class ServerStatusCommand(CliCommand):
             try:
                 validate_write_file(self.args.path, "output-file")
             except ValueError as error:
-                print(error)
+                logger.error(error)
                 sys.exit(1)
 
     def _build_req_params(self):
@@ -61,13 +62,15 @@ class ServerStatusCommand(CliCommand):
         if self.args.path:
             try:
                 write_file(self.args.path, status)
-                print(_(messages.STATUS_SUCCESSFULLY_WRITTEN))
+                logger.info(_(messages.STATUS_SUCCESSFULLY_WRITTEN))
             except EnvironmentError as err:
-                err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
-                print(err_msg)
+                logger.error(
+                    _(messages.WRITE_FILE_ERROR),
+                    {"path": self.args.path, "error": err}
+                )
         else:
             print(status)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
-        print(_(messages.SERVER_STATUS_FAILURE))
+        logger.error(_(messages.SERVER_STATUS_FAILURE))
         sys.exit(1)

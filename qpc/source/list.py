@@ -1,8 +1,7 @@
 """SourceListCommand is used to list sources for system scans."""
 
-from __future__ import print_function
-
 import urllib.parse as urlparse
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -61,7 +62,7 @@ class SourceListCommand(CliCommand):
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
         if count == 0:
-            print(_(messages.SOURCE_LIST_NO_SOURCES))
+            logger.error(_(messages.SOURCE_LIST_NO_SOURCES))
         else:
             data = pretty_print(results)
             print(data)

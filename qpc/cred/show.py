@@ -1,8 +1,7 @@
 """CredShowCommand is used to show a specific credential."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -12,6 +11,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -56,5 +57,5 @@ class CredShowCommand(CliCommand):
             data = pretty_print(cred_entry)
             print(data)
         else:
-            print(_(messages.CRED_DOES_NOT_EXIST % self.args.name))
+            logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)

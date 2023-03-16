@@ -12,7 +12,7 @@ from qpc.utils import (
     write_insights_config,
 )
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 class InsightsConfigureCommand(CliCommand):
@@ -65,4 +65,4 @@ class InsightsConfigureCommand(CliCommand):
             "use_http": self.args.use_http,
         }
         write_insights_config(insights_config)
-        log.info(_(messages.INSIGHTS_CONFIG_SUCCESS), insights_config)
+        logger.info(_(messages.INSIGHTS_CONFIG_SUCCESS), insights_config)

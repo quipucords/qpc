@@ -1,8 +1,7 @@
 """CredListCommand is used to list authentication credentials."""
 
-from __future__ import print_function
-
 import urllib.parse as urlparse
+from logging import getLogger
 
 from requests import codes
 
@@ -12,6 +11,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -62,7 +63,7 @@ class CredListCommand(CliCommand):
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
         if count == 0:
-            print(_(messages.CRED_LIST_NO_CREDS))
+            logger.error(_(messages.CRED_LIST_NO_CREDS))
         else:
             data = pretty_print(results)
             print(data)

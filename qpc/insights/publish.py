@@ -16,7 +16,7 @@ from qpc.request import request as qpc_request
 from qpc.translation import _
 from qpc.utils import read_insights_config, read_insights_login_config
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 class InsightsPublishCommand(CliCommand):
@@ -56,10 +56,10 @@ class InsightsPublishCommand(CliCommand):
     def _validate_insights_report_name(self, input_file):
         """Validate if report file exists and its file extension (tar.gz)."""
         if not os.path.isfile(input_file):
-            log.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
+            logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
         if "tar.gz" not in input_file:
-            log.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
+            logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
 
     def _validate_insights_report_content(self, input_file):
@@ -67,13 +67,13 @@ class InsightsPublishCommand(CliCommand):
         filenames = self._get_filenames(input_file)
 
         if len(filenames) < 2:
-            log.error(_(messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER))
+            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER))
             raise SystemExit(1)
 
         top_folder, filenames = self._separate_top_folder(filenames)
 
         if f"{top_folder}/metadata.json" not in filenames:
-            log.error(_(messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA))
+            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA))
             raise SystemExit(1)
 
         for filename in filenames:
@@ -84,7 +84,7 @@ class InsightsPublishCommand(CliCommand):
             with tarfile.open(input_file) as tarball:
                 filenames = sorted(tarball.getnames())
         except tarfile.ReadError as err:
-            log.exception(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.exception(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1) from err
         return filenames
 
@@ -99,17 +99,17 @@ class InsightsPublishCommand(CliCommand):
         elif self._is_top_folder(top_folder.parent):
             top_folder = top_folder.parent
         else:
-            log.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1)
         return top_folder, filenames
 
     def _validate_filename(self, top_folder, filename):
         filepath = Path(filename)
         if filepath.parent != top_folder:
-            log.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1)
         if filepath.suffix != ".json":
-            log.error(_(messages.INSIGHTS_REPORT_CONTENT_NOT_JSON))
+            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_NOT_JSON))
             raise SystemExit(1)
 
     def _remove_file_extension(self, input_file):
@@ -155,7 +155,7 @@ class InsightsPublishCommand(CliCommand):
 
     def _handle_response_error(self, response):  # pylint: disable=signature-differs
         if response.status_code == 404:
-            log.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report)
+            logger.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report)
             sys.exit(1)
         return super()._handle_response_error(response)
 
@@ -173,7 +173,7 @@ class InsightsPublishCommand(CliCommand):
         if not response.ok:
             self._handle_response_error(response)
 
-        log.info(_(messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL))
+        logger.info(_(messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL))
 
         output_file = NamedTemporaryFile(  # pylint: disable=consider-using-with
             suffix=".tar.gz", delete=False
@@ -199,16 +199,16 @@ class InsightsPublishCommand(CliCommand):
     def _make_publish_request(self, session_client, url, files):
         """Make insights client request and log status code."""
         response = session_client.post(url=url, files=files)
-        log.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
+        logger.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
         if response.ok:
-            log.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
+            logger.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
             print(response.text)
         elif response.status_code == 401:
-            log.error(_(messages.INSIGHTS_PUBLISH_AUTH_ERROR))
+            logger.error(_(messages.INSIGHTS_PUBLISH_AUTH_ERROR))
         elif response.status_code == 404:
-            log.error(_(messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR))
+            logger.error(_(messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR))
         elif response.status_code == 500:
-            log.error(_(messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR))
+            logger.error(_(messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR))
 
         return response.ok
 
@@ -221,5 +221,5 @@ class InsightsPublishCommand(CliCommand):
         try:
             self._publish_to_ingress()
         except QPCError as err:
-            log.error(_(err.message))
+            logger.error(_(err.message))
             SystemExit(1)

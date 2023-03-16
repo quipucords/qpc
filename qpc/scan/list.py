@@ -1,8 +1,7 @@
 """ScanListCommand is used to list system scans."""
 
-from __future__ import print_function
-
 import urllib.parse as urlparse
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -55,7 +56,7 @@ class ScanListCommand(CliCommand):
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
         if count == 0:
-            print(_(messages.SCAN_LIST_NO_SCANS))
+            logger.error(_(messages.SCAN_LIST_NO_SCANS))
         else:
             data = pretty_print(results)
             print(data)

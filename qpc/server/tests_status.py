@@ -46,8 +46,6 @@ class ServerStatusTests(unittest.TestCase):
 
     def test_download_server_status(self):
         """Testing recording server status command in a file."""
-        status_out = StringIO()
-
         get_status_url = get_server_location() + STATUS_URI
         get_status_json_data = {
             "api_version": 1,
@@ -58,15 +56,14 @@ class ServerStatusTests(unittest.TestCase):
             mocker.get(get_status_url, status_code=200, json=get_status_json_data)
             ssc = ServerStatusCommand(SUBPARSER)
             args = Namespace(path=self.test_json_filename)
-            with redirect_stdout(status_out):
+            with self.assertLogs(level="INFO") as log:
                 ssc.main(args)
-                self.assertEqual(
-                    status_out.getvalue().strip(), messages.STATUS_SUCCESSFULLY_WRITTEN
-                )
-                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                self.assertDictEqual(get_status_json_data, file_content_dict)
+                expected_message = messages.STATUS_SUCCESSFULLY_WRITTEN
+                self.assertIn(expected_message, log.output[-1])
+            with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
+                data = json_file.read()
+                file_content_dict = json.loads(data)
+            self.assertDictEqual(get_status_json_data, file_content_dict)
 
     def test_print_server_status(self):
         """Testing recording server status command in a file."""

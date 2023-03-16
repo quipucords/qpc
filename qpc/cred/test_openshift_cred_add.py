@@ -111,12 +111,13 @@ class TestOpenShiftAddCredential:
     @pytest.mark.parametrize("cred_type", ["OPENSHIFT", "openshift", "OpenShiFt"])
     def test_add_green_path(
         self,
-        capsys,
+        caplog,
         requests_mock,
         openshift_token_input,
         cred_type,
     ):
         """Test openshift cred add green path."""
+        caplog.set_level("INFO")
         url = get_server_location() + CREDENTIAL_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -130,6 +131,4 @@ class TestOpenShiftAddCredential:
             "--token",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == (messages.CRED_ADDED % "openshift_credential" + "\n")
-        assert err == ""
+        assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_credential"

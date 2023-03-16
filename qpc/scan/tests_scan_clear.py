@@ -94,7 +94,6 @@ class ScanClearCliTests(unittest.TestCase):
 
         Successfully with stubbed data when specifying a name
         """
-        scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI + "?name=scan1"
         delete_url = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -105,10 +104,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
             ncc = ScanClearCommand(SUBPARSER)
             args = Namespace(name="scan1")
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SCAN_REMOVED % "scan1" + "\n"
-                self.assertEqual(scan_out.getvalue(), expected)
+                expected_msg = messages.SCAN_REMOVED % "scan1"
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_clear_by_name_err(self):
         """Test the clear scan command successfully.
@@ -182,7 +181,6 @@ class ScanClearCliTests(unittest.TestCase):
 
     def test_clear_all(self):
         """Testing the clear scan command successfully with stubbed data."""
-        scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI
         delete_url = get_server_location() + SCAN_URI + "1/"
         delete_url2 = get_server_location() + SCAN_URI + "2/"
@@ -196,7 +194,6 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url2, status_code=204)
             ncc = ScanClearCommand(SUBPARSER)
             args = Namespace(name=None)
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SCAN_CLEAR_ALL_SUCCESS + "\n"
-                self.assertEqual(scan_out.getvalue(), expected)
+                self.assertIn(messages.SCAN_CLEAR_ALL_SUCCESS, log.output[-1])

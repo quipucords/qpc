@@ -94,7 +94,6 @@ class SourceClearCliTests(unittest.TestCase):
 
         Successfully with stubbed data when specifying a name
         """
-        source_out = StringIO()
         get_url = get_server_location() + SOURCE_URI + "?name=source1"
         delete_url = get_server_location() + SOURCE_URI + "1/"
         source_entry = {
@@ -111,10 +110,10 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
             ncc = SourceClearCommand(SUBPARSER)
             args = Namespace(name="source1")
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SOURCE_REMOVED % "source1" + "\n"
-                self.assertEqual(source_out.getvalue(), expected)
+                expected_message = messages.SOURCE_REMOVED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_clear_by_name_err(self):
         """Test the clear source command successfully.
@@ -197,7 +196,6 @@ class SourceClearCliTests(unittest.TestCase):
 
     def test_clear_all(self):
         """Testing the clear source command successfully with stubbed data."""
-        source_out = StringIO()
         get_url = get_server_location() + SOURCE_URI
         delete_url = get_server_location() + SOURCE_URI + "1/"
         source_entry = {
@@ -214,7 +212,6 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
             ncc = SourceClearCommand(SUBPARSER)
             args = Namespace(name=None)
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SOURCE_CLEAR_ALL_SUCCESS + "\n"
-                self.assertEqual(source_out.getvalue(), expected)
+                self.assertIn(messages.SOURCE_CLEAR_ALL_SUCCESS, log.output[-1])

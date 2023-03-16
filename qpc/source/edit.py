@@ -1,8 +1,7 @@
 """SourceEditCommand is used to edit existing sources for system scans."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -14,9 +13,10 @@ from qpc.source.utils import build_source_payload, validate_port
 from qpc.translation import _
 from qpc.utils import read_in_file
 
+logger = getLogger(__name__)
+
+
 # pylint: disable=too-few-public-methods
-
-
 class SourceEditCommand(CliCommand):
     """Defines the edit command.
 
@@ -52,7 +52,7 @@ class SourceEditCommand(CliCommand):
             nargs="+",
             metavar="HOSTS",
             default=[],
-            help=_(messages.SOURCE_HOSTS_HELP % PKG_NAME),
+            help=_(messages.SOURCE_HOSTS_HELP) % PKG_NAME,
             required=False,
         )
         self.parser.add_argument(
@@ -60,7 +60,7 @@ class SourceEditCommand(CliCommand):
             dest="exclude_hosts",
             nargs="+",
             metavar="EXCLUDE_HOSTS",
-            help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP % PKG_NAME),
+            help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP) % PKG_NAME,
             required=False,
         )
         self.parser.add_argument(
@@ -124,7 +124,7 @@ class SourceEditCommand(CliCommand):
             or self.args.disable_ssl
             or self.args.ssl_protocol
         ):
-            print(_(messages.SOURCE_EDIT_NO_ARGS % (self.args.name)))
+            logger.error(_(messages.SOURCE_EDIT_NO_ARGS), (self.args.name))
             self.parser.print_help()
             sys.exit(1)
 
@@ -162,10 +162,10 @@ class SourceEditCommand(CliCommand):
                 source_entry = results[0]
                 self.req_path = self.req_path + str(source_entry["id"]) + "/"
             else:
-                print(_(messages.SOURCE_DOES_NOT_EXIST % self.args.name))
+                logger.error(_(messages.SOURCE_DOES_NOT_EXIST), self.args.name)
                 sys.exit(1)
         else:
-            print(_(messages.SOURCE_DOES_NOT_EXIST % self.args.name))
+            logger.error(_(messages.SOURCE_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)
 
         # check for valid cred values
@@ -191,15 +191,15 @@ class SourceEditCommand(CliCommand):
                         cred_name = cred_entry["name"]
                         self.args.cred.remove(cred_name)
                     not_found_str = ",".join(self.args.cred)
-                    print(
-                        _(
-                            messages.SOURCE_EDIT_CREDS_NOT_FOUND
-                            % (not_found_str, self.args.name)
-                        )
+                    logger.error(
+                        _(messages.SOURCE_EDIT_CREDS_NOT_FOUND),
+                        {
+                            "reference": not_found_str, "source": self.args.name,
+                        }
                     )
                     sys.exit(1)
             else:
-                print(_(messages.SOURCE_EDIT_CRED_PROCESS_ERR % self.args.name))
+                logger.error(_(messages.SOURCE_EDIT_CRED_PROCESS_ERR), self.args.name)
                 sys.exit(1)
 
     def _build_data(self):
@@ -210,4 +210,4 @@ class SourceEditCommand(CliCommand):
         self.req_payload = build_source_payload(self.args, add_none=False)
 
     def _handle_response_success(self):
-        print(_(messages.SOURCE_UPDATED % self.args.name))
+        logger.info(_(messages.SOURCE_UPDATED), self.args.name)

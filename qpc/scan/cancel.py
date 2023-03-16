@@ -1,6 +1,5 @@
 """ScanCancelCommand is used to cancel a specific system scan."""
-
-from __future__ import print_function
+from logging import getLogger
 
 from requests import codes
 
@@ -8,6 +7,9 @@ from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.request import PUT
 from qpc.translation import _
+
+logger = getLogger(__name__)
+
 
 # pylint: disable=too-few-public-methods
 
@@ -47,4 +49,4 @@ class ScanCancelCommand(CliCommand):
             self.req_path = self.req_path + str(self.args.id) + "/cancel/"
 
     def _handle_response_success(self):
-        print(_(messages.SCAN_CANCELED % self.args.id))
+        logger.info(_(messages.SCAN_CANCELED), self.args.id)

@@ -1,9 +1,8 @@
 """ReportUploadCommand is used to upload details JSON."""
 
-from __future__ import print_function
-
 import json
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -13,6 +12,9 @@ from qpc.release import PKG_NAME
 from qpc.report import utils
 from qpc.request import POST
 from qpc.translation import _
+
+logger = getLogger(__name__)
+
 
 # pylint: disable=invalid-name
 try:
@@ -61,7 +63,7 @@ class ReportUploadCommand(CliCommand):
         sources = utils.validate_and_create_json(file)
 
         if not sources:
-            print(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON) % file)
+            logger.error(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON), file)
             sys.exit(1)
         self.json = {
             utils.SOURCES_KEY: sources,
@@ -84,14 +86,12 @@ class ReportUploadCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         if json_data.get("id"):
-            print(
-                _(
-                    messages.REPORT_SUCCESSFULLY_UPLOADED
-                    % (json_data.get("id"), PKG_NAME, json_data.get("id"))
-                )
+            logger.info(
+                _(messages.REPORT_SUCCESSFULLY_UPLOADED),
+                {"id": json_data.get("id"), "pkg_name": PKG_NAME}
             )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         json_data = self.response.json()
-        print(_(messages.REPORT_FAILED_TO_UPLOADED) % json_data.get("error"))
+        logger.error(_(messages.REPORT_FAILED_TO_UPLOADED), json_data.get("error"))
         sys.exit(1)

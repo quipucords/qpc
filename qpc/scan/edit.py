@@ -1,8 +1,7 @@
 """ScanEditCommand is used to edit existing scans."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -16,6 +15,8 @@ from qpc.scan.utils import (
     get_source_ids,
 )
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -112,7 +113,7 @@ class ScanEditCommand(CliCommand):
                 or self.args.ext_product_search_dirs == []
             )
         ):
-            print(_(messages.SCAN_EDIT_NO_ARGS % (self.args.name)))
+            logger.error(_(messages.SCAN_EDIT_NO_ARGS), (self.args.name))
             self.parser.print_help()
             sys.exit(1)
 
@@ -136,10 +137,10 @@ class ScanEditCommand(CliCommand):
                         self.req_path = self.req_path + str(scan_entry["id"]) + "/"
                         exists = True
             if not exists or count == 0:
-                print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))
+                logger.error(_(messages.SCAN_DOES_NOT_EXIST), self.args.name)
                 sys.exit(1)
         else:
-            print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))
+            logger.error(_(messages.SCAN_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)
 
         # check for valid source values
@@ -173,4 +174,4 @@ class ScanEditCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        print(_(messages.SCAN_UPDATED % json_data.get("name")))
+        logger.info(_(messages.SCAN_UPDATED), json_data.get("name"))

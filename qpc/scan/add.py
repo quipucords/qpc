@@ -1,8 +1,7 @@
 """ScanAddCommand is used to create a scan."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -11,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.scan.utils import get_enabled_products, get_optional_products, get_source_ids
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -129,4 +130,4 @@ class ScanAddCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        print(_(messages.SCAN_ADDED % json_data.get("name")))
+        logger.info(_(messages.SCAN_ADDED), json_data.get("name"))

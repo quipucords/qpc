@@ -1,8 +1,7 @@
 """ConfigureHostCommand is used to set target host and port server."""
 
-from __future__ import print_function
-
 from argparse import SUPPRESS
+from logging import getLogger
 
 import qpc.server as config
 from qpc import messages
@@ -10,6 +9,8 @@ from qpc.clicommand import CliCommand
 from qpc.source.utils import validate_port
 from qpc.translation import _
 from qpc.utils import write_server_config
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -86,7 +87,11 @@ class ConfigureHostCommand(CliCommand):
         protocol = "https"
         if self.args.use_http:
             protocol = "http"
-        print(
-            _(messages.SERVER_CONFIG_SUCCESS)
-            % (protocol, self.args.host, self.args.port)
+        logger.info(
+            _(messages.SERVER_CONFIG_SUCCESS),
+            {
+                "protocol": protocol,
+                "host": self.args.host,
+                "port": self.args.port,
+            }
         )

@@ -251,13 +251,14 @@ class ReportDetailsTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = messages.WRITE_FILE_ERROR % (self.test_json_filename, "")
+                err_msg = messages.WRITE_FILE_ERROR % {
+                    "path": self.test_json_filename, "error": ""
+                }
                 self.assertIn(err_msg, log.output[0])
 
     def test_details_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
         fake_dir = "/cody/is/awesome/details.json"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -273,21 +274,17 @@ class ReportDetailsTests(unittest.TestCase):
                 path=fake_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    (
-                        messages.REPORT_DIRECTORY_DOES_NOT_EXIST
-                        % os.path.dirname(fake_dir)
-                    ),
+                err_msg = (
+                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(fake_dir)
                 )
+                self.assertIn(err_msg, log.output[0])
 
     def test_details_nonjson_path(self):
         """Testing error for non json file path."""
         non_json_dir = "/Users/details.tar.gz"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -303,17 +300,15 @@ class ReportDetailsTests(unittest.TestCase):
                 path=non_json_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), (messages.OUTPUT_FILE_TYPE % ".json")
-                )
+                err_msg = messages.OUTPUT_FILE_TYPE % ".json"
+                self.assertIn(err_msg, log.output[0])
 
     def test_details_noncsv_path(self):
         """Testing error for noncsv file path."""
         non_csv_dir = "/Users/details.tar.gz"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -329,16 +324,14 @@ class ReportDetailsTests(unittest.TestCase):
                 path=non_csv_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), (messages.OUTPUT_FILE_TYPE % ".csv")
-                )
+                err_msg = messages.OUTPUT_FILE_TYPE % ".csv"
+                self.assertIn(err_msg, log.output[0])
 
     def test_details_report_id_not_exist(self):
         """Test details with nonexistent report id."""
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         with requests_mock.Mocker() as mocker:
@@ -357,18 +350,14 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID % 1,
-                )
+                err_msg = messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_detail_report_error_scan_job(self):
         """Testing error with scan job id."""
-        report_out = StringIO()
-
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
@@ -392,13 +381,11 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_NO_DETAIL_REPORT_FOR_SJ % 1,
-                )
+                err_msg = messages.REPORT_NO_DETAIL_REPORT_FOR_SJ % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_detail_report_as_csv_masked(self):
         """Testing retrieving csv details report with masked query param."""
@@ -440,7 +427,6 @@ class ReportDetailsTests(unittest.TestCase):
 
     def test_details_old_version(self):
         """Test too old server version."""
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         with requests_mock.Mocker() as mocker:
@@ -459,13 +445,14 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_csv_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.SERVER_TOO_OLD_FOR_CLI % ("0.9.2", "0.9.2", "0.0.45"),
-                )
+                err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
+                    "min_version": "0.9.2",
+                    "current_version": "0.0.45"
+                }
+                self.assertIn(err_msg, log.output[0])
 
 
 def test_details_report_as_json_no_output_file(caplog, capsys, requests_mock):

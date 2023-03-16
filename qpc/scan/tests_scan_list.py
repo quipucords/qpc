@@ -77,17 +77,14 @@ class ScanListCliTests(unittest.TestCase):
 
     def test_list_scan_empty(self):
         """Testing the list scan command successfully with empty data."""
-        scan_out = StringIO()
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
             slc = ScanListCommand(SUBPARSER)
             args = Namespace()
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="ERROR") as log:
                 slc.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_LIST_NO_SCANS + "\n"
-                )
+                self.assertIn(messages.SCAN_LIST_NO_SCANS, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
     def test_list_scan_data(self, b_input):

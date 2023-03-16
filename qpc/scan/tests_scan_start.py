@@ -59,7 +59,6 @@ class ScanStartCliTests(unittest.TestCase):
 
     def test_start_scan(self):
         """Testing the start scan command successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI
         url_post = get_server_location() + SCAN_URI + "1/jobs/"
         results = [
@@ -80,11 +79,10 @@ class ScanStartCliTests(unittest.TestCase):
             mocker.post(url_post, status_code=201, json={"id": 1})
             ssc = ScanStartCommand(SUBPARSER)
             args = Namespace(name="scan1")
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ssc.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_STARTED % "1" + "\n"
-                )
+                expected_message = messages.SCAN_STARTED % "1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_unsuccessful_start_scan(self):
         """Testing the start scan command unsuccessfully."""

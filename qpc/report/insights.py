@@ -1,7 +1,5 @@
 """ReportInsightsCommand is to show insights report."""
 
-from __future__ import print_function
-
 import sys
 from logging import getLogger
 
@@ -13,7 +11,7 @@ from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import check_extension, validate_write_file, write_file
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -74,7 +72,7 @@ class ReportInsightsCommand(CliCommand):
             if self.args.path:
                 validate_write_file(self.args.path, "output-file")
         except ValueError as error:
-            print(error)
+            logger.error(error)
             sys.exit(1)
 
         if self.args.report_id is None:
@@ -93,15 +91,16 @@ class ReportInsightsCommand(CliCommand):
                         f"{self.req_path}{self.report_id}{report.INSIGHTS_PATH_SUFFIX}"
                     )
                 else:
-                    print(
-                        _(
-                            messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ
-                            % self.args.scan_job_id
-                        )
+                    logger.error(
+                        _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
+                        self.args.scan_job_id
                     )
                     sys.exit(1)
             else:
-                print(_(messages.REPORT_SJ_DOES_NOT_EXIST % self.args.scan_job_id))
+                logger.error(
+                    _(messages.REPORT_SJ_DOES_NOT_EXIST),
+                    self.args.scan_job_id
+                )
                 sys.exit(1)
         else:
             self.report_id = self.args.report_id
@@ -116,20 +115,23 @@ class ReportInsightsCommand(CliCommand):
             else:
                 file_content = self.response.text
             write_file(self.args.path, file_content, binary=True)
-            log.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+            logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
-            err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
-            log.error(err_msg)
+            logger.error(
+                _(messages.WRITE_FILE_ERROR),
+                {"path": self.args.path, "error": err}
+            )
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.args.report_id is None:
-            print(_(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % self.args.scan_job_id))
+            logger.error(
+                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
+                self.args.scan_job_id
+            )
         else:
-            print(
-                _(
-                    messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID
-                    % self.args.report_id
-                )
+            logger.error(
+                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID),
+                self.args.report_id
             )
         sys.exit(1)

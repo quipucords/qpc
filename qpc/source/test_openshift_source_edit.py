@@ -30,11 +30,12 @@ class TestOpenShiftEditSource:
 
     def test_edit_partial_green_path(
         self,
-        capsys,
+        caplog,
         requests_mock,
         ocp_source_mock,
     ):
         """Test partial openshift edit source successfully."""
+        caplog.set_level("INFO")
         url_patch = get_server_location() + SOURCE_URI + "1/"
         requests_mock.patch(url_patch, status_code=200)
         sys.argv = [
@@ -47,17 +48,16 @@ class TestOpenShiftEditSource:
             "[4.3.2.1]",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == messages.SOURCE_UPDATED % "ocp_source_1" + "\n"
-        assert err == ""
+        assert caplog.messages[-1] == messages.SOURCE_UPDATED % "ocp_source_1"
 
     def test_full_edit(
         self,
-        capsys,
+        caplog,
         requests_mock,
         ocp_source_mock,
     ):
         """Test full openshift edit source successfully."""
+        caplog.set_level("INFO")
         url_patch = get_server_location() + SOURCE_URI + "1/"
         requests_mock.patch(url_patch, status_code=200)
         sys.argv = [
@@ -76,9 +76,7 @@ class TestOpenShiftEditSource:
             "true",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == messages.SOURCE_UPDATED % "ocp_source_1" + "\n"
-        assert err == ""
+        assert caplog.messages[-1] == messages.SOURCE_UPDATED % "ocp_source_1"
 
     @pytest.mark.parametrize(
         "status_code,err_log_message",

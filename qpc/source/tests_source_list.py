@@ -9,6 +9,7 @@ from unittest.mock import ANY, patch
 import requests
 import requests_mock
 
+from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.list import SourceListCommand
@@ -76,15 +77,14 @@ class SourceListCliTests(unittest.TestCase):
 
     def test_list_source_empty(self):
         """Testing the list source command successfully with empty data."""
-        source_out = StringIO()
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
             nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="ERROR") as log:
                 nlc.main(args)
-                self.assertEqual(source_out.getvalue(), "No sources exist yet.\n")
+                self.assertIn(messages.SOURCE_LIST_NO_SOURCES, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
     def test_list_source_data(self, b_input):

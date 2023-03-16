@@ -1,7 +1,5 @@
 """Utilities for the credential credentials module."""
 
-from __future__ import print_function
-
 from getpass import getpass
 from logging import getLogger
 
@@ -9,7 +7,7 @@ from qpc import messages
 from qpc.translation import _
 from qpc.utils import check_if_prompt_is_not_empty
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 def get_password(args, req_payload, add_none=True):

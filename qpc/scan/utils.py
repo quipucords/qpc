@@ -1,12 +1,14 @@
 """Utilities for the scan module."""
 
-from __future__ import print_function
+from logging import getLogger
 
 from requests import codes
 
 from qpc import messages, scan, source
 from qpc.request import GET, request
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 def get_source_ids(parser, source_names):
@@ -34,10 +36,10 @@ def get_source_ids(parser, source_names):
                 source_entry = results[0]
                 source_ids.append(source_entry["id"])
             else:
-                print(_(messages.SOURCE_DOES_NOT_EXIST % source_name))
+                logger.error(_(messages.SOURCE_DOES_NOT_EXIST), source_name)
                 not_found = True
         else:
-            print(_(messages.SOURCE_DOES_NOT_EXIST % source_name))
+            logger.error(_(messages.SOURCE_DOES_NOT_EXIST), source_name)
             not_found = True
     return not_found, source_ids
 
@@ -67,9 +69,9 @@ def get_scan_object_id(parser, name):
                     scan_object_id = str(result["id"]) + "/"
                     found = True
         if not found or count == 0:
-            print(_(messages.SCAN_DOES_NOT_EXIST % name))
+            logger.error(_(messages.SCAN_DOES_NOT_EXIST), name)
     else:
-        print(_(messages.SCAN_DOES_NOT_EXIST % name))
+        logger.error(_(messages.SCAN_DOES_NOT_EXIST), name)
     return found, scan_object_id
 
 

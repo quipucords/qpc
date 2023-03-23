@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import json
@@ -158,7 +148,6 @@ class ReportDetailsTests(unittest.TestCase):
                 with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
-                    print(file_content_dict)
                 self.assertDictEqual(get_report_csv_data, file_content_dict)
 
     # Test validation
@@ -447,7 +436,6 @@ class ReportDetailsTests(unittest.TestCase):
                 with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
-                    print(file_content_dict)
                 self.assertDictEqual(get_report_csv_data, file_content_dict)
 
     def test_details_old_version(self):

@@ -87,7 +87,6 @@ class ReportDetailsCommand(CliCommand):
             dest="path",
             metavar="PATH",
             help=_(messages.REPORT_PATH_HELP),
-            required=True,
         )
         self.parser.add_argument(
             "--mask",
@@ -113,7 +112,8 @@ class ReportDetailsCommand(CliCommand):
         if extension:
             check_extension(extension, self.args.path)
         try:
-            validate_write_file(self.args.path, "output-file")
+            if self.args.path:
+                validate_write_file(self.args.path, "output-file")
         except ValueError as error:
             print(error)
             sys.exit(1)

@@ -10,6 +10,7 @@
 #
 """Test the CLI module."""
 
+import json
 import os
 import sys
 import time
@@ -44,6 +45,7 @@ class ReportInsightsTests(unittest.TestCase):
         # nosetests command.
         self.orig_stderr = sys.stderr
         self.test_tar_gz_filename = f"test_{time.time():.0f}.tar.gz"
+        self.test_json_filename = f"test_{time.time():.0f}.json"
         sys.stderr = HushUpStderr()
 
     def tearDown(self):
@@ -292,3 +294,33 @@ class ReportInsightsTests(unittest.TestCase):
                     report_out.getvalue().strip(),
                     messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1,
                 )
+
+
+def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
+    """Testing retrieving insights report as json without output file."""
+    caplog.set_level("INFO")
+    report_url = get_server_location() + REPORT_URI + "1/insights/"
+    report_json_data = {
+        "id": 1,
+        "report_id": 1,
+        "hosts": {"00968d16-78b7-4bda-ab7d-668f3c0ef1ee": {"key": "value"}},
+    }
+    json_filename = f"test_{time.time():.0f}.json"
+    expected_json = {json_filename: report_json_data}
+    requests_mock.get(
+        report_url,
+        status_code=200,
+        json=expected_json,
+        headers={"X-Server-Version": VERSION},
+    )
+    sys.argv = [
+        "/bin/qpc",
+        "report",
+        "insights",
+        "--report",
+        "1",
+    ]
+    CLI().main()
+    captured = capsys.readouterr()
+    assert caplog.messages[-1] == messages.REPORT_SUCCESSFULLY_WRITTEN
+    assert json.loads(captured.out)

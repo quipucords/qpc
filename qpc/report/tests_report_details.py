@@ -478,3 +478,31 @@ class ReportDetailsTests(unittest.TestCase):
                     report_out.getvalue().strip(),
                     messages.SERVER_TOO_OLD_FOR_CLI % ("0.9.2", "0.9.2", "0.0.45"),
                 )
+
+
+def test_details_report_as_json_no_output_file(caplog, capsys, requests_mock):
+    """Testing retrieving details report as json without output file."""
+    caplog.set_level("INFO")
+    report_url = get_server_location() + REPORT_URI + "1/details/"
+    report_json_data = {"id": 1, "report": [{"key": "value"}]}
+    json_filename = f"test_{time.time():.0f}.json"
+    buffer_content = create_tar_buffer({json_filename: report_json_data})
+
+    requests_mock.get(
+        report_url,
+        status_code=200,
+        content=buffer_content,
+        headers={"X-Server-Version": VERSION},
+    )
+    sys.argv = [
+        "/bin/qpc",
+        "report",
+        "details",
+        "--json",
+        "--report",
+        "1",
+    ]
+    CLI().main()
+    assert caplog.messages[-1] == messages.REPORT_SUCCESSFULLY_WRITTEN
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)

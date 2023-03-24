@@ -68,7 +68,6 @@ class ReportInsightsCommand(CliCommand):
             dest="path",
             metavar="PATH",
             help=_(messages.REPORT_PATH_HELP),
-            required=True,
         )
         # Don't change this when you upgrade versions
         self.min_server_version = "0.9.0"
@@ -76,11 +75,15 @@ class ReportInsightsCommand(CliCommand):
 
     def _validate_args(self):
         CliCommand._validate_args(self)
-        self.req_headers = {"Accept": "application/gzip"}
+        if self.args.path:
+            self.req_headers = {"Accept": "application/gzip"}
+        else:
+            self.req_headers = {"Accept": "application/json"}
         check_extension("tar.gz", self.args.path)
 
         try:
-            validate_write_file(self.args.path, "output-file")
+            if self.args.path:
+                validate_write_file(self.args.path, "output-file")
         except ValueError as error:
             print(error)
             sys.exit(1)
@@ -119,11 +122,15 @@ class ReportInsightsCommand(CliCommand):
 
     def _handle_response_success(self):
         try:
-            write_file(self.args.path, self.response.content, binary=True)
-            print(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+            if self.args.path:
+                file_content = self.response.content
+            else:
+                file_content = self.response.text
+            write_file(self.args.path, file_content, binary=True)
+            log.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
-            print(err_msg)
+            log.error(err_msg)
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ

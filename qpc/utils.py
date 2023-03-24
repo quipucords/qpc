@@ -499,12 +499,15 @@ def write_file(filename, content, binary=False):
     :raises: EnvironmentError if file cannot be written
     """
     result = None
-    input_path = os.path.expanduser(os.path.expandvars(filename))
-    mode = "w"
-    if binary:
-        mode = "wb"
-    with open(input_path, mode) as out_file:  # pylint: disable=unspecified-encoding
-        out_file.write(content)
+    if filename is None:
+        print(content)
+    else:
+        input_path = os.path.expanduser(os.path.expandvars(filename))
+        mode = "w"
+        if binary:
+            mode = "wb"
+        with open(input_path, mode) as out_file:  # pylint: disable=unspecified-encoding
+            out_file.write(content)
     return result
 
 
@@ -551,6 +554,8 @@ def create_tar_buffer(files_data):
 
 def check_extension(extension, path):
     """Check if .json is in the file extension."""
+    if path is None:
+        return
     if extension not in path:
         print(t(messages.OUTPUT_FILE_TYPE % extension))
         sys.exit(1)

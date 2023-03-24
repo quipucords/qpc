@@ -14,6 +14,7 @@
 from __future__ import print_function
 
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -27,6 +28,8 @@ from qpc.utils import (
     validate_write_file,
     write_file,
 )
+
+log = getLogger("qpc")
 
 
 # pylint: disable=too-few-public-methods
@@ -156,10 +159,10 @@ class ReportDetailsCommand(CliCommand):
 
         try:
             write_file(self.args.path, file_content)
-            print(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+            log.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
             err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
-            print(err_msg)
+            log.error(err_msg)
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ

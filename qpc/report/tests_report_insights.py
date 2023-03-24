@@ -57,8 +57,6 @@ class ReportInsightsTests(unittest.TestCase):
 
     def test_insights_report_as_json(self):
         """Testing retrieving insights report as json."""
-        report_out = StringIO()
-
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
@@ -81,16 +79,12 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
 
     def test_insights_report_as_json_report_id(self):
         """Testing retreiving insights report as json with report id."""
-        report_out = StringIO()
-
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {
             "id": 1,
@@ -110,11 +104,9 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
 
     # Test validation
     def test_insights_report_output_directory(self):
@@ -178,7 +170,6 @@ class ReportInsightsTests(unittest.TestCase):
     def test_insights_file_fails_to_write(self, file):
         """Testing insights failure while writing to file."""
         file.side_effect = EnvironmentError()
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_tar_gz_filename: get_report_json_data}
@@ -194,11 +185,11 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % (self.test_tar_gz_filename, "")
-                self.assertEqual(report_out.getvalue().strip(), err_msg)
+                self.assertIn(err_msg, log.output[0])
 
     def test_insights_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""

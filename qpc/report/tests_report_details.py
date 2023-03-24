@@ -62,9 +62,7 @@ class ReportDetailsTests(unittest.TestCase):
             pass
 
     def test_detail_report_as_json(self):
-        """Testing retreiving detail report as json."""
-        report_out = StringIO()
-
+        """Testing retrieving detail report as json."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
@@ -88,20 +86,16 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_report_json_data, file_content_dict)
 
     def test_detail_report_as_json_report_id(self):
-        """Testing retreiving detail report as json with report id."""
-        report_out = StringIO()
-
+        """Testing retrieving detail report as json with report id."""
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -122,19 +116,16 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 self.assertDictEqual(get_report_json_data, file_content_dict)
 
     def test_detail_report_as_csv(self):
-        """Testing retreiving detail report as csv."""
-        report_out = StringIO()
+        """Testing retrieving detail report as csv."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
@@ -161,11 +152,9 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_csv_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
@@ -250,7 +239,6 @@ class ReportDetailsTests(unittest.TestCase):
     def test_details_file_fails_to_write(self, file):
         """Testing details failure while writing to file."""
         file.side_effect = EnvironmentError()
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/details/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -271,11 +259,11 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % (self.test_json_filename, "")
-                self.assertEqual(report_out.getvalue().strip(), err_msg)
+                self.assertIn(err_msg, log.output[0])
 
     def test_details_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
@@ -424,8 +412,7 @@ class ReportDetailsTests(unittest.TestCase):
                 )
 
     def test_detail_report_as_csv_masked(self):
-        """Testing retreiving csv details report with masked query param."""
-        report_out = StringIO()
+        """Testing retrieving csv details report with masked query param."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = (
@@ -454,11 +441,9 @@ class ReportDetailsTests(unittest.TestCase):
                 path=self.test_csv_filename,
                 mask=True,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), messages.REPORT_SUCCESSFULLY_WRITTEN
-                )
+                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)

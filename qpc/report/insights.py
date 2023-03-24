@@ -14,6 +14,7 @@
 from __future__ import print_function
 
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +23,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import check_extension, validate_write_file, write_file
+
+log = getLogger("qpc")
 
 
 # pylint: disable=too-few-public-methods

@@ -1,9 +1,13 @@
 """CLI messages for translation."""
 
+from qpc.source import SOURCE_TYPE_CHOICES
+
+VALID_DATA_SOURCES = ", ".join(SOURCE_TYPE_CHOICES)
+
 CRED_NAME_HELP = "Credential name."
-CRED_TYPE_HELP = "Type of credential. Valid values: vcenter, network, satellite."
+CRED_TYPE_HELP = f"Type of credential. Valid values: {VALID_DATA_SOURCES}."
 CRED_TYPE_FILTER_HELP = (
-    "Filter for listing credentials by type. Valid values: vcenter, network."
+    f"Filter for listing credentials by type. Valid values: {VALID_DATA_SOURCES}."
 )
 CRED_USER_HELP = "User name for authenticating against the target system."
 CRED_PWD_HELP = "Password for authenticating against the target system."
@@ -56,11 +60,11 @@ CRED_BECOME_USER_HELP = (
 CRED_BECOME_PASSWORD_HELP = (
     "The privilege escalation password to be used when running a network scan."
 )
-CRED_TOKEN_HELP = "OpenShift token."
+CRED_TOKEN_HELP = "Authentication token."
 
 SOURCE_NAME_HELP = "Source name."
 SOURCES_NAME_HELP = "List of source names."
-SOURCE_TYPE_HELP = "Type of source. Valid values: vcenter, network, satellite."
+SOURCE_TYPE_HELP = f"Type of source. Valid values: {VALID_DATA_SOURCES}."
 SOURCE_HOSTS_HELP = (
     'IP ranges to scan. Run the "man %s" command for more '
     "information about supported formats."
@@ -298,7 +302,7 @@ SSH_PASSPHRASE = "Provide a passphrase for the SSH keyfile."
 BECOME_PASSWORD = (
     "Provide a privilege escalation password to be used when running a network scan."
 )
-OPENSHIFT_TOKEN = "Provide a token for OpenShift authentication.\nToken: "
+AUTH_TOKEN = "Provide a token for authentication.\nToken: "
 
 MERGE_JOB_ID_NOT_FOUND = "Report merge job %s not found."
 MERGE_JOB_ID_STATUS = "Report merge job %(job_id)s is %(status)s."

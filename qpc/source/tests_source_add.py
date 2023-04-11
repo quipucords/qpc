@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import os
@@ -227,7 +217,6 @@ class SourceAddCliTests(unittest.TestCase):
     ##################################################
     def test_add_source_net_one_host(self):
         """Testing add network source command successfully with one host."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -243,15 +232,13 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_net_valid_hosts(self):
         """Testing add network source command with hosts in valid formats."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -276,15 +263,13 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_with_paramiko(self):
         """Testing add network source command with use_paramiko set to true."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -302,11 +287,10 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
 
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_with_paramiko_and_ssl(self):
         """Testing add network source command with use_paramiko set to true."""
@@ -336,7 +320,6 @@ class SourceAddCliTests(unittest.TestCase):
 
     def test_add_source_one_excludehost(self):
         """Testing the add network source command with one exclude host."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -353,15 +336,13 @@ class SourceAddCliTests(unittest.TestCase):
                 exclude_hosts=["1.2.3.4"],
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_exclude_hosts(self):
         """Testing add network source command with many valid exclude hosts."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -393,18 +374,16 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     ##################################################
     # Vcenter Source Test
     ##################################################
     def test_add_source_vc(self):
         """Testing the add vcenter source command successfully."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -416,15 +395,13 @@ class SourceAddCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="vcenter"
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_with_ssl_params(self):
         """Testing add vcenter source command with all ssl params."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -443,18 +420,16 @@ class SourceAddCliTests(unittest.TestCase):
                 type="vcenter",
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     ##################################################
     # Satellite Source Test
     ##################################################
     def test_add_source_sat(self):
         """Testing the add satellite source command successfully."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -466,15 +441,13 @@ class SourceAddCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="satellite"
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_add_source_sat_no_ssl(self):
         """Testing the add satellite with ssl_cert_verify set to false."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -490,8 +463,7 @@ class SourceAddCliTests(unittest.TestCase):
                 type="satellite",
                 ssl_cert_verify="false",
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_ADDED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_ADDED % "source1"
+                self.assertIn(expected_message, log.output[-1])

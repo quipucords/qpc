@@ -1,19 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ScanClearCommand is used to clear one or all host scans."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import DELETE, GET, request
 from qpc.translation import _
 from qpc.utils import handle_error_response
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -70,11 +60,11 @@ class ScanClearCommand(CliCommand):
         if response.status_code == codes.no_content:
             deleted = True
             if print_out:
-                print(_(messages.SCAN_REMOVED % name))
+                logger.info(_(messages.SCAN_REMOVED), name)
         else:
             handle_error_response(response)
             if print_out:
-                print(_(messages.SCAN_FAILED_TO_REMOVE % name))
+                logger.error(_(messages.SCAN_FAILED_TO_REMOVE), name)
         return deleted
 
     # pylint: disable=too-many-branches
@@ -83,7 +73,7 @@ class ScanClearCommand(CliCommand):
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
         if self.args.name and count == 0:
-            print(_(messages.SCAN_NOT_FOUND % self.args.name))
+            logger.error(_(messages.SCAN_NOT_FOUND), self.args.name)
             sys.exit(1)
         elif self.args.name and count == 1:
             # delete single scan
@@ -96,7 +86,7 @@ class ScanClearCommand(CliCommand):
                     if self._delete_entry(result) is False:
                         sys.exit(1)
         elif count == 0:
-            print(_(messages.SCAN_NO_SCANS_TO_REMOVE))
+            logger.error(_(messages.SCAN_NO_SCANS_TO_REMOVE))
             sys.exit(1)
         else:
             # remove all scan entries
@@ -107,10 +97,10 @@ class ScanClearCommand(CliCommand):
                     remove_error.append(entry["id"])
             if remove_error:
                 scan_err = ",".join(str(remove_error))
-                print(_(messages.SCAN_PARTIAL_REMOVE % scan_err))
+                logger.error(_(messages.SCAN_PARTIAL_REMOVE), scan_err)
                 sys.exit(1)
             else:
                 if not next_link:
-                    print(messages.SCAN_CLEAR_ALL_SUCCESS)
+                    logger.info(messages.SCAN_CLEAR_ALL_SUCCESS)
                 else:
                     self._do_command()

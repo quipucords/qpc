@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import os
@@ -145,7 +135,6 @@ class SourceEditCliTests(unittest.TestCase):
     ##################################################
     def test_edit_net_source(self):
         """Testing the edit network source command successfully."""
-        source_out = StringIO()
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_patch = get_server_location() + SOURCE_URI + "1/"
@@ -175,15 +164,13 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_UPDATED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_source_exclude_host(self):
         """Testing edit network source command by adding an excluded host."""
-        source_out = StringIO()
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_patch = get_server_location() + SOURCE_URI + "1/"
@@ -212,18 +199,16 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 port=22,
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_UPDATED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     ##################################################
     # Vcenter Source Test
     ##################################################
     def test_edit_vc_source(self):
         """Testing the edit vcenter source command successfully."""
-        source_out = StringIO()
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_patch = get_server_location() + SOURCE_URI + "1/"
@@ -246,15 +231,13 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.patch(url_patch, status_code=200)
             aec = SourceEditCommand(SUBPARSER)
             args = Namespace(name="source1", hosts=["1.2.3.5"], cred=["credential1"])
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_UPDATED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_disable_ssl(self):
         """Testing that you can edit the disable-ssl arg successfully."""
-        source_out = StringIO()
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_patch = get_server_location() + SOURCE_URI + "1/"
@@ -283,15 +266,13 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 disable_ssl="True",
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_UPDATED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_ssl_protocol(self):
         """Testing that you can edit the ssl_protocol arg successfully."""
-        source_out = StringIO()
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_patch = get_server_location() + SOURCE_URI + "1/"
@@ -320,11 +301,10 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 ssl_protocol="SSLv23",
             )
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    source_out.getvalue(), messages.SOURCE_UPDATED % "source1" + "\n"
-                )
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_source_no_val(self):
         """Testing the edit source command with a server error."""

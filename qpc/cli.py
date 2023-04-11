@@ -1,17 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2019 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """QPC Command Line Interface."""
-
-from __future__ import print_function
 
 import sys
 from argparse import ArgumentParser
@@ -69,7 +56,7 @@ from qpc.utils import (
     ensure_config_dir_exists,
     ensure_data_dir_exists,
     get_server_location,
-    log,
+    logger,
     read_client_token,
     read_require_auth,
     setup_logging,
@@ -197,12 +184,12 @@ class CLI:
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == "":
-                log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
+                logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
                 sys.exit(1)
 
         if read_require_auth():
             if (not is_server_cmd or is_server_logout) and not read_client_token():
-                log.error(_(messages.SERVER_LOGIN_REQUIRED % PKG_NAME))
+                logger.error(_(messages.SERVER_LOGIN_REQUIRED), PKG_NAME)
                 sys.exit(1)
 
         if self.args.subcommand in self.subcommands:

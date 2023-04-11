@@ -1,20 +1,9 @@
-#
-# Copyright (c) 2019 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import os
 import sys
 import unittest
 from argparse import ArgumentParser, Namespace
-from io import StringIO
 
 import requests_mock
 
@@ -22,7 +11,7 @@ from qpc import messages
 from qpc.release import PKG_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.upload import ReportUploadCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr
 from qpc.utils import get_server_location, write_server_config
 
 TMP_BADDETAILS1 = (
@@ -66,43 +55,38 @@ class ReportUploadTests(unittest.TestCase):
 
     def test_upload_good_details_report(self):
         """Test uploading a good details report."""
-        report_out = StringIO()
-
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
             nac = ReportUploadCommand(SUBPARSER)
             args = Namespace(json_file=TMP_GOODDETAILS[0])
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertIn(
-                    messages.REPORT_SUCCESSFULLY_UPLOADED % ("1", PKG_NAME, "1"),
-                    report_out.getvalue().strip(),
-                )
+                expected_message = messages.REPORT_SUCCESSFULLY_UPLOADED % {
+                    "id": "1", "pkg_name": PKG_NAME
+                }
+
+                self.assertIn(expected_message, log.output[-1])
 
     def test_upload_bad_details_report(self):
         """Test uploading a bad details report."""
-        report_out = StringIO()
-
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
             nac = ReportUploadCommand(SUBPARSER)
             args = Namespace(json_file=TMP_BADDETAILS1[0])
-            with self.assertRaises(SystemExit):
-                with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
+                with self.assertRaises(SystemExit):
                     nac.main(args)
-            self.assertIn(
-                messages.REPORT_UPLOAD_FILE_INVALID_JSON % (TMP_BADDETAILS1[0]),
-                report_out.getvalue().strip(),
-            )
+                err_msg = (
+                    messages.REPORT_UPLOAD_FILE_INVALID_JSON % (TMP_BADDETAILS1[0])
+                )
+                self.assertIn(err_msg, log.output[-1])
 
     def test_upload_bad_details_report_no_fingerprints(self):
         """Test uploading a details report that produces no fingerprints."""
-        report_out = StringIO()
-
         put_report_data = {
             "error": "FAILED to create report id=23 - produced no valid fingerprints"
         }
@@ -111,10 +95,10 @@ class ReportUploadTests(unittest.TestCase):
             mocker.post(put_merge_url, status_code=400, json=put_report_data)
             nac = ReportUploadCommand(SUBPARSER)
             args = Namespace(json_file=TMP_GOODDETAILS[0])
-            with self.assertRaises(SystemExit):
-                with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
+                with self.assertRaises(SystemExit):
                     nac.main(args)
-            self.assertIn(
-                messages.REPORT_FAILED_TO_UPLOADED % (put_report_data.get("error")),
-                report_out.getvalue().strip(),
-            )
+                err_msg = (
+                    messages.REPORT_FAILED_TO_UPLOADED % (put_report_data.get("error"))
+                )
+                self.assertIn(err_msg, log.output[-1])

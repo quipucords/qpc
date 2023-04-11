@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import sys
@@ -69,7 +59,6 @@ class ScanStartCliTests(unittest.TestCase):
 
     def test_start_scan(self):
         """Testing the start scan command successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI
         url_post = get_server_location() + SCAN_URI + "1/jobs/"
         results = [
@@ -90,11 +79,10 @@ class ScanStartCliTests(unittest.TestCase):
             mocker.post(url_post, status_code=201, json={"id": 1})
             ssc = ScanStartCommand(SUBPARSER)
             args = Namespace(name="scan1")
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ssc.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_STARTED % "1" + "\n"
-                )
+                expected_message = messages.SCAN_STARTED % "1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_unsuccessful_start_scan(self):
         """Testing the start scan command unsuccessfully."""

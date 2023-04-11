@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2018-2019 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import os
@@ -112,8 +102,6 @@ class ReportMergeTests(unittest.TestCase):
 
     def test_detail_merge_job_ids(self):
         """Testing report merge command with scan job ids."""
-        report_out = StringIO()
-
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         scanjob1_data = {"report_id": 1}
@@ -128,12 +116,12 @@ class ReportMergeTests(unittest.TestCase):
             args = Namespace(
                 scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    messages.REPORT_SUCCESSFULLY_MERGED % ("1", PKG_NAME, "1"),
-                    report_out.getvalue().strip(),
-                )
+                expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+                    "id": "1", "pkg_name": PKG_NAME
+                }
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_detail_merge_error_job_ids(self):
         """Testing report merge error with scan job ids."""
@@ -160,8 +148,6 @@ class ReportMergeTests(unittest.TestCase):
 
     def test_detail_merge_report_ids(self):
         """Testing report merge command with report ids."""
-        report_out = StringIO()
-
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
@@ -170,12 +156,12 @@ class ReportMergeTests(unittest.TestCase):
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_SUCCESSFULLY_MERGED % ("1", PKG_NAME, "1"),
-                )
+                expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+                    "id": "1", "pkg_name": PKG_NAME
+                }
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_detail_merge_error_report_ids(self):
         """Testing report merge error with report ids."""
@@ -196,8 +182,6 @@ class ReportMergeTests(unittest.TestCase):
 
     def test_detail_merge_json_files(self):
         """Testing report merge command with json files."""
-        report_out = StringIO()
-
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
@@ -208,12 +192,12 @@ class ReportMergeTests(unittest.TestCase):
                 json_files=[TMP_DETAILSFILE1[0], TMP_GOODDETAILS[0]],
                 report_ids=None,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertIn(
-                    messages.REPORT_SUCCESSFULLY_MERGED % ("1", PKG_NAME, "1"),
-                    report_out.getvalue().strip(),
-                )
+                expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+                    "id": "1", "pkg_name": PKG_NAME
+                }
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_detail_merge_json_files_not_exist(self):
         """Testing report merge file not found error with json files."""
@@ -301,7 +285,6 @@ class ReportMergeTests(unittest.TestCase):
 
     def test_detail_merge_json_directory(self):
         """Testing report merge command with json directory."""
-        report_out = StringIO()
         put_report_data = {"id": 1}
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
@@ -310,12 +293,12 @@ class ReportMergeTests(unittest.TestCase):
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=None, json_dir=["/tmp/"]
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="INFO") as log:
                 nac.main(args)
-                self.assertIn(
-                    messages.REPORT_SUCCESSFULLY_MERGED % ("1", PKG_NAME, "1"),
-                    report_out.getvalue().strip(),
-                )
+                expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+                    "id": "1", "pkg_name": PKG_NAME
+                }
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_detail_merge_json_directory_error_dir_not_found(self):
         """Testing report merge command with json_dir parameter (notdir)."""

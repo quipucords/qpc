@@ -1,12 +1,3 @@
-# Copyright (c) 2022 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test openshift cred add in CLI."""
 import sys
 
@@ -120,12 +111,13 @@ class TestOpenShiftAddCredential:
     @pytest.mark.parametrize("cred_type", ["OPENSHIFT", "openshift", "OpenShiFt"])
     def test_add_green_path(
         self,
-        capsys,
+        caplog,
         requests_mock,
         openshift_token_input,
         cred_type,
     ):
         """Test openshift cred add green path."""
+        caplog.set_level("INFO")
         url = get_server_location() + CREDENTIAL_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -139,6 +131,4 @@ class TestOpenShiftAddCredential:
             "--token",
         ]
         CLI().main()
-        out, err = capsys.readouterr()
-        assert out == (messages.CRED_ADDED % "openshift_credential" + "\n")
-        assert err == ""
+        assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_credential"

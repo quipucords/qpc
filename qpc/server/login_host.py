@@ -1,19 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """LoginHostCommand is used to login with username and password."""
 
-from __future__ import print_function
-
 from getpass import getpass
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.translation import _
 from qpc.utils import delete_client_token, write_client_token
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -90,4 +80,4 @@ class LoginHostCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         write_client_token(json_data)
-        print(_(messages.LOGIN_SUCCESS))
+        logger.info(_(messages.LOGIN_SUCCESS))

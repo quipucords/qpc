@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 import sys
 import unittest
@@ -18,6 +8,7 @@ from unittest.mock import ANY, patch
 import requests
 import requests_mock
 
+from qpc import messages
 from qpc.cred import CREDENTIAL_URI
 from qpc.cred.list import CredListCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -49,11 +40,11 @@ class CredentialListCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    clc.main(args)
+                    cred_list.main(args)
 
     def test_list_cred_conn_err(self):
         """Testing the list credential command with a connection error."""
@@ -61,11 +52,11 @@ class CredentialListCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    clc.main(args)
+                    cred_list.main(args)
 
     def test_list_cred_internal_err(self):
         """Testing the list credential command with an internal error."""
@@ -73,23 +64,23 @@ class CredentialListCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    clc.main(args)
+                    cred_list.main(args)
 
     def test_list_cred_empty(self):
         """Testing the list credential command successfully with empty data."""
-        cred_out = StringIO()
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace()
-            with redirect_stdout(cred_out):
-                clc.main(args)
-                self.assertEqual(cred_out.getvalue(), "No credentials exist yet.\n")
+            with self.assertLogs(level="INFO") as log:
+                cred_list.main(args)
+                expected_message = messages.CRED_LIST_NO_CREDS
+                self.assertIn(expected_message, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
     def test_list_cred_data(self, b_input):
@@ -109,10 +100,10 @@ class CredentialListCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(next_link, status_code=200, json=data2)
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace()
             with redirect_stdout(cred_out):
-                clc.main(args)
+                cred_list.main(args)
                 expected = (
                     '[{"id":1,"name":"cred1","password":"********",'
                     '"username":"root"}]'
@@ -138,10 +129,10 @@ class CredentialListCliTests(unittest.TestCase):
         data = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
-            clc = CredListCommand(SUBPARSER)
+            cred_list = CredListCommand(SUBPARSER)
             args = Namespace(type="network")
             with redirect_stdout(cred_out):
-                clc.main(args)
+                cred_list.main(args)
                 expected = (
                     '[{"cred_type":"network","id":1,'
                     '"name":"cred1","password":"********",'

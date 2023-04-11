@@ -1,20 +1,8 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ScanListCommand is used to list system scans."""
-
-from __future__ import print_function
 
 import sys
 import urllib.parse as urlparse
+from logging import getLogger
 
 from requests import codes
 
@@ -24,6 +12,8 @@ from qpc.request import GET
 from qpc.scan.utils import get_scan_object_id
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -79,7 +69,7 @@ class ScanJobCommand(CliCommand):
             self.parser.print_usage()
             sys.exit(1)
         if self.args.id and self.args.status:
-            print(_(messages.SCAN_JOB_ID_STATUS))
+            logger.info(_(messages.SCAN_JOB_ID_STATUS))
             self.parser.print_usage()
             sys.exit(1)
 
@@ -109,7 +99,7 @@ class ScanJobCommand(CliCommand):
                     data = pretty_print(json_data)
                     print(data)
                 else:
-                    print(_(messages.SCAN_LIST_NO_SCANS))
+                    logger.error(_(messages.SCAN_LIST_NO_SCANS))
                     sys.exit(1)
             else:
                 data = pretty_print(results)
@@ -125,5 +115,5 @@ class ScanJobCommand(CliCommand):
                 input(_(messages.NEXT_RESULTS))
                 self._do_command()
         else:
-            print(_(messages.SCAN_LIST_NO_SCANS))
+            logger.error(_(messages.SCAN_LIST_NO_SCANS))
             sys.exit(1)

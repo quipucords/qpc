@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
-
 """Test the CLI module."""
 
 import sys
@@ -106,7 +94,6 @@ class ScanClearCliTests(unittest.TestCase):
 
         Successfully with stubbed data when specifying a name
         """
-        scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI + "?name=scan1"
         delete_url = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -117,10 +104,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
             ncc = ScanClearCommand(SUBPARSER)
             args = Namespace(name="scan1")
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SCAN_REMOVED % "scan1" + "\n"
-                self.assertEqual(scan_out.getvalue(), expected)
+                expected_msg = messages.SCAN_REMOVED % "scan1"
+                self.assertIn(expected_msg, log.output[-1])
 
     def test_clear_by_name_err(self):
         """Test the clear scan command successfully.
@@ -194,7 +181,6 @@ class ScanClearCliTests(unittest.TestCase):
 
     def test_clear_all(self):
         """Testing the clear scan command successfully with stubbed data."""
-        scan_out = StringIO()
         get_url = get_server_location() + SCAN_URI
         delete_url = get_server_location() + SCAN_URI + "1/"
         delete_url2 = get_server_location() + SCAN_URI + "2/"
@@ -208,7 +194,6 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url2, status_code=204)
             ncc = ScanClearCommand(SUBPARSER)
             args = Namespace(name=None)
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 ncc.main(args)
-                expected = messages.SCAN_CLEAR_ALL_SUCCESS + "\n"
-                self.assertEqual(scan_out.getvalue(), expected)
+                self.assertIn(messages.SCAN_CLEAR_ALL_SUCCESS, log.output[-1])

@@ -1,23 +1,14 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2019 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Helper functions for processing reports."""
-
-from __future__ import print_function
 
 import json
 import os
+from logging import getLogger
 
 from qpc import messages
 from qpc.translation import _
+
+logger = getLogger(__name__)
+
 
 # pylint: disable=invalid-name
 try:
@@ -43,7 +34,7 @@ def validate_and_create_json(file):
     """
     # pylint: disable=too-many-branches,too-many-statements
     # pylint: disable=too-many-locals
-    print(_(messages.REPORT_UPLOAD_VALIDATE_JSON % file))
+    logger.info(_(messages.REPORT_UPLOAD_VALIDATE_JSON), file)
     sources = None
     if os.path.isfile(file):
         details_report = None
@@ -51,20 +42,23 @@ def validate_and_create_json(file):
             try:
                 details_report = json.load(details_file)
             except json_exception_class:
-                print(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON % file))
+                logger.error(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON), file)
                 return None
 
             # validate version type
             file_report_version = details_report.get(REPORT_VERSION_KEY, None)
             if not file_report_version:
                 # warn about old format but continue
-                print(_(messages.REPORT_MISSING_REPORT_VERSION % file))
+                logger.error(_(messages.REPORT_MISSING_REPORT_VERSION), file)
                 file_report_version = DEFAULT_REPORT_VERSION
 
             file_report_type = details_report.get(REPORT_TYPE_KEY, DETAILS_REPORT_TYPE)
             if file_report_type != DETAILS_REPORT_TYPE:
                 # terminate if different from details type
-                print(_(messages.REPORT_INVALID_REPORT_TYPE % (file, file_report_type)))
+                logger.error(
+                    _(messages.REPORT_INVALID_REPORT_TYPE),
+                    {"file": file, "report_type": file_report_type}
+                )
                 return None
 
             # validate sources
@@ -75,12 +69,16 @@ def validate_and_create_json(file):
                     facts = source.get(FACTS_KEY)
                     server_id = source.get(SERVER_ID_KEY)
                     if not facts:
-                        print(_(messages.REPORT_JSON_MISSING_ATTR % (file, FACTS_KEY)))
+                        logger.error(
+                            _(messages.REPORT_JSON_MISSING_ATTR),
+                            {"file": file, "key": FACTS_KEY}
+                        )
                         has_error = True
                         break
                     if not server_id:
-                        print(
-                            _(messages.REPORT_JSON_MISSING_ATTR % (file, SERVER_ID_KEY))
+                        logger.error(
+                            _(messages.REPORT_JSON_MISSING_ATTR),
+                            {"file": file, "key": FACTS_KEY}
                         )
                         has_error = True
                         break
@@ -90,14 +88,17 @@ def validate_and_create_json(file):
 
                 if not has_error:
                     # Source is valid so add it
-                    print(_(messages.REPORT_JSON_DIR_FILE_SUCCESS % file))
+                    logger.info(_(messages.REPORT_JSON_DIR_FILE_SUCCESS), file)
                 else:
                     return None
             else:
-                print(_(messages.REPORT_JSON_MISSING_ATTR % (file, SOURCES_KEY)))
+                logger.error(
+                    _(messages.REPORT_JSON_MISSING_ATTR),
+                    {"file": file, "key": SOURCES_KEY}
+                )
                 return None
     else:
-        print(_(messages.FILE_NOT_FOUND % file))
+        logger.error(_(messages.FILE_NOT_FOUND), file)
         return None
 
     return sources

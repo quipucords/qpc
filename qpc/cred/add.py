@@ -1,17 +1,6 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """CredAddCommand is used to add authentication credentials."""
 
-from __future__ import print_function
+from logging import getLogger
 
 from requests import codes
 
@@ -20,7 +9,10 @@ from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.cred.utils import build_credential_payload
 from qpc.request import POST
+from qpc.source import SOURCE_TYPE_CHOICES
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -57,12 +49,7 @@ class CredAddCommand(CliCommand):
         self.parser.add_argument(
             "--type",
             dest="type",
-            choices=[
-                credential.NETWORK_CRED_TYPE,
-                credential.VCENTER_CRED_TYPE,
-                credential.SATELLITE_CRED_TYPE,
-                credential.OPENSHIFT_CRED_TYPE,
-            ],
+            choices=SOURCE_TYPE_CHOICES,
             metavar="TYPE",
             help=_(messages.CRED_TYPE_HELP),
             type=str.lower,
@@ -128,4 +115,4 @@ class CredAddCommand(CliCommand):
         self.req_payload = build_credential_payload(self.args, self.args.type)
 
     def _handle_response_success(self):
-        print(_(messages.CRED_ADDED % self.args.name))
+        logger.info(_(messages.CRED_ADDED), self.args.name)

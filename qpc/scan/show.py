@@ -1,19 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ScanShowCommand is used to show info on a specific system scan."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -75,7 +65,7 @@ class ScanShowCommand(CliCommand):
                         self.req_path = self.req_path + str(result["id"]) + "/"
                         found = True
             if not found or count == 0:
-                print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))
+                logger.error(_(messages.SCAN_DOES_NOT_EXIST), self.args.name)
                 sys.exit(1)
 
     def _handle_response_success(self):
@@ -84,5 +74,5 @@ class ScanShowCommand(CliCommand):
         print(data)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
-        print(_(messages.SCAN_DOES_NOT_EXIST % self.args.name))
+        logger.error(_(messages.SCAN_DOES_NOT_EXIST), self.args.name)
         sys.exit(1)

@@ -1,17 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Utilities for the credential credentials module."""
-
-from __future__ import print_function
 
 from getpass import getpass
 from logging import getLogger
@@ -20,7 +7,7 @@ from qpc import messages
 from qpc.translation import _
 from qpc.utils import check_if_prompt_is_not_empty
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 def get_password(args, req_payload, add_none=True):
@@ -53,7 +40,7 @@ def get_password(args, req_payload, add_none=True):
     elif add_none:
         req_payload["become_password"] = None
     if getattr(args, "token", None):
-        token_prompt = getpass(messages.OPENSHIFT_TOKEN)
+        token_prompt = getpass(messages.AUTH_TOKEN)
         check_if_prompt_is_not_empty(token_prompt)
         req_payload["auth_token"] = token_prompt
     elif add_none:

@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import json
@@ -276,13 +266,14 @@ class ReportDeploymentsTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = messages.WRITE_FILE_ERROR % (self.test_json_filename, "")
+                err_msg = messages.WRITE_FILE_ERROR % {
+                    "path": self.test_json_filename, "error": ""
+                }
                 self.assertIn(err_msg, log.output[0])
 
     def test_deployments_nonexistent_directory(self):
         """Testing error for nonexistent directory in output."""
         fake_dir = "/cody/is/awesome/deployments.json"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -298,21 +289,17 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=fake_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    (
-                        messages.REPORT_DIRECTORY_DOES_NOT_EXIST
-                        % os.path.dirname(fake_dir)
-                    ),
+                err_msg = (
+                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(fake_dir)
                 )
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_nonjson_directory(self):
         """Testing error for nonjson output path."""
         non_json_dir = "/Users/deployments.tar.gz"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -328,17 +315,15 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=non_json_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), (messages.OUTPUT_FILE_TYPE % ".json")
-                )
+                err_msg = messages.OUTPUT_FILE_TYPE % ".json"
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_noncsv_directory(self):
         """Testing error for noncsv output path."""
         non_csv_dir = "/cody/is/awesome/deployments.tar.gz"
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -354,16 +339,14 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=non_csv_dir,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(), (messages.OUTPUT_FILE_TYPE % ".csv")
-                )
+                err_msg = messages.OUTPUT_FILE_TYPE % ".csv"
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_report_id_not_exist(self):
         """Test deployments with nonexistent report id."""
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {self.test_json_filename: get_report_json_data}
@@ -384,16 +367,14 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID % 1
-                self.assertEqual(report_out.getvalue().strip(), err)
+                err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_report_error_scan_job(self):
         """Testing error with scan job id."""
-        report_out = StringIO()
-
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
@@ -417,13 +398,11 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1,
-                )
+                err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_report_mask(self):
         """Testing retreiving json deployments report with masked values."""
@@ -459,8 +438,6 @@ class ReportDeploymentsTests(unittest.TestCase):
 
     def test_deployments_masked_sj_428(self):
         """Deployments report retrieved from sj returns 428."""
-        report_out = StringIO()
-
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
@@ -484,17 +461,14 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=True,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.REPORT_COULD_NOT_BE_MASKED_SJ % 1,
-                )
+                err_msg = messages.REPORT_COULD_NOT_BE_MASKED_SJ % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_masked_report_428(self):
         """Deployments report retrieved from report returns 428."""
-        report_out = StringIO()
         get_report_url = (
             get_server_location() + REPORT_URI + "1/deployments/" + "?mask=True"
         )
@@ -517,15 +491,14 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=True,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err = messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID % 1
-                self.assertEqual(report_out.getvalue().strip(), err)
+                err_msg = messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID % 1
+                self.assertIn(err_msg, log.output[0])
 
     def test_deployments_old_version(self):
         """Test too old server version."""
-        report_out = StringIO()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         with requests_mock.Mocker() as mocker:
@@ -544,13 +517,14 @@ class ReportDeploymentsTests(unittest.TestCase):
                 path=self.test_json_filename,
                 mask=False,
             )
-            with redirect_stdout(report_out):
+            with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                self.assertEqual(
-                    report_out.getvalue().strip(),
-                    messages.SERVER_TOO_OLD_FOR_CLI % ("0.9.2", "0.9.2", "0.0.45"),
-                )
+                err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
+                    "min_version": "0.9.2",
+                    "current_version": "0.0.45"
+                }
+                self.assertIn(err_msg, log.output[0])
 
 
 def test_deployments_report_as_json_no_output_file(caplog, capsys, requests_mock):

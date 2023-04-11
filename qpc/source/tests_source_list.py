@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import sys
@@ -19,6 +9,7 @@ from unittest.mock import ANY, patch
 import requests
 import requests_mock
 
+from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.list import SourceListCommand
@@ -86,15 +77,14 @@ class SourceListCliTests(unittest.TestCase):
 
     def test_list_source_empty(self):
         """Testing the list source command successfully with empty data."""
-        source_out = StringIO()
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
             nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
-            with redirect_stdout(source_out):
+            with self.assertLogs(level="ERROR") as log:
                 nlc.main(args)
-                self.assertEqual(source_out.getvalue(), "No sources exist yet.\n")
+                self.assertIn(messages.SOURCE_LIST_NO_SOURCES, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
     def test_list_source_data(self, b_input):

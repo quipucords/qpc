@@ -1,12 +1,3 @@
-# Copyright (c) 2022 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """InsightsConfigureCommand is used to set target host and port for insights upload."""
 from logging import getLogger
 
@@ -21,7 +12,7 @@ from qpc.utils import (
     write_insights_config,
 )
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 class InsightsConfigureCommand(CliCommand):
@@ -74,4 +65,4 @@ class InsightsConfigureCommand(CliCommand):
             "use_http": self.args.use_http,
         }
         write_insights_config(insights_config)
-        log.info(_(messages.INSIGHTS_CONFIG_SUCCESS), insights_config)
+        logger.info(_(messages.INSIGHTS_CONFIG_SUCCESS), insights_config)

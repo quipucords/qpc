@@ -1,22 +1,10 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018-2019 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ReportMergeCommand is used to merge scan jobs results."""
-
-from __future__ import print_function
 
 import json
 import os
 import sys
 from glob import glob
+from logging import getLogger
 
 from requests import codes
 
@@ -27,6 +15,9 @@ from qpc.report import utils
 from qpc.request import GET, POST, PUT, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
+
+logger = getLogger(__name__)
+
 
 # pylint: disable=invalid-name
 try:
@@ -129,7 +120,7 @@ class ReportMergeCommand(CliCommand):
         """
         # pylint: disable=too-many-branches,too-many-statements
         # pylint: disable=too-many-locals
-        print(_(messages.REPORT_VALIDATE_JSON % files))
+        logger.info(_(messages.REPORT_VALIDATE_JSON), files)
         all_sources = []
         for file in files:
             sources = utils.validate_and_create_json(file)
@@ -137,7 +128,7 @@ class ReportMergeCommand(CliCommand):
             if sources:
                 all_sources += sources
         if all_sources == []:
-            print(_(messages.REPORT_JSON_DIR_ALL_FAIL))
+            logger.error(_(messages.REPORT_JSON_DIR_ALL_FAIL))
             sys.exit(1)
         self.json = {
             utils.SOURCES_KEY: all_sources,
@@ -152,7 +143,7 @@ class ReportMergeCommand(CliCommand):
         if len(self.args.json_files) > 1:
             self._validate_create_json(self.args.json_files)
         else:
-            print(_(messages.REPORT_JSON_FILES_HELP))
+            logger.info(_(messages.REPORT_JSON_FILES_HELP))
             sys.exit(1)
 
     def _merge_json_dir(self):
@@ -164,11 +155,11 @@ class ReportMergeCommand(CliCommand):
         if isinstance(path, list):
             path = path[0]
         if os.path.isdir(path) is not True:
-            print(_(messages.REPORT_JSON_DIR_NOT_FOUND % path))
+            logger.error(_(messages.REPORT_JSON_DIR_NOT_FOUND), path)
             sys.exit(1)
         json_files = glob(os.path.join(path, "*.json"))
         if not json_files:
-            print(_(messages.REPORT_JSON_DIR_NO_FILES % path))
+            logger.error(_(messages.REPORT_JSON_DIR_NO_FILES), path)
             sys.exit(1)
         self._validate_create_json(json_files)
 
@@ -185,9 +176,11 @@ class ReportMergeCommand(CliCommand):
             ) = self._get_report_ids()
             if not_found is True:
                 if job_not_found:
-                    print(_(messages.REPORT_SJS_DO_NOT_EXIST % job_not_found))
+                    logger.error(_(messages.REPORT_SJS_DO_NOT_EXIST), job_not_found)
                 if report_not_found:
-                    print(_(messages.REPORTS_REPORTS_DO_NOT_EXIST % report_not_found))
+                    logger.error(
+                        _(messages.REPORTS_REPORTS_DO_NOT_EXIST), report_not_found
+                    )
                 sys.exit(1)
         elif self.args.report_ids:
             report_ids = self.args.report_ids
@@ -214,11 +207,9 @@ class ReportMergeCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         if json_data.get("id"):
-            print(
-                _(
-                    messages.REPORT_SUCCESSFULLY_MERGED
-                    % (json_data.get("id"), PKG_NAME, json_data.get("id"))
-                )
+            logger.info(
+                _(messages.REPORT_SUCCESSFULLY_MERGED),
+                {"id": json_data.get("id"), "pkg_name": PKG_NAME},
             )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
@@ -228,6 +219,5 @@ class ReportMergeCommand(CliCommand):
             print(json_data.get("reports")[0])
             sys.exit(1)
 
-        print("No reports found.  Error json: ")
-        print(json_data)
+        logger.error(_(messages.MERGE_ERROR), json_data)
         sys.exit(1)

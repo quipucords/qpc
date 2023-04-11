@@ -1,14 +1,3 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Common module for handling request calls to the server."""
 
 import json
@@ -30,8 +19,8 @@ from qpc.utils import (
     get_server_location,
     get_ssl_verify,
     handle_error_response,
-    log,
     log_request_info,
+    logger,
     read_client_token,
     read_server_config,
 )
@@ -66,11 +55,9 @@ def handle_general_errors(response, min_server_version):
     if "0.0.0" not in server_version and LooseVersion(server_version) < LooseVersion(
         min_server_version
     ):
-        print(
-            _(
-                messages.SERVER_TOO_OLD_FOR_CLI
-                % (min_server_version, min_server_version, server_version)
-            )
+        logger.error(
+            _(messages.SERVER_TOO_OLD_FOR_CLI),
+            {"min_version": min_server_version, "current_version": server_version}
         )
         sys.exit(1)
 
@@ -83,15 +70,15 @@ def handle_general_errors(response, min_server_version):
 
     if response.status_code == 401:
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
+        logger.error(_(messages.SERVER_LOGIN_REQUIRED), PKG_NAME)
         sys.exit(1)
     elif response.status_code == 400 and response_data == token_expired:
         handle_error_response(response)
-        log.error(_(messages.SERVER_LOGIN_REQUIRED % (PKG_NAME)))
+        logger.error(_(messages.SERVER_LOGIN_REQUIRED), PKG_NAME)
         sys.exit(1)
     elif response.status_code == 500:
         handle_error_response(response)
-        log.error(_(messages.SERVER_INTERNAL_ERROR))
+        logger.error(_(messages.SERVER_INTERNAL_ERROR))
         sys.exit(1)
 
     return response
@@ -211,7 +198,7 @@ def request(
                 put(url, payload, req_headers), min_server_version
             )
         else:
-            log.error("Unsupported request method %s", method)
+            logger.error("Unsupported request method %s", method)
             parser.print_help()
             sys.exit(1)
         try:
@@ -229,8 +216,11 @@ def request(
             port = config.get(CONFIG_PORT_KEY)
             if config.get(CONFIG_USE_HTTP):
                 protocol = "http"
-            log.error(_(CONNECTION_ERROR_MSG % (protocol, host, port)))
-            log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
+            logger.error(
+                _(CONNECTION_ERROR_MSG),
+                {"protocol": protocol, "host": host, "port": port}
+            )
+            logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
         else:
-            log.error(_(messages.SERVER_CONFIG_REQUIRED % PKG_NAME))
+            logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
         sys.exit(1)

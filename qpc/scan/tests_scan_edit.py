@@ -1,13 +1,3 @@
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """Test the CLI module."""
 
 import sys
@@ -76,7 +66,6 @@ class SourceEditCliTests(unittest.TestCase):
 
     def test_edit_scan_source(self):
         """Testing the edit scan source command successfully."""
-        scan_out = StringIO()
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -100,15 +89,13 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_partial_edit_scan_source(self):
         """Testing the edit scan source command successfully."""
-        scan_out = StringIO()
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -133,15 +120,13 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_scan_ext_products(self):
         """Testing the edit scanvcommand with enabled products successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -171,15 +156,13 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=["jboss_eap", "jboss_brms"],
                 ext_product_search_dirs=None,
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_scan_search_dirs(self):
         """Testing the edit scan command with search dirs successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -205,16 +188,14 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs="/foo/bar/",
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     # pylint: disable=invalid-name
     def test_edit_scan_reset_ext_products(self):
         """Testing the edit scan command with reset successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -244,16 +225,14 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=[],
                 ext_product_search_dirs=None,
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     # pylint: disable=invalid-name
     def test_edit_scan_reset_search_dirs(self):
         """Testing the edit scan command with reset successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -283,16 +262,14 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=[],
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     # pylint: disable=invalid-name
     def test_edit_scan_reset_dis_products(self):
         """Testing the edit scan command with reset successfully."""
-        scan_out = StringIO()
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -322,11 +299,10 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with redirect_stdout(scan_out):
+            with self.assertLogs(level="INFO") as log:
                 aec.main(args)
-                self.assertEqual(
-                    scan_out.getvalue(), messages.SCAN_UPDATED % "scan1" + "\n"
-                )
+                expected_message = messages.SCAN_UPDATED % "scan1"
+                self.assertIn(expected_message, log.output[-1])
 
     def test_edit_scan_no_val(self):
         """Testing the edit scan command with a scan that doesn't exist."""

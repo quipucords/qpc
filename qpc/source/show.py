@@ -1,19 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """SourceShowCommand is used to show sources for system scans."""
 
-from __future__ import print_function
-
 import sys
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -67,5 +57,5 @@ class SourceShowCommand(CliCommand):
             data = pretty_print(cred_entry)
             print(data)
         else:
-            print(_(messages.SOURCE_DOES_NOT_EXIST % self.args.name))
+            logger.error(_(messages.SOURCE_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)

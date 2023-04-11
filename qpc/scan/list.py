@@ -1,19 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2017-2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ScanListCommand is used to list system scans."""
 
-from __future__ import print_function
-
 import urllib.parse as urlparse
+from logging import getLogger
 
 from requests import codes
 
@@ -22,6 +10,8 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
 from qpc.utils import pretty_print
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -66,7 +56,7 @@ class ScanListCommand(CliCommand):
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
         if count == 0:
-            print(_(messages.SCAN_LIST_NO_SCANS))
+            logger.error(_(messages.SCAN_LIST_NO_SCANS))
         else:
             data = pretty_print(results)
             print(data)

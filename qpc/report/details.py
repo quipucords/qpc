@@ -1,17 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright (c) 2018 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public License,
-# version 3 (GPLv3). There is NO WARRANTY for this software, express or
-# implied, including the implied warranties of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
-# along with this software; if not, see
-# https://www.gnu.org/licenses/gpl-3.0.txt.
-#
 """ReportDetailsCommand is used to show details report."""
-
-from __future__ import print_function
 
 import sys
 from logging import getLogger
@@ -29,7 +16,7 @@ from qpc.utils import (
     write_file,
 )
 
-log = getLogger("qpc")
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -115,7 +102,7 @@ class ReportDetailsCommand(CliCommand):
             if self.args.path:
                 validate_write_file(self.args.path, "output-file")
         except ValueError as error:
-            print(error)
+            logger.error(error)
             sys.exit(1)
 
         if self.args.report_id is None:
@@ -134,15 +121,16 @@ class ReportDetailsCommand(CliCommand):
                         f"{self.req_path}{self.report_id}{report.DETAILS_PATH_SUFFIX}"
                     )
                 else:
-                    print(
-                        _(
-                            messages.REPORT_NO_DETAIL_REPORT_FOR_SJ
-                            % self.args.scan_job_id
-                        )
+                    logger.error(
+                        _(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ),
+                        self.args.scan_job_id
                     )
                     sys.exit(1)
             else:
-                print(_(messages.REPORT_SJ_DOES_NOT_EXIST % self.args.scan_job_id))
+                logger.error(
+                    _(messages.REPORT_SJ_DOES_NOT_EXIST),
+                    self.args.scan_job_id
+                )
                 sys.exit(1)
         else:
             self.report_id = self.args.report_id
@@ -159,17 +147,23 @@ class ReportDetailsCommand(CliCommand):
 
         try:
             write_file(self.args.path, file_content)
-            log.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+            logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
-            err_msg = _(messages.WRITE_FILE_ERROR % (self.args.path, err))
-            log.error(err_msg)
+            logger.error(
+                _(messages.WRITE_FILE_ERROR),
+                {"path": self.args.path, "error": err}
+            )
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.args.report_id is None:
-            print(_(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ % self.args.scan_job_id))
+            logger.error(
+                _(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ),
+                self.args.scan_job_id
+            )
         else:
-            print(
-                _(messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID % self.args.report_id)
+            logger.error(
+                _(messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID),
+                self.args.report_id
             )
         sys.exit(1)

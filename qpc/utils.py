@@ -369,7 +369,9 @@ def setup_logging(verbosity):
         # (at least until we add an option controlling the log format)
         stream_handler.setFormatter(logging.Formatter(log_fmt))
     stream_handler.setLevel(log_level)
-    logger.addHandler(stream_handler)
+    main_package_name, *_ = __name__.partition(".")
+    global_logger = logging.getLogger(main_package_name)
+    global_logger.addHandler(stream_handler)
 
 
 def log_request_info(method, command, url, response_json, response_code):

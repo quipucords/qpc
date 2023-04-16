@@ -132,3 +132,28 @@ class TestOpenShiftAddCredential:
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_credential"
+
+    def test_no_api_info_shown_with_verbose_flag(
+        self,
+        caplog,
+        requests_mock,
+        openshift_token_input
+    ):
+        """Test that no API information is shown when the -v flag is used."""
+        caplog.set_level("INFO")
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.post(url, status_code=201)
+        sys.argv = [
+            "/bin/qpc",
+            "-v",
+            "cred",
+            "add",
+            "--name",
+            "openshift_credential",
+            "--type",
+            "openshift",
+            "--token",
+        ]
+        CLI().main()
+        for message in caplog.messages:
+            assert "POST" not in message

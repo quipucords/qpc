@@ -385,7 +385,7 @@ def log_request_info(method, command, url, response_json, response_code):
     :param response_code: the status code being returned (ie. 200)
     """
     message = 'Method: "%s", Command: "%s", URL: "%s", Response: "%s", Status Code: "%s'
-    logger.info(message, method, command, url, response_json, response_code)
+    logger.debug(message, method, command, url, response_json, response_code)
 
 
 def log_args(args):

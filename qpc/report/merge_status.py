@@ -49,14 +49,14 @@ class ReportMergeStatusCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        logger.info(
-            _(messages.MERGE_JOB_ID_STATUS),
-            {"job_id": self.args.job_id, "status": json_data.get("status").lower()}
+        print(
+            _(messages.MERGE_JOB_ID_STATUS)
+            % {"job_id": self.args.job_id, "status": json_data.get("status").lower()}
         )
         if json_data.get("report_id"):
-            logger.info(
-                _(messages.DISPLAY_REPORT_ID),
-                {
+            print(
+                _(messages.DISPLAY_REPORT_ID)
+                % {
                     "report_id": json_data.get("report_id"),
                     "pkg_name": PKG_NAME,
                 }

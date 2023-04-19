@@ -57,4 +57,4 @@ class ScanStartCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        logger.info(_(messages.SCAN_STARTED), json_data.get("id"))
+        print(_(messages.SCAN_STARTED) % json_data.get("id"))

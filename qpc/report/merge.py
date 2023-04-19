@@ -143,7 +143,7 @@ class ReportMergeCommand(CliCommand):
         if len(self.args.json_files) > 1:
             self._validate_create_json(self.args.json_files)
         else:
-            logger.info(_(messages.REPORT_JSON_FILES_HELP))
+            logger.error(_(messages.REPORT_JSON_FILES_HELP))
             sys.exit(1)
 
     def _merge_json_dir(self):
@@ -207,9 +207,9 @@ class ReportMergeCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         if json_data.get("id"):
-            logger.info(
-                _(messages.REPORT_SUCCESSFULLY_MERGED),
-                {"id": json_data.get("id"), "pkg_name": PKG_NAME},
+            print(
+                _(messages.REPORT_SUCCESSFULLY_MERGED)
+                % {"id": json_data.get("id"), "pkg_name": PKG_NAME},
             )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ

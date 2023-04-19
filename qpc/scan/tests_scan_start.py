@@ -74,15 +74,15 @@ class ScanStartCliTests(unittest.TestCase):
             }
         ]
         scan_data = {"count": 1, "results": results}
-        with requests_mock.Mocker() as mocker:
+        captured_stdout = StringIO()
+        with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.post(url_post, status_code=201, json={"id": 1})
             ssc = ScanStartCommand(SUBPARSER)
             args = Namespace(name="scan1")
-            with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
-                expected_message = messages.SCAN_STARTED % "1"
-                self.assertIn(expected_message, log.output[-1])
+            ssc.main(args)
+            expected_message = messages.SCAN_STARTED % "1"
+            self.assertIn(expected_message, captured_stdout.getvalue())
 
     def test_unsuccessful_start_scan(self):
         """Testing the start scan command unsuccessfully."""

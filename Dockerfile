@@ -1,7 +1,8 @@
 FROM redhat/ubi8-minimal
 
 WORKDIR /app/qpc
-VOLUME ["/root/.config"]
+VOLUME ["/root/.config/qpc"]
+VOLUME ["/root/.local/share/qpc"]
 
 COPY pyproject.toml poetry.lock ./
 RUN microdnf update \

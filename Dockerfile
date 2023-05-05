@@ -11,6 +11,8 @@ RUN microdnf update \
         glibc-langpack-en \
         jq \
         make \
+        man-db \
+        man \
         openssh-clients \
         procps-ng \
         python39 \
@@ -29,6 +31,7 @@ ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Copy QPC
 COPY . .
+COPY docs/qpc.1 /usr/local/share/man/man1/qpc.1
 
 ENTRYPOINT ["/bin/bash", "deploy/docker_run.sh"]
 

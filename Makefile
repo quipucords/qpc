@@ -24,7 +24,7 @@ help:
 	@echo "  manpage             to build the manpage"
 	@echo "  insights-client     to setup the insights-client egg"
 	@echo "  insights-clean      to remove the insights-client egg"
-	@echo "  build-container 	   to build the quipucords-cli container image"
+	@echo "  build-container     to build the quipucords-cli container image"
 
 clean:
 	-rm -rf dist/ build/ qpc.egg-info/
@@ -76,5 +76,5 @@ insights-clean:
 	sudo rm -rf /etc/insights-client/*
 	sudo rm -rf /var/lib/insights/*
 
-build-container:
+build-container: manpage
 	podman build -t quipucords-cli .

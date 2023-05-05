@@ -143,6 +143,15 @@ def put(url, payload, headers=None):
     return requests.put(url, json=payload, headers=headers, verify=ssl_verify)
 
 
+methods = {
+    "POST": post,
+    "GET": get,
+    "PATCH": patch,
+    "DELETE": delete,
+    "PUT": put,
+}
+
+
 # pylint: disable=too-many-arguments, too-many-branches, too-many-locals
 def request(
     method,
@@ -169,58 +178,71 @@ def request(
     log_command = None
     if parser is not None:
         log_command = parser.prog
-    req_headers = {}
     token = read_client_token()
-    # create the url by adding the path to the configured server location
     url = get_server_location() + path
-    if headers:
-        req_headers.update(headers)
+    req_headers = headers or {}
     if token:
         req_headers["Authorization"] = f"Token {token}"
 
+    if method not in methods:
+        logger.error("Unsupported request method %s", method)
+        parser.print_help()
+        sys.exit(1)
+
     try:
-        if method == POST:
-            result = handle_general_errors(
-                post(url, payload, req_headers), min_server_version
-            )
-        elif method == GET:
-            result = handle_general_errors(
-                get(url, params, req_headers), min_server_version
-            )
-        elif method == PATCH:
-            result = handle_general_errors(
-                patch(url, payload, req_headers), min_server_version
-            )
-        elif method == DELETE:
-            result = handle_general_errors(delete(url, req_headers), min_server_version)
-        elif method == PUT:
-            result = handle_general_errors(
-                put(url, payload, req_headers), min_server_version
-            )
-        else:
-            logger.error("Unsupported request method %s", method)
-            parser.print_help()
-            sys.exit(1)
-        try:
-            log_request_info(
+        result = perform_request(
+            method,
+            url,
+            params,
+            payload,
+            req_headers,
+            min_server_version
+        )
+
+    except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
+        handle_connection_error()
+        sys.exit(1)
+
+    log_request_info(
                 method, log_command, url, result.json(), result.status_code
             )
-        except ValueError:
-            log_request_info(method, log_command, url, result.text, result.status_code)
-        return result
-    except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
-        config = read_server_config()
-        if config is not None:
-            protocol = "https"
-            host = config.get(CONFIG_HOST_KEY)
-            port = config.get(CONFIG_PORT_KEY)
-            if config.get(CONFIG_USE_HTTP):
-                protocol = "http"
-            logger.error(
-                _(CONNECTION_ERROR_MSG),
-                {"protocol": protocol, "host": host, "port": port}
-            )
-            logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
-        else:
-            logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
-        sys.exit(1)
+    return result
+
+
+def handle_connection_error():
+    """Log connection error."""
+    config = read_server_config()
+    if config is not None:
+        protocol = "https"
+        host = config.get(CONFIG_HOST_KEY)
+        port = config.get(CONFIG_PORT_KEY)
+        if config.get(CONFIG_USE_HTTP):
+            protocol = "http"
+        logger.error(
+            _(CONNECTION_ERROR_MSG),
+            {"protocol": protocol, "host": host, "port": port}
+        )
+    logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
+
+
+def perform_request(
+    method,
+    url,
+    params=None,
+    payload=None,
+    req_headers=None,
+    min_server_version=QPC_MIN_SERVER_VERSION,
+):
+    """Perform the api request and return the response."""
+    request_method = methods[method]
+    if method == "GET":
+        return handle_general_errors(
+            request_method(url, params, req_headers), min_server_version
+        )
+    if method == "DELETE":
+        return handle_general_errors(
+            request_method(url, req_headers), min_server_version
+        )
+    return handle_general_errors(
+        request_method(url, payload, req_headers), min_server_version
+    )

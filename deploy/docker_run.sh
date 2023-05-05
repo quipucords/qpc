@@ -3,7 +3,7 @@ cd /app/qpc
 QPC_COMMAND="${1}"
 shift
 if [ "${QPC_COMMAND}" == "qpc" ]; then
-  poetry run qpc "$@"
+  poetry run qpc "${@}"
 elif [ "${QPC_COMMAND}" == "man" ]; then
   man "${@}"
 else

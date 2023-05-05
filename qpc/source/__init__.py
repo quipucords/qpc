@@ -22,5 +22,5 @@ SOURCE_TYPE_CHOICES = [
     VCENTER_SOURCE_TYPE,
 ]
 
-BOOLEAN_CHOICES = ["True", "False", "true", "false"]
+BOOLEAN_CHOICES = ["true", "false"]
 VALID_SSL_PROTOCOLS = ["SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2"]

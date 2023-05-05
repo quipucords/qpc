@@ -7,9 +7,7 @@ VOLUME ["/root/.local/share/qpc"]
 COPY pyproject.toml poetry.lock ./
 RUN microdnf update \
     && microdnf install -y \
-        gcc \
         git \
-        glibc-langpack-en \
         jq \
         make \
         man-db \

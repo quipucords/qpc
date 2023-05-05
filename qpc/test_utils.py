@@ -1,4 +1,5 @@
 """Test qpc cred utils."""
+
 import pytest
 
 from qpc.messages import PROMPT_INPUT

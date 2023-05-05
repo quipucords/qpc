@@ -204,8 +204,8 @@ def request(
         sys.exit(1)
 
     log_request_info(
-                method, log_command, url, result.json(), result.status_code
-            )
+        method, log_command, url, decode_response_json(result), result.status_code
+    )
     return result
 
 
@@ -246,3 +246,11 @@ def perform_request(
     return handle_general_errors(
         request_method(url, payload, req_headers), min_server_version
     )
+
+
+def decode_response_json(response):
+    """Return either a json or text to avoid saving binary to logs."""
+    try:
+        return response.json()
+    except ValueError:
+        return "<encoded blob ignored>"

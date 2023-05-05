@@ -106,6 +106,7 @@ class SourceEditCommand(CliCommand):
             "--use-paramiko",
             dest="use_paramiko",
             choices=source.BOOLEAN_CHOICES,
+            type=str.lower,
             help=_(messages.SOURCE_PARAMIKO_HELP),
             required=False,
         )

@@ -1,4 +1,4 @@
-FROM redhat/ubi9-minimal:9.2
+FROM redhat/ubi9-minimal
 
 WORKDIR /app/qpc
 VOLUME ["/root/.config/qpc"]
@@ -23,7 +23,7 @@ RUN microdnf update -y \
     && pip install -U pip \
     && pip install poetry \
     && poetry config virtualenvs.in-project true \
-    && poetry install -n
+    && poetry install -n --only main
 
 ENV VIRTUAL_ENV=/app/qpc/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
@@ -32,5 +32,5 @@ ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 COPY . .
 COPY docs/qpc.1 /usr/local/share/man/man1/qpc.1
 
-ENTRYPOINT ["/bin/bash", "deploy/docker_run.sh"]
+ENTRYPOINT ["deploy/docker_run.sh"]
 

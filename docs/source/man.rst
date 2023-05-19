@@ -17,8 +17,7 @@ Description
 
 The Quipucords tool, accessed through the ``qpc`` command, is an inspection and reporting tool. It is designed to identify environment data, or *facts*, such as the number of physical and virtual systems on a network, their operating systems, and other configuration data. In addition, it is designed to identify and report more detailed facts for some versions of key Red Hat packages and products for the Linux based IT resources in that network. The ability to inspect the software and systems that are running on your network improves your ability to understand and report on your entitlement usage. Ultimately, this inspection and reporting process is part of the larger system administration task of managing your inventories.
 
-The Quipucords tool uses two types of configuration to manage the inspection process. A *credential* contains configuration such as the user name and password or SSH key of the user that runs the inspection process.  A *source* defines the entity to be inspected and one or more credentials to use during the inspection process. The entity to be inspected can be a host, subnet, network, or systems management solution such as vCenter Server or Satellite. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
-
+The Quipucords tool uses two types of configuration to manage the inspection process. A *credential* contains configuration, such as the username and password or SSH key of the user that runs the inspection process. Certain credential types also support the use of an access token as an alternative authentication method. A *source* defines the entity to be inspected and one or more credentials to use during the inspection process. The entity to be inspected can be a host, subnet, network, or systems management solution such as Openshift, Ansible Automation Platform, vCenter Server, or Satellite. You can save multiple credentials and sources to use with Quipucords in various combinations as you run inspection processes, or *scans*. When you have completed a scan, you can access the output as a *report* to review the results.
 By default, the credentials and sources that are created when using Quipucords are encrypted in a database. The values are encrypted with AES-256 encryption. They are decrypted when the Quipucords server runs a scan by using a *vault password* to access the encrypted values that are stored in the database.
 
 The Quipucords tool is an *agentless* inspection tool, so there is no need to install the tool on the sources to be inspected.
@@ -94,7 +93,7 @@ To log in to the server after the connection is configured, use the ``login`` su
 
 ``--username=username``
 
-  Optional. Sets the user name that is used to log in to the server. If omitted, qpc will prompt for the server username.
+  Optional. Sets the username that is used to log in to the server. If omitted, qpc will prompt for the server username.
 
 ``--password=password``
 
@@ -126,16 +125,16 @@ Credentials
 
 Use the ``qpc cred`` command to create and manage credentials.
 
-A credential contains user name and password or SSH key information that is used for authentication during a scan. The Quipucords tool uses SSH to connect to servers on the network and uses credentials to access those servers.
+A credential contains a username-password pair, SSH key, or access token to authenticate with the remote servers during a scan. The Quipucords tool uses SSH to connect to servers on the network and uses credentials to access those servers.
 
 When a scan runs, it uses a source that contains information such as the host names, IP addresses, a network, or a systems management solution to be accessed. The source also contains references to the credentials that are required to access those systems. A single source can contain a reference to multiple credentials as needed to connect to all systems in that network or systems management solution.
 
 Creating and Editing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To create a credential, supply the type of credential and supply SSH credentials as either a user name-password pair or a user name-key pair. The Quipucords tool stores each set of credentials in a separate credential entry.
+To create a credential, supply the type of credential and supply SSH credentials as either a username-password pair, a username-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 
-**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]**
+**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | ansible)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 ``--name=name``
 
@@ -143,19 +142,19 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--type=type``
 
-  Required. Sets the type of credential. The value must be ``network``, ``vcenter``, or ``satellite``. The type cannot be edited after a credential is created.
+  Required. Sets the type of credential. The value must be ``network``, ``vcenter``, ``satellite``, ``openshift``, or ``ansible``. You cannot edit a credential's type after creating it.
 
 ``--username=username``
 
-  Required. Sets the user name of the SSH identity that is used to bind to the server.
+  Required for both password and SSH key authentication. Sets the username of the SSH identity that is used to bind to the server.
 
 ``--password``
 
-  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile`` option.
+  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile`` and ``--token`` options.
 
 ``--sshkeyfile=key_file``
 
-  Sets the path of the file that contains the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` option.
+  Sets the path of the file that contains the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` and ``--token`` options.
 
 ``--sshpassphrase``
 
@@ -173,20 +172,24 @@ To create a credential, supply the type of credential and supply SSH credentials
 
   Prompts for the privilege escalation password to be used when running a network scan.
 
-The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, or even the user name. For example, network security might require passwords to be updated every few months. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
+``--token``
 
-**qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]**
+  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile`` and ``--password`` options.
+
+The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
+
+**qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 Listing and Showing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``qpc cred list`` command returns the details for every credential that is configured for Quipucords. This output includes the name, user name, password, SSH keyfile, and sudo password for each entry. Passwords are masked if provided, if not, they will appear as ``null``.
+The ``qpc cred list`` command returns the details for every credential that is configured for Quipucords. This output includes the name, username, password, SSH keyfile, sudo password, or token (if applicable) for each entry. Passwords and tokens are masked if provided, if not, they will appear as ``null``.
 
-**qpc cred list --type=** *(network | vcenter | satellite)*
+**qpc cred list --type=** *(network | vcenter | satellite | openshift | ansible)*
 
 ``--type=type``
 
-  Optional.  Filters the results by credential type.  The value must be ``network``, ``vcenter``, or ``satellite``.
+  Optional.  Filters the results by credential type.  The value must be ``network``, ``vcenter``, ``satellite``, ``openshift``, or ``ansible``.
 
 The ``qpc cred show`` command is the same as the ``qpc cred list`` command, except that it returns details for a single specified credential.
 
@@ -220,7 +223,7 @@ Sources
 
 Use the ``qpc source`` command to create and manage sources.
 
-A source contains a single entity or a set of multiple entities that are to be inspected. A source can be one or more physical machines, virtual machines, or containers, or it can be a collection of network information, including IP addresses or host names, or it can be information about a systems management solution such as vCenter Server or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
+A source contains a single entity or a set of multiple entities that are to be inspected. A source can be one or more physical machines, virtual machines, or containers, or it can be a collection of network information, including IP addresses or host names, or it can be information about a systems management solution such as Openshift, Ansible Automation Platform, vCenter Server, or Satellite. The source also contains information about the SSH ports and SSH credentials that are needed to access the systems to be inspected. The SSH credentials are provided through reference to one or more of the Quipucords credentials that you configure.
 
 When you configure a scan, it contains references to one or more sources, including the credentials that are provided in each source. Therefore, you can reference sources in different scan configurations for various purposes, for example, to scan your entire infrastructure or a specific sector of that infrastructure.
 
@@ -229,7 +232,7 @@ Creating and Editing Sources
 
 To create a source, supply the type of source with the ``type`` option, one or more host names or IP addresses to connect to with the ``--hosts`` option, and the credentials needed to access those systems with the ``--cred`` option. The ``qpc source`` command allows multiple entries for the ``hosts`` and ``cred`` options. Therefore, a single source can access a collection of servers and subnets as needed to create an accurate and complete scan.
 
-**qpc source add --name=** *name*  **--type=** *(network | vcenter | satellite)* **--hosts** *ip_address* **--cred** *credential* **[--exclude-hosts** *ip_address* **]** **[--port=** *port* **]** **[--use-paramiko=** *(True | False)* **]** **[--ssl-cert-verify=** *(True | False)* **]** **[--ssl-protocol=** *protocol* **]** **[--disable-ssl=** *(True | False)* **]**
+**qpc source add --name=** *name*  **--type=** *(network | vcenter | satellite | openshift | ansible)* **--hosts** *ip_address* **--cred** *credential* **[--exclude-hosts** *ip_address* **]** **[--port=** *port* **]** **[--use-paramiko=** *(True | False)* **]** **[--ssl-cert-verify=** *(True | False)* **]** **[--ssl-protocol=** *protocol* **]** **[--disable-ssl=** *(True | False)* **]**
 
 ``--name=name``
 
@@ -237,7 +240,7 @@ To create a source, supply the type of source with the ``type`` option, one or m
 
 ``--type=type``
 
-  Required. Sets the type of source.  The value must be ``network``, ``vcenter``, or ``satellite``. The type cannot be edited after a source is created.
+  Required. Sets the type of source.  The value must be ``network``, ``vcenter``, ``satellite``, ``openshift``, or ``ansible``. The type cannot be edited after a source is created.
 
 ``--hosts ip_address``
 
@@ -275,7 +278,7 @@ To create a source, supply the type of source with the ``type`` option, one or m
 
 ``--port=port``
 
-  Optional. Sets a port to be used for the scan. This value supports connection and inspection on a non-standard port. By default, a Network scan runs on port 22, and a vCenter or Satellite scan runs on port 443.
+  Optional. Sets a port to be used for the scan. This value supports connection and inspection on a non-standard port. By default, a Network scan uses port 22, vCenter, Ansible, and Satellite scans use port 443, and an Openshift scan uses port 6443.
 
 ``--use-paramiko=(True | False)``
 
@@ -310,11 +313,11 @@ Listing and Showing Sources
 
 The ``qpc source list`` command returns the details for all configured sources. The output of this command includes the host names, IP addresses, or IP ranges, the credentials, and the ports that are configured for each source.
 
-**qpc source list [--type=** *(network | vcenter | satellite)* **]**
+**qpc source list [--type=** *(network | vcenter | satellite | openshift | ansible)* **]**
 
 ``--type=type``
 
-  Optional.  Filters the results by source type. The value must be ``network``, ``vcenter``, or ``satellite``.
+  Optional.  Filters the results by source type. The value must be ``network``, ``vcenter``, ``satellite``, ``openshift``, or ``ansible``.
 
 
 The ``qpc source show`` command is the same as the ``qpc source list`` command, except that it returns details for a single specified source.
@@ -347,7 +350,7 @@ Scans
 
 Use the ``qpc scan`` command to create, run and manage scans.
 
-A scan contains a set of one or more sources of any type plus additional options that refine how the scan runs, such as the products to omit from the scan and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include network and systems management solution, such as Satellite and vCenter Server, sources in a single scan. When you configure a scan to include multiple sources of different types, for example, a Network source and a Satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results for each source type, or a processed deployments report with deduplicated and merged results.
+A scan contains a set of one or more sources of any type, plus additional options that refine how the scan runs, such as the products to omit from the scan, and the maximum number of parallel system scans. Because a scan can combine sources of different types, you can include any combination of Network, OpenShift, Ansible Automation Platform, Satellite, and vCenter Server sources in a single scan. When you configure a scan to include multiple sources of different types, for example a Network source and a Satellite source, the same part of your infrastructure might be scanned more than once. The results for this type of scan could show duplicate information in the reported results. However, you have the option to view the unprocessed detailed report that would show these duplicate results for each source type, or a processed deployments report with deduplicated and merged results.
 
 The creation of a scan groups sources, the credentials contained within those sources, and the other options so that the act of running the scan is repeatable. When you run the scan, each instance is saved as a scan job.
 
@@ -501,7 +504,7 @@ Use the ``qpc report`` command to retrieve a report from a scan. You can retriev
 
 Viewing the Details Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``qpc report details`` command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, and Satellite scans, as applicable.
+The ``qpc report details`` command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, Satellite, Openshift and Ansible scans, as applicable.
 
 **qpc report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path* **[--mask]**
 
@@ -523,7 +526,7 @@ The ``qpc report details`` command retrieves a detailed report that contains the
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report.
+  Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report. When the field is not provided and `--json` specified, a JSON report will be generated to stdout.
 
 ``--mask``
 
@@ -555,7 +558,7 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved.  The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report.
+  Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report. When the field is not provided and `--json` specified, a JSON report will be generated to stdout.
 
 ``--mask``
 
@@ -577,7 +580,7 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
 ``--output-file=path``
 
-  Required. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.
+  Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.  If this field is not provided, it will automatically generate a JSON report to stdout.
 
 
 Downloading Reports
@@ -655,15 +658,49 @@ Insights
 
 Use the ``qpc insights`` command to interact with Red Hat Insights and its services.
 
-Uploading to Insights
-~~~~~~~~~~~~~~~~~~~~~
-The ``qpc insights upload`` command can be used to upload an insights report to Red Hat Insights and its services. You can upload a report by using the associated report identifier or scan job identifier for the scan that is used to generate the report.
+Configuring Insights
+~~~~~~~~~~~~~~~~~~~~
+
+To configure the connection to Insights server, you may optionally provide the host address and port to override the default values.
+
+**qpc insights config --host=** *host* **[--port=** *port* **]** **[--use-http]**
+
+``--host=host``
+
+  Optional. Sets the host address for Insights. The default host is ``console.redhat.com``.
+
+``--port=port``
+
+  Optional. Sets the port to use to connect to Insights. The default port is ``443``.
+
+``--use-http``
+
+  Optional. Determines whether to use HTTP instead of HTTPS. The default value is ``False``.
+
+Adding Insights credentials information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To configure Insights credentials, simply provide the appropriate username and password associated with your Insights account.
+
+**qpc insights add_login [--username=** *username* **] [--password=** *password* **]**
+
+``--username=username``
+
+  Required. Sets the username that is used to log in to Insights.
+
+``--password=password``
+
+  Required. Prompts for the password for the ``--username`` identity.
+
+Publishing to Insights
+~~~~~~~~~~~~~~~~~~~~~~
+The ``qpc insights publish`` command allows you to publish an Insights report to Red Hat Insights and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
 
 **qpc insights publish (--report** *report_identifiers* **| --input-file** *path_to_tar_gz* )
 
 ``--report=report_identifier``
 
-  Contains the report identifier to use to retrieve and upload the insights report. Mutually exclusive with the ``--input-file`` option.
+  Contains the report identifier to use to retrieve and publish the Insights report. Mutually exclusive with the ``--input-file`` option.
 
 ``--input-file=path to tar.gz containing the Insights report``
 
@@ -687,21 +724,81 @@ Examples
 --------
 
 Creating a new network type credential with a keyfile
-  ``qpc cred add --name=new_creds --type=network --username=qpc_user --sshkeyfile=/etc/ssh/ssh_host_rsa_key``
+  ``qpc cred add --name net_cred --type network --username qpc_user --sshkeyfile /etc/ssh/ssh_host_rsa_key``
 Creating a new network type credential with a password
-  ``qpc cred add --name=other_creds --type=network --username=qpc_user_pass --password``
+  ``qpc cred add --name net_cred2 --type network --username qpc_user --password``
+Creating a new openshift type credential with a token
+  ``qpc cred add --name ocp_cred --type openshift --token``
+Creating a new openshift type credential with a password
+  ``qpc cred add --name ocp_cred2 --type openshift --username ocp_user --password``
 Creating a new vcenter type credential
-  ``qpc cred add --name=vcenter_cred --type=vcenter --username=vc-user_pass --password``
+  ``qpc cred add --name vcenter_cred --type vcenter --username vc_user --password``
+Creating a new satellite type credential
+  ``qpc cred add --name sat_cred --type satellite --username sat_user --password``
+Creating a new ansible type credential
+  ``qpc cred add --name ansible_cred --type ansible --username ansible_user --password``
+Listing all credentials
+  ``qpc cred list``
+Listing network credentials
+  ``qpc cred list --type network``
+Showing details for a specified credential
+  ``qpc cred show --name ocp_cred2``
+Clearing all credentials
+  ``qpc cred clear --all``
+Clearing a specified credential
+  ``qpc cred clear --name vcenter_cred``
 Creating a new network source
-  ``qpc source add --name=new_source --type network --hosts 1.192.0.19 1.192.0.20 --cred new_creds``
+  ``qpc source add --name net_source --type network --hosts 1.192.0.19 1.192.0.20 --cred net_cred``
 Creating a new network source with an excluded host
-  ``qpc source add --name=new_source --type network --hosts 1.192.1.[0:255] --exclude-hosts 1.192.1.19 --cred new_creds``
-Creating a new vcenter source
-  ``qpc source add --name=new_source --type vcenter --hosts 1.192.0.19 --cred vcenter_cred``
+  ``qpc source add --name net_source2 --type network --hosts 1.192.1.[0:255] --exclude-hosts 1.192.1.19 --cred net_cred``
+Creating a new vcenter source specifying a SSL protocol
+  ``qpc source add --name vcenter_source --type vcenter --hosts 1.192.0.19 --cred vcenter_cred --ssl-protocol SSLv23``
+Creating a new satellite source disabling SSL
+  ``qpc source add --name sat_source --type satellite --hosts satellite.example.redhat.com --disable-ssl true --cred sat_cred``
+Creating a new ansible source disabling SSL certificate verification
+  ``qpc source add --name ansible_source --type ansible --hosts  10.0.205.205 --ssl-cert-verify false --cred ansible_cred``
 Editing a source
-  ``qpc source edit --name=new_source --hosts 1.192.0.[0:255] --cred new_creds other_creds``
-Running a scan with one source
-  ``qpc scan start --sources new_source``
+  ``qpc source edit --name net_source --hosts 1.192.0.[0:255] --cred net_cred net_cred2``
+Creating a scan
+  ``qpc scan add --name net_scan --sources net_source net_source2``
+Creating a scan that includes a list of products in the inspection
+  ``qpc scan add --name net_scan2 --sources net_source --enabled-ext-product-search jboss_eap``
+Editing a scan setting maximum concurrency
+  ``qpc scan edit --name net_scan --max-concurrency 10``
+Listing a scan filtering by scan type
+  ``qpc scan list --type inspect``
+Running a scan
+  ``qpc scan start --name net_scan``
+Canceling a scan
+  ``qpc scan cancel --id 1``
+Viewing scan jobs related to a specified scan
+  ``qpc scan job --name net_scan``
+Retrieves a JSON details report with no output file
+  ``qpc report details --report 2  --json``
+Retrieves a JSON details report
+  ``qpc report details --report 2  --json --output-file path_to_your_file.json``
+Retrieves a CSV deployments report
+  ``qpc report deployments --report 2  --csv --output-file path_to_your_file.csv``
+Retrieves a JSON Insights report with no output file
+  ``qpc report insights --scan-job 1``
+Retrieves a tar.gz Insights report
+  ``qpc report insights --scan-job 1 --output-file path_to_your_file.tar.gz``
+Downloading a set of reports
+  ``qpc report download --report 1 --output-file path_to_your_file.tar.gz``
+Merging scan job results using ids
+  ``qpc report report merge --job-ids 1 3``
+Merging scan job results providing JSON files
+  ``qpc report report merge --json-files path_to_report_1.json path_to_report_2.json``
+Reprocessing a report
+  ``qpc report upload --json-file path_to_report.json``
+Configuring Insights
+  ``qpc insights config --host stage.console.redhat.com --port 8080``
+Adding Insights credentials
+  ``qpc insights add_login --username insights-user --password``
+Publishing to Insights using a report id
+  ``qpc insights publish --report 1``
+Publishing to Insights using a previously downloaded report
+  ``qpc insights publish --input-file path_to_report.tar.gz``
 
 Security Considerations
 -----------------------
@@ -711,9 +808,8 @@ The authentication data in the credentials and the network-specific and system-s
 Authors
 -------
 
-The Quipucords tool was originally written by Chris Hambridge <chambrid@redhat.com>, Kevan Holdaway <kholdawa@redhat.com>, Ashley Aiken <aaiken@redhat.com>, Cody Myers <cmyers@redhat.com>, and Cecilia Carter <cecarter@redhat.com>.
-
+Quipucords is written and maintained by Red Hat. Please refer to the commit history for a full list of contributors.```
 Copyright
 ---------
 
-Copyright 2018-2019 Red Hat, Inc. Licensed under the GNU Public License version 3.
+Copyright 2018-2023 Red Hat, Inc. Licensed under the GNU Public License version 3.

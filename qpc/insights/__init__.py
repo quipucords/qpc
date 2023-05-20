@@ -1,7 +1,6 @@
 """Constants for the Insights commands."""
 
 SUBCOMMAND = "insights"
-UPLOAD = "upload"
 CONFIG = "config"
 ADD_LOGIN = "add_login"
 PUBLISH = "publish"

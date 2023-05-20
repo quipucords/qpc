@@ -1,4 +1,4 @@
-"""InsightsConfigureCommand is used to set target host and port for insights upload."""
+"""InsightsConfigureCommand is used to set target host and port for insights publish."""
 from logging import getLogger
 
 from qpc import insights, messages
@@ -19,7 +19,7 @@ class InsightsConfigureCommand(CliCommand):
     """Defines insights configure command.
 
     This command is for configuring the target
-    host and port server for insights upload.
+    host and port server for insights publish.
     """
 
     SUBCOMMAND = insights.SUBCOMMAND

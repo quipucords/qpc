@@ -1,6 +1,5 @@
 """Utilities for the insights module."""
 
-
 import re
 from argparse import ArgumentTypeError
 from getpass import getpass

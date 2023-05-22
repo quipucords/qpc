@@ -64,7 +64,8 @@ class ReportUploadTests(unittest.TestCase):
             with self.assertLogs(level="INFO") as log:
                 nac.main(args)
                 expected_message = messages.REPORT_SUCCESSFULLY_UPLOADED % {
-                    "id": "1", "pkg_name": PKG_NAME
+                    "id": "1",
+                    "pkg_name": PKG_NAME,
                 }
 
                 self.assertIn(expected_message, log.output[-1])
@@ -80,8 +81,8 @@ class ReportUploadTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = (
-                    messages.REPORT_UPLOAD_FILE_INVALID_JSON % (TMP_BADDETAILS1[0])
+                err_msg = messages.REPORT_UPLOAD_FILE_INVALID_JSON % (
+                    TMP_BADDETAILS1[0]
                 )
                 self.assertIn(err_msg, log.output[-1])
 
@@ -98,7 +99,7 @@ class ReportUploadTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = (
-                    messages.REPORT_FAILED_TO_UPLOADED % (put_report_data.get("error"))
+                err_msg = messages.REPORT_FAILED_TO_UPLOADED % (
+                    put_report_data.get("error")
                 )
                 self.assertIn(err_msg, log.output[-1])

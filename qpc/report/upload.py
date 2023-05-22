@@ -88,7 +88,7 @@ class ReportUploadCommand(CliCommand):
         if json_data.get("id"):
             logger.info(
                 _(messages.REPORT_SUCCESSFULLY_UPLOADED),
-                {"id": json_data.get("id"), "pkg_name": PKG_NAME}
+                {"id": json_data.get("id"), "pkg_name": PKG_NAME},
             )
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ

@@ -195,8 +195,9 @@ class SourceEditCommand(CliCommand):
                     logger.error(
                         _(messages.SOURCE_EDIT_CREDS_NOT_FOUND),
                         {
-                            "reference": not_found_str, "source": self.args.name,
-                        }
+                            "reference": not_found_str,
+                            "source": self.args.name,
+                        },
                     )
                     sys.exit(1)
             else:

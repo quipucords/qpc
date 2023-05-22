@@ -181,7 +181,8 @@ class ReportInsightsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
-                    "path": self.test_tar_gz_filename, "error": ""
+                    "path": self.test_tar_gz_filename,
+                    "error": "",
                 }
                 self.assertIn(err_msg, log.output[0])
 
@@ -199,8 +200,8 @@ class ReportInsightsTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = (
-                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(fake_dir)
+                err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
+                    fake_dir
                 )
                 self.assertIn(err_msg, log.output[0])
 

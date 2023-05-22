@@ -134,10 +134,7 @@ class TestOpenShiftAddCredential:
         assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_credential"
 
     def test_no_api_info_shown_with_verbose_flag(
-        self,
-        caplog,
-        requests_mock,
-        openshift_token_input
+        self, caplog, requests_mock, openshift_token_input
     ):
         """Test that no API information is shown when the -v flag is used."""
         caplog.set_level("INFO")

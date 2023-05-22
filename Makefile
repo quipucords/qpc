@@ -35,28 +35,27 @@ install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
-lint:
-	tox -e lint
+lint: lint-isort lint-black lint-flake8 lint-docs
 
 lint-isort:
-	tox -e lint-isort
+	poetry run isort --check --diff .
 
 lint-flake8:
-	tox -e lint-flake8
+	poetry run flakeheaven lint
 
 lint-black:
-	tox -e lint-black
+	poetry run black --diff --check .
 
 lint-docs:
 	poetry run rstcheck docs/source/man.rst
 
 test:
-	tox -e py39
+	poetry run pytest
 
 test-coverage:
-	coverage run -m unittest discover qpc/ -v
-	coverage report -m --omit $(OMIT_PATTERNS)
-	echo $(OMIT_PATTERNS)
+	poetry run pytest --cov=qpc
+	poetry run coverage report --show-missing
+	poetry run coverage xml
 
 manpage:
 	$(pandoc) docs/source/man.rst \

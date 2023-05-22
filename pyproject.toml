@@ -33,12 +33,7 @@ pytest-cov = ">=3.0.0"
 pytest-lazy-fixture = ">=0.6.3"
 requests-mock = ">=1.9.3"
 pytest-mock = "^3.8.2"
-tox = "^4.4.4"
 rstcheck = "^6.1.1"
-
-[tool.poetry.group.ci.dependencies]
-tox = "^4.4.4"
-tox-gh-actions = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

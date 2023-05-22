@@ -11,26 +11,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        type:
+          [
+            lint,
+            test-coverage,
+        ]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0 # fetches all commits/tags
 
-      - name: Set up Python ${{ matrix.python-version }} 
-        uses: actions/setup-python@v2
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4.5.0
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: "poetry.lock"
 
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install poetry
-          poetry install --only=ci
+        run: poetry install
 
-      - name: Test with tox
-        run: poetry run tox
+      - name: Test phase
+        run: make ${{ matrix.type }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
+  

@@ -40,7 +40,9 @@ class ConfigureHostTests(unittest.TestCase):
             self.assertEqual(config["host"], "127.0.0.1")
             self.assertEqual(config["port"], DEFAULT_PORT)
             expected_message = messages.SERVER_CONFIG_SUCCESS % {
-                "protocol": "https", "host": "127.0.0.1", "port": str(DEFAULT_PORT)
+                "protocol": "https",
+                "host": "127.0.0.1",
+                "port": str(DEFAULT_PORT),
             }
             self.assertIn(expected_message, log.output[-1])
         # Restore stderr
@@ -83,7 +85,9 @@ class ConfigureHostTests(unittest.TestCase):
             self.assertEqual(config["host"], "127.0.0.1")
             self.assertEqual(config["port"], 8005)
             expected_message = messages.SERVER_CONFIG_SUCCESS % {
-                "protocol": "https", "host": "127.0.0.1", "port": "8005"
+                "protocol": "https",
+                "host": "127.0.0.1",
+                "port": "8005",
             }
             self.assertIn(expected_message, log.output[-1])
 

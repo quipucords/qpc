@@ -91,14 +91,12 @@ class ReportDownloadCommand(CliCommand):
                     self.req_path = f"{self.req_path}{self.report_id}"
                 else:
                     logger.error(
-                        _(messages.DOWNLOAD_NO_REPORT_FOR_SJ),
-                        self.args.scan_job_id
+                        _(messages.DOWNLOAD_NO_REPORT_FOR_SJ), self.args.scan_job_id
                     )
                     sys.exit(1)
             else:
                 logger.error(
-                    _(messages.DOWNLOAD_SJ_DOES_NOT_EXIST),
-                    self.args.scan_job_id
+                    _(messages.DOWNLOAD_SJ_DOES_NOT_EXIST), self.args.scan_job_id
                 )
                 sys.exit(1)
         else:
@@ -111,24 +109,17 @@ class ReportDownloadCommand(CliCommand):
             write_file(self.args.path, file_content, True)
             logger.info(
                 _(messages.DOWNLOAD_SUCCESSFULLY_WRITTEN),
-                {"report": self.report_id, "path": self.args.path}
+                {"report": self.report_id, "path": self.args.path},
             )
         except EnvironmentError as err:
             logger.error(
-                _(messages.WRITE_FILE_ERROR),
-                {"path": self.args.path, "error": err}
+                _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
             )
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.response.status_code == 428:
-            logger.error(
-                _(messages.DOWNLOAD_NO_MASK_REPORT),
-                self.args.report_id
-            )
+            logger.error(_(messages.DOWNLOAD_NO_MASK_REPORT), self.args.report_id)
         else:
-            logger.error(
-                _(messages.DOWNLOAD_NO_REPORT_FOUND),
-                self.args.report_id
-            )
+            logger.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report_id)
         sys.exit(1)

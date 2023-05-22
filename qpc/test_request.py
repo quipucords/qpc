@@ -12,26 +12,24 @@ def test_request_invalid_method(server_config, caplog):
     caplog.set_level("ERROR")
     parser_mock = MagicMock()
     with pytest.raises(SystemExit):
-        with patch('builtins.print'):
-            with patch('argparse.ArgumentParser.print_help'):
-                request('INVALID_METHOD', '/path', parser=parser_mock)
-    assert caplog.messages[-1] == 'Unsupported request method INVALID_METHOD'
+        with patch("builtins.print"):
+            with patch("argparse.ArgumentParser.print_help"):
+                request("INVALID_METHOD", "/path", parser=parser_mock)
+    assert caplog.messages[-1] == "Unsupported request method INVALID_METHOD"
 
 
-@pytest.mark.parametrize(
-    "method", ["GET", "DELETE", "PUT", "POST", "PATCH"]
-)
+@pytest.mark.parametrize("method", ["GET", "DELETE", "PUT", "POST", "PATCH"])
 def test_request_methods(server_config, method):
     """Test request with valid http methods."""
     with patch("qpc.request.perform_request") as mock_perform_request:
         request(method, "/path")
         mock_perform_request.assert_called_once_with(
             method,
-            'http://127.0.0.1:8000/path',
+            "http://127.0.0.1:8000/path",
             None,
             None,
             {},
-            '0.9.0',
+            "0.9.0",
         )
 
 
@@ -58,4 +56,4 @@ def test_log_request_info_valid_json(server_config, caplog):
     with patch("qpc.request.perform_request", return_value=response):
         request("GET", "/path")
 
-    assert 'Response: "{\'message\': \'Success\'}"' in caplog.messages[-1]
+    assert "Response: \"{'message': 'Success'}\"" in caplog.messages[-1]

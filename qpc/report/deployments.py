@@ -127,13 +127,12 @@ class ReportDeploymentsCommand(CliCommand):
                 else:
                     logger.error(
                         _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ),
-                        self.args.scan_job_id
+                        self.args.scan_job_id,
                     )
                     sys.exit(1)
             else:
                 logger.error(
-                    _(messages.REPORT_SJ_DOES_NOT_EXIST),
-                    self.args.scan_job_id
+                    _(messages.REPORT_SJ_DOES_NOT_EXIST), self.args.scan_job_id
                 )
                 sys.exit(1)
         else:
@@ -154,8 +153,7 @@ class ReportDeploymentsCommand(CliCommand):
             logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
             logger.error(
-                _(messages.WRITE_FILE_ERROR),
-                {"path": self.args.path, "error": err}
+                _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
             )
             sys.exit(1)
 
@@ -168,17 +166,17 @@ class ReportDeploymentsCommand(CliCommand):
             else:
                 logger.error(
                     _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ),
-                    self.args.scan_job_id
+                    self.args.scan_job_id,
                 )
         else:
             if self.response.status_code == 428:
                 logger.error(
                     _(messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID),
-                    self.args.report_id
+                    self.args.report_id,
                 )
             else:
                 logger.error(
                     _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID),
-                    self.args.report_id
+                    self.args.report_id,
                 )
         sys.exit(1)

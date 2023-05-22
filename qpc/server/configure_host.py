@@ -93,5 +93,5 @@ class ConfigureHostCommand(CliCommand):
                 "protocol": protocol,
                 "host": self.args.host,
                 "port": self.args.port,
-            }
+            },
         )

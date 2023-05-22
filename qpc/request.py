@@ -57,7 +57,7 @@ def handle_general_errors(response, min_server_version):
     ):
         logger.error(
             _(messages.SERVER_TOO_OLD_FOR_CLI),
-            {"min_version": min_server_version, "current_version": server_version}
+            {"min_version": min_server_version, "current_version": server_version},
         )
         sys.exit(1)
 
@@ -191,12 +191,7 @@ def request(
 
     try:
         result = perform_request(
-            method,
-            url,
-            params,
-            payload,
-            req_headers,
-            min_server_version
+            method, url, params, payload, req_headers, min_server_version
         )
 
     except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
@@ -219,8 +214,7 @@ def handle_connection_error():
         if config.get(CONFIG_USE_HTTP):
             protocol = "http"
         logger.error(
-            _(CONNECTION_ERROR_MSG),
-            {"protocol": protocol, "host": host, "port": port}
+            _(CONNECTION_ERROR_MSG), {"protocol": protocol, "host": host, "port": port}
         )
     logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
 

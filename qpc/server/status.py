@@ -65,8 +65,7 @@ class ServerStatusCommand(CliCommand):
                 logger.info(_(messages.STATUS_SUCCESSFULLY_WRITTEN))
             except EnvironmentError as err:
                 logger.error(
-                    _(messages.WRITE_FILE_ERROR),
-                    {"path": self.args.path, "error": err}
+                    _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
                 )
         else:
             print(status)

@@ -267,7 +267,8 @@ class ReportDeploymentsTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     nac.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
-                    "path": self.test_json_filename, "error": ""
+                    "path": self.test_json_filename,
+                    "error": "",
                 }
                 self.assertIn(err_msg, log.output[0])
 
@@ -292,8 +293,8 @@ class ReportDeploymentsTests(unittest.TestCase):
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
                     nac.main(args)
-                err_msg = (
-                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(fake_dir)
+                err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
+                    fake_dir
                 )
                 self.assertIn(err_msg, log.output[0])
 
@@ -522,7 +523,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                     nac.main(args)
                 err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
                     "min_version": "0.9.2",
-                    "current_version": "0.0.45"
+                    "current_version": "0.0.45",
                 }
                 self.assertIn(err_msg, log.output[0])
 

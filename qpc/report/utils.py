@@ -57,7 +57,7 @@ def validate_and_create_json(file):
                 # terminate if different from details type
                 logger.error(
                     _(messages.REPORT_INVALID_REPORT_TYPE),
-                    {"file": file, "report_type": file_report_type}
+                    {"file": file, "report_type": file_report_type},
                 )
                 return None
 
@@ -71,14 +71,14 @@ def validate_and_create_json(file):
                     if not facts:
                         logger.error(
                             _(messages.REPORT_JSON_MISSING_ATTR),
-                            {"file": file, "key": FACTS_KEY}
+                            {"file": file, "key": FACTS_KEY},
                         )
                         has_error = True
                         break
                     if not server_id:
                         logger.error(
                             _(messages.REPORT_JSON_MISSING_ATTR),
-                            {"file": file, "key": FACTS_KEY}
+                            {"file": file, "key": FACTS_KEY},
                         )
                         has_error = True
                         break
@@ -94,7 +94,7 @@ def validate_and_create_json(file):
             else:
                 logger.error(
                     _(messages.REPORT_JSON_MISSING_ATTR),
-                    {"file": file, "key": SOURCES_KEY}
+                    {"file": file, "key": SOURCES_KEY},
                 )
                 return None
     else:

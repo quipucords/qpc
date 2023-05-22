@@ -93,13 +93,12 @@ class ReportInsightsCommand(CliCommand):
                 else:
                     logger.error(
                         _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
-                        self.args.scan_job_id
+                        self.args.scan_job_id,
                     )
                     sys.exit(1)
             else:
                 logger.error(
-                    _(messages.REPORT_SJ_DOES_NOT_EXIST),
-                    self.args.scan_job_id
+                    _(messages.REPORT_SJ_DOES_NOT_EXIST), self.args.scan_job_id
                 )
                 sys.exit(1)
         else:
@@ -118,20 +117,17 @@ class ReportInsightsCommand(CliCommand):
             logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
         except EnvironmentError as err:
             logger.error(
-                _(messages.WRITE_FILE_ERROR),
-                {"path": self.args.path, "error": err}
+                _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
             )
             sys.exit(1)
 
     def _handle_response_error(self):  # pylint: disable=arguments-differ
         if self.args.report_id is None:
             logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
-                self.args.scan_job_id
+                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ), self.args.scan_job_id
             )
         else:
             logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID),
-                self.args.report_id
+                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID), self.args.report_id
             )
         sys.exit(1)

@@ -3,10 +3,8 @@
 import json
 import sys
 
-# pylint: disable=no-name-in-module,import-error
-from distutils.version import LooseVersion
-
 import requests
+from packaging.version import Version
 
 from qpc import messages
 from qpc.release import PKG_NAME
@@ -24,6 +22,9 @@ from qpc.utils import (
     read_client_token,
     read_server_config,
 )
+
+# pylint: disable=no-name-in-module,import-error
+
 
 # Need to determine how we get this information; config file at install?
 
@@ -52,7 +53,7 @@ def handle_general_errors(response, min_server_version):
     if not server_version:
         server_version = QPC_MIN_SERVER_VERSION
 
-    if "0.0.0" not in server_version and LooseVersion(server_version) < LooseVersion(
+    if "0.0.0" not in server_version and Version(server_version) < Version(
         min_server_version
     ):
         logger.error(

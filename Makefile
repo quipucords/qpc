@@ -1,5 +1,7 @@
 DATE		= $(shell date)
 PYTHON		= $(shell which python)
+PKG_VERSION = $(shell poetry -s version)
+BUILD_DATE  = $(shell date +'%B %d, %Y')
 
 TOPDIR = $(shell pwd)
 DIRS	= test bin locale src
@@ -60,8 +62,8 @@ manpage:
 	$(pandoc) docs/source/man.rst \
 	  --standalone -t man -o docs/qpc.1 \
 	  --variable=section:1 \
-	  --variable=date:'June 6, 2019' \
-	  --variable=footer:'version 3' \
+	  --variable=date:'$(BUILD_DATE)' \
+	  --variable=footer:'version $(PKG_VERSION)' \
 	  --variable=header:'QPC Command Line Guide'
 
 insights-client:

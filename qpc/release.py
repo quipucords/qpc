@@ -1,5 +1,7 @@
 """File to hold release constants."""
-VERSION = "1.0.1"
+from . import __package__version__
+
+VERSION = __package__version__
 AUTHOR = "QPC Team"
 AUTHOR_EMAIL = "qpc@redhat.com"
 PKG_NAME = "qpc"

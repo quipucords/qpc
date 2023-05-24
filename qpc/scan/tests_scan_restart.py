@@ -15,15 +15,23 @@ from qpc.scan.restart import ScanRestartCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ScanRestartCliTests(unittest.TestCase):
     """Class for testing the scan restart commands for qpc."""
 
-    def setUp(self):
+    def _init_command(self):
+        """Initialize command."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return ScanRestartCommand(subparser)
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -41,11 +49,11 @@ class ScanRestartCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.SSLError)
-            nsc = ScanRestartCommand(SUBPARSER)
+
             args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_restart_scan_conn_err(self):
@@ -54,11 +62,11 @@ class ScanRestartCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
-            nsc = ScanRestartCommand(SUBPARSER)
+
             args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_restart_scan_internal_err(self):
@@ -67,11 +75,11 @@ class ScanRestartCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=500, json={"error": ["Server Error"]})
-            nsc = ScanRestartCommand(SUBPARSER)
+
             args = Namespace(id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_restart_scan_data(self):
@@ -79,9 +87,9 @@ class ScanRestartCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
-            nsc = ScanRestartCommand(SUBPARSER)
+
             args = Namespace(id="1")
             with self.assertLogs(level="INFO") as log:
-                nsc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_RESTARTED % "1"
                 self.assertIn(expected_message, log.output[-1])

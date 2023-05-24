@@ -24,12 +24,17 @@ TMP_GOODDETAILS = (
 )
 NONEXIST_FILE = "/tmp/does/not/exist/bad.json"
 JSON_FILES_LIST = [TMP_BADDETAILS1, TMP_GOODDETAILS]
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ReportUploadTests(unittest.TestCase):
     """Class for testing the scan show commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ReportUploadCommand(subparser)
 
     # pylint: disable=invalid-name
     def setUp(self):
@@ -59,10 +64,10 @@ class ReportUploadTests(unittest.TestCase):
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportUploadCommand(SUBPARSER)
+
             args = Namespace(json_file=TMP_GOODDETAILS[0])
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.REPORT_SUCCESSFULLY_UPLOADED % {
                     "id": "1",
                     "pkg_name": PKG_NAME,
@@ -76,11 +81,11 @@ class ReportUploadTests(unittest.TestCase):
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportUploadCommand(SUBPARSER)
+
             args = Namespace(json_file=TMP_BADDETAILS1[0])
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_UPLOAD_FILE_INVALID_JSON % (
                     TMP_BADDETAILS1[0]
                 )
@@ -94,11 +99,11 @@ class ReportUploadTests(unittest.TestCase):
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(put_merge_url, status_code=400, json=put_report_data)
-            nac = ReportUploadCommand(SUBPARSER)
+
             args = Namespace(json_file=TMP_GOODDETAILS[0])
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_FAILED_TO_UPLOADED % (
                     put_report_data.get("error")
                 )

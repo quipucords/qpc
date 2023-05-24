@@ -30,8 +30,7 @@ class SourceEditCommand(CliCommand):
     def __init__(self, subparsers):
         """Create command."""
         # pylint: disable=no-member
-        CliCommand.__init__(
-            self,
+        super().__init__(
             self.SUBCOMMAND,
             self.ACTION,
             subparsers.add_parser(self.ACTION),

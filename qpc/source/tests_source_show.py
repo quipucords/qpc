@@ -14,17 +14,20 @@ from qpc.source.show import SourceShowCommand
 from qpc.tests_utilities import HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class SourceShowCliTests(unittest.TestCase):
     """Class for testing the source show commands for qpc."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = SourceShowCommand(subparser)
+
     def setUp(self):
         """Create test setup."""
         # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
         write_server_config({"host": "127.0.0.1", "port": 8000, "use_http": True})
@@ -41,11 +44,10 @@ class SourceShowCliTests(unittest.TestCase):
         url = self.base_url + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            nsc = SourceShowCommand(SUBPARSER)
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_source_conn_err(self):
@@ -54,11 +56,10 @@ class SourceShowCliTests(unittest.TestCase):
         url = self.base_url + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            nsc = SourceShowCommand(SUBPARSER)
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_source_internal_err(self):
@@ -67,11 +68,10 @@ class SourceShowCliTests(unittest.TestCase):
         url = self.base_url + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            nsc = SourceShowCommand(SUBPARSER)
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), "Server Error")
 
     def test_show_source_empty(self):
@@ -80,11 +80,10 @@ class SourceShowCliTests(unittest.TestCase):
         url = self.base_url + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            nsc = SourceShowCommand(SUBPARSER)
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         source_out.getvalue(), 'Source "source1" does not exist\n'
                     )
@@ -103,10 +102,9 @@ class SourceShowCliTests(unittest.TestCase):
         data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
-            nsc = SourceShowCommand(SUBPARSER)
             args = Namespace(name="source1")
             with redirect_stdout(source_out):
-                nsc.main(args)
+                self.command.main(args)
                 expected = (
                     '{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1"}'

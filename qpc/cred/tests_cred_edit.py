@@ -21,15 +21,24 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_KEY = "/tmp/testkey"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class CredentialEditCliTests(unittest.TestCase):
     """Class for testing the credential edit commands for qpc."""
 
+    def _init_command(self):
+        """Return command with argument parser properly initialized."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return CredEditCommand(subparser)
+
     def setUp(self):
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -80,7 +89,6 @@ class CredentialEditCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI + "?name=cred_none"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="cred_none",
                 username="root",
@@ -90,7 +98,7 @@ class CredentialEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_edit.main(args)
+                    self.command.main(args)
 
     def test_edit_cred_ssl_err(self):
         """Testing the edit credential command with a connection error."""
@@ -98,7 +106,6 @@ class CredentialEditCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -108,7 +115,7 @@ class CredentialEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_edit.main(args)
+                    self.command.main(args)
 
     def test_edit_cred_conn_err(self):
         """Testing the edit credential command with a connection error."""
@@ -116,7 +123,6 @@ class CredentialEditCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -126,7 +132,7 @@ class CredentialEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_edit.main(args)
+                    self.command.main(args)
 
     def test_edit_host_cred(self):
         """Testing the edit credential command successfully."""
@@ -145,7 +151,6 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="cred1",
                 username="root",
@@ -155,7 +160,7 @@ class CredentialEditCliTests(unittest.TestCase):
                 ssh_passphrase=None,
             )
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -175,7 +180,6 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="cred1",
                 username="root",
@@ -185,7 +189,7 @@ class CredentialEditCliTests(unittest.TestCase):
                 ssh_passphrase=None,
             )
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -206,10 +210,9 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(name="cred1", username="root", password=None)
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -229,10 +232,9 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(name="cred1", username="root", password=None)
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -242,7 +244,6 @@ class CredentialEditCliTests(unittest.TestCase):
         url_get = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=500, json=None)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(
                 name="cred1",
                 username="root",
@@ -252,7 +253,7 @@ class CredentialEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_edit.main(args)
+                    self.command.main(args)
 
     def test_edit_sat_cred(self):
         """Testing the edit credential command successfully."""
@@ -271,10 +272,9 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(name="cred1", username="root", password=None)
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -294,9 +294,8 @@ class CredentialEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
-            cred_edit = CredEditCommand(SUBPARSER)
             args = Namespace(name="cred1", username="root", password=None)
             with self.assertLogs(level="INFO") as log:
-                cred_edit.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
                 self.assertIn(expected_message, log.output[-1])

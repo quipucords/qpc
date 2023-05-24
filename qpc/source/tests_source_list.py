@@ -16,12 +16,16 @@ from qpc.source.list import SourceListCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class SourceListCliTests(unittest.TestCase):
     """Class for testing the source list commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = SourceListCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -42,11 +46,10 @@ class SourceListCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nlc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_source_conn_err(self):
@@ -55,11 +58,10 @@ class SourceListCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nlc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_source_internal_err(self):
@@ -68,11 +70,10 @@ class SourceListCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nlc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), "Server Error")
 
     def test_list_source_empty(self):
@@ -80,10 +81,9 @@ class SourceListCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with self.assertLogs(level="ERROR") as log:
-                nlc.main(args)
+                self.command.main(args)
                 self.assertIn(messages.SOURCE_LIST_NO_SOURCES, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
@@ -104,10 +104,9 @@ class SourceListCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(next_link, status_code=200, json=data2)
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace()
             with redirect_stdout(source_out):
-                nlc.main(args)
+                self.command.main(args)
                 expected = (
                     '[{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1"}]'
@@ -133,10 +132,9 @@ class SourceListCliTests(unittest.TestCase):
         data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
-            nlc = SourceListCommand(SUBPARSER)
             args = Namespace(type="network")
             with redirect_stdout(source_out):
-                nlc.main(args)
+                self.command.main(args)
                 expected = (
                     '[{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1",'

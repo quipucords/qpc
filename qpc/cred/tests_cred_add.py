@@ -23,12 +23,17 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_KEY = "/tmp/testkey"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class CredentialAddCliTests(unittest.TestCase):
     """Class for testing the credential add commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = CredAddCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -98,7 +103,6 @@ class CredentialAddCliTests(unittest.TestCase):
         error = {"name": ["credential with this name already exists."]}
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=400, json=error)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="cred_dup",
                 username="root",
@@ -110,8 +114,7 @@ class CredentialAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_add.main(args)
-                    cred_add.main(args)
+                    self.command.main(args)
 
     def test_add_cred_ssl_err(self):
         """Testing the add credential command with a connection error."""
@@ -119,7 +122,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, exc=requests.exceptions.SSLError)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -131,7 +133,7 @@ class CredentialAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_add.main(args)
+                    self.command.main(args)
 
     def test_add_cred_conn_err(self):
         """Testing the add credential command with a connection error."""
@@ -139,7 +141,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, exc=requests.exceptions.ConnectTimeout)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -151,14 +152,13 @@ class CredentialAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_add.main(args)
+                    self.command.main(args)
 
     def test_add_host_cred(self):
         """Testing the add host cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=201)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -171,7 +171,7 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_password=None,
             )
             with self.assertLogs(level="INFO") as log:
-                cred_add.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -180,7 +180,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=201)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 username="root",
@@ -193,7 +192,7 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_password=None,
             )
             with self.assertLogs(level="INFO") as log:
-                cred_add.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -203,7 +202,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=201)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 type=VCENTER_CRED_TYPE,
@@ -212,7 +210,7 @@ class CredentialAddCliTests(unittest.TestCase):
             )
             do_mock_raw_input.return_value = "abc"
             with self.assertLogs(level="INFO") as log:
-                cred_add.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -222,7 +220,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=201)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 type=SATELLITE_CRED_TYPE,
@@ -231,7 +228,7 @@ class CredentialAddCliTests(unittest.TestCase):
             )
             do_mock_raw_input.return_value = "abc"
             with self.assertLogs(level="INFO") as log:
-                cred_add.main(args)
+                self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -242,7 +239,6 @@ class CredentialAddCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.post(url, status_code=401)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 type=SATELLITE_CRED_TYPE,
@@ -252,7 +248,7 @@ class CredentialAddCliTests(unittest.TestCase):
             do_mock_raw_input.return_value = "abc"
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_add.main(args)
+                    self.command.main(args)
 
     @patch("getpass._raw_input")
     def test_add_cred_expired(self, do_mock_raw_input):
@@ -262,7 +258,6 @@ class CredentialAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             expired = {"detail": "Token has expired"}
             mocker.post(url, status_code=400, json=expired)
-            cred_add = CredAddCommand(SUBPARSER)
             args = Namespace(
                 name="credential1",
                 type=SATELLITE_CRED_TYPE,
@@ -272,4 +267,4 @@ class CredentialAddCliTests(unittest.TestCase):
             do_mock_raw_input.return_value = "abc"
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    cred_add.main(args)
+                    self.command.main(args)

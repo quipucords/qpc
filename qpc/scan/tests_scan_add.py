@@ -17,12 +17,16 @@ from qpc.source import SOURCE_URI
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ScanAddCliTests(unittest.TestCase):
     """Class for testing the scan add commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ScanAddCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -49,12 +53,12 @@ class ScanAddCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source_none"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(sources=["source_none"])
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
-                    ssc.main(args)
+                    self.command.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         'Source "source_none" does not exist' in scan_out.getvalue()
                     )
@@ -65,11 +69,11 @@ class ScanAddCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(sources=["source1"])
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_add_scan_conn_err(self):
@@ -78,11 +82,11 @@ class ScanAddCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(sources=["source1"])
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_add_scan_bad_resp(self):
@@ -91,11 +95,11 @@ class ScanAddCliTests(unittest.TestCase):
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=500, json=None)
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(sources=["source1"], max_concurrency=50)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
                     )
@@ -120,7 +124,7 @@ class ScanAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.post(url_post, status_code=201, json={"name": "scan1"})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -134,7 +138,7 @@ class ScanAddCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -155,7 +159,7 @@ class ScanAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.post(url_post, status_code=201, json={"name": "scan1"})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -169,7 +173,7 @@ class ScanAddCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -195,7 +199,7 @@ class ScanAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.post(url_post, status_code=201, json={"name": "scan1"})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -205,7 +209,7 @@ class ScanAddCliTests(unittest.TestCase):
                 ext_product_search_dirs="/foo/bar/",
             )
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -230,7 +234,7 @@ class ScanAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.post(url_post, status_code=201, json={"name": "scan1"})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -240,7 +244,7 @@ class ScanAddCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -254,7 +258,7 @@ class ScanAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.post(url_post, status_code=201, json={"name": "scan1"})
-            ssc = ScanAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -264,6 +268,6 @@ class ScanAddCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])

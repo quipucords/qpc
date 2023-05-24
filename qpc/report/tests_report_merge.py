@@ -61,12 +61,17 @@ JSON_FILES_LIST = [
     TMP_GOODDETAILS,
     TMP_BADDETAILS5,
 ]
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ReportMergeTests(unittest.TestCase):
     """Class for testing the scan show commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ReportMergeCommand(subparser)
 
     # pylint: disable=invalid-name
     def setUp(self):
@@ -113,11 +118,11 @@ class ReportMergeTests(unittest.TestCase):
             mocker.get(get_scanjob1_url, status_code=200, json=scanjob1_data)
             mocker.get(get_scanjob2_url, status_code=200, json=scanjob2_data)
             mocker.put(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
             )
-            nac.main(args)
+            self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
                 "pkg_name": PKG_NAME,
@@ -139,13 +144,13 @@ class ReportMergeTests(unittest.TestCase):
             mocker.get(get_scanjob1_url, status_code=200, json=scanjob1_data)
             mocker.get(get_scanjob2_url, status_code=200, json=scanjob2_data)
             mocker.put(put_merge_url, status_code=400, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    nac.main(args)
+                    self.command.main(args)
 
     def test_detail_merge_report_ids(self):
         """Testing report merge command with report ids."""
@@ -154,11 +159,11 @@ class ReportMergeTests(unittest.TestCase):
         captured_stdout = StringIO()
         with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.put(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
             )
-            nac.main(args)
+            self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
                 "pkg_name": PKG_NAME,
@@ -174,13 +179,13 @@ class ReportMergeTests(unittest.TestCase):
         put_merge_url = get_server_location() + ASYNC_MERGE_URI
         with requests_mock.Mocker() as mocker:
             mocker.put(put_merge_url, status_code=400, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    nac.main(args)
+                    self.command.main(args)
 
     def test_detail_merge_json_files(self):
         """Testing report merge command with json files."""
@@ -189,13 +194,13 @@ class ReportMergeTests(unittest.TestCase):
         captured_stdout = StringIO()
         with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=None,
                 json_files=[TMP_DETAILSFILE1[0], TMP_GOODDETAILS[0]],
                 report_ids=None,
             )
-            nac.main(args)
+            self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
                 "pkg_name": PKG_NAME,
@@ -205,7 +210,7 @@ class ReportMergeTests(unittest.TestCase):
     def test_detail_merge_json_files_not_exist(self):
         """Testing report merge file not found error with json files."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=[TMP_DETAILSFILE1[0], NONEXIST_FILE[0]],
@@ -214,7 +219,7 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
                 self.assertIn(
                     messages.FILE_NOT_FOUND % NONEXIST_FILE[0],
                     report_out.getvalue().strip(),
@@ -223,7 +228,7 @@ class ReportMergeTests(unittest.TestCase):
     def test_detail_merge_error_json_files(self):
         """Testing report merge error with json files."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=[TMP_DETAILSFILE1[0], TMP_NOTJSONFILE[0]],
@@ -232,12 +237,12 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_error_all_json_files(self):
         """Testing report merge error with all bad json files."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=[TMP_BADDETAILS1[0], TMP_BADDETAILS2[0]],
@@ -246,12 +251,12 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_only_one_json_file(self):
         """Testing report merge error with only 1 json file."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=[
@@ -262,29 +267,29 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_error_no_args(self):
         """Testing report merge error with no arguments."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None, json_files=None, report_ids=None, json_dir=None
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_error_too_few_args(self):
         """Testing report merge error with only 1 job id."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=[1], json_files=None, report_ids=None, json_dir=None
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_json_directory(self):
         """Testing report merge command with json directory."""
@@ -293,11 +298,11 @@ class ReportMergeTests(unittest.TestCase):
         captured_stdout = StringIO()
         with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.post(put_merge_url, status_code=201, json=put_report_data)
-            nac = ReportMergeCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=None, json_dir=["/tmp/"]
             )
-            nac.main(args)
+            self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
                 "pkg_name": PKG_NAME,
@@ -308,7 +313,7 @@ class ReportMergeTests(unittest.TestCase):
         """Testing report merge command with json_dir parameter (notdir)."""
         bad_json_directory = "/tmp/does/not/exist/1316"
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=None,
@@ -317,12 +322,12 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_json_directory_error_path_passed(self):
         """Testing report merge command with json_dir parameter (file)."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=None,
@@ -331,12 +336,12 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_json_invalid_report_type_passed(self):
         """Testing report merge command bad report_type."""
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None,
             json_files=None,
@@ -345,7 +350,7 @@ class ReportMergeTests(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)
 
     def test_detail_merge_json_directory_no_detail_reports(self):
         """Testing report merge command with json_dir (no details)."""
@@ -354,10 +359,10 @@ class ReportMergeTests(unittest.TestCase):
             if os.path.isfile(file[0]):
                 os.remove(file[0])
         report_out = StringIO()
-        nac = ReportMergeCommand(SUBPARSER)
+
         args = Namespace(
             scan_job_ids=None, json_files=None, report_ids=None, json_dir="/tmp/"
         )
         with self.assertRaises(SystemExit):
             with redirect_stdout(report_out):
-                nac.main(args)
+                self.command.main(args)

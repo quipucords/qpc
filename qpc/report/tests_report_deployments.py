@@ -20,16 +20,24 @@ from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import create_tar_buffer, get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ReportDeploymentsTests(unittest.TestCase):
     """Class for testing the deployments report command."""
 
-    # pylint: disable=invalid-name
-    def setUp(self):
+    def _init_command(self):
+        """Initialize command."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return ReportDeploymentsCommand(subparser)
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
+
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -67,7 +75,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 report_id=None,
@@ -77,7 +85,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 mask=False,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
@@ -97,7 +105,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -107,7 +115,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 mask=False,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
@@ -133,7 +141,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 json=get_report_csv_data,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 report_id=None,
@@ -143,7 +151,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 mask=False,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
@@ -198,7 +206,7 @@ class ReportDeploymentsTests(unittest.TestCase):
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=400, json=get_scanjob_json_data)
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 output_json=True,
@@ -209,7 +217,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         report_out.getvalue(), messages.REPORT_SJ_DOES_NOT_EXIST
                     )
@@ -222,7 +230,7 @@ class ReportDeploymentsTests(unittest.TestCase):
         get_scanjob_json_data = {"id": 1}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 report_id=None,
@@ -233,7 +241,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         report_out.getvalue(),
                         messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ,
@@ -254,7 +262,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -265,7 +273,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
                     "path": self.test_json_filename,
                     "error": "",
@@ -281,7 +289,7 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -292,7 +300,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
                     fake_dir
                 )
@@ -307,7 +315,7 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -318,7 +326,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.OUTPUT_FILE_TYPE % ".json"
                 self.assertIn(err_msg, log.output[0])
 
@@ -331,7 +339,7 @@ class ReportDeploymentsTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -342,7 +350,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.OUTPUT_FILE_TYPE % ".csv"
                 self.assertIn(err_msg, log.output[0])
 
@@ -359,7 +367,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -370,7 +378,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -390,7 +398,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 report_id=None,
@@ -401,7 +409,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -420,7 +428,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -430,7 +438,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 mask=True,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
                 with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                     data = json_file.read()
@@ -453,7 +461,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1",
                 report_id=None,
@@ -464,7 +472,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_COULD_NOT_BE_MASKED_SJ % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -483,7 +491,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -494,7 +502,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -509,7 +517,7 @@ class ReportDeploymentsTests(unittest.TestCase):
                 headers={"X-Server-Version": "0.0.45"},
                 json=get_report_json_data,
             )
-            nac = ReportDeploymentsCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
@@ -520,7 +528,7 @@ class ReportDeploymentsTests(unittest.TestCase):
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
                     "min_version": "0.9.2",
                     "current_version": "0.0.45",

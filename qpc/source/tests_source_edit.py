@@ -19,15 +19,24 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, read_in_file, write_server_config
 
 TMP_HOSTFILE = "/tmp/testhostsfile"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class SourceEditCliTests(unittest.TestCase):
     """Class for testing the source edit commands for qpc."""
 
+    def _init_command(self):
+        """Return command with argument parser properly initialized."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return SourceEditCommand(subparser)
+
     def setUp(self):
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -88,14 +97,13 @@ class SourceEditCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source_none"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            aec = SourceEditCommand(SUBPARSER)
             args = Namespace(
                 name="source_none", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
-                    aec.main(args)
+                    self.command.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         'Source "source_none" does not exist' in source_out.getvalue()
                     )
@@ -106,13 +114,12 @@ class SourceEditCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            aec = SourceEditCommand(SUBPARSER)
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_edit_source_conn_err(self):
@@ -121,13 +128,13 @@ class SourceEditCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     ##################################################
@@ -156,7 +163,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
             mocker.patch(url_patch, status_code=200)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.4", "2.3.4.5"],
@@ -165,7 +172,7 @@ class SourceEditCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -191,7 +198,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
             mocker.patch(url_patch, status_code=200)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.[0:255]"],
@@ -200,7 +207,7 @@ class SourceEditCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -229,10 +236,10 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
             mocker.patch(url_patch, status_code=200)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(name="source1", hosts=["1.2.3.5"], cred=["credential1"])
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -259,7 +266,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
             mocker.patch(url_patch, status_code=200)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.5"],
@@ -267,7 +274,7 @@ class SourceEditCliTests(unittest.TestCase):
                 disable_ssl="True",
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -294,7 +301,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
             mocker.patch(url_patch, status_code=200)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.5"],
@@ -302,7 +309,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ssl_protocol="SSLv23",
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -312,13 +319,13 @@ class SourceEditCliTests(unittest.TestCase):
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=500, json=None)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         source_out.getvalue(), messages.SERVER_INTERNAL_ERROR
                     )
@@ -346,7 +353,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=200, json=cred_data)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.4"],
@@ -355,7 +362,7 @@ class SourceEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         "An error occurred while processing "
                         'the "--cred" input' in source_out.getvalue()
@@ -380,7 +387,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.get(url_get_cred, status_code=500)
-            aec = SourceEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 hosts=["1.2.3.4"],
@@ -389,7 +396,7 @@ class SourceEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         "An error occurred while processing "
                         'the "--cred" input' in source_out.getvalue()

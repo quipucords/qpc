@@ -14,12 +14,16 @@ from qpc.report.merge_status import ReportMergeStatusCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ReportMergeStatusTests(unittest.TestCase):
     """Class for testing the report merge status commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ReportMergeStatusCommand(subparser)
 
     # pylint: disable=invalid-name
     def setUp(self):
@@ -57,9 +61,9 @@ class ReportMergeStatusTests(unittest.TestCase):
         captured_stdout = StringIO()
         with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.get(self.url + "1/", status_code=200, json=good_json)
-            nac = ReportMergeStatusCommand(SUBPARSER)
+
             args = Namespace(job_id="1")
-            nac.main(args)
+            self.command.main(args)
             result1 = messages.MERGE_JOB_ID_STATUS % {
                 "job_id": "1",
                 "status": "completed",
@@ -77,11 +81,11 @@ class ReportMergeStatusTests(unittest.TestCase):
         report_out = StringIO()
         with requests_mock.Mocker() as mocker:
             mocker.get(self.url + "1/", status_code=404, json=None)
-            nac = ReportMergeStatusCommand(SUBPARSER)
+
             args = Namespace(job_id="1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(report_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         report_out.getvalue(), messages.MERGE_JOB_ID_NOT_FOUND % "1"
                     )

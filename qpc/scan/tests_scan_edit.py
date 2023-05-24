@@ -16,15 +16,24 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_HOSTFILE = "/tmp/testhostsfile"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class SourceEditCliTests(unittest.TestCase):
     """Class for testing the source edit commands for qpc."""
 
-    def setUp(self):
+    def _init_command(self):
+        """Initialize command."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return ScanEditCommand(subparser)
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -53,12 +62,12 @@ class SourceEditCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI + "?name=scan_none"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(name="scan_none", sources=["source1"])
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    aec.main(args)
-                    aec.main(args)
+                    self.command.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         messages.SCAN_DOES_NOT_EXIST % "scan_none"
                         in scan_out.getvalue()
@@ -80,7 +89,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.patch(url_patch, status_code=200, json=scan_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -90,7 +99,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -111,7 +120,7 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.get(url_get_source, status_code=200, json=source_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -121,7 +130,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -147,7 +156,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=None,
@@ -157,7 +166,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -179,7 +188,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=None,
@@ -189,7 +198,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs="/foo/bar/",
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -216,7 +225,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=None,
@@ -226,7 +235,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -253,7 +262,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=None,
@@ -263,7 +272,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=[],
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -290,7 +299,7 @@ class SourceEditCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.patch(url_patch, status_code=200, json=updated_entry)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=None,
@@ -300,7 +309,7 @@ class SourceEditCliTests(unittest.TestCase):
                 ext_product_search_dirs=None,
             )
             with self.assertLogs(level="INFO") as log:
-                aec.main(args)
+                self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -310,7 +319,7 @@ class SourceEditCliTests(unittest.TestCase):
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=500, json=None)
-            aec = ScanEditCommand(SUBPARSER)
+
             args = Namespace(
                 name="scan1",
                 sources=["source1"],
@@ -321,7 +330,7 @@ class SourceEditCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    aec.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
                     )

@@ -16,12 +16,16 @@ from qpc.scan.list import ScanListCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ScanListCliTests(unittest.TestCase):
     """Class for testing the scan list commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ScanListCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -42,11 +46,11 @@ class ScanListCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    slc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_scan_conn_err(self):
@@ -55,11 +59,11 @@ class ScanListCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    slc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_list_scan_internal_err(self):
@@ -68,11 +72,11 @@ class ScanListCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace()
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    slc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), "Server Error")
 
     def test_list_scan_empty(self):
@@ -80,10 +84,10 @@ class ScanListCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace()
             with self.assertLogs(level="ERROR") as log:
-                slc.main(args)
+                self.command.main(args)
                 self.assertIn(messages.SCAN_LIST_NO_SCANS, log.output[-1])
 
     @patch("builtins.input", return_value="yes")
@@ -103,10 +107,10 @@ class ScanListCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(next_link, status_code=200, json=data2)
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace()
             with redirect_stdout(scan_out):
-                slc.main(args)
+                self.command.main(args)
                 expected = (
                     '[{"id":1,"scan_type":"inspect"'
                     ',"source":{"id":1,"name":"scan1"}'
@@ -131,10 +135,10 @@ class ScanListCliTests(unittest.TestCase):
         data = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
-            slc = ScanListCommand(SUBPARSER)
+
             args = Namespace(type="inspect")
             with redirect_stdout(scan_out):
-                slc.main(args)
+                self.command.main(args)
                 expected = (
                     '[{"id":1,"scan_type":"inspect"'
                     ',"source":{"id":1,"name":"scan1"}'

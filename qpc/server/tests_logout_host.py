@@ -12,12 +12,16 @@ from qpc.server import LOGOUT_URI
 from qpc.server.logout_host import LogoutHostCommand
 from qpc.tests_utilities import HushUpStderr
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class LogoutTests(unittest.TestCase):
     """Class for testing the logout host function."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = LogoutHostCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -37,7 +41,6 @@ class LogoutTests(unittest.TestCase):
         url = utils.get_server_location() + LOGOUT_URI
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200)
-            lhc = LogoutHostCommand(SUBPARSER)
             args = Namespace()
-            lhc.main(args)
+            self.command.main(args)
             self.assertFalse(os.path.exists(utils.QPC_CLIENT_TOKEN))

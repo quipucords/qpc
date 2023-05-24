@@ -13,12 +13,16 @@ from qpc.cred.show import CredShowCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class CredentialShowCliTests(unittest.TestCase):
     """Class for testing the credential show commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = CredShowCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -39,11 +43,11 @@ class CredentialShowCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            csc = CredShowCommand(SUBPARSER)
+
             args = Namespace(name="credential1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    csc.main(args)
+                    self.command.main(args)
 
     def test_show_cred_conn_err(self):
         """Testing the show credential command with a connection error."""
@@ -51,11 +55,11 @@ class CredentialShowCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            csc = CredShowCommand(SUBPARSER)
+
             args = Namespace(name="credential1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    csc.main(args)
+                    self.command.main(args)
 
     def test_show_cred_internal_err(self):
         """Testing the show credential command with an internal error."""
@@ -63,11 +67,11 @@ class CredentialShowCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            csc = CredShowCommand(SUBPARSER)
+
             args = Namespace(name="credential1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    csc.main(args)
+                    self.command.main(args)
 
     def test_show_cred_empty(self):
         """Testing the show credential command successfully with empty data."""
@@ -75,11 +79,11 @@ class CredentialShowCliTests(unittest.TestCase):
         url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            csc = CredShowCommand(SUBPARSER)
+
             args = Namespace(name="cred1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):
-                    csc.main(args)
+                    self.command.main(args)
 
     def test_show_cred_data(self):
         """Testing the show credential command with stubbed data."""
@@ -95,10 +99,10 @@ class CredentialShowCliTests(unittest.TestCase):
         data = {"count": 1, "results": results}
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
-            csc = CredShowCommand(SUBPARSER)
+
             args = Namespace(name="cred1")
             with redirect_stdout(cred_out):
-                csc.main(args)
+                self.command.main(args)
                 expected = (
                     '{"id":1,"name":"cred1","password":"********","username":"root"}'
                 )

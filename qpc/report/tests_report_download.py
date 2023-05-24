@@ -18,16 +18,24 @@ from qpc.scan import SCAN_JOB_URI
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr
 from qpc.utils import create_tar_buffer, get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ReportDownloadTests(unittest.TestCase):
     """Class for testing the report download command."""
 
-    # pylint: disable=invalid-name
-    def setUp(self):
+    def _init_command(self):
+        """Initialize command."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return ReportDownloadCommand(subparser)
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
+
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -61,12 +69,12 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 content=buffer_content,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
                     "report": "1",
                     "path": self.test_tar_filename,
@@ -86,12 +94,12 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 content=buffer_content,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
                     "report": "1",
                     "path": self.test_tar_filename,
@@ -136,13 +144,13 @@ class ReportDownloadTests(unittest.TestCase):
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=400, json=get_scanjob_json_data)
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.DOWNLOAD_SJ_DOES_NOT_EXIST % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -152,13 +160,13 @@ class ReportDownloadTests(unittest.TestCase):
         get_scanjob_json_data = {"id": 1}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.DOWNLOAD_NO_REPORT_FOR_SJ % "1"
                 self.assertIn(err_msg, log.output[0])
 
@@ -171,11 +179,11 @@ class ReportDownloadTests(unittest.TestCase):
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(scan_job_id=None, report_id="1", path=fake_dir, mask=False)
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
                     fake_dir
                 )
@@ -197,13 +205,13 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 content=buffer_content,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
                     "path": self.test_tar_filename,
                     "error": err,
@@ -221,13 +229,13 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 json=get_report_json_data,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id=1, path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.DOWNLOAD_NO_REPORT_FOUND % 1
                 self.assertIn(err_msg, log.output[0])
 
@@ -242,13 +250,13 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": "0.0.45"},
                 json=get_report_json_data,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id=1, path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
                     "min_version": "0.9.2",
                     "current_version": "0.0.45",
@@ -268,13 +276,13 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 content=buffer_content,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id="1", path="test.json", mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.OUTPUT_FILE_TYPE % "tar.gz"
                 self.assertIn(err_msg, log.output[-1])
 
@@ -291,12 +299,12 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 content=buffer_content,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_filename, mask=True
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
                     "report": "1",
                     "path": self.test_tar_filename,
@@ -314,12 +322,12 @@ class ReportDownloadTests(unittest.TestCase):
                 headers={"X-Server-Version": VERSION},
                 json=get_report_json_data,
             )
-            nac = ReportDownloadCommand(SUBPARSER)
+
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_filename, mask=False
             )
             with self.assertLogs(level="ERROR") as log:
                 with self.assertRaises(SystemExit):
-                    nac.main(args)
+                    self.command.main(args)
                 err_msg = messages.DOWNLOAD_NO_MASK_REPORT % 1
                 self.assertIn(err_msg, log.output[0])

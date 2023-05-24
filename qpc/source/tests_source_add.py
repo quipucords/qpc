@@ -20,13 +20,18 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_HOSTFILE = "/tmp/testhostsfile"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 # pylint: disable=too-many-public-methods
 class SourceAddCliTests(unittest.TestCase):
     """Class for testing the source add commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = SourceAddCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -112,7 +117,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=400, json=error)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source_dup",
                 cred=["cred1"],
@@ -122,8 +127,8 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
-                    nac.main(args)
+                    self.command.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         "source with this name already exists." in source_out.getvalue()
                     )
@@ -136,7 +141,7 @@ class SourceAddCliTests(unittest.TestCase):
         get_cred_data = {"count": 1, "results": cred_results}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1", "cred2"],
@@ -146,7 +151,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         "An error occurred while processing "
                         'the "--cred" input' in source_out.getvalue()
@@ -158,7 +163,7 @@ class SourceAddCliTests(unittest.TestCase):
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1%2Ccred2"
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=500)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1", "cred2"],
@@ -168,7 +173,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         "An error occurred while processing "
                         'the "--cred" input' in source_out.getvalue()
@@ -180,7 +185,7 @@ class SourceAddCliTests(unittest.TestCase):
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, exc=requests.exceptions.SSLError)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -190,7 +195,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_add_source_conn_err(self):
@@ -199,7 +204,7 @@ class SourceAddCliTests(unittest.TestCase):
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, exc=requests.exceptions.ConnectTimeout)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -209,7 +214,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     ##################################################
@@ -224,7 +229,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -233,7 +238,7 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -246,7 +251,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -264,7 +269,7 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -277,7 +282,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -288,7 +293,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
 
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -303,7 +308,6 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=400)
-            nac = SourceAddCommand(SUBPARSER)
 
             args = Namespace(
                 name="source1",
@@ -316,7 +320,7 @@ class SourceAddCliTests(unittest.TestCase):
             )
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    nac.main(args)
+                    self.command.main(args)
 
     def test_add_source_one_excludehost(self):
         """Testing the add network source command with one exclude host."""
@@ -327,7 +331,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -337,7 +341,7 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -350,7 +354,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -375,7 +379,7 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -391,12 +395,12 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="vcenter"
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -409,7 +413,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -421,7 +425,7 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -437,12 +441,12 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="satellite"
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -455,7 +459,7 @@ class SourceAddCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=200, json=get_cred_data)
             mocker.post(post_source_url, status_code=201)
-            nac = SourceAddCommand(SUBPARSER)
+
             args = Namespace(
                 name="source1",
                 cred=["cred1"],
@@ -464,6 +468,6 @@ class SourceAddCliTests(unittest.TestCase):
                 ssl_cert_verify="false",
             )
             with self.assertLogs(level="INFO") as log:
-                nac.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 self.assertIn(expected_message, log.output[-1])

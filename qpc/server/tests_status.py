@@ -18,12 +18,17 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_KEY = "/tmp/testkey"
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
 
 
 class ServerStatusTests(unittest.TestCase):
     """Class for testing the server status command for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ServerStatusCommand(subparser)
 
     # pylint: disable=invalid-name
     def setUp(self):
@@ -54,10 +59,10 @@ class ServerStatusTests(unittest.TestCase):
         }
         with requests_mock.Mocker() as mocker:
             mocker.get(get_status_url, status_code=200, json=get_status_json_data)
-            ssc = ServerStatusCommand(SUBPARSER)
+
             args = Namespace(path=self.test_json_filename)
             with self.assertLogs(level="INFO") as log:
-                ssc.main(args)
+                self.command.main(args)
                 expected_message = messages.STATUS_SUCCESSFULLY_WRITTEN
                 self.assertIn(expected_message, log.output[-1])
             with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
@@ -77,10 +82,10 @@ class ServerStatusTests(unittest.TestCase):
         }
         with requests_mock.Mocker() as mocker:
             mocker.get(get_status_url, status_code=200, json=get_status_json_data)
-            ssc = ServerStatusCommand(SUBPARSER)
+
             args = Namespace(path=None)
             with redirect_stdout(status_out):
-                ssc.main(args)
+                self.command.main(args)
                 self.assertDictEqual(
                     json.loads(status_out.getvalue().strip()), get_status_json_data
                 )
@@ -105,11 +110,11 @@ class ServerStatusTests(unittest.TestCase):
         get_status_json_data = {"api": 1}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_status_url, status_code=400, json=get_status_json_data)
-            ssc = ServerStatusCommand(SUBPARSER)
+
             args = Namespace(path=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(status_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         status_out.getvalue(), messages.SERVER_STATUS_FAILURE
                     )

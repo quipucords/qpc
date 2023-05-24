@@ -14,12 +14,16 @@ from qpc.scan.start import ScanStartCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ScanStartCliTests(unittest.TestCase):
     """Class for testing the scan start commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = ScanStartCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -48,11 +52,11 @@ class ScanStartCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
             mocker.post(url_post, status_code=300, json=None)
-            ssc = ScanStartCommand(SUBPARSER)
+
             args = Namespace(name="scan_none")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         'Scan "scan_none" does not exist.' in scan_out.getvalue()
                     )
@@ -78,9 +82,9 @@ class ScanStartCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.post(url_post, status_code=201, json={"id": 1})
-            ssc = ScanStartCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
-            ssc.main(args)
+            self.command.main(args)
             expected_message = messages.SCAN_STARTED % "1"
             self.assertIn(expected_message, captured_stdout.getvalue())
 
@@ -105,11 +109,11 @@ class ScanStartCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=200, json=scan_data)
             mocker.post(url_post, status_code=201, json={"id": 1})
-            ssc = ScanStartCommand(SUBPARSER)
+
             args = Namespace(name="scan2")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertTrue(
                         'Scan "scan2" does not exist' in scan_out.getvalue()
                     )
@@ -120,11 +124,11 @@ class ScanStartCliTests(unittest.TestCase):
         url_get_scan = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url_get_scan, status_code=500, json=None)
-            ssc = ScanStartCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    ssc.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
                     )

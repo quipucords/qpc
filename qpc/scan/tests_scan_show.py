@@ -14,15 +14,23 @@ from qpc.scan.show import ScanShowCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class ScanShowCliTests(unittest.TestCase):
     """Class for testing the scan show commands for qpc."""
 
-    def setUp(self):
+    def _init_command(self):
+        """Initialize command."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        return ScanShowCommand(subparser)
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Create test setup."""
+        # different from most other test cases where command is initialized once per
+        # class, this one requires to be initialized for each test method because
+        # SourceEditCommand instance modifies req_path on the fly. This seems to be a
+        # code smell to me, but I'm choosing to ignore it for now
+        self.command = self._init_command()
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -40,11 +48,11 @@ class ScanShowCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            nsc = ScanShowCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_scan_conn_err(self):
@@ -53,11 +61,11 @@ class ScanShowCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI + "?name=scan1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            nsc = ScanShowCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_show_scan_internal_err(self):
@@ -66,11 +74,11 @@ class ScanShowCliTests(unittest.TestCase):
         url = get_server_location() + SCAN_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            nsc = ScanShowCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(scan_out):
-                    nsc.main(args)
+                    self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), "Server Error")
 
     # pylint: disable=invalid-name
@@ -86,10 +94,10 @@ class ScanShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(get_url, status_code=200, json=scan_entry)
-            nsc = ScanShowCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with redirect_stdout(scan_out):
-                nsc.main(args)
+                self.command.main(args)
                 expected = '{"id":1,"name":"scan1","sources":["source1"]}'
                 self.assertEqual(
                     scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
@@ -107,10 +115,10 @@ class ScanShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json=data)
             mocker.get(get_url, status_code=200, json=scan_entry)
-            nsc = ScanShowCommand(SUBPARSER)
+
             args = Namespace(name="scan1")
             with redirect_stdout(scan_out):
-                nsc.main(args)
+                self.command.main(args)
                 expected = '{"id":1,"name":"scan1","sources":["source1"]}'
                 self.assertEqual(
                     scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),

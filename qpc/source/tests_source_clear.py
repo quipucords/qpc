@@ -15,12 +15,16 @@ from qpc.source.clear import SourceClearCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
-PARSER = ArgumentParser()
-SUBPARSER = PARSER.add_subparsers(dest="subcommand")
-
 
 class SourceClearCliTests(unittest.TestCase):
     """Class for testing the source clear commands for qpc."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test case."""
+        argument_parser = ArgumentParser()
+        subparser = argument_parser.add_subparsers(dest="subcommand")
+        cls.command = SourceClearCommand(subparser)
 
     def setUp(self):
         """Create test setup."""
@@ -41,11 +45,11 @@ class SourceClearCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_clear_source_conn_err(self):
@@ -54,11 +58,11 @@ class SourceClearCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
 
     def test_clear_source_internal_err(self):
@@ -67,11 +71,11 @@ class SourceClearCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     self.assertEqual(source_out.getvalue(), "Server Error")
 
     def test_clear_source_empty(self):
@@ -80,11 +84,11 @@ class SourceClearCliTests(unittest.TestCase):
         url = get_server_location() + SOURCE_URI + "?name=source1"
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     self.assertEqual(
                         source_out.getvalue(), 'Source "source1" was not found\n'
                     )
@@ -108,10 +112,10 @@ class SourceClearCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=204)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertLogs(level="INFO") as log:
-                ncc.main(args)
+                self.command.main(args)
                 expected_message = messages.SOURCE_REMOVED % "source1"
                 self.assertIn(expected_message, log.output[-1])
 
@@ -136,11 +140,11 @@ class SourceClearCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=500, json=err_data)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name="source1")
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     expected = 'Failed to remove source "source1"'
                     self.assertTrue(expected in source_out.getvalue())
 
@@ -153,11 +157,11 @@ class SourceClearCliTests(unittest.TestCase):
         get_url = get_server_location() + SOURCE_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json={"count": 0})
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     expected = "No sources exist to be removed\n"
                     self.assertEqual(source_out.getvalue(), expected)
 
@@ -182,11 +186,11 @@ class SourceClearCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=500, json=err_data)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name=None)
             with self.assertRaises(SystemExit):
                 with redirect_stdout(source_out):
-                    ncc.main(args)
+                    self.command.main(args)
                     expected = (
                         "Some sources were removed, however and"
                         " error occurred removing the following"
@@ -210,8 +214,8 @@ class SourceClearCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(get_url, status_code=200, json=data)
             mocker.delete(delete_url, status_code=204)
-            ncc = SourceClearCommand(SUBPARSER)
+
             args = Namespace(name=None)
             with self.assertLogs(level="INFO") as log:
-                ncc.main(args)
+                self.command.main(args)
                 self.assertIn(messages.SOURCE_CLEAR_ALL_SUCCESS, log.output[-1])

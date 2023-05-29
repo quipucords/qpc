@@ -23,7 +23,7 @@ RUN microdnf update -y \
     && pip install -U pip \
     && pip install poetry \
     && poetry config virtualenvs.in-project true \
-    && poetry install -n --only main
+    && poetry install -n --only main --no-root
 
 ENV VIRTUAL_ENV=/app/qpc/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"

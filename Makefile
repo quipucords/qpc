@@ -63,5 +63,5 @@ manpage:
 	  --variable=footer:'version $(PKG_VERSION)' \
 	  --variable=header:'QPC Command Line Guide'
 
-build-container: manpage
+build-container:
 	podman build -t quipucords-cli .

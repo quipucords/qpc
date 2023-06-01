@@ -1,5 +1,4 @@
 """Commands for import organization."""
-# flake8: noqa
 # pylint: disable=unused-import
 from qpc.cred.add import CredAddCommand
 from qpc.cred.clear import CredClearCommand

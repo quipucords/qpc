@@ -9,7 +9,9 @@ from qpc.utils import QPC_MIN_SERVER_VERSION, handle_error_response, log_args
 class CliCommand:
     """Base class for all sub-commands."""
 
-    def __init__(self, subcommand, action, parser, req_method, req_path, success_codes):
+    def __init__(  # noqa: PLR0913
+        self, subcommand, action, parser, req_method, req_path, success_codes
+    ):
         """Create cli command base object."""
         self.subcommand = subcommand
         self.action = action

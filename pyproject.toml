@@ -18,6 +18,7 @@ python = "^3.8"
 requests = ">=2.28.1"
 cryptography = ">=37.0.4"
 packaging = "^23.1"
+ruff = "^0.0.270"
 
 [tool.poetry.group.dev.dependencies]
 coverage = ">=6.4.2"
@@ -39,6 +40,34 @@ build-backend = "poetry.core.masonry.api"
 [tool.isort]
 profile = "black"
 known_first_party = ["qpc"]
+
+[tool.ruff]
+select = [
+    "C90", # mccabe complexity
+    "D",   # pydocstyle
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "Q",   # flake8-quotes
+    "W",   # pycodestyle
+    "PL",  # Pylint
+]
+ignore = [
+    "D203",
+    "D403",
+    "PLC1901",
+    "PLR2004",
+]
+src = ["qpc"]
+target-version = "py311"
+
+[tool.ruff.per-file-ignores]
+"**/commands.py" = ["F401"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.pydocstyle]
+convention = "pep257"
 
 [tool.pytest.ini_options]
 pythonpath = "qpc"

@@ -149,7 +149,7 @@ methods = {
 }
 
 
-def request(
+def request(  # noqa: PLR0913
     method,
     path,
     params=None,
@@ -215,7 +215,7 @@ def handle_connection_error():
     logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
 
 
-def perform_request(
+def perform_request(  # noqa: PLR0913
     method,
     url,
     params=None,

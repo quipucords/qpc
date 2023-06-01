@@ -95,8 +95,7 @@ class ScanClearCommand(CliCommand):
                 scan_err = ",".join(str(remove_error))
                 logger.error(_(messages.SCAN_PARTIAL_REMOVE), scan_err)
                 sys.exit(1)
+            elif not next_link:
+                logger.info(messages.SCAN_CLEAR_ALL_SUCCESS)
             else:
-                if not next_link:
-                    logger.info(messages.SCAN_CLEAR_ALL_SUCCESS)
-                else:
-                    self._do_command()
+                self._do_command()

@@ -91,8 +91,7 @@ class CredClearCommand(CliCommand):
                 cred_err = ",".join(remove_error)
                 logger.error(_(messages.CRED_PARTIAL_REMOVE), cred_err)
                 sys.exit(1)
+            elif not next_link:
+                logger.info(_(messages.CRED_CLEAR_ALL_SUCCESS))
             else:
-                if not next_link:
-                    logger.info(_(messages.CRED_CLEAR_ALL_SUCCESS))
-                else:
-                    self._do_command()
+                self._do_command()

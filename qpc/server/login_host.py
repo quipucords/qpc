@@ -14,7 +14,6 @@ from qpc.utils import delete_client_token, write_client_token
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class LoginHostCommand(CliCommand):
     """Defines the login host command.
 
@@ -27,7 +26,6 @@ class LoginHostCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

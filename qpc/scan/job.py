@@ -16,7 +16,6 @@ from qpc.utils import pretty_print
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ScanJobCommand(CliCommand):
     """Defines the job command.
 
@@ -28,7 +27,6 @@ class ScanJobCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -87,7 +85,6 @@ class ScanJobCommand(CliCommand):
             self.req_params = {"status": self.args.status}
 
     def _handle_response_success(self):
-        # pylint: disable=no-member
         if self.response.status_code in [codes.ok]:
             json_data = self.response.json()
             count = json_data.get("count", 0)

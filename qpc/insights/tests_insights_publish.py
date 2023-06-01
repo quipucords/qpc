@@ -45,9 +45,7 @@ def patched_insights_credentials():
 @pytest.fixture
 def inapropriate_payload_file():
     """Temp file with inappropriate extension for testing purposes."""
-    tmp_file = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
-        suffix=".json"
-    )
+    tmp_file = tempfile.NamedTemporaryFile(suffix=".json")
     yield tmp_file
     tmp_file.close()
 
@@ -173,7 +171,7 @@ class TestInsightsPublishCommand:
             CLI().main()
         assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT % tmp_path.name
 
-    def test_insights_publish_successful(  # pylint: disable=too-many-arguments
+    def test_insights_publish_successful(
         self,
         payload_file,
         patched_insights_config,
@@ -206,7 +204,7 @@ class TestInsightsPublishCommand:
             (500, messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR),
         ],
     )
-    def test_insights_publish_returning_error(  # pylint: disable=too-many-arguments
+    def test_insights_publish_returning_error(
         self,
         payload_file,
         patched_insights_config,
@@ -273,7 +271,7 @@ class TestInsightsPublishCommand:
             CLI().main()
         assert caplog.messages[-1] == log_message
 
-    def test_publish_download_successful(  # pylint: disable=too-many-arguments
+    def test_publish_download_successful(
         self,
         mocker,
         payload_file,
@@ -311,7 +309,7 @@ class TestInsightsPublishCommand:
             (500, messages.SERVER_INTERNAL_ERROR),
         ],
     )
-    def test_insights_publish_download_error(  # pylint: disable=too-many-arguments
+    def test_insights_publish_download_error(
         self,
         caplog,
         requests_mock,

@@ -14,7 +14,6 @@ from qpc.utils import pretty_print
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ScanListCommand(CliCommand):
     """Defines the list command.
 
@@ -26,7 +25,6 @@ class ScanListCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

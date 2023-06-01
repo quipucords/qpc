@@ -28,7 +28,7 @@ def get_source_ids(parser, source_names):
             params={"name": source_name},
             payload=None,
         )
-        if response.status_code == codes.ok:  # pylint: disable=no-member
+        if response.status_code == codes.ok:
             json_data = response.json()
             count = json_data.get("count", 0)
             results = json_data.get("results", [])
@@ -59,7 +59,7 @@ def get_scan_object_id(parser, name):
         params={"name": name},
         payload=None,
     )
-    if response.status_code == codes.ok:  # pylint: disable=no-member
+    if response.status_code == codes.ok:
         json_data = response.json()
         count = json_data.get("count", 0)
         results = json_data.get("results", [])
@@ -128,7 +128,6 @@ def get_enabled_products(enabled_ext_product_search, ext_product_search_dirs, ed
             for product in enabled_ext_product_search:
                 enabled_default[product] = True
         return enabled_default
-    # pylint: disable=no-else-return
     if enabled_ext_product_search == []:
         enabled_default = {
             scan.JBOSS_FUSE: False,
@@ -156,7 +155,6 @@ def get_enabled_products(enabled_ext_product_search, ext_product_search_dirs, ed
     return None
 
 
-# pylint: disable=R0912
 def build_scan_payload(
     args, sources, disabled_optional_products, enabled_ext_product_search
 ):
@@ -184,7 +182,6 @@ def build_scan_payload(
             options = {"disabled_optional_products": disabled_optional_products}
         else:
             options["disabled_optional_products"] = disabled_optional_products
-    # pylint: disable=too-many-boolean-expressions
     if (
         hasattr(args, "enabled_ext_product_search")
         or (hasattr(args, "ext-product-search-dirs"))

@@ -14,7 +14,6 @@ from qpc.utils import handle_error_response
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class SourceClearCommand(CliCommand):
     """Defines the clear command.
 
@@ -27,7 +26,6 @@ class SourceClearCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -57,7 +55,6 @@ class SourceClearCommand(CliCommand):
         delete_uri = source.SOURCE_URI + str(source_entry["id"]) + "/"
         response = request(DELETE, delete_uri, parser=self.parser)
         name = source_entry["name"]
-        # pylint: disable=no-member
         if response.status_code == codes.no_content:
             deleted = True
             if print_out:

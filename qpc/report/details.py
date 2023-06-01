@@ -19,7 +19,6 @@ from qpc.utils import (
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ReportDetailsCommand(CliCommand):
     """Defines the report details command.
 
@@ -31,7 +30,6 @@ class ReportDetailsCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -113,7 +111,7 @@ class ReportDetailsCommand(CliCommand):
                 path=f"{scan.SCAN_JOB_URI}{self.args.scan_job_id}",
                 payload=None,
             )
-            if response.status_code == codes.ok:  # pylint: disable=no-member
+            if response.status_code == codes.ok:
                 json_data = response.json()
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
@@ -153,7 +151,7 @@ class ReportDetailsCommand(CliCommand):
             )
             sys.exit(1)
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         if self.args.report_id is None:
             logger.error(
                 _(messages.REPORT_NO_DETAIL_REPORT_FOR_SJ), self.args.scan_job_id

@@ -52,7 +52,6 @@ LOG_LEVEL_INFO = 0
 
 QPC_MIN_SERVER_VERSION = "0.9.0"
 
-# pylint: disable=invalid-name
 logging.captureWarnings(True)
 logger = logging.getLogger(__name__)
 
@@ -155,7 +154,6 @@ def read_server_config():
 
     :returns: The validate dictionary with configuration
     """
-    # pylint: disable=too-many-return-statements
     if not os.path.exists(QPC_SERVER_CONFIG):
         logger.error("Server config %s was not found.", QPC_SERVER_CONFIG)
         return None
@@ -447,7 +445,6 @@ def read_in_file(filename):
     """
     result = None
     input_path = os.path.expanduser(os.path.expandvars(filename))
-    # pylint: disable=no-else-return
     if os.path.isfile(input_path):
         try:
             with open(input_path, "r", encoding="utf-8") as in_file:
@@ -496,7 +493,7 @@ def write_file(filename, content, binary=False):
         mode = "w"
         if binary:
             mode = "wb"
-        with open(input_path, mode) as out_file:  # pylint: disable=unspecified-encoding
+        with open(input_path, mode) as out_file:
             out_file.write(content)
     return result
 

@@ -15,7 +15,6 @@ from qpc.utils import pretty_print
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class CredShowCommand(CliCommand):
     """Defines the show command.
 
@@ -28,7 +27,6 @@ class CredShowCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

@@ -15,7 +15,6 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class CredEditCommand(CliCommand):
     """Defines the edit command.
 
@@ -28,7 +27,6 @@ class CredEditCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -123,7 +121,7 @@ class CredEditCommand(CliCommand):
             params={"name": self.args.name},
             payload=None,
         )
-        if response.status_code == codes.ok:  # pylint: disable=no-member
+        if response.status_code == codes.ok:
             json_data = response.json()
             count = json_data.get("count", 0)
             if count == 1:

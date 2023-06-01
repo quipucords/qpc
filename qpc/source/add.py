@@ -34,7 +34,7 @@ class SourceAddCommand(CliCommand):
             subparsers.add_parser(self.ACTION),
             POST,
             source.SOURCE_URI,
-            [codes.created],  # pylint: disable=no-member
+            [codes.created],
         )
         self.parser.add_argument(
             "--name",
@@ -148,7 +148,7 @@ class SourceAddCommand(CliCommand):
             params={"name": cred_list},
             payload=None,
         )
-        if response.status_code == codes.ok:  # pylint: disable=no-member
+        if response.status_code == codes.ok:
             json_data = response.json()
             count = json_data.get("count", 0)
             results = json_data.get("results", [])

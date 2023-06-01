@@ -14,7 +14,6 @@ from qpc.utils import handle_error_response
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ScanClearCommand(CliCommand):
     """Defines the clear command.
 
@@ -26,7 +25,6 @@ class ScanClearCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -56,7 +54,6 @@ class ScanClearCommand(CliCommand):
         delete_uri = scan.SCAN_URI + str(scan_entry["id"]) + "/"
         response = request(DELETE, delete_uri, parser=self.parser)
         name = scan_entry["name"]
-        # pylint: disable=no-member
         if response.status_code == codes.no_content:
             deleted = True
             if print_out:
@@ -67,7 +64,6 @@ class ScanClearCommand(CliCommand):
                 logger.error(_(messages.SCAN_FAILED_TO_REMOVE), name)
         return deleted
 
-    # pylint: disable=too-many-branches
     def _handle_response_success(self):
         json_data = self.response.json()
         count = json_data.get("count", 0)

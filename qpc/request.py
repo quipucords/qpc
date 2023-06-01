@@ -23,9 +23,6 @@ from qpc.utils import (
     read_server_config,
 )
 
-# pylint: disable=no-name-in-module,import-error
-
-
 # Need to determine how we get this information; config file at install?
 
 POST = "POST"
@@ -36,7 +33,6 @@ PUT = "PUT"
 
 CONNECTION_ERROR_MSG = messages.CONNECTION_ERROR_MSG
 
-# pylint: disable=invalid-name
 try:
     exception_class = json.decoder.JSONDecodeError
 except AttributeError:
@@ -153,7 +149,6 @@ methods = {
 }
 
 
-# pylint: disable=too-many-arguments, too-many-branches, too-many-locals
 def request(
     method,
     path,

@@ -248,7 +248,6 @@ class ScanAddCliTests(unittest.TestCase):
                 expected_message = messages.SCAN_ADDED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
-    # pylint: disable=invalid-name
     def test_disable_optional_products_empty(self):
         """Testing that the disable-optional-products flag works correctly."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"

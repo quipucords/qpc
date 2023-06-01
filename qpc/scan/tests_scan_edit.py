@@ -27,7 +27,7 @@ class SourceEditCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanEditCommand(subparser)
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -202,7 +202,6 @@ class SourceEditCliTests(unittest.TestCase):
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
-    # pylint: disable=invalid-name
     def test_edit_scan_reset_ext_products(self):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
@@ -239,7 +238,6 @@ class SourceEditCliTests(unittest.TestCase):
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
-    # pylint: disable=invalid-name
     def test_edit_scan_reset_search_dirs(self):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
@@ -276,7 +274,6 @@ class SourceEditCliTests(unittest.TestCase):
                 expected_message = messages.SCAN_UPDATED % "scan1"
                 self.assertIn(expected_message, log.output[-1])
 
-    # pylint: disable=invalid-name
     def test_edit_scan_reset_dis_products(self):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"

@@ -6,11 +6,9 @@ from qpc.request import request
 from qpc.utils import QPC_MIN_SERVER_VERSION, handle_error_response, log_args
 
 
-# pylint: disable=too-few-public-methods, too-many-instance-attributes
 class CliCommand:
     """Base class for all sub-commands."""
 
-    # pylint: disable=too-many-arguments
     def __init__(self, subcommand, action, parser, req_method, req_path, success_codes):
         """Create cli command base object."""
         self.subcommand = subcommand
@@ -64,7 +62,6 @@ class CliCommand:
             min_server_version=self.min_server_version,
         )
 
-        # pylint: disable=no-member
         if self.response.status_code not in self.success_codes:
             # handle error cases
             self._handle_response_error()

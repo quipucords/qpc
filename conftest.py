@@ -9,7 +9,6 @@
 #
 """pytest configuration file."""
 
-# pylint: disable=import-outside-toplevel
 from unittest import mock
 
 import pytest
@@ -40,7 +39,7 @@ def _set_path_constants_to_none():
         mocker.start()
 
 
-def pytest_collection(session):  # pylint: disable=unused-argument
+def pytest_collection(session):
     """pytest collection hook.
 
     This function runs before collecting tests.

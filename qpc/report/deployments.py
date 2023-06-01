@@ -166,15 +166,14 @@ class ReportDeploymentsCommand(CliCommand):
                     _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ),
                     self.args.scan_job_id,
                 )
+        elif self.response.status_code == 428:
+            logger.error(
+                _(messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID),
+                self.args.report_id,
+            )
         else:
-            if self.response.status_code == 428:
-                logger.error(
-                    _(messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID),
-                    self.args.report_id,
-                )
-            else:
-                logger.error(
-                    _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID),
-                    self.args.report_id,
-                )
+            logger.error(
+                _(messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID),
+                self.args.report_id,
+            )
         sys.exit(1)

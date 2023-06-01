@@ -91,8 +91,7 @@ class SourceClearCommand(CliCommand):
                 cred_err = ",".join(remove_error)
                 logger.error(_(messages.SOURCE_PARTIAL_REMOVE), cred_err)
                 sys.exit(1)
+            elif not next_link:
+                logger.info(messages.SOURCE_CLEAR_ALL_SUCCESS)
             else:
-                if not next_link:
-                    logger.info(messages.SOURCE_CLEAR_ALL_SUCCESS)
-                else:
-                    self._do_command()
+                self._do_command()

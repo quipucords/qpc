@@ -64,7 +64,7 @@ class ScanClearCommand(CliCommand):
                 logger.error(_(messages.SCAN_FAILED_TO_REMOVE), name)
         return deleted
 
-    def _handle_response_success(self):
+    def _handle_response_success(self):  # noqa: C901 PLR0912
         json_data = self.response.json()
         count = json_data.get("count", 0)
         results = json_data.get("results", [])

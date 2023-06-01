@@ -100,7 +100,9 @@ def get_optional_products(disabled_optional_products):
     return disabled_products
 
 
-def get_enabled_products(enabled_ext_product_search, ext_product_search_dirs, edit):
+def get_enabled_products(  # noqa: C901
+    enabled_ext_product_search, ext_product_search_dirs, edit
+):
     """Construct a dictionary based on the enabled extended product search args.
 
     :param enabled_ext_product_search The products to enable

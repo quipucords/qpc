@@ -108,7 +108,7 @@ class SourceEditCommand(CliCommand):
             required=False,
         )
 
-    def _validate_args(self):
+    def _validate_args(self):  # noqa: C901 PLR0912
         CliCommand._validate_args(self)
 
         if not (

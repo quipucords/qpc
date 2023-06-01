@@ -83,7 +83,7 @@ class ReportDetailsCommand(CliCommand):
         self.report_id = None
         self.min_server_version = "0.9.2"
 
-    def _validate_args(self):
+    def _validate_args(self):  # noqa: PLR0912
         CliCommand._validate_args(self)
         extension = None
         if self.args.output_json:

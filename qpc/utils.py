@@ -149,7 +149,7 @@ def read_insights_config():
     return insights_config
 
 
-def read_server_config():
+def read_server_config():  # noqa: C901 PLR0911
     """Retrieve configuration for sonar server.
 
     :returns: The validate dictionary with configuration
@@ -395,7 +395,7 @@ def log_args(args):
     logger.debug(message, args)
 
 
-def handle_error_response(response):
+def handle_error_response(response):  # noqa: C901 PLR0912
     """Print errors from response data.
 
     :param response: The response object with a dictionary of keys and

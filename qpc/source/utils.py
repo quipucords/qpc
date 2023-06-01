@@ -37,7 +37,7 @@ def validate_port(arg):
     return arg
 
 
-def build_source_payload(args, add_none=True):
+def build_source_payload(args, add_none=True):  # noqa: C901 PLR0912
     """Construct payload from command line arguments.
 
     :param args: the command line arguments

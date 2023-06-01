@@ -57,4 +57,4 @@ make test-coverage
 
 -----
 
-See [Makefile](https://github.com/quipucords/qpc/blob/master/Makefile) for additional development utilities.
+See [Makefile](https://github.com/quipucords/qpc/blob/main/Makefile) for additional development utilities.

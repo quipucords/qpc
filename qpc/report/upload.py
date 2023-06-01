@@ -16,12 +16,10 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=invalid-name
 try:
     json_exception_class = json.decoder.JSONDecodeError
 except AttributeError:
     json_exception_class = ValueError
-# pylint: disable=too-few-public-methods
 
 
 class ReportUploadCommand(CliCommand):
@@ -36,7 +34,6 @@ class ReportUploadCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -91,7 +88,7 @@ class ReportUploadCommand(CliCommand):
                 {"id": json_data.get("id"), "pkg_name": PKG_NAME},
             )
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         json_data = self.response.json()
         logger.error(_(messages.REPORT_FAILED_TO_UPLOADED), json_data.get("error"))
         sys.exit(1)

@@ -16,7 +16,6 @@ from qpc.utils import read_in_file
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class SourceEditCommand(CliCommand):
     """Defines the edit command.
 
@@ -29,7 +28,6 @@ class SourceEditCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         super().__init__(
             self.SUBCOMMAND,
             self.ACTION,
@@ -110,7 +108,6 @@ class SourceEditCommand(CliCommand):
             required=False,
         )
 
-    # pylint: disable=too-many-branches
     def _validate_args(self):
         CliCommand._validate_args(self)
 
@@ -154,7 +151,7 @@ class SourceEditCommand(CliCommand):
             params={"name": self.args.name},
             payload=None,
         )
-        if response.status_code == codes.ok:  # pylint: disable=no-member
+        if response.status_code == codes.ok:
             json_data = response.json()
             count = json_data.get("count", 0)
             results = json_data.get("results", [])
@@ -169,7 +166,7 @@ class SourceEditCommand(CliCommand):
             sys.exit(1)
 
         # check for valid cred values
-        if len(self.args.cred) > 0:  # pylint: disable=len-as-condition
+        if len(self.args.cred) > 0:
             cred_list = ",".join(self.args.cred)
             response = request(
                 parser=self.parser,
@@ -178,7 +175,7 @@ class SourceEditCommand(CliCommand):
                 params={"name": cred_list},
                 payload=None,
             )
-            if response.status_code == codes.ok:  # pylint: disable=no-member
+            if response.status_code == codes.ok:
                 json_data = response.json()
                 count = json_data.get("count", 0)
                 results = json_data.get("results", [])

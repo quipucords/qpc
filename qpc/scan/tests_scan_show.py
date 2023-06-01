@@ -24,7 +24,7 @@ class ScanShowCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanShowCommand(subparser)
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -81,7 +81,6 @@ class ScanShowCliTests(unittest.TestCase):
                     self.command.main(args)
                     self.assertEqual(scan_out.getvalue(), "Server Error")
 
-    # pylint: disable=invalid-name
     def test_show_scan_data_multiple_scans(self):
         """Testing the show scan command successfully with stubbed data."""
         scan_out = StringIO()

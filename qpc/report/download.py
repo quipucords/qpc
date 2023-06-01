@@ -14,7 +14,6 @@ from qpc.utils import check_extension, validate_write_file, write_file
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ReportDownloadCommand(CliCommand):
     """Defines the report download command.
 
@@ -26,7 +25,6 @@ class ReportDownloadCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -84,7 +82,7 @@ class ReportDownloadCommand(CliCommand):
                 path=f"{scan.SCAN_JOB_URI}{self.args.scan_job_id}",
                 payload=None,
             )
-            if response.status_code == codes.ok:  # pylint: disable=no-member
+            if response.status_code == codes.ok:
                 json_data = response.json()
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
@@ -117,7 +115,7 @@ class ReportDownloadCommand(CliCommand):
             )
             sys.exit(1)
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         if self.response.status_code == 428:
             logger.error(_(messages.DOWNLOAD_NO_MASK_REPORT), self.args.report_id)
         else:

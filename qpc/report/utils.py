@@ -10,7 +10,6 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=invalid-name
 try:
     json_exception_class = json.decoder.JSONDecodeError
 except AttributeError:
@@ -32,8 +31,6 @@ def validate_and_create_json(file):
     :param file: str containing path for details report file
     :return: sources dictionary or None if there were validation errors
     """
-    # pylint: disable=too-many-branches,too-many-statements
-    # pylint: disable=too-many-locals
     logger.info(_(messages.REPORT_UPLOAD_VALIDATE_JSON), file)
     sources = None
     if os.path.isfile(file):

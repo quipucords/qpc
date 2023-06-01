@@ -13,7 +13,6 @@ from qpc.utils import write_server_config
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ConfigureHostCommand(CliCommand):
     """Defines the configure host command.
 
@@ -26,7 +25,6 @@ class ConfigureHostCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

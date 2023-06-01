@@ -11,9 +11,6 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
-
-
 class ScanCancelCommand(CliCommand):
     """Defines the cancel command.
 
@@ -25,7 +22,6 @@ class ScanCancelCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

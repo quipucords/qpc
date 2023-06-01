@@ -13,7 +13,6 @@ from qpc.utils import delete_client_token
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class LogoutHostCommand(CliCommand):
     """Defines the logout host command.
 
@@ -25,7 +24,6 @@ class LogoutHostCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

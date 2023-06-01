@@ -25,7 +25,7 @@ class ScanCancelCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanCancelCommand(subparser)
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because

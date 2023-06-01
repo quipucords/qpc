@@ -19,7 +19,7 @@ class TestOpenShiftAddCredential:
             (500, "An internal server error occurred."),
         ],
     )
-    def test_add_returning_error(  # pylint: disable=too-many-arguments
+    def test_add_returning_error(
         self,
         capsys,
         requests_mock,

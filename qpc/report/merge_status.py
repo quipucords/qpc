@@ -14,7 +14,6 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ReportMergeStatusCommand(CliCommand):
     """Defines the job command.
 
@@ -26,7 +25,6 @@ class ReportMergeStatusCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -62,6 +60,6 @@ class ReportMergeStatusCommand(CliCommand):
                 }
             )
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         logger.error(_(messages.MERGE_JOB_ID_NOT_FOUND), self.args.job_id)
         sys.exit(1)

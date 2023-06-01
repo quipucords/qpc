@@ -14,7 +14,6 @@ from qpc.utils import pretty_print
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ScanShowCommand(CliCommand):
     """Defines the show command.
 
@@ -27,7 +26,6 @@ class ScanShowCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -55,7 +53,7 @@ class ScanShowCommand(CliCommand):
             params={"name": self.args.name},
             payload=None,
         )
-        if response.status_code == codes.ok:  # pylint: disable=no-member
+        if response.status_code == codes.ok:
             json_data = response.json()
             count = json_data.get("count", 0)
             results = json_data.get("results", [])
@@ -73,6 +71,6 @@ class ScanShowCommand(CliCommand):
         data = pretty_print(json_data)
         print(data)
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         logger.error(_(messages.SCAN_DOES_NOT_EXIST), self.args.name)
         sys.exit(1)

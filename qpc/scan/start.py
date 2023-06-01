@@ -14,7 +14,6 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ScanStartCommand(CliCommand):
     """Defines the start command.
 
@@ -27,7 +26,6 @@ class ScanStartCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,

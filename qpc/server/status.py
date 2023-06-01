@@ -14,7 +14,6 @@ from qpc.utils import pretty_print, validate_write_file, write_file
 logger = getLogger(__name__)
 
 
-# pylint: disable=too-few-public-methods
 class ServerStatusCommand(CliCommand):
     """Defines the server status command.
 
@@ -26,7 +25,6 @@ class ServerStatusCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -70,6 +68,6 @@ class ServerStatusCommand(CliCommand):
         else:
             print(status)
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         logger.error(_(messages.SERVER_STATUS_FAILURE))
         sys.exit(1)

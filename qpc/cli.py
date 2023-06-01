@@ -63,7 +63,6 @@ from qpc.utils import (
 )
 
 
-# pylint: disable=too-few-public-methods
 class CLI:
     """Defines the CLI class.
 

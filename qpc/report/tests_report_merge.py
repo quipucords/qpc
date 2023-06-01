@@ -73,7 +73,6 @@ class ReportMergeTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ReportMergeCommand(subparser)
 
-    # pylint: disable=invalid-name
     def setUp(self):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)

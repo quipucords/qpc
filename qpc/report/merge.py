@@ -19,12 +19,10 @@ from qpc.translation import _
 logger = getLogger(__name__)
 
 
-# pylint: disable=invalid-name
 try:
     json_exception_class = json.decoder.JSONDecodeError
 except AttributeError:
     json_exception_class = ValueError
-# pylint: disable=too-few-public-methods
 
 
 class ReportMergeCommand(CliCommand):
@@ -39,7 +37,6 @@ class ReportMergeCommand(CliCommand):
 
     def __init__(self, subparsers):
         """Create command."""
-        # pylint: disable=no-member
         CliCommand.__init__(
             self,
             self.SUBCOMMAND,
@@ -99,7 +96,7 @@ class ReportMergeCommand(CliCommand):
             response = request(
                 parser=self.parser, method=GET, path=path, params=None, payload=None
             )
-            if response.status_code == codes.ok:  # pylint: disable=no-member
+            if response.status_code == codes.ok:
                 json_data = response.json()
                 report_id = json_data.get("report_id", None)
                 if report_id:
@@ -118,8 +115,6 @@ class ReportMergeCommand(CliCommand):
 
         :param files: list(str) of the files to be merged
         """
-        # pylint: disable=too-many-branches,too-many-statements
-        # pylint: disable=too-many-locals
         logger.info(_(messages.REPORT_VALIDATE_JSON), files)
         all_sources = []
         for file in files:
@@ -212,7 +207,7 @@ class ReportMergeCommand(CliCommand):
                 % {"id": json_data.get("id"), "pkg_name": PKG_NAME},
             )
 
-    def _handle_response_error(self):  # pylint: disable=arguments-differ
+    def _handle_response_error(self):
         json_data = self.response.json()
         reports = json_data.get("reports")
         if reports:

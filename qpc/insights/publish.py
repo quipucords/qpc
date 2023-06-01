@@ -130,9 +130,7 @@ class InsightsPublishCommand(CliCommand):
         auth = (insights_login["username"], insights_login["password"])
 
         insights_client = InsightsClient(base_url=base_url, auth=auth)
-        file_to_be_uploaded = open(  # pylint: disable=consider-using-with
-            input_file, "rb"
-        )
+        file_to_be_uploaded = open(input_file, "rb")
         filename_without_extensions = self._remove_file_extension(input_file)
         files = {
             "file": (
@@ -153,7 +151,7 @@ class InsightsPublishCommand(CliCommand):
         if not successfully_submitted:
             raise SystemExit(1)
 
-    def _handle_response_error(self, response):  # pylint: disable=signature-differs
+    def _handle_response_error(self, response):
         if response.status_code == 404:
             logger.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report)
             sys.exit(1)
@@ -175,9 +173,7 @@ class InsightsPublishCommand(CliCommand):
 
         logger.info(_(messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL))
 
-        output_file = NamedTemporaryFile(  # pylint: disable=consider-using-with
-            suffix=".tar.gz", delete=False
-        )
+        output_file = NamedTemporaryFile(suffix=".tar.gz", delete=False)
         output_file_path = Path(output_file.name)
         output_file_path.write_bytes(response.content)
 

@@ -37,7 +37,6 @@ def validate_port(arg):
     return arg
 
 
-# pylint: disable=R0912
 def build_source_payload(args, add_none=True):
     """Construct payload from command line arguments.
 

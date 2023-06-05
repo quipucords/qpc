@@ -16,7 +16,7 @@ from qpc.insights.commands import (
     InsightsConfigureCommand,
     InsightsPublishCommand,
 )
-from qpc.release import PKG_NAME, VERSION
+from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION
 from qpc.report.commands import (
     ReportDeploymentsCommand,
     ReportDetailsCommand,
@@ -183,12 +183,12 @@ class CLI:
             # Before attempting to run command, check server location
             server_location = get_server_location()
             if server_location is None or server_location == "":
-                logger.error(_(messages.SERVER_CONFIG_REQUIRED), PKG_NAME)
+                logger.error(_(messages.SERVER_CONFIG_REQUIRED), QPC_VAR_PROGRAM_NAME)
                 sys.exit(1)
 
         if read_require_auth():
             if (not is_server_cmd or is_server_logout) and not read_client_token():
-                logger.error(_(messages.SERVER_LOGIN_REQUIRED), PKG_NAME)
+                logger.error(_(messages.SERVER_LOGIN_REQUIRED), QPC_VAR_PROGRAM_NAME)
                 sys.exit(1)
 
         if self.args.subcommand in self.subcommands:

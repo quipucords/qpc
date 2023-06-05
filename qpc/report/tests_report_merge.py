@@ -10,7 +10,7 @@ from io import StringIO
 import requests_mock
 
 from qpc import messages
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI
@@ -124,7 +124,7 @@ class ReportMergeTests(unittest.TestCase):
             self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
-                "pkg_name": PKG_NAME,
+                "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             self.assertIn(expected_msg, captured_stdout.getvalue())
 
@@ -165,7 +165,7 @@ class ReportMergeTests(unittest.TestCase):
             self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
-                "pkg_name": PKG_NAME,
+                "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             self.assertIn(expected_msg, captured_stdout.getvalue())
 
@@ -202,7 +202,7 @@ class ReportMergeTests(unittest.TestCase):
             self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
-                "pkg_name": PKG_NAME,
+                "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             self.assertIn(expected_msg, captured_stdout.getvalue())
 
@@ -304,7 +304,7 @@ class ReportMergeTests(unittest.TestCase):
             self.command.main(args)
             expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
                 "id": "1",
-                "pkg_name": PKG_NAME,
+                "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             self.assertIn(expected_msg, captured_stdout.getvalue())
 

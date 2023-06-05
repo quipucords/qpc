@@ -2,6 +2,8 @@ DATE		= $(shell date)
 PYTHON		= $(shell which python)
 PKG_VERSION = $(shell poetry -s version)
 BUILD_DATE  = $(shell date +'%B %d, %Y')
+QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), "qpc")
+QPC_VAR_PROGRAM_NAME_UPPER := $(shell echo $(QPC_VAR_PROGRAM_NAME) | tr '[:lower:]' '[:upper:]')
 
 TOPDIR = $(shell pwd)
 DIRS	= test bin locale src
@@ -51,13 +53,26 @@ test-coverage:
 	poetry run coverage report --show-missing
 	poetry run coverage xml
 
+generate-man:
+	@export QPC_VAR_CURRENT_YEAR=$(shell date +'%Y') \
+	&& export QPC_VAR_PROJECT=$${QPC_VAR_PROJECT:-Quipucords} \
+	&& export QPC_VAR_PROGRAM_NAME=$${QPC_VAR_PROGRAM_NAME:-qpc} \
+	&& jinja -X QPC_VAR docs/source/man.j2 $(ARGS)
+
+update-man.rst:
+	$(MAKE) generate-man ARGS="-o docs/source/man.rst"
+
+manpage-test:
+	@poetry run $(MAKE) --no-print-directory generate-man | diff -u docs/source/man.rst -
+
 manpage:
-	$(pandoc) docs/source/man.rst \
-	  --standalone -t man -o docs/qpc.1 \
-	  --variable=section:1 \
-	  --variable=date:'$(BUILD_DATE)' \
-	  --variable=footer:'version $(PKG_VERSION)' \
-	  --variable=header:'QPC Command Line Guide'
+	@$(MAKE) --no-print-directory generate-man | \
+	$(pandoc) -s - \
+	  --standalone -t man -o docs/$(QPC_VAR_PROGRAM_NAME).1\
+	  --variable=section:1\
+	  --variable=date:'$(BUILD_DATE)'\
+	  --variable=footer:'version $(PKG_VERSION)'\
+	  --variable=header:'$(QPC_VAR_PROGRAM_NAME_UPPER) Command Line Guide'
 
 build-container:
 	podman build -t quipucords-cli .

@@ -7,7 +7,7 @@ from requests import codes
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.request import GET
 from qpc.translation import _
 
@@ -56,7 +56,7 @@ class ReportMergeStatusCommand(CliCommand):
                 _(messages.DISPLAY_REPORT_ID)
                 % {
                     "report_id": json_data.get("report_id"),
-                    "pkg_name": PKG_NAME,
+                    "prog_name": QPC_VAR_PROGRAM_NAME,
                 }
             )
 

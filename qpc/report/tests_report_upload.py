@@ -8,7 +8,7 @@ from argparse import ArgumentParser, Namespace
 import requests_mock
 
 from qpc import messages
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.upload import ReportUploadCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr
@@ -69,7 +69,7 @@ class ReportUploadTests(unittest.TestCase):
                 self.command.main(args)
                 expected_message = messages.REPORT_SUCCESSFULLY_UPLOADED % {
                     "id": "1",
-                    "pkg_name": PKG_NAME,
+                    "prog_name": QPC_VAR_PROGRAM_NAME,
                 }
 
                 self.assertIn(expected_message, log.output[-1])

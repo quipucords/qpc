@@ -255,7 +255,7 @@ REPORT_JSON_DIR_NOT_FOUND = "%s is not a directory"
 REPORT_SUCCESSFULLY_WRITTEN = "Report written successfully."
 REPORT_SUCCESSFULLY_MERGED = (
     "Report merge job %(id)s created. "
-    'To check merge status, run "%(pkg_name)s report merge-status --job %(id)s"'
+    'To check merge status, run "%(prog_name)s report merge-status --job %(id)s"'
 )
 REPORT_UPLOAD_VALIDATE_JSON = "Checking file for valid JSON details report. %s"
 REPORT_UPLOAD_FILE_INVALID_JSON = "Failed: %s is not a JSON details report."
@@ -263,7 +263,7 @@ REPORT_UPLOAD_JSON_FILE_HELP = "The path to the details report JSON file."
 REPORT_UPLOAD_VALIDATE_JSON = "Checking %s for valid JSON details report."
 REPORT_SUCCESSFULLY_UPLOADED = (
     "Report uploaded. Job %(id)s created. "
-    'To check processing status, run "%(pkg_name)s scan job --id %(id)s"'
+    'To check processing status, run "%(prog_name)s scan job --id %(id)s"'
 )
 REPORT_FAILED_TO_UPLOADED = "Report could not be created.  Error: %s"
 REPORT_MASK_HELP = (
@@ -309,7 +309,7 @@ MERGE_JOB_ID_STATUS = "Report merge job %(job_id)s is %(status)s."
 MERGE_ERROR = "No reports found. Error json: %s"
 DISPLAY_REPORT_ID = (
     'Created merge report with id: "%(report_id)s".'
-    ' To download report, run "%(pkg_name)s report'
+    ' To download report, run "%(prog_name)s report'
     ' deployments --report %(report_id)s --csv --output-file temp.csv"'
 )
 SERVER_CONFIG_REQUIRED = (

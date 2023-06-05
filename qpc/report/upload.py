@@ -8,7 +8,7 @@ from requests import codes
 
 from qpc import messages, report
 from qpc.clicommand import CliCommand
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import utils
 from qpc.request import POST
 from qpc.translation import _
@@ -85,7 +85,7 @@ class ReportUploadCommand(CliCommand):
         if json_data.get("id"):
             logger.info(
                 _(messages.REPORT_SUCCESSFULLY_UPLOADED),
-                {"id": json_data.get("id"), "pkg_name": PKG_NAME},
+                {"id": json_data.get("id"), "prog_name": QPC_VAR_PROGRAM_NAME},
             )
 
     def _handle_response_error(self):

@@ -7,7 +7,7 @@ from requests import codes
 
 from qpc import cred, messages, source
 from qpc.clicommand import CliCommand
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.request import GET, PATCH, request
 from qpc.source.utils import build_source_payload, validate_port
 from qpc.translation import _
@@ -49,7 +49,7 @@ class SourceEditCommand(CliCommand):
             nargs="+",
             metavar="HOSTS",
             default=[],
-            help=_(messages.SOURCE_HOSTS_HELP) % PKG_NAME,
+            help=_(messages.SOURCE_HOSTS_HELP) % QPC_VAR_PROGRAM_NAME,
             required=False,
         )
         self.parser.add_argument(
@@ -57,7 +57,7 @@ class SourceEditCommand(CliCommand):
             dest="exclude_hosts",
             nargs="+",
             metavar="EXCLUDE_HOSTS",
-            help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP) % PKG_NAME,
+            help=_(messages.SOURCE_EXCLUDE_HOSTS_HELP) % QPC_VAR_PROGRAM_NAME,
             required=False,
         )
         self.parser.add_argument(

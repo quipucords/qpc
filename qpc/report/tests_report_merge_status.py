@@ -8,7 +8,7 @@ from io import StringIO
 import requests_mock
 
 from qpc import messages
-from qpc.release import PKG_NAME
+from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge_status import ReportMergeStatusCommand
 from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
@@ -69,7 +69,7 @@ class ReportMergeStatusTests(unittest.TestCase):
             }
             result2 = messages.DISPLAY_REPORT_ID % {
                 "report_id": "10",
-                "pkg_name": PKG_NAME,
+                "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             stdout_lines = captured_stdout.getvalue().splitlines()
             self.assertIn(result1, stdout_lines[-2])

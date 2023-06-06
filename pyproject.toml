@@ -23,7 +23,6 @@ ruff = "^0.0.270"
 [tool.poetry.group.dev.dependencies]
 coverage = ">=6.4.2"
 black = ">=22.6.0"
-isort = ">=5.10.1"
 pytest = ">=7.1.2"
 pytest-cov = ">=3.0.0"
 pytest-lazy-fixture = ">=0.6.3"
@@ -35,16 +34,13 @@ rstcheck = "^6.1.1"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
-known_first_party = ["qpc"]
-
 [tool.ruff]
 select = [
     "C90", # mccabe complexity
     "D",   # pydocstyle
     "E",   # pycodestyle
     "F",   # pyflakes
+    "I",   # isort
     "Q",   # flake8-quotes
     "W",   # pycodestyle
     "PL",  # Pylint

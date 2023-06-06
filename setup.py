@@ -4,9 +4,8 @@
 import sys
 from pathlib import Path
 
-from setuptools import find_packages, setup
-
 from qpc.release import AUTHOR, AUTHOR_EMAIL, ENTRYPOINT, PKG_NAME, URL, VERSION
+from setuptools import find_packages, setup
 
 BASE_QPC_DIR = Path(__file__).absolute().parent
 sys.path.insert(0, BASE_QPC_DIR / "qpc")

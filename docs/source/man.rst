@@ -808,7 +808,8 @@ The authentication data in the credentials and the network-specific and system-s
 Authors
 -------
 
-Quipucords is written and maintained by Red Hat. Please refer to the commit history for a full list of contributors.```
+Quipucords is written and maintained by Red Hat. Please refer to the commit history for a full list of contributors.
+
 Copyright
 ---------
 

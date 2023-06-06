@@ -64,6 +64,9 @@ target-version = "py311"
     "PLR0913"
 ]
 
+[tool.ruff.isort]
+known-first-party = ["qpc"]
+
 [tool.ruff.mccabe]
 max-complexity = 10
 

@@ -18,7 +18,6 @@ help:
 	@echo "  clean               to remove client egg"
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
-	@echo "  lint-isort          to run the isort import order checker"
 	@echo "  lint-black          to run the black format checker"
 	@echo "  lint-docs           to run rstcheck against docs"
 	@echo "  test                to run unit tests"
@@ -33,13 +32,10 @@ install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
-lint: lint-ruff lint-isort lint-black lint-docs
+lint: lint-ruff lint-black lint-docs
 
 lint-ruff:
 	poetry run ruff .
-
-lint-isort:
-	poetry run isort --check --diff .
 
 lint-black:
 	poetry run black --diff --check .

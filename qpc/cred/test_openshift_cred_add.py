@@ -1,5 +1,6 @@
 """Test openshift cred add in CLI."""
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -12,6 +13,7 @@ from qpc.utils import get_server_location
 class TestOpenShiftAddCredential:
     """Class for testing OpenShift add credential."""
 
+    @patch("sys.stdin.isatty")
     @pytest.mark.parametrize(
         "status_code,err_log_message",
         [
@@ -21,6 +23,7 @@ class TestOpenShiftAddCredential:
     )
     def test_add_returning_error(
         self,
+        mock_isatty,
         capsys,
         requests_mock,
         openshift_token_input,
@@ -28,6 +31,7 @@ class TestOpenShiftAddCredential:
         err_log_message,
     ):
         """Test openshift cred add with several errors."""
+        mock_isatty.return_value = True
         url = get_server_location() + CREDENTIAL_URI
         requests_mock.post(url, status_code=status_code)
         sys.argv = [
@@ -86,7 +90,10 @@ class TestOpenShiftAddCredential:
             CLI().main()
         out, err = capsys.readouterr()
         assert out == ""
-        assert "one of the arguments --password --sshkeyfile --token is required" in err
+        assert (
+            "one of the arguments --password --sshkeyfile"
+            " --sshkey --token is required" in err
+        )
 
     def test_add_no_name(
         self,
@@ -108,9 +115,11 @@ class TestOpenShiftAddCredential:
         assert out == ""
         assert "the following arguments are required: --name" in err
 
+    @patch("sys.stdin.isatty")
     @pytest.mark.parametrize("cred_type", ["OPENSHIFT", "openshift", "OpenShiFt"])
     def test_add_green_path(
         self,
+        mock_isatty,
         caplog,
         requests_mock,
         openshift_token_input,
@@ -118,6 +127,7 @@ class TestOpenShiftAddCredential:
     ):
         """Test openshift cred add green path."""
         caplog.set_level("INFO")
+        mock_isatty.return_value = True
         url = get_server_location() + CREDENTIAL_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [
@@ -133,11 +143,13 @@ class TestOpenShiftAddCredential:
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_credential"
 
+    @patch("sys.stdin.isatty")
     def test_no_api_info_shown_with_verbose_flag(
-        self, caplog, requests_mock, openshift_token_input
+        self, mock_isatty, caplog, requests_mock, openshift_token_input
     ):
         """Test that no API information is shown when the -v flag is used."""
         caplog.set_level("INFO")
+        mock_isatty.return_value = True
         url = get_server_location() + CREDENTIAL_URI
         requests_mock.post(url, status_code=201)
         sys.argv = [

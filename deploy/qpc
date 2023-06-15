@@ -14,7 +14,9 @@ else
 fi
 
 mkdir -p ~/.config/qpc ~/.local/share/qpc
-podman run -it --rm \
+export TTY_OPTS="-it"
+[[ "${1}" == "--no-tty" ]] && shift && TTY_OPTS="-i"
+podman run ${TTY_OPTS} --rm \
     -v ~/.config/qpc:/root/.config/qpc${VOLUME_LABEL} \
     -v ~/.local/share/qpc:/root/.local/share/qpc${VOLUME_LABEL} \
     --entrypoint='/app/qpc/deploy/docker_run.sh' \

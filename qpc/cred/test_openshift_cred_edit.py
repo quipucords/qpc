@@ -1,5 +1,6 @@
 """Test openshift cred edit in CLI."""
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -12,13 +13,16 @@ from qpc.utils import get_server_location
 class TestOpenShiftEditCredential:
     """Class for testing OpenShift edit credential."""
 
+    @patch("sys.stdin.isatty")
     def test_edit_partial_green_path(
         self,
+        mock_isatty,
         caplog,
         requests_mock,
         openshift_token_input,
     ):
         """Test partial openshift edit cred successfully."""
+        mock_isatty.return_value = True
         caplog.set_level("INFO")
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -44,13 +48,16 @@ class TestOpenShiftEditCredential:
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_UPDATED % "openshift_cred"
 
+    @patch("sys.stdin.isatty")
     def test_edit_green_path(
         self,
+        mock_isatty,
         caplog,
         requests_mock,
         openshift_token_input,
     ):
         """Test openshift edit cred successfully."""
+        mock_isatty.return_value = True
         caplog.set_level("INFO")
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"

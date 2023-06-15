@@ -196,8 +196,9 @@ class CredentialAddCliTests(unittest.TestCase):
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_vcenter_cred(self, do_mock_raw_input):
+    def test_add_vcenter_cred(self, do_mock_raw_input, mock_isatty):
         """Testing the add vcenter cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -208,14 +209,16 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
             with self.assertLogs(level="INFO") as log:
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_sat_cred(self, do_mock_raw_input):
+    def test_add_sat_cred(self, do_mock_raw_input, mock_isatty):
         """Testing the add sat cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -226,14 +229,16 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
             with self.assertLogs(level="INFO") as log:
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 self.assertIn(expected_message, log.output[-1])
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_cred_401(self, do_mock_raw_input):
+    def test_add_cred_401(self, do_mock_raw_input, mock_isatty):
         """Testing the 401 error flow."""
         cred_out = StringIO()
         url = get_server_location() + CREDENTIAL_URI
@@ -245,6 +250,7 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
             with self.assertRaises(SystemExit):
                 with redirect_stdout(cred_out):

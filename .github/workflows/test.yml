@@ -13,6 +13,7 @@ jobs:
       matrix:
         type:
           [
+            manpage-test,
             lint,
             test-coverage,
         ]
@@ -33,7 +34,7 @@ jobs:
           cache-dependency-path: "poetry.lock"
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --with build
 
       - name: Test phase
         run: make ${{ matrix.type }}

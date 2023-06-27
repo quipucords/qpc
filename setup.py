@@ -6,13 +6,20 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-from qpc.release import AUTHOR, AUTHOR_EMAIL, ENTRYPOINT, PKG_NAME, URL, VERSION
+from qpc.release import (
+    AUTHOR,
+    AUTHOR_EMAIL,
+    ENTRYPOINT,
+    QPC_VAR_PROGRAM_NAME,
+    URL,
+    VERSION,
+)
 
 BASE_QPC_DIR = Path(__file__).absolute().parent
 sys.path.insert(0, BASE_QPC_DIR / "qpc")
 
 setup(
-    name=PKG_NAME,
+    name=QPC_VAR_PROGRAM_NAME,
     version=VERSION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,

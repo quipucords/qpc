@@ -57,7 +57,7 @@ generate-man:
 	@export QPC_VAR_CURRENT_YEAR=$(shell date +'%Y') \
 	&& export QPC_VAR_PROJECT=$${QPC_VAR_PROJECT:-Quipucords} \
 	&& export QPC_VAR_PROGRAM_NAME=$${QPC_VAR_PROGRAM_NAME:-qpc} \
-	&& jinja -X QPC_VAR docs/source/man.j2 $(ARGS)
+	&& poetry run jinja -X QPC_VAR docs/source/man.j2 $(ARGS)
 
 update-man.rst:
 	$(MAKE) generate-man ARGS="-o docs/source/man.rst"

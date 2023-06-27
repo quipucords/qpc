@@ -17,16 +17,21 @@ VOLUME ["/root/.local/share/qpc"]
 COPY pyproject.toml poetry.lock ./
 RUN microdnf update -y \
     && microdnf install -y \
+        coreutils-single \
         git \
         jq \
+        libcap \
         make \
-        man-db \
         man \
+        man-db \
         openssh-clients \
+        passwd \
         procps-ng \
         python3.11 \
         python3.11-pip \
+        shadow-utils \
         tar \
+        util-linux \
         which \
     && if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3.11 /usr/bin/python; fi \
     && if [[ ! -e /usr/bin/pip    ]]; then ln -sf /usr/bin/pip3.11    /usr/bin/pip;    fi \
@@ -46,4 +51,7 @@ COPY . .
 # install the aplication itself
 RUN poetry install -n --only main --sync
 
-ENTRYPOINT ["deploy/docker_run.sh"]
+LABEL com.github.containers.toolbox="true"
+# toolbox requires an "empty"entrypoint - which is fine, CMD is ok for qpc usecase
+CMD ["deploy/docker_run.sh"]
+ENTRYPOINT []

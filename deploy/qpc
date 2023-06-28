@@ -1,7 +1,21 @@
 #!/bin/bash
+
+if [[ -n $(command -v getenforce) ]]; then
+    # SELinux status can be enforced, permissive or disabled (ref: man getenforce)
+    SELINUX_STATUS=$(getenforce | tr '[:upper:]' '[:lower:]')
+else
+    SELINUX_STATUS=disabled
+fi
+
+if [[ "$SELINUX_STATUS" != "disabled" ]]; then
+    VOLUME_LABEL=":z"
+else
+    VOLUME_LABEL=""
+fi
+
 mkdir -p ~/.config/qpc ~/.local/share/qpc
 podman run -it --rm \
-    -v ~/.config/qpc:/root/.config/qpc \
-    -v ~/.local/share/qpc:/root/.local/share/qpc \
+    -v ~/.config/qpc:/root/.config/qpc${VOLUME_LABEL} \
+    -v ~/.local/share/qpc:/root/.local/share/qpc${VOLUME_LABEL} \
     --entrypoint='/app/qpc/deploy/docker_run.sh' \
     qpc "$@"

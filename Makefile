@@ -75,4 +75,4 @@ manpage:
 	  --variable=header:'$(QPC_VAR_PROGRAM_NAME_UPPER) Command Line Guide'
 
 build-container:
-	podman build -t quipucords-cli .
+	podman build -t ${QPC_VAR_PROGRAM_NAME} .

@@ -9,8 +9,8 @@ elif [ -n "${QPC_COMMAND}" ]; then
   poetry run ${QPC_VAR_PROGRAM_NAME} "${@}"
 else
   echo "Usage:"
-  echo "   $ alias ${QPC_VAR_PROGRAM_NAME}=\"docker run -it -v ~/.config/qpc:/root/.config/qpc \\"
-  echo "                               -v ~/.local/share/qpc:/root/.local/share/qpc \\"
+  echo "   $ alias ${QPC_VAR_PROGRAM_NAME}=\"docker run -it -v ~/.config/qpc:/root/.config/qpc:z \\"
+  echo "                               -v ~/.local/share/qpc:/root/.local/share/qpc:z \\"
   echo "                               --entrypoint='/app/qpc/deploy/docker_run.sh' \\"
   echo "                               ${QPC_VAR_PROGRAM_NAME}\""
   echo "   $ ${QPC_VAR_PROGRAM_NAME} [--help] <args>"

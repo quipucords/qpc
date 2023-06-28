@@ -39,7 +39,7 @@ ENV VIRTUAL_ENV=/app/qpc/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # copy manpage
-COPY --from=manpage_builder /app/docs/*.1 /usr/local/share/man/man1/qpc.1
+COPY --from=manpage_builder /app/docs/*.1 /usr/local/share/man/man1/
 
 # copy the rest of the application
 COPY . .

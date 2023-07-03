@@ -1,0 +1,46 @@
+name: Build Container Image
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [main, 'release/*']
+
+env:
+  STABLE_TAG: ${{ github.event_name == 'push' && github.ref_name || format('pr-{0}', github.event.pull_request.number) }}
+  # We had a problem with GitHub setting quay expiration label also during
+  # merge to main, so we just set meaningless value as a workaround.
+  EXPIRATION_LABEL: ${{ github.event_name == 'push' && 'quipucords.source=github' || 'quay.expires-after=3d' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # fetches all commits/tags
+
+      - name: Build qpc image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: quipucords/qpc
+          tags: ${{ env.STABLE_TAG }} ${{ env.STABLE_TAG == 'main' && 'latest' || '' }}
+          containerfiles: |
+            ./Dockerfile
+          labels: |
+            ${{ env.EXPIRATION_LABEL }}
+            quipucords.cli.git_sha=${{ github.sha }}
+
+      - name: Push To quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: quipucords/qpc
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/
+          username: ${{ secrets.QUAYIO_USERNAME }}
+          password: ${{ secrets.QUAYIO_PASSWORD }}

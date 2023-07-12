@@ -1,10 +1,11 @@
 """Test the CLI module."""
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
 from unittest.mock import ANY, patch
 
+import pytest
 import requests
 import requests_mock
 
@@ -15,17 +16,16 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class CredentialListCliTests(unittest.TestCase):
+class TestCredentialListCli:
     """Class for testing the credential list commands for qpc."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = CredListCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -33,7 +33,7 @@ class CredentialListCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -46,7 +46,7 @@ class CredentialListCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace()
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -58,7 +58,7 @@ class CredentialListCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace()
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -70,21 +70,21 @@ class CredentialListCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace()
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
-    def test_list_cred_empty(self):
+    def test_list_cred_empty(self, caplog):
         """Testing the list credential command successfully with empty data."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace()
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_LIST_NO_CREDS
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     @patch("builtins.input", return_value="yes")
     def test_list_cred_data(self, b_input):
@@ -112,9 +112,9 @@ class CredentialListCliTests(unittest.TestCase):
                     '[{"id":1,"name":"cred1","password":"********",'
                     '"username":"root"}]'
                 )
-                self.assertEqual(
-                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected + expected,
+                assert (
+                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected + expected
                 )
                 b_input.assert_called_with(ANY)
 
@@ -142,7 +142,7 @@ class CredentialListCliTests(unittest.TestCase):
                     '"name":"cred1","password":"********",'
                     '"username":"root"}]'
                 )
-                self.assertEqual(
-                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )

@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -14,17 +14,16 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class CredentialShowCliTests(unittest.TestCase):
+class TestCredentialShowCli:
     """Class for testing the credential show commands for qpc."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = CredShowCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -32,7 +31,7 @@ class CredentialShowCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -45,7 +44,7 @@ class CredentialShowCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(name="credential1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -57,7 +56,7 @@ class CredentialShowCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(name="credential1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -69,7 +68,7 @@ class CredentialShowCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(name="credential1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -81,7 +80,7 @@ class CredentialShowCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(name="cred1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -106,7 +105,7 @@ class CredentialShowCliTests(unittest.TestCase):
                 expected = (
                     '{"id":1,"name":"cred1","password":"********","username":"root"}'
                 )
-                self.assertEqual(
-                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )

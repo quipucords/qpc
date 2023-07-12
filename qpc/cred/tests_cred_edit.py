@@ -1,10 +1,11 @@
 """Test the CLI module."""
+import logging
 import os
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -23,7 +24,7 @@ from qpc.utils import get_server_location, write_server_config
 TMP_KEY = "/tmp/testkey"
 
 
-class CredentialEditCliTests(unittest.TestCase):
+class TestCredentialEditCli:
     """Class for testing the credential edit commands for qpc."""
 
     def _init_command(self):
@@ -32,7 +33,7 @@ class CredentialEditCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return CredEditCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -49,7 +50,7 @@ class CredentialEditCliTests(unittest.TestCase):
         with open(TMP_KEY, "w", encoding="utf-8") as test_sshkey:
             test_sshkey.write("fake ssh keyfile.")
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -59,7 +60,7 @@ class CredentialEditCliTests(unittest.TestCase):
     def test_edit_req_args_err(self):
         """Testing the credential edit command required flags."""
         cred_out = StringIO()
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(cred_out):
                 sys.argv = ["/bin/qpc", "credential", "edit", "--name", "credential1"]
                 CLI().main()
@@ -70,7 +71,7 @@ class CredentialEditCliTests(unittest.TestCase):
         When providing an invalid path for the sshkeyfile.
         """
         cred_out = StringIO()
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(cred_out):
                 sys.argv = [
                     "/bin/qpc",
@@ -96,7 +97,7 @@ class CredentialEditCliTests(unittest.TestCase):
                 password=None,
                 become_password=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -113,7 +114,7 @@ class CredentialEditCliTests(unittest.TestCase):
                 password=None,
                 become_password=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -130,11 +131,11 @@ class CredentialEditCliTests(unittest.TestCase):
                 password=None,
                 become_password=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
-    def test_edit_host_cred(self):
+    def test_edit_host_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -159,12 +160,12 @@ class CredentialEditCliTests(unittest.TestCase):
                 become_password=None,
                 ssh_passphrase=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_partial_edit_host_cred(self):
+    def test_partial_edit_host_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -188,12 +189,12 @@ class CredentialEditCliTests(unittest.TestCase):
                 become_password=None,
                 ssh_passphrase=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_vcenter_cred(self):
+    def test_edit_vcenter_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -211,12 +212,12 @@ class CredentialEditCliTests(unittest.TestCase):
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
             args = Namespace(name="cred1", username="root", password=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_partial_edit_vcenter_cred(self):
+    def test_partial_edit_vcenter_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -233,10 +234,10 @@ class CredentialEditCliTests(unittest.TestCase):
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
             args = Namespace(name="cred1", username="root", password=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     def test_edit_cred_get_error(self):
         """Testing the edit credential command server error occurs."""
@@ -251,11 +252,11 @@ class CredentialEditCliTests(unittest.TestCase):
                 password=None,
                 become_password=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
-    def test_edit_sat_cred(self):
+    def test_edit_sat_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -273,12 +274,12 @@ class CredentialEditCliTests(unittest.TestCase):
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
             args = Namespace(name="cred1", username="root", password=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_partial_edit_sat_cred(self):
+    def test_partial_edit_sat_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -295,7 +296,7 @@ class CredentialEditCliTests(unittest.TestCase):
             mocker.get(url_get, status_code=200, json=data)
             mocker.patch(url_patch, status_code=200)
             args = Namespace(name="cred1", username="root", password=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text

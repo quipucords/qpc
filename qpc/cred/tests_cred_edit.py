@@ -4,6 +4,7 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from io import StringIO
+from unittest.mock import patch
 
 import pytest
 import requests
@@ -189,6 +190,42 @@ class TestCredentialEditCli:
                 become_password=None,
                 ssh_passphrase=None,
             )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_UPDATED % "cred1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("qpc.cred.utils.get_multiline_pass")
+    def test_partial_edit_host_cred_ssh_key(
+        self, mock_multiline_pass, mock_isatty, caplog
+    ):
+        """Testing credential edit partial command for an ssh_key successfully."""
+        url_get = get_server_location() + CREDENTIAL_URI
+        url_patch = get_server_location() + CREDENTIAL_URI + "1/"
+        results = [
+            {
+                "id": 1,
+                "name": "cred1",
+                "cred_type": NETWORK_CRED_TYPE,
+                "username": "root",
+                "password": "********",
+            }
+        ]
+        data = {"count": 1, "results": results}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(url_get, status_code=200, json=data)
+            mocker.patch(url_patch, status_code=200)
+            args = Namespace(
+                name="cred1",
+                username=None,
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            mock_multiline_pass.return_value = "Multi-line\nOpenSSH Key\n"
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"

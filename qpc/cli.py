@@ -1,7 +1,7 @@
 """QPC Command Line Interface."""
 
+import argparse
 import sys
-from argparse import ArgumentParser
 
 from qpc import cred, insights, messages, report, scan, server, source
 from qpc.cred.commands import (
@@ -16,7 +16,7 @@ from qpc.insights.commands import (
     InsightsConfigureCommand,
     InsightsPublishCommand,
 )
-from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION
+from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION, get_current_sha1
 from qpc.report.commands import (
     ReportDeploymentsCommand,
     ReportDetailsCommand,
@@ -63,6 +63,34 @@ from qpc.utils import (
 )
 
 
+class VersionGitAction(argparse.Action):
+    """Action to show the current git commit SHA-1."""
+
+    def __init__(
+        self,
+        option_strings,
+        dest=argparse.SUPPRESS,
+        default=argparse.SUPPRESS,
+        help="show program's current git commit SHA-1 and exit",
+    ):
+        """Initialize the VersionGitAction."""
+        super(VersionGitAction, self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            default=default,
+            nargs=0,
+            help=help,
+        )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        """Get and display the value, and then exit."""
+        commit_hash = get_current_sha1()
+        formatter = parser._get_formatter()
+        formatter.add_text(commit_hash)
+        parser._print_message(formatter.format_help(), sys.stdout)
+        parser.exit()
+
+
 class CLI:
     """Defines the CLI class.
 
@@ -75,8 +103,11 @@ class CLI:
         self.shortdesc = shortdesc
         if shortdesc is not None and description is None:
             description = shortdesc
-        self.parser = ArgumentParser(usage=usage, description=description)
+        self.parser = argparse.ArgumentParser(usage=usage, description=description)
         self.parser.add_argument("--version", action="version", version=VERSION)
+        self.parser.add_argument(
+            "--version-git", action=VersionGitAction, help=argparse.SUPPRESS
+        )
         self.parser.add_argument(
             "-v",
             dest="verbosity",

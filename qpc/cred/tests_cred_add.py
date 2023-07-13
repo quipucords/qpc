@@ -76,7 +76,7 @@ class TestCredentialAddCli:
             ]
             CLI().main()
 
-    def test_add_bad_key(self):
+    def test_add_bad_keyfile(self):
         """Testing the add credential command.
 
         When providing an invalid path for the sshkeyfile.
@@ -171,6 +171,81 @@ class TestCredentialAddCli:
                 become_user=None,
                 become_password=None,
             )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("qpc.cred.utils.get_multiline_pass")
+    def test_add_host_cred_with_sshkey(self, mock_multiline_pass, mock_isatty, caplog):
+        """Testing the add host cred command with an ssh_key successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            mock_multiline_pass.return_value = "This\nIs\nA\nMulti-Line\nOpenSSH Key\n"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("sys.stdin.readlines")
+    def test_add_host_cred_with_sshkey_from_stdin(
+        self, mock_readlines, mock_isatty, caplog
+    ):
+        """Testing the add host cred command with an ssh_key from stdin successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = False
+            mock_readlines.return_value = "Multi-Line\nOpenSSH Key\nFrom Stdin\n"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("getpass._raw_input")
+    @patch("qpc.cred.utils.get_multiline_pass")
+    def test_add_host_cred_with_sshkey_and_passphrase(
+        self, mock_multiline_pass, mock_raw_input, mock_isatty, caplog
+    ):
+        """Testing add host cred with an ssh_key and ssh_passphrase successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=True,
+            )
+            mock_isatty.return_value = True
+            mock_multiline_pass.return_value = "OpenSSH Key\nWith passphrase\n"
+            mock_raw_input.return_value = "This is the passphrase"
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"

@@ -18,7 +18,6 @@ python = "^3.8"
 requests = ">=2.28.1"
 cryptography = ">=37.0.4"
 packaging = "^23.1"
-ruff = "^0.0.270"
 setuptools = "^67.8.0"
 gitpython = "^3.1.32"
 
@@ -31,7 +30,7 @@ pytest-lazy-fixture = ">=0.6.3"
 requests-mock = ">=1.9.3"
 pytest-mock = "^3.8.2"
 rstcheck = "^6.1.1"
-
+ruff = "^0.0.270"
 
 [tool.poetry.group.build.dependencies]
 jinja-cli = "^1.2.2"

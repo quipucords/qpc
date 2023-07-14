@@ -1,14 +1,15 @@
 """Test the CLI module."""
 
 import json
+import logging
 import os
 import sys
 import time
-import unittest
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO  # noqa: I100
 from unittest.mock import patch
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -22,7 +23,7 @@ from qpc.utils import create_tar_buffer, get_server_location, write_server_confi
 VERSION = "0.9.4"
 
 
-class ReportInsightsTests(unittest.TestCase):
+class TestReportInsights:
     """Class for testing the insights report command."""
 
     def _init_command(self):
@@ -31,7 +32,7 @@ class ReportInsightsTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ReportInsightsCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -46,7 +47,7 @@ class ReportInsightsTests(unittest.TestCase):
         self.test_json_filename = f"test_{time.time():.0f}.json"
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -55,7 +56,7 @@ class ReportInsightsTests(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-    def test_insights_report_as_json(self):
+    def test_insights_report_as_json(self, caplog):
         """Testing retrieving insights report as json."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
@@ -79,11 +80,11 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
+                assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
 
-    def test_insights_report_as_json_report_id(self):
+    def test_insights_report_as_json_report_id(self, caplog):
         """Testing retreiving insights report as json with report id."""
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {
@@ -104,26 +105,26 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
-                self.assertIn(messages.REPORT_SUCCESSFULLY_WRITTEN, log.output[-1])
+                assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
 
     # Test validation
     def test_insights_report_output_directory(self):
         """Testing fail because output directory."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "report", "insights", "--output-file", "/"]
             CLI().main()
 
     def test_insights_report_output_directory_not_exist(self):
         """Testing fail because output directory does not exist."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "report", "insights", "--output-file", "/foo/bar/"]
             CLI().main()
 
     def test_insights_report_output_file_empty(self):
         """Testing fail because output file empty."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "report", "insights", "--output-file", ""]
             CLI().main()
 
@@ -139,12 +140,10 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        report_out.getvalue(), messages.REPORT_SJ_DOES_NOT_EXIST
-                    )
+                    assert report_out.getvalue() == messages.REPORT_SJ_DOES_NOT_EXIST
 
     def test_insights_report_invalid_scan_job(self):
         """Deployments report with scanjob but no report_id."""
@@ -158,16 +157,16 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        report_out.getvalue(),
-                        messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ,
+                    assert (
+                        report_out.getvalue()
+                        == messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ
                     )
 
     @patch("qpc.report.insights.write_file")
-    def test_insights_file_fails_to_write(self, file):
+    def test_insights_file_fails_to_write(self, file, caplog):
         """Testing insights failure while writing to file."""
         file.side_effect = EnvironmentError()
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
@@ -185,16 +184,16 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with self.assertLogs(level="ERROR") as log:
-                with self.assertRaises(SystemExit):
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
                     "path": self.test_tar_gz_filename,
                     "error": "",
                 }
-                self.assertIn(err_msg, log.output[0])
+                assert err_msg in caplog.text
 
-    def test_insights_nonexistent_directory(self):
+    def test_insights_nonexistent_directory(self, caplog):
         """Testing error for nonexistent directory in output."""
         fake_dir = "/kevan/is/awesome/insights.tar.gz"
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
@@ -205,15 +204,15 @@ class ReportInsightsTests(unittest.TestCase):
             mocker.get(get_report_url, status_code=200, content=buffer_content)
 
             args = Namespace(scan_job_id=None, report_id="1", path=fake_dir)
-            with self.assertLogs(level="ERROR") as log:
-                with self.assertRaises(SystemExit):
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
                     fake_dir
                 )
-                self.assertIn(err_msg, log.output[0])
+                assert err_msg in caplog.text
 
-    def test_insights_tar_path(self):
+    def test_insights_tar_path(self, caplog):
         """Testing error for nonjson output path."""
         non_tar_file = "/Users/insights.json"
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
@@ -229,13 +228,13 @@ class ReportInsightsTests(unittest.TestCase):
             )
 
             args = Namespace(scan_job_id=None, report_id="1", path=non_tar_file)
-            with self.assertLogs(level="ERROR") as log:
-                with self.assertRaises(SystemExit):
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.OUTPUT_FILE_TYPE % "tar.gz"
-                self.assertIn(err_msg, log.output[0])
+                assert err_msg in caplog.text
 
-    def test_insights_report_id_not_exist(self):
+    def test_insights_report_id_not_exist(self, caplog):
         """Test insights with nonexistent report id."""
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
@@ -252,13 +251,13 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id=None, report_id="1", path=self.test_tar_gz_filename
             )
-            with self.assertLogs(level="ERROR") as log:
-                with self.assertRaises(SystemExit):
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID % 1
-                self.assertIn(err_msg, log.output[0])
+                assert err_msg in caplog.text
 
-    def test_insights_report_error_scan_job(self):
+    def test_insights_report_error_scan_job(self, caplog):
         """Testing error with scan job id."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
@@ -278,11 +277,11 @@ class ReportInsightsTests(unittest.TestCase):
             args = Namespace(
                 scan_job_id="1", report_id=None, path=self.test_tar_gz_filename
             )
-            with self.assertLogs(level="ERROR") as log:
-                with self.assertRaises(SystemExit):
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1
-                self.assertIn(err_msg, log.output[0])
+                assert err_msg in caplog.text
 
 
 def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):

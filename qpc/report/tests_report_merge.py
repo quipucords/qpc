@@ -3,10 +3,10 @@
 import os
 import sys
 import time
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -63,17 +63,17 @@ JSON_FILES_LIST = [
 ]
 
 
-class ReportMergeTests(unittest.TestCase):
+class TestReportMergeTests:
     """Class for testing the scan show commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ReportMergeCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -88,7 +88,7 @@ class ReportMergeTests(unittest.TestCase):
             with open(file[0], "w", encoding="utf-8") as test_file:
                 test_file.write(file[1])
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         for file in JSON_FILES_LIST:
@@ -126,7 +126,7 @@ class ReportMergeTests(unittest.TestCase):
                 "id": "1",
                 "prog_name": QPC_VAR_PROGRAM_NAME,
             }
-            self.assertIn(expected_msg, captured_stdout.getvalue())
+            assert expected_msg in captured_stdout.getvalue()
 
     def test_detail_merge_error_job_ids(self):
         """Testing report merge error with scan job ids."""
@@ -147,7 +147,7 @@ class ReportMergeTests(unittest.TestCase):
             args = Namespace(
                 scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
                     self.command.main(args)
 
@@ -167,7 +167,7 @@ class ReportMergeTests(unittest.TestCase):
                 "id": "1",
                 "prog_name": QPC_VAR_PROGRAM_NAME,
             }
-            self.assertIn(expected_msg, captured_stdout.getvalue())
+            assert expected_msg in captured_stdout.getvalue()
 
     def test_detail_merge_error_report_ids(self):
         """Testing report merge error with report ids."""
@@ -182,7 +182,7 @@ class ReportMergeTests(unittest.TestCase):
             args = Namespace(
                 scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
                     self.command.main(args)
 
@@ -204,7 +204,7 @@ class ReportMergeTests(unittest.TestCase):
                 "id": "1",
                 "prog_name": QPC_VAR_PROGRAM_NAME,
             }
-            self.assertIn(expected_msg, captured_stdout.getvalue())
+            assert expected_msg in captured_stdout.getvalue()
 
     def test_detail_merge_json_files_not_exist(self):
         """Testing report merge file not found error with json files."""
@@ -216,12 +216,12 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=None,
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
-                self.assertIn(
-                    messages.FILE_NOT_FOUND % NONEXIST_FILE[0],
-                    report_out.getvalue().strip(),
+                assert (
+                    messages.FILE_NOT_FOUND % NONEXIST_FILE[0]
+                    in report_out.getvalue().strip()
                 )
 
     def test_detail_merge_error_json_files(self):
@@ -234,7 +234,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=None,
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -248,7 +248,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=None,
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -264,7 +264,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=None,
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -275,7 +275,7 @@ class ReportMergeTests(unittest.TestCase):
         args = Namespace(
             scan_job_ids=None, json_files=None, report_ids=None, json_dir=None
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -286,7 +286,7 @@ class ReportMergeTests(unittest.TestCase):
         args = Namespace(
             scan_job_ids=[1], json_files=None, report_ids=None, json_dir=None
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -306,7 +306,7 @@ class ReportMergeTests(unittest.TestCase):
                 "id": "1",
                 "prog_name": QPC_VAR_PROGRAM_NAME,
             }
-            self.assertIn(expected_msg, captured_stdout.getvalue())
+            assert expected_msg in captured_stdout.getvalue()
 
     def test_detail_merge_json_directory_error_dir_not_found(self):
         """Testing report merge command with json_dir parameter (notdir)."""
@@ -319,7 +319,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=bad_json_directory,
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -333,7 +333,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=TMP_BADDETAILS1[0],
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -347,7 +347,7 @@ class ReportMergeTests(unittest.TestCase):
             report_ids=None,
             json_dir=TMP_BADDETAILS5[0],
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)
 
@@ -362,6 +362,6 @@ class ReportMergeTests(unittest.TestCase):
         args = Namespace(
             scan_job_ids=None, json_files=None, report_ids=None, json_dir="/tmp/"
         )
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(report_out):
                 self.command.main(args)

@@ -63,7 +63,7 @@ from qpc.utils import (
 )
 
 
-class VersionGitAction(argparse.Action):
+class BuildShaAction(argparse.Action):
     """Action to show the current git commit SHA-1."""
 
     def __init__(
@@ -71,10 +71,10 @@ class VersionGitAction(argparse.Action):
         option_strings,
         dest=argparse.SUPPRESS,
         default=argparse.SUPPRESS,
-        help="show program's current git commit SHA-1 and exit",
+        help="show git commit SHA-1 used to build the program and exit",
     ):
-        """Initialize the VersionGitAction."""
-        super(VersionGitAction, self).__init__(
+        """Initialize the BuildShaAction."""
+        super(BuildShaAction, self).__init__(
             option_strings=option_strings,
             dest=dest,
             default=default,
@@ -106,7 +106,7 @@ class CLI:
         self.parser = argparse.ArgumentParser(usage=usage, description=description)
         self.parser.add_argument("--version", action="version", version=VERSION)
         self.parser.add_argument(
-            "--version-git", action=VersionGitAction, help=argparse.SUPPRESS
+            "--build-sha", action=BuildShaAction, help=argparse.SUPPRESS
         )
         self.parser.add_argument(
             "-v",

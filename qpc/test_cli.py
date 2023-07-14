@@ -18,9 +18,9 @@ def test_version(capsys):
     assert captured.out.strip() == VERSION
 
 
-def test_version_git(capsys):
-    """Test the `--version-git` argument."""
-    test_argv = ["/bin/qpc", "--version-git"]
+def test_build_sha(capsys):
+    """Test the `--build-sha` argument."""
+    test_argv = ["/bin/qpc", "--build-sha"]
     expected_value = "C00010FF"
     with pytest.raises(SystemExit), patch.object(sys, "argv", test_argv), patch.object(
         cli, "get_current_sha1"

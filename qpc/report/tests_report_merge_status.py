@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -15,24 +15,24 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ReportMergeStatusTests(unittest.TestCase):
+class TestReportMergeStatus:
     """Class for testing the report merge status commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ReportMergeStatusCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
         self.url = get_server_location() + ASYNC_MERGE_URI
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         sys.stderr = self.orig_stderr
 
@@ -72,8 +72,8 @@ class ReportMergeStatusTests(unittest.TestCase):
                 "prog_name": QPC_VAR_PROGRAM_NAME,
             }
             stdout_lines = captured_stdout.getvalue().splitlines()
-            self.assertIn(result1, stdout_lines[-2])
-            self.assertIn(result2, stdout_lines[-1])
+            assert result1 in stdout_lines[-2]
+            assert result2 in stdout_lines[-1]
 
     def test_job_id_not_exist(self):
         """Test the job command with an invalid ID."""
@@ -82,9 +82,9 @@ class ReportMergeStatusTests(unittest.TestCase):
             mocker.get(self.url + "1/", status_code=404, json=None)
 
             args = Namespace(job_id="1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        report_out.getvalue(), messages.MERGE_JOB_ID_NOT_FOUND % "1"
+                    assert (
+                        report_out.getvalue() == messages.MERGE_JOB_ID_NOT_FOUND % "1"
                     )

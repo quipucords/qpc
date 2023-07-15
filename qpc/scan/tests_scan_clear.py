@@ -1,10 +1,11 @@
 """Test the CLI module."""
 
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -16,17 +17,17 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanClearCliTests(unittest.TestCase):
+class TestScanClearCli:
     """Class for testing the scan clear commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ScanClearCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -34,7 +35,7 @@ class ScanClearCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teaddown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -47,10 +48,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_clear_scan_conn_err(self):
         """Testing the clear scan command with a connection error."""
@@ -60,10 +61,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_clear_scan_internal_err(self):
         """Testing the clear scan command with an internal error."""
@@ -73,10 +74,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), "Server Error")
+                    assert scan_out.getvalue() == "Server Error"
 
     def test_clear_scan_empty(self):
         """Testing the clear scan command successfully with empty data."""
@@ -86,14 +87,12 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        scan_out.getvalue(), 'scan "scan1" was not found\n'
-                    )
+                    assert scan_out.getvalue() == 'scan "scan1" was not found\n'
 
-    def test_clear_by_name(self):
+    def test_clear_by_name(self, caplog):
         """Testing the clear scan command.
 
         Successfully with stubbed data when specifying a name
@@ -108,10 +107,10 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
 
             args = Namespace(name="scan1")
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_msg = messages.SCAN_REMOVED % "scan1"
-                self.assertIn(expected_msg, log.output[-1])
+                assert expected_msg in caplog.text
 
     def test_clear_by_name_err(self):
         """Test the clear scan command successfully.
@@ -130,11 +129,11 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=500, json=err_data)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
                     expected = 'Failed to remove scan "scan1"'
-                    self.assertTrue(expected in scan_out.getvalue())
+                    assert expected in scan_out.getvalue()
 
     def test_clear_all_empty(self):
         """Test the clear scan command successfully.
@@ -147,11 +146,11 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.get(get_url, status_code=200, json={"count": 0})
 
             args = Namespace(name=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
                     expected = "No scans exist to be removed\n"
-                    self.assertEqual(scan_out.getvalue(), expected)
+                    assert scan_out.getvalue() == expected
 
     def test_clear_all_with_error(self):
         """Testing the clear scan command successfully.
@@ -173,7 +172,7 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url2, status_code=204)
 
             args = Namespace(name=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
                     expected = (
@@ -181,9 +180,9 @@ class ScanClearCliTests(unittest.TestCase):
                         " error occurred removing the following"
                         " credentials:"
                     )
-                    self.assertTrue(expected in scan_out.getvalue())
+                    assert expected in scan_out.getvalue()
 
-    def test_clear_all(self):
+    def test_clear_all(self, caplog):
         """Testing the clear scan command successfully with stubbed data."""
         get_url = get_server_location() + SCAN_URI
         delete_url = get_server_location() + SCAN_URI + "1/"
@@ -198,6 +197,6 @@ class ScanClearCliTests(unittest.TestCase):
             mocker.delete(delete_url2, status_code=204)
 
             args = Namespace(name=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
-                self.assertIn(messages.SCAN_CLEAR_ALL_SUCCESS, log.output[-1])
+                assert messages.SCAN_CLEAR_ALL_SUCCESS in caplog.text

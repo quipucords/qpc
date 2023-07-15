@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -15,7 +15,7 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanShowCliTests(unittest.TestCase):
+class TestScanShowCli:
     """Class for testing the scan show commands for qpc."""
 
     def _init_command(self):
@@ -24,7 +24,7 @@ class ScanShowCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanShowCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -37,7 +37,7 @@ class ScanShowCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -50,10 +50,10 @@ class ScanShowCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_show_scan_conn_err(self):
         """Testing the show scan command with a connection error."""
@@ -63,10 +63,10 @@ class ScanShowCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_show_scan_internal_err(self):
         """Testing the show scan command with an internal error."""
@@ -76,10 +76,10 @@ class ScanShowCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), "Server Error")
+                    assert scan_out.getvalue() == "Server Error"
 
     def test_show_scan_data_multiple_scans(self):
         """Testing the show scan command successfully with stubbed data."""
@@ -98,9 +98,9 @@ class ScanShowCliTests(unittest.TestCase):
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = '{"id":1,"name":"scan1","sources":["source1"]}'
-                self.assertEqual(
-                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )
 
     def test_show_scan_data_one_scan(self):
@@ -119,7 +119,7 @@ class ScanShowCliTests(unittest.TestCase):
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = '{"id":1,"name":"scan1","sources":["source1"]}'
-                self.assertEqual(
-                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )

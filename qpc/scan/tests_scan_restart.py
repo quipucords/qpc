@@ -1,10 +1,11 @@
 """Test the CLI module."""
 
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -16,7 +17,7 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanRestartCliTests(unittest.TestCase):
+class TestScanRestartCli:
     """Class for testing the scan restart commands for qpc."""
 
     def _init_command(self):
@@ -25,7 +26,7 @@ class ScanRestartCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanRestartCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -38,7 +39,7 @@ class ScanRestartCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -51,10 +52,10 @@ class ScanRestartCliTests(unittest.TestCase):
             mocker.put(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(id="1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_restart_scan_conn_err(self):
         """Testing the restart scan command with a connection error."""
@@ -64,10 +65,10 @@ class ScanRestartCliTests(unittest.TestCase):
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(id="1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_restart_scan_internal_err(self):
         """Testing the restart scan command with an internal error."""
@@ -77,19 +78,19 @@ class ScanRestartCliTests(unittest.TestCase):
             mocker.put(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(id="1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), "Server Error")
+                    assert scan_out.getvalue() == "Server Error"
 
-    def test_restart_scan_data(self):
+    def test_restart_scan_data(self, caplog):
         """Testing the restart scan command successfully with stubbed data."""
         url = get_server_location() + SCAN_JOB_URI + "1/restart/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
 
             args = Namespace(id="1")
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_RESTARTED % "1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text

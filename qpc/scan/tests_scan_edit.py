@@ -1,10 +1,11 @@
 """Test the CLI module."""
 
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -18,7 +19,7 @@ from qpc.utils import get_server_location, write_server_config
 TMP_HOSTFILE = "/tmp/testhostsfile"
 
 
-class SourceEditCliTests(unittest.TestCase):
+class TestSourceEditCli:
     """Class for testing the source edit commands for qpc."""
 
     def _init_command(self):
@@ -27,7 +28,7 @@ class SourceEditCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanEditCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -40,7 +41,7 @@ class SourceEditCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Tear down test case setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -48,12 +49,12 @@ class SourceEditCliTests(unittest.TestCase):
     def test_edit_req_args_err(self):
         """Testing the edit command required flags."""
         source_out = StringIO()
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(source_out):
                 sys.argv = ["/bin/qpc", "scan", "edit", "--name", "scan1"]
                 CLI().main()
-                self.assertEqual(
-                    source_out.getvalue(), "No arguments provided to edit scan scan1"
+                assert (
+                    source_out.getvalue() == "No arguments provided to edit scan scan1"
                 )
 
     def test_edit_scan_none(self):
@@ -64,16 +65,16 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(name="scan_none", sources=["source1"])
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
                     self.command.main(args)
-                    self.assertTrue(
+                    assert (
                         messages.SCAN_DOES_NOT_EXIST % "scan_none"
                         in scan_out.getvalue()
                     )
 
-    def test_edit_scan_source(self):
+    def test_edit_scan_source(self, caplog):
         """Testing the edit scan source command successfully."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
@@ -98,12 +99,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_partial_edit_scan_source(self):
+    def test_partial_edit_scan_source(self, caplog):
         """Testing the edit scan source command successfully."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
@@ -129,12 +130,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_scan_ext_products(self):
+    def test_edit_scan_ext_products(self, caplog):
         """Testing the edit scanvcommand with enabled products successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -165,12 +166,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=["jboss_eap", "jboss_brms"],
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_scan_search_dirs(self):
+    def test_edit_scan_search_dirs(self, caplog):
         """Testing the edit scan command with search dirs successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -197,12 +198,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs="/foo/bar/",
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_scan_reset_ext_products(self):
+    def test_edit_scan_reset_ext_products(self, caplog):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -233,12 +234,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=[],
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_scan_reset_search_dirs(self):
+    def test_edit_scan_reset_search_dirs(self, caplog):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -269,12 +270,12 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=[],
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_scan_reset_dis_products(self):
+    def test_edit_scan_reset_dis_products(self, caplog):
         """Testing the edit scan command with reset successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
@@ -305,10 +306,10 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_UPDATED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     def test_edit_scan_no_val(self):
         """Testing the edit scan command with a scan that doesn't exist."""
@@ -325,9 +326,7 @@ class SourceEditCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
-                    )
+                    assert scan_out.getvalue() == messages.SERVER_INTERNAL_ERROR

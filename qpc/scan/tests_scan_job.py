@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -16,7 +16,7 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanJobCliTests(unittest.TestCase):
+class TestScanJobCli:
     """Class for testing the scan job commands for qpc."""
 
     def _init_command(self):
@@ -25,7 +25,7 @@ class ScanJobCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return ScanJobCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -38,7 +38,7 @@ class ScanJobCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -51,10 +51,10 @@ class ScanJobCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(name="scan1", id=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_scan_job_conn_err(self):
         """Testing the scan job command with a connection error."""
@@ -64,10 +64,10 @@ class ScanJobCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(name="scan1", id=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_scan_job_internal_err(self):
         """Testing the scan job command with an internal error."""
@@ -77,10 +77,10 @@ class ScanJobCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(name="scan1", id=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), "Server Error")
+                    assert scan_out.getvalue() == "Server Error"
 
     def test_scan_job_empty(self):
         """Testing the scan job command successfully with empty data."""
@@ -90,12 +90,10 @@ class ScanJobCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(name="scan1", id=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        scan_out.getvalue(), messages.SCAN_LIST_NO_SCANS + "\n"
-                    )
+                    assert scan_out.getvalue() == messages.SCAN_LIST_NO_SCANS + "\n"
 
     def test_scan_job_filter_id(self):
         """Testing the list scan with filter by id."""
@@ -121,9 +119,9 @@ class ScanJobCliTests(unittest.TestCase):
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = '{"id":1,"scan":"scan1","status":"completed"}'
-                self.assertEqual(
-                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )
 
     def test_scan_job_filter_status(self):
@@ -159,9 +157,9 @@ class ScanJobCliTests(unittest.TestCase):
                     '[{"id":1,"scan":"scan1","status":"completed"},'
                     '{"id":2,"scan":"scan1","status":"completed"}]'
                 )
-                self.assertEqual(
-                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )
 
     def test_scan_job_no_filter(self):
@@ -197,9 +195,9 @@ class ScanJobCliTests(unittest.TestCase):
                     '[{"id":1,"scan":"scan1","status":"completed"},'
                     '{"id":2,"scan":"scan1","status":"running"}]'
                 )
-                self.assertEqual(
-                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )
 
     def test_scan_job_name_and_id(self):
@@ -207,7 +205,7 @@ class ScanJobCliTests(unittest.TestCase):
         scan_out = StringIO()
 
         args = Namespace(name="scan1", id=1, status=None)
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = (
@@ -216,17 +214,17 @@ class ScanJobCliTests(unittest.TestCase):
                     ": error: argument --name: not allowed "
                     "with argument --id"
                 )
-                self.assertEqual(scan_out.getvalue(), expected)
+                assert scan_out.getvalue() == expected
 
     def test_scan_job_id_and_status(self):
         """Testing the scan job with id and status filter."""
         scan_out = StringIO()
 
         args = Namespace(name=None, id=1, status="completed")
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(scan_out):
                 self.command.main(args)
-                self.assertEqual(scan_out.getvalue(), messages.SCAN_JOB_ID_STATUS)
+                assert scan_out.getvalue() == messages.SCAN_JOB_ID_STATUS
 
     def test_scan_job_no_jobs(self):
         """Testing the scan job with no jobs."""
@@ -249,7 +247,7 @@ class ScanJobCliTests(unittest.TestCase):
             mocker.get(urlscanjob, status_code=200, json=scan_job)
 
             args = Namespace(name="scan1", id=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), messages.SCAN_LIST_NO_SCANS)
+                    assert scan_out.getvalue() == messages.SCAN_LIST_NO_SCANS

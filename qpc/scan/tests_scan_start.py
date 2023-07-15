@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -15,17 +15,17 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanStartCliTests(unittest.TestCase):
+class TestScanStartCli:
     """Class for testing the scan start commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ScanStartCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -33,14 +33,14 @@ class ScanStartCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Tear down test case setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
 
     def test_start_req_args_err(self):
         """Testing the scan start command required flags."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "scan", "start", "--name", "scan1"]
             CLI().main()
 
@@ -54,12 +54,10 @@ class ScanStartCliTests(unittest.TestCase):
             mocker.post(url_post, status_code=300, json=None)
 
             args = Namespace(name="scan_none")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        'Scan "scan_none" does not exist.' in scan_out.getvalue()
-                    )
+                    assert 'Scan "scan_none" does not exist.' in scan_out.getvalue()
 
     def test_start_scan(self):
         """Testing the start scan command successfully."""
@@ -86,7 +84,7 @@ class ScanStartCliTests(unittest.TestCase):
             args = Namespace(name="scan1")
             self.command.main(args)
             expected_message = messages.SCAN_STARTED % "1"
-            self.assertIn(expected_message, captured_stdout.getvalue())
+            assert expected_message in captured_stdout.getvalue()
 
     def test_unsuccessful_start_scan(self):
         """Testing the start scan command unsuccessfully."""
@@ -111,12 +109,10 @@ class ScanStartCliTests(unittest.TestCase):
             mocker.post(url_post, status_code=201, json={"id": 1})
 
             args = Namespace(name="scan2")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        'Scan "scan2" does not exist' in scan_out.getvalue()
-                    )
+                    assert 'Scan "scan2" does not exist' in scan_out.getvalue()
 
     def test_start_scan_bad_resp(self):
         """Testing the start scan command with a 500 error."""
@@ -126,9 +122,7 @@ class ScanStartCliTests(unittest.TestCase):
             mocker.get(url_get_scan, status_code=500, json=None)
 
             args = Namespace(name="scan1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
-                    )
+                    assert scan_out.getvalue() == messages.SERVER_INTERNAL_ERROR

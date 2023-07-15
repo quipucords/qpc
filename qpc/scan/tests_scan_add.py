@@ -1,10 +1,11 @@
 """Test the CLI module."""
 
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -18,17 +19,17 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class ScanAddCliTests(unittest.TestCase):
+class TestScanAddCli:
     """Class for testing the scan add commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ScanAddCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -36,14 +37,14 @@ class ScanAddCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Tear down test case setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
 
     def test_add_req_args_err(self):
         """Testing the scan add command required flags."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "scan", "add", "--name", "scan1"]
             CLI().main()
 
@@ -55,13 +56,11 @@ class ScanAddCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(sources=["source_none"])
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
                     self.command.main(args)
-                    self.assertTrue(
-                        'Source "source_none" does not exist' in scan_out.getvalue()
-                    )
+                    assert 'Source "source_none" does not exist' in scan_out.getvalue()
 
     def test_add_scan_ssl_err(self):
         """Testing the add scan command with a connection error."""
@@ -71,10 +70,10 @@ class ScanAddCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(sources=["source1"])
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_add_scan_conn_err(self):
         """Testing the add scan command with a connection error."""
@@ -84,10 +83,10 @@ class ScanAddCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(sources=["source1"])
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(scan_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert scan_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_add_scan_bad_resp(self):
         """Testing the add scan command with a 500."""
@@ -97,14 +96,12 @@ class ScanAddCliTests(unittest.TestCase):
             mocker.get(url_get_source, status_code=500, json=None)
 
             args = Namespace(sources=["source1"], max_concurrency=50)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(scan_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        scan_out.getvalue(), messages.SERVER_INTERNAL_ERROR
-                    )
+                    assert scan_out.getvalue() == messages.SERVER_INTERNAL_ERROR
 
-    def test_add_scan(self):
+    def test_add_scan(self, caplog):
         """Testing the add scan command successfully."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_post = get_server_location() + SCAN_URI
@@ -137,12 +134,12 @@ class ScanAddCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_disable_optional_products(self):
+    def test_disable_optional_products(self, caplog):
         """Testing that the disable-optional-products flag works correctly."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_post = get_server_location() + SCAN_URI
@@ -172,12 +169,12 @@ class ScanAddCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_enabled_products_and_dirs(self):
+    def test_enabled_products_and_dirs(self, caplog):
         """Testing that the ext products & search dirs flags work correctly."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_post = get_server_location() + SCAN_URI
@@ -208,12 +205,12 @@ class ScanAddCliTests(unittest.TestCase):
                 enabled_ext_product_search=["jboss-eap", "jboss-brms"],
                 ext_product_search_dirs="/foo/bar/",
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_enabled_products_only(self):
+    def test_enabled_products_only(self, caplog):
         """Testing that the enabled-ext-product-search flag works."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_post = get_server_location() + SCAN_URI
@@ -243,12 +240,12 @@ class ScanAddCliTests(unittest.TestCase):
                 enabled_ext_product_search=["jboss_eap", "jboss_brms"],
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_disable_optional_products_empty(self):
+    def test_disable_optional_products_empty(self, caplog):
         """Testing that the disable-optional-products flag works correctly."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
         url_post = get_server_location() + SCAN_URI
@@ -266,7 +263,7 @@ class ScanAddCliTests(unittest.TestCase):
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text

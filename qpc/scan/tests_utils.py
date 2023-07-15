@@ -1,12 +1,10 @@
 """Test the CLI module."""
 
-import unittest
-
 from qpc.scan import JBOSS_BRMS, JBOSS_EAP, JBOSS_FUSE, JBOSS_WS
 from qpc.scan.utils import get_enabled_products, get_optional_products
 
 
-class ScanUtilsTests(unittest.TestCase):
+class TestScanUtils:
     """Class for testing the scan utils."""
 
     def test_default_optional_values(self):
@@ -18,7 +16,7 @@ class ScanUtilsTests(unittest.TestCase):
             JBOSS_WS: False,
         }
         result = get_optional_products([])
-        self.assertEqual(disabled_default, result)
+        assert disabled_default == result
 
     def test_default_extended_search_values(self):
         """Testing the scan default extended searchvalues."""
@@ -30,4 +28,4 @@ class ScanUtilsTests(unittest.TestCase):
             "search_directories": [],
         }
         result = get_enabled_products([], [], True)
-        self.assertEqual(disabled_default, result)
+        assert disabled_default == result

@@ -1,12 +1,11 @@
 """Test the utils module."""
 
 import os
-import unittest
 
 from qpc import utils
 
 
-class UtilsTests(unittest.TestCase):
+class TestUtils:
     """Class for testing the utils module qpc."""
 
     def test_read_client_token(self):
@@ -18,9 +17,9 @@ class UtilsTests(unittest.TestCase):
             token_json = {"token": expected_token}
             utils.write_client_token(token_json)
         token = utils.read_client_token()
-        self.assertTrue(isinstance(token, str))
+        assert isinstance(token, str)
         if check_value:
-            self.assertEqual(token, expected_token)
+            assert token == expected_token
 
     def test_extract_json_from_tarfile(self):
         """Test extracting json from tarfile."""
@@ -35,4 +34,4 @@ class UtilsTests(unittest.TestCase):
         test_file = {"test.json": report_json}
         fileobj = utils.create_tar_buffer(test_file)
         json = utils.extract_json_from_tar(fileobj, print_pretty=False)
-        self.assertEqual(json, report_json)
+        assert json == report_json

@@ -1,10 +1,11 @@
 """Test the CLI module."""
 
+import logging
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -16,17 +17,16 @@ from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class SourceClearCliTests(unittest.TestCase):
+class TestSourceClearCli:
     """Class for testing the source clear commands for qpc."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = SourceClearCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -34,7 +34,7 @@ class SourceClearCliTests(unittest.TestCase):
         self.orig_stderr = sys.stderr
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -47,10 +47,10 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.SSLError)
 
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_clear_source_conn_err(self):
         """Testing the clear source command with a connection error."""
@@ -60,10 +60,10 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
 
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_clear_source_internal_err(self):
         """Testing the clear source command with an internal error."""
@@ -73,10 +73,10 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
 
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), "Server Error")
+                    assert source_out.getvalue() == "Server Error"
 
     def test_clear_source_empty(self):
         """Testing the clear source command successfully with empty data."""
@@ -86,14 +86,12 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.get(url, status_code=200, json={"count": 0})
 
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        source_out.getvalue(), 'Source "source1" was not found\n'
-                    )
+                    assert source_out.getvalue() == 'Source "source1" was not found\n'
 
-    def test_clear_by_name(self):
+    def test_clear_by_name(self, caplog):
         """Testing the clear source command.
 
         Successfully with stubbed data when specifying a name
@@ -114,10 +112,10 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
 
             args = Namespace(name="source1")
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_REMOVED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     def test_clear_by_name_err(self):
         """Test the clear source command successfully.
@@ -142,11 +140,11 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=500, json=err_data)
 
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
                     expected = 'Failed to remove source "source1"'
-                    self.assertTrue(expected in source_out.getvalue())
+                    assert expected in source_out.getvalue()
 
     def test_clear_all_empty(self):
         """Test the clear source command successfully.
@@ -159,11 +157,11 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.get(get_url, status_code=200, json={"count": 0})
 
             args = Namespace(name=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
                     expected = "No sources exist to be removed\n"
-                    self.assertEqual(source_out.getvalue(), expected)
+                    assert source_out.getvalue() == expected
 
     def test_clear_all_with_error(self):
         """Testing the clear source command successfully.
@@ -188,7 +186,7 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=500, json=err_data)
 
             args = Namespace(name=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
                     expected = (
@@ -196,9 +194,9 @@ class SourceClearCliTests(unittest.TestCase):
                         " error occurred removing the following"
                         " credentials:"
                     )
-                    self.assertTrue(expected in source_out.getvalue())
+                    assert expected in source_out.getvalue()
 
-    def test_clear_all(self):
+    def test_clear_all(self, caplog):
         """Testing the clear source command successfully with stubbed data."""
         get_url = get_server_location() + SOURCE_URI
         delete_url = get_server_location() + SOURCE_URI + "1/"
@@ -216,6 +214,6 @@ class SourceClearCliTests(unittest.TestCase):
             mocker.delete(delete_url, status_code=204)
 
             args = Namespace(name=None)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
-                self.assertIn(messages.SOURCE_CLEAR_ALL_SUCCESS, log.output[-1])
+                assert messages.SOURCE_CLEAR_ALL_SUCCESS in caplog.text

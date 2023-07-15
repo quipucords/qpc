@@ -1,11 +1,12 @@
 """Test the CLI module."""
 
+import logging
 import os
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -21,7 +22,7 @@ from qpc.utils import get_server_location, read_in_file, write_server_config
 TMP_HOSTFILE = "/tmp/testhostsfile"
 
 
-class SourceEditCliTests(unittest.TestCase):
+class TestSourceEditCli:
     """Class for testing the source edit commands for qpc."""
 
     def _init_command(self):
@@ -30,7 +31,7 @@ class SourceEditCliTests(unittest.TestCase):
         subparser = argument_parser.add_subparsers(dest="subcommand")
         return SourceEditCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # different from most other test cases where command is initialized once per
         # class, this one requires to be initialized for each test method because
@@ -48,7 +49,7 @@ class SourceEditCliTests(unittest.TestCase):
             test_hostfile.write("1.2.3.4\n")
             test_hostfile.write("1.2.3.[1:10]\n")
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -58,18 +59,18 @@ class SourceEditCliTests(unittest.TestCase):
     def test_edit_req_args_err(self):
         """Testing the add edit command required flags."""
         source_out = StringIO()
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(source_out):
                 sys.argv = ["/bin/qpc", "source", "edit", "--name", "source1"]
                 CLI().main()
-                self.assertEqual(
-                    source_out.getvalue(),
-                    "No arguments provided to edit source source1",
+                assert (
+                    source_out.getvalue()
+                    == "No arguments provided to edit source source1"
                 )
 
     def test_edit_process_file(self):
         """Testing the add source command process file."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = [
                 "/bin/qpc",
                 "source",
@@ -89,7 +90,7 @@ class SourceEditCliTests(unittest.TestCase):
         """Test the input reading mechanism."""
         vals = read_in_file(TMP_HOSTFILE)
         expected = ["1.2.3.4", "1.2.3.[1:10]"]
-        self.assertEqual(expected, vals)
+        assert expected == vals
 
     def test_edit_source_none(self):
         """Testing the edit cred command for none existing cred."""
@@ -100,11 +101,11 @@ class SourceEditCliTests(unittest.TestCase):
             args = Namespace(
                 name="source_none", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
                     self.command.main(args)
-                    self.assertTrue(
+                    assert (
                         'Source "source_none" does not exist' in source_out.getvalue()
                     )
 
@@ -117,10 +118,10 @@ class SourceEditCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_edit_source_conn_err(self):
         """Testing the edit source command with a connection error."""
@@ -132,15 +133,15 @@ class SourceEditCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     ##################################################
     # Network Source Test
     ##################################################
-    def test_edit_net_source(self):
+    def test_edit_net_source(self, caplog):
         """Testing the edit network source command successfully."""
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -171,12 +172,12 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_source_exclude_host(self):
+    def test_edit_source_exclude_host(self, caplog):
         """Testing edit network source command by adding an excluded host."""
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -206,15 +207,15 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     ##################################################
     # Vcenter Source Test
     ##################################################
-    def test_edit_vc_source(self):
+    def test_edit_vc_source(self, caplog):
         """Testing the edit vcenter source command successfully."""
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -238,12 +239,12 @@ class SourceEditCliTests(unittest.TestCase):
             mocker.patch(url_patch, status_code=200)
 
             args = Namespace(name="source1", hosts=["1.2.3.5"], cred=["credential1"])
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_disable_ssl(self):
+    def test_edit_disable_ssl(self, caplog):
         """Testing that you can edit the disable-ssl arg successfully."""
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -273,12 +274,12 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 disable_ssl="True",
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_edit_ssl_protocol(self):
+    def test_edit_ssl_protocol(self, caplog):
         """Testing that you can edit the ssl_protocol arg successfully."""
         url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -308,10 +309,10 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1"],
                 ssl_protocol="SSLv23",
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_UPDATED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     def test_edit_source_no_val(self):
         """Testing the edit source command with a server error."""
@@ -323,12 +324,10 @@ class SourceEditCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", hosts=["1.2.3.4"], cred=["credential1"], port=22
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        source_out.getvalue(), messages.SERVER_INTERNAL_ERROR
-                    )
+                    assert source_out.getvalue() == messages.SERVER_INTERNAL_ERROR
 
     def test_edit_source_cred_nf(self):
         """Testing the edit source command where cred is not found."""
@@ -360,12 +359,12 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1", "cred2"],
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        "An error occurred while processing "
-                        'the "--cred" input' in source_out.getvalue()
+                    assert (
+                        'An error occurred while processing the "--cred" input'
+                        in source_out.getvalue()
                     )
 
     def test_edit_source_cred_err(self):
@@ -394,10 +393,10 @@ class SourceEditCliTests(unittest.TestCase):
                 cred=["credential1", "cred2"],
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        "An error occurred while processing "
-                        'the "--cred" input' in source_out.getvalue()
+                    assert (
+                        'An error occurred while processing the "--cred" input'
+                        in source_out.getvalue()
                     )

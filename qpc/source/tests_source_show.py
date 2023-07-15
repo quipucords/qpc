@@ -1,10 +1,10 @@
 """Test the CLI module."""
 
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -15,17 +15,16 @@ from qpc.tests_utilities import HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class SourceShowCliTests(unittest.TestCase):
+class TestSourceShowCli:
     """Class for testing the source show commands for qpc."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = SourceShowCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         # Temporarily disable stderr for these tests, CLI errors clutter up
         self.orig_stderr = sys.stderr
@@ -33,7 +32,7 @@ class SourceShowCliTests(unittest.TestCase):
         write_server_config({"host": "127.0.0.1", "port": 8000, "use_http": True})
         self.base_url = get_server_location()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -45,10 +44,10 @@ class SourceShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_show_source_conn_err(self):
         """Testing the show source command with a connection error."""
@@ -57,10 +56,10 @@ class SourceShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_show_source_internal_err(self):
         """Testing the show source command with an internal error."""
@@ -69,10 +68,10 @@ class SourceShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": ["Server Error"]})
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), "Server Error")
+                    assert source_out.getvalue() == "Server Error"
 
     def test_show_source_empty(self):
         """Testing the show source command successfully with empty data."""
@@ -81,12 +80,10 @@ class SourceShowCliTests(unittest.TestCase):
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, json={"count": 0})
             args = Namespace(name="source1")
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        source_out.getvalue(), 'Source "source1" does not exist\n'
-                    )
+                    assert source_out.getvalue() == 'Source "source1" does not exist\n'
 
     def test_show_source_data(self):
         """Testing the show source command successfully with stubbed data."""
@@ -109,7 +106,7 @@ class SourceShowCliTests(unittest.TestCase):
                     '{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1"}'
                 )
-                self.assertEqual(
-                    source_out.getvalue().replace("\n", "").replace(" ", "").strip(),
-                    expected,
+                assert (
+                    source_out.getvalue().replace("\n", "").replace(" ", "").strip()
+                    == expected
                 )

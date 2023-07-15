@@ -1,11 +1,12 @@
 """Test the CLI module."""
 
+import logging
 import os
 import sys
-import unittest
 from argparse import ArgumentParser, ArgumentTypeError, Namespace
 from io import StringIO
 
+import pytest
 import requests
 import requests_mock
 
@@ -22,17 +23,17 @@ from qpc.utils import get_server_location, write_server_config
 TMP_HOSTFILE = "/tmp/testhostsfile"
 
 
-class SourceAddCliTests(unittest.TestCase):
+class TestSourceAddCli:
     """Class for testing the source add commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = SourceAddCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -45,7 +46,7 @@ class SourceAddCliTests(unittest.TestCase):
             test_hostfile.write("1.2.3.4\n")
             test_hostfile.write("1.2.3.[1:10]\n")
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test case setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -54,13 +55,13 @@ class SourceAddCliTests(unittest.TestCase):
 
     def test_add_req_args_err(self):
         """Testing the add source command required flags."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "source", "add", "--name", "source1"]
             CLI().main()
 
     def test_add_process_file(self):
         """Testing the add source command process file."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = [
                 "/bin/qpc",
                 "source",
@@ -79,31 +80,31 @@ class SourceAddCliTests(unittest.TestCase):
     def test_validate_port_string(self):
         """Testing the add source command with port validation non-integer."""
         source_out = StringIO()
-        with self.assertRaises(ArgumentTypeError):
+        with pytest.raises(ArgumentTypeError):
             with redirect_stdout(source_out):
                 validate_port("ff")
-                self.assertTrue("Port value ff" in source_out.getvalue())
+                assert "Port value ff" in source_out.getvalue()
 
     def test_validate_port_bad_type(self):
         """Testing the add source command with port validation bad type."""
         source_out = StringIO()
-        with self.assertRaises(ArgumentTypeError):
+        with pytest.raises(ArgumentTypeError):
             with redirect_stdout(source_out):
                 validate_port(["ff"])
-                self.assertTrue("Port value ff" in source_out.getvalue())
+                assert "Port value ff" in source_out.getvalue()
 
     def test_validate_port_range_err(self):
         """Test the add source command with port validation out of range."""
         source_out = StringIO()
-        with self.assertRaises(ArgumentTypeError):
+        with pytest.raises(ArgumentTypeError):
             with redirect_stdout(source_out):
                 validate_port("65537")
-                self.assertTrue("Port value 65537" in source_out.getvalue())
+                assert "Port value 65537" in source_out.getvalue()
 
     def test_validate_port_good(self):
         """Testing the add source command with port validation success."""
         val = validate_port("80")
-        self.assertEqual(80, val)
+        assert val == 80
 
     def test_add_source_name_dup(self):
         """Testing the add source command duplicate name."""
@@ -124,11 +125,11 @@ class SourceAddCliTests(unittest.TestCase):
                 hosts=["1.2.3.4"],
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
                     self.command.main(args)
-                    self.assertTrue(
+                    assert (
                         "source with this name already exists." in source_out.getvalue()
                     )
 
@@ -148,12 +149,12 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        "An error occurred while processing "
-                        'the "--cred" input' in source_out.getvalue()
+                    assert (
+                        'An error occurred while processing the "--cred" input'
+                        in source_out.getvalue()
                     )
 
     def test_add_source_cred_err(self):
@@ -170,12 +171,12 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertTrue(
-                        "An error occurred while processing "
-                        'the "--cred" input' in source_out.getvalue()
+                    assert (
+                        'An error occurred while processing the "--cred" input'
+                        in source_out.getvalue()
                     )
 
     def test_add_source_ssl_err(self):
@@ -192,10 +193,10 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     def test_add_source_conn_err(self):
         """Testing the add source command with a connection error."""
@@ -211,15 +212,15 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
-                    self.assertEqual(source_out.getvalue(), CONNECTION_ERROR_MSG)
+                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
 
     ##################################################
     # Network Source Test
     ##################################################
-    def test_add_source_net_one_host(self):
+    def test_add_source_net_one_host(self, caplog):
         """Testing add network source command successfully with one host."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -236,12 +237,12 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_source_net_valid_hosts(self):
+    def test_add_source_net_valid_hosts(self, caplog):
         """Testing add network source command with hosts in valid formats."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -267,12 +268,12 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_source_with_paramiko(self):
+    def test_add_source_with_paramiko(self, caplog):
         """Testing add network source command with use_paramiko set to true."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -291,10 +292,10 @@ class SourceAddCliTests(unittest.TestCase):
                 port=22,
             )
 
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     def test_add_source_with_paramiko_and_ssl(self):
         """Testing add network source command with use_paramiko set to true."""
@@ -316,11 +317,11 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(source_out):
                     self.command.main(args)
 
-    def test_add_source_one_excludehost(self):
+    def test_add_source_one_excludehost(self, caplog):
         """Testing the add network source command with one exclude host."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -338,12 +339,12 @@ class SourceAddCliTests(unittest.TestCase):
                 exclude_hosts=["1.2.3.4"],
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_source_exclude_hosts(self):
+    def test_add_source_exclude_hosts(self, caplog):
         """Testing add network source command with many valid exclude hosts."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -376,15 +377,15 @@ class SourceAddCliTests(unittest.TestCase):
                 type="network",
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     ##################################################
     # Vcenter Source Test
     ##################################################
-    def test_add_source_vc(self):
+    def test_add_source_vc(self, caplog):
         """Testing the add vcenter source command successfully."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -397,12 +398,12 @@ class SourceAddCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="vcenter"
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_source_with_ssl_params(self):
+    def test_add_source_with_ssl_params(self, caplog):
         """Testing add vcenter source command with all ssl params."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -422,15 +423,15 @@ class SourceAddCliTests(unittest.TestCase):
                 type="vcenter",
                 port=22,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
     ##################################################
     # Satellite Source Test
     ##################################################
-    def test_add_source_sat(self):
+    def test_add_source_sat(self, caplog):
         """Testing the add satellite source command successfully."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -443,12 +444,12 @@ class SourceAddCliTests(unittest.TestCase):
             args = Namespace(
                 name="source1", cred=["cred1"], hosts=["1.2.3.4"], type="satellite"
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_source_sat_no_ssl(self):
+    def test_add_source_sat_no_ssl(self, caplog):
         """Testing the add satellite with ssl_cert_verify set to false."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
@@ -465,7 +466,7 @@ class SourceAddCliTests(unittest.TestCase):
                 type="satellite",
                 ssl_cert_verify="false",
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text

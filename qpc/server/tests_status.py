@@ -1,13 +1,14 @@
 """Test the CLI module."""
 
 import json
+import logging
 import os
 import sys
 import time
-import unittest
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
+import pytest
 import requests_mock
 
 from qpc import messages
@@ -20,17 +21,16 @@ from qpc.utils import get_server_location, write_server_config
 TMP_KEY = "/tmp/testkey"
 
 
-class ServerStatusTests(unittest.TestCase):
+class TestServerStatus:
     """Class for testing the server status command for qpc."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ServerStatusCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -39,7 +39,7 @@ class ServerStatusTests(unittest.TestCase):
         self.test_json_filename = f"test_{time.time():.0f}.json"
         sys.stderr = HushUpStderr()
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -48,7 +48,7 @@ class ServerStatusTests(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-    def test_download_server_status(self):
+    def test_download_server_status(self, caplog):
         """Testing recording server status command in a file."""
         get_status_url = get_server_location() + STATUS_URI
         get_status_json_data = {
@@ -60,14 +60,14 @@ class ServerStatusTests(unittest.TestCase):
             mocker.get(get_status_url, status_code=200, json=get_status_json_data)
 
             args = Namespace(path=self.test_json_filename)
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.STATUS_SUCCESSFULLY_WRITTEN
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
             with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
                 data = json_file.read()
                 file_content_dict = json.loads(data)
-            self.assertDictEqual(get_status_json_data, file_content_dict)
+            assert get_status_json_data == file_content_dict
 
     def test_print_server_status(self):
         """Testing recording server status command in a file."""
@@ -85,19 +85,17 @@ class ServerStatusTests(unittest.TestCase):
             args = Namespace(path=None)
             with redirect_stdout(status_out):
                 self.command.main(args)
-                self.assertDictEqual(
-                    json.loads(status_out.getvalue().strip()), get_status_json_data
-                )
+                assert json.loads(status_out.getvalue().strip()) == get_status_json_data
 
     def test_write_status_output_directory_not_exist(self):
         """Testing fail because output directory does not exist."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "server", "status", "--output-file", "/foo/bar/"]
             CLI().main()
 
     def test_write_status_output_file_empty(self):
         """Testing fail because output file empty."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "server", "status", "--output-file"]
             CLI().main()
 
@@ -111,9 +109,7 @@ class ServerStatusTests(unittest.TestCase):
             mocker.get(get_status_url, status_code=400, json=get_status_json_data)
 
             args = Namespace(path=None)
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(status_out):
                     self.command.main(args)
-                    self.assertEqual(
-                        status_out.getvalue(), messages.SERVER_STATUS_FAILURE
-                    )
+                    assert status_out.getvalue() == messages.SERVER_STATUS_FAILURE

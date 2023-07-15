@@ -2,7 +2,6 @@
 
 import os
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace
 
 import requests_mock
@@ -13,17 +12,16 @@ from qpc.server.logout_host import LogoutHostCommand
 from qpc.tests_utilities import HushUpStderr
 
 
-class LogoutTests(unittest.TestCase):
+class TestLogout:
     """Class for testing the logout host function."""
 
-    @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = LogoutHostCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _method):
         """Create test setup."""
         # Temporarily disable stderr for these tests, CLI errors clutter up
         # nosetests command.
@@ -31,7 +29,7 @@ class LogoutTests(unittest.TestCase):
         sys.stderr = HushUpStderr()
         utils.write_server_config({"host": "127.0.0.1", "port": 8000, "use_http": True})
 
-    def tearDown(self):
+    def teardown_method(self, _method):
         """Remove test case setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -43,4 +41,4 @@ class LogoutTests(unittest.TestCase):
             mocker.put(url, status_code=200)
             args = Namespace()
             self.command.main(args)
-            self.assertFalse(os.path.exists(utils.QPC_CLIENT_TOKEN))
+            assert not os.path.exists(utils.QPC_CLIENT_TOKEN)

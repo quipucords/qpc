@@ -31,25 +31,31 @@ def get_password(args, req_payload, add_none=True):
     :param add_none: add None for a key if True vs. not in dictionary
     :returns: the updated dictionary
     """
-    req_payload = _get_password_value(args, req_payload, add_none)
+    req_payload = _get_attribute_value(
+        "password", messages.CONN_PASSWORD, args, req_payload, add_none
+    )
     req_payload = _get_ssh_key_value(args, req_payload, add_none)
-    req_payload = _get_ssh_passphrase_value(args, req_payload, add_none)
-    req_payload = _get_become_password_value(args, req_payload, add_none)
+    req_payload = _get_attribute_value(
+        "ssh_passphrase", messages.SSH_PASSPHRASE, args, req_payload, add_none
+    )
+    req_payload = _get_attribute_value(
+        "become_password", messages.BECOME_PASSWORD, args, req_payload, add_none
+    )
     req_payload = _get_token_value(args, req_payload, add_none)
 
     return req_payload
 
 
-def _get_password_value(args, req_payload, add_none):
-    """Collect the password value and place in credential dictionary."""
-    if "password" in args and args.password:
+def _get_attribute_value(attribute, prompt, args, req_payload, add_none):
+    """Collect the attribute value and place in credential dictionary."""
+    if attribute in args and getattr(args, attribute):
         with a_tty():
-            print(_(messages.CONN_PASSWORD))
+            print(_(prompt))
             pass_prompt = getpass()
             check_if_prompt_is_not_empty(pass_prompt)
-            req_payload["password"] = pass_prompt
+            req_payload[attribute] = pass_prompt
     elif add_none:
-        req_payload["password"] = None
+        req_payload[attribute] = None
 
     return req_payload
 
@@ -66,34 +72,6 @@ def _get_ssh_key_value(args, req_payload, add_none):
         req_payload["ssh_key"] = pass_prompt
     elif add_none:
         req_payload["ssh_key"] = None
-
-    return req_payload
-
-
-def _get_ssh_passphrase_value(args, req_payload, add_none):
-    """Collect the ssh_passphrase value and place in credential dictionary."""
-    if "ssh_passphrase" in args and args.ssh_passphrase:
-        with a_tty():
-            print(_(messages.SSH_PASSPHRASE))
-            pass_prompt = getpass()
-            check_if_prompt_is_not_empty(pass_prompt)
-            req_payload["ssh_passphrase"] = pass_prompt
-    elif add_none:
-        req_payload["ssh_passphrase"] = None
-
-    return req_payload
-
-
-def _get_become_password_value(args, req_payload, add_none):
-    """Collect the become_password value and place in credential dictionary."""
-    if "become_password" in args and args.become_password:
-        with a_tty():
-            print(_(messages.BECOME_PASSWORD))
-            pass_prompt = getpass()
-            check_if_prompt_is_not_empty(pass_prompt)
-            req_payload["become_password"] = pass_prompt
-    elif add_none:
-        req_payload["become_password"] = None
 
     return req_payload
 

@@ -1,12 +1,13 @@
 """Test the CLI module."""
 
+import logging
 import os
 import sys
-import unittest
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
 from unittest.mock import patch
 
+import pytest
 import requests
 import requests_mock
 
@@ -25,17 +26,17 @@ from qpc.utils import get_server_location, write_server_config
 TMP_KEY = "/tmp/testkey"
 
 
-class CredentialAddCliTests(unittest.TestCase):
+class TestCredentialAddCli:
     """Class for testing the credential add commands for qpc."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = CredAddCommand(subparser)
 
-    def setUp(self):
+    def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
         # Temporarily disable stderr for these tests, CLI errors clutter up
@@ -47,7 +48,7 @@ class CredentialAddCliTests(unittest.TestCase):
         with open(TMP_KEY, "w", encoding="utf-8") as test_sshkey:
             test_sshkey.write("fake ssh keyfile.")
 
-    def tearDown(self):
+    def teardown_method(self, _test_method):
         """Remove test setup."""
         # Restore stderr
         sys.stderr = self.orig_stderr
@@ -56,13 +57,13 @@ class CredentialAddCliTests(unittest.TestCase):
 
     def test_add_req_args_err(self):
         """Testing the add credential command required flags."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "credential", "add", "--name", "credential1"]
             CLI().main()
 
     def test_add_no_type(self):
         """Testing the add credential without type flag."""
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             sys.argv = [
                 "/bin/qpc",
                 "credential",
@@ -75,13 +76,13 @@ class CredentialAddCliTests(unittest.TestCase):
             ]
             CLI().main()
 
-    def test_add_bad_key(self):
+    def test_add_bad_keyfile(self):
         """Testing the add credential command.
 
         When providing an invalid path for the sshkeyfile.
         """
         cred_out = StringIO()
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             with redirect_stdout(cred_out):
                 sys.argv = [
                     "/bin/qpc",
@@ -112,7 +113,7 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_password=None,
                 ssh_passphrase=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -131,7 +132,7 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_password=None,
                 ssh_passphrase=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -150,11 +151,11 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_password=None,
                 ssh_passphrase=None,
             )
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
-    def test_add_host_cred(self):
+    def test_add_host_cred(self, caplog):
         """Testing the add host cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -170,12 +171,87 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_user=None,
                 become_password=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
-    def test_add_host_cred_with_become(self):
+    @patch("sys.stdin.isatty")
+    @patch("qpc.cred.utils.get_multiline_pass")
+    def test_add_host_cred_with_sshkey(self, mock_multiline_pass, mock_isatty, caplog):
+        """Testing the add host cred command with an ssh_key successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            mock_multiline_pass.return_value = "This\nIs\nA\nMulti-Line\nOpenSSH Key\n"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("sys.stdin.readlines")
+    def test_add_host_cred_with_sshkey_from_stdin(
+        self, mock_readlines, mock_isatty, caplog
+    ):
+        """Testing the add host cred command with an ssh_key from stdin successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = False
+            mock_readlines.return_value = "Multi-Line\nOpenSSH Key\nFrom Stdin\n"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("getpass._raw_input")
+    @patch("qpc.cred.utils.get_multiline_pass")
+    def test_add_host_cred_with_sshkey_and_passphrase(
+        self, mock_multiline_pass, mock_raw_input, mock_isatty, caplog
+    ):
+        """Testing add host cred with an ssh_key and ssh_passphrase successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_key=True,
+                ssh_passphrase=True,
+            )
+            mock_isatty.return_value = True
+            mock_multiline_pass.return_value = "OpenSSH Key\nWith passphrase\n"
+            mock_raw_input.return_value = "This is the passphrase"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    def test_add_host_cred_with_become(self, caplog):
         """Testing the add host cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -191,13 +267,14 @@ class CredentialAddCliTests(unittest.TestCase):
                 become_user="root",
                 become_password=None,
             )
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_vcenter_cred(self, do_mock_raw_input):
+    def test_add_vcenter_cred(self, do_mock_raw_input, mock_isatty, caplog):
         """Testing the add vcenter cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -208,14 +285,16 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_sat_cred(self, do_mock_raw_input):
+    def test_add_sat_cred(self, do_mock_raw_input, mock_isatty, caplog):
         """Testing the add sat cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -226,14 +305,16 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
-            with self.assertLogs(level="INFO") as log:
+            with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
-                self.assertIn(expected_message, log.output[-1])
+                assert expected_message in caplog.text
 
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
-    def test_add_cred_401(self, do_mock_raw_input):
+    def test_add_cred_401(self, do_mock_raw_input, mock_isatty):
         """Testing the 401 error flow."""
         cred_out = StringIO()
         url = get_server_location() + CREDENTIAL_URI
@@ -245,8 +326,9 @@ class CredentialAddCliTests(unittest.TestCase):
                 username="root",
                 password="sdf",
             )
+            mock_isatty.return_value = True
             do_mock_raw_input.return_value = "abc"
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
 
@@ -265,6 +347,6 @@ class CredentialAddCliTests(unittest.TestCase):
                 password="sdf",
             )
             do_mock_raw_input.return_value = "abc"
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)

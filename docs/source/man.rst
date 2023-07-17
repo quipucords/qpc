@@ -134,7 +134,7 @@ Creating and Editing Credentials
 
 To create a credential, supply the type of credential and supply SSH credentials as either a username-password pair, a username-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 
-**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | ansible)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | ansible)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* | --sshkey**)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 ``--name=name``
 
@@ -150,15 +150,19 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--password``
 
-  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile`` and ``--token`` options.
+  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile``, ``--sshkey`` and ``--token`` options.
 
 ``--sshkeyfile=key_file``
 
-  Sets the path of the file that contains the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` and ``--token`` options.
+  Sets the path of the file that contains the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password``, ``--ssh-key`` and ``--token`` options.
+
+``--sshkey``
+
+  Prompts for the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password``, ``--token`` and ``--sshkeyfile`` options.
 
 ``--sshpassphrase``
 
-  Prompts for the passphrase to be used when connecting with an SSH keyfile that requires a passphrase. Can only be used with the ``--sshkeyfile`` option.
+  Prompts for the passphrase to be used when connecting with an SSH keyfile or SSH key that requires a passphrase. Can only be used with the ``--sshkeyfile`` or ``--sshkey`` option.
 
 ``--become-method=become_method``
 
@@ -174,11 +178,11 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--token``
 
-  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile`` and ``--password`` options.
+  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile``, ``--sshkey`` and ``--password`` options.
 
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
 
-**qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* | --sshkey **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 Listing and Showing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -723,82 +727,170 @@ The following options are available for every Quipucords command.
 Examples
 --------
 
-Creating a new network type credential with a keyfile
-  ``qpc cred add --name net_cred --type network --username qpc_user --sshkeyfile /etc/ssh/ssh_host_rsa_key``
-Creating a new network type credential with a password
-  ``qpc cred add --name net_cred2 --type network --username qpc_user --password``
-Creating a new openshift type credential with a token
+* Creating a new network type credential with a password
+
+  ``qpc cred add --name net_cred --type network --username qpc_user --password``
+
+* Creating a new network type credential with a keyfile
+
+  ``qpc cred add --name net_cred2 --type network --username qpc_user --sshkeyfile /etc/ssh/ssh_host_rsa_key``
+
+* Creating a new network type credential with a keyfile requiring a passphrase
+
+  ``qpc cred add --name net_cred3 --type network --username qpc_user --sshkeyfile /etc/ssh/ssh_host_rsa_key --sshpassphrase``
+
+* Creating a new network type credential with an SSH key
+
+  ``qpc cred add --name net_cred4 --type network --username qpc_user --sshkey``
+
+* Creating a new network type credential with an SSH key requiring a passphrase
+
+  ``qpc cred add --name net_cred5 --type network --username qpc_user --sshkey --sshpassphrase``
+
+* Creating a new openshift type credential with a token
+
   ``qpc cred add --name ocp_cred --type openshift --token``
-Creating a new openshift type credential with a password
+
+* Creating a new openshift type credential with a password
+
   ``qpc cred add --name ocp_cred2 --type openshift --username ocp_user --password``
-Creating a new vcenter type credential
+
+* Creating a new vcenter type credential
+
   ``qpc cred add --name vcenter_cred --type vcenter --username vc_user --password``
-Creating a new satellite type credential
+
+* Creating a new satellite type credential
+
   ``qpc cred add --name sat_cred --type satellite --username sat_user --password``
-Creating a new ansible type credential
+
+* Creating a new ansible type credential
+
   ``qpc cred add --name ansible_cred --type ansible --username ansible_user --password``
-Listing all credentials
+
+* Listing all credentials
+
   ``qpc cred list``
-Listing network credentials
+
+* Listing network credentials
+
   ``qpc cred list --type network``
-Showing details for a specified credential
+
+* Showing details for a specified credential
+
   ``qpc cred show --name ocp_cred2``
-Clearing all credentials
+
+* Clearing all credentials
+
   ``qpc cred clear --all``
-Clearing a specified credential
+
+* Clearing a specified credential
+
   ``qpc cred clear --name vcenter_cred``
-Creating a new network source
+
+* Creating a new network source
+
   ``qpc source add --name net_source --type network --hosts 1.192.0.19 1.192.0.20 --cred net_cred``
-Creating a new network source with an excluded host
+
+* Creating a new network source with an excluded host
+
   ``qpc source add --name net_source2 --type network --hosts 1.192.1.[0:255] --exclude-hosts 1.192.1.19 --cred net_cred``
-Creating a new vcenter source specifying a SSL protocol
+
+* Creating a new vcenter source specifying a SSL protocol
+
   ``qpc source add --name vcenter_source --type vcenter --hosts 1.192.0.19 --cred vcenter_cred --ssl-protocol SSLv23``
-Creating a new satellite source disabling SSL
+
+* Creating a new satellite source disabling SSL
+
   ``qpc source add --name sat_source --type satellite --hosts satellite.example.redhat.com --disable-ssl true --cred sat_cred``
-Creating a new ansible source disabling SSL certificate verification
+
+* Creating a new ansible source disabling SSL certificate verification
+
   ``qpc source add --name ansible_source --type ansible --hosts  10.0.205.205 --ssl-cert-verify false --cred ansible_cred``
-Editing a source
+
+* Editing a source
+
   ``qpc source edit --name net_source --hosts 1.192.0.[0:255] --cred net_cred net_cred2``
-Creating a scan
+
+* Creating a scan
+
   ``qpc scan add --name net_scan --sources net_source net_source2``
-Creating a scan that includes a list of products in the inspection
+
+* Creating a scan that includes a list of products in the inspection
+
   ``qpc scan add --name net_scan2 --sources net_source --enabled-ext-product-search jboss_eap``
-Editing a scan setting maximum concurrency
+
+* Editing a scan setting maximum concurrency
+
   ``qpc scan edit --name net_scan --max-concurrency 10``
-Listing a scan filtering by scan type
+
+* Listing a scan filtering by scan type
+
   ``qpc scan list --type inspect``
-Running a scan
+
+* Running a scan
+
   ``qpc scan start --name net_scan``
-Canceling a scan
+
+* Canceling a scan
+
   ``qpc scan cancel --id 1``
-Viewing scan jobs related to a specified scan
+
+* Viewing scan jobs related to a specified scan
+
   ``qpc scan job --name net_scan``
-Retrieves a JSON details report with no output file
+
+* Retrieves a JSON details report with no output file
+
   ``qpc report details --report 2  --json``
-Retrieves a JSON details report
+
+* Retrieves a JSON details report
+
   ``qpc report details --report 2  --json --output-file path_to_your_file.json``
-Retrieves a CSV deployments report
+
+* Retrieves a CSV deployments report
+
   ``qpc report deployments --report 2  --csv --output-file path_to_your_file.csv``
-Retrieves a JSON Insights report with no output file
+
+* Retrieves a JSON Insights report with no output file
+
   ``qpc report insights --scan-job 1``
-Retrieves a tar.gz Insights report
+
+* Retrieves a tar.gz Insights report
+
   ``qpc report insights --scan-job 1 --output-file path_to_your_file.tar.gz``
-Downloading a set of reports
+
+* Downloading a set of reports
+
   ``qpc report download --report 1 --output-file path_to_your_file.tar.gz``
-Merging scan job results using ids
+
+* Merging scan job results using ids
+
   ``qpc report report merge --job-ids 1 3``
-Merging scan job results providing JSON files
+
+* Merging scan job results providing JSON files
+
   ``qpc report report merge --json-files path_to_report_1.json path_to_report_2.json``
-Reprocessing a report
+
+* Reprocessing a report
+
   ``qpc report upload --json-file path_to_report.json``
-Configuring Insights
+
+* Configuring Insights
+
   ``qpc insights config --host stage.console.redhat.com --port 8080``
-Adding Insights credentials
+
+* Adding Insights credentials
+
   ``qpc insights add_login --username insights-user --password``
-Publishing to Insights using a report id
+
+* Publishing to Insights using a report id
+
   ``qpc insights publish --report 1``
-Publishing to Insights using a previously downloaded report
+
+* Publishing to Insights using a previously downloaded report
+
   ``qpc insights publish --input-file path_to_report.tar.gz``
+
 
 Security Considerations
 -----------------------

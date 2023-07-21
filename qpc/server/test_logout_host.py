@@ -1,6 +1,5 @@
 """Test the CLI module."""
 
-import os
 import sys
 from argparse import ArgumentParser, Namespace
 
@@ -41,4 +40,4 @@ class TestLogout:
             mocker.put(url, status_code=200)
             args = Namespace()
             self.command.main(args)
-            assert not os.path.exists(utils.QPC_CLIENT_TOKEN)
+            assert not utils.QPC_CLIENT_TOKEN.exists()

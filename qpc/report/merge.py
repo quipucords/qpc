@@ -1,10 +1,9 @@
 """ReportMergeCommand is used to merge scan jobs results."""
 
 import json
-import os
 import sys
-from glob import glob
 from logging import getLogger
+from pathlib import Path
 
 from requests import codes
 
@@ -149,10 +148,11 @@ class ReportMergeCommand(CliCommand):
         path = self.args.json_dir
         if isinstance(path, list):
             path = path[0]
-        if os.path.isdir(path) is not True:
+        path = Path(path)
+        if not path.is_dir():
             logger.error(_(messages.REPORT_JSON_DIR_NOT_FOUND), path)
             sys.exit(1)
-        json_files = glob(os.path.join(path, "*.json"))
+        json_files = list(path.glob("*.json"))
         if not json_files:
             logger.error(_(messages.REPORT_JSON_DIR_NO_FILES), path)
             sys.exit(1)

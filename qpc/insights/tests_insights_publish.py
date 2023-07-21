@@ -346,7 +346,7 @@ class TestInsightsPublishCommand:
         mocker.patch.object(
             InsightsPublishCommand,
             "_download_insights_report",
-            return_value=str(payload_file),
+            return_value=payload_file,
         )
         mock_validate_report_name = mocker.patch.object(
             InsightsPublishCommand, "_validate_insights_report_name"
@@ -367,7 +367,7 @@ class TestInsightsPublishCommand:
         ]
         CLI().main()
 
-        mock_validate_report_name.assert_called_with(str(payload_file))
-        mock_validate_report_content.assert_called_with(str(payload_file))
+        mock_validate_report_name.assert_called_with(payload_file)
+        mock_validate_report_content.assert_called_with(payload_file)
 
         assert not payload_file.exists()

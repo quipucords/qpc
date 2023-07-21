@@ -1,7 +1,6 @@
 """Test the CLI module."""
 
 import logging
-import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError, Namespace
 from io import StringIO
@@ -17,12 +16,19 @@ from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.add import SourceAddCommand
 from qpc.source.utils import validate_port
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, write_server_config
-
-TMP_HOSTFILE = "/tmp/testhostsfile"
+from qpc.tests_utilities import redirect_stdout
+from qpc.utils import get_server_location
 
 
+@pytest.fixture
+def hostsfile(tmp_path):
+    """Return the path to a hostsfile for testing."""
+    _file = tmp_path / "hostsfile"
+    _file.write_text("1.2.3.4\n1.2.3.[1:10]\n")
+    return str(_file)
+
+
+@pytest.mark.usefixtures("server_config")
 class TestSourceAddCli:
     """Class for testing the source add commands for qpc."""
 
@@ -33,36 +39,24 @@ class TestSourceAddCli:
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = SourceAddCommand(subparser)
 
-    def setup_method(self, _test_method):
-        """Create test setup."""
-        write_server_config(DEFAULT_CONFIG)
-        # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
-        self.orig_stderr = sys.stderr
-        sys.stderr = HushUpStderr()
-        if os.path.isfile(TMP_HOSTFILE):
-            os.remove(TMP_HOSTFILE)
-        with open(TMP_HOSTFILE, "w", encoding="utf-8") as test_hostfile:
-            test_hostfile.write("1.2.3.4\n")
-            test_hostfile.write("1.2.3.[1:10]\n")
-
-    def teardown_method(self, _test_method):
-        """Remove test case setup."""
-        # Restore stderr
-        sys.stderr = self.orig_stderr
-        if os.path.isfile(TMP_HOSTFILE):
-            os.remove(TMP_HOSTFILE)
-
     def test_add_req_args_err(self):
         """Testing the add source command required flags."""
         with pytest.raises(SystemExit):
             sys.argv = ["/bin/qpc", "source", "add", "--name", "source1"]
             CLI().main()
 
-    def test_add_process_file(self):
+    def test_add_process_file(self, hostsfile, requests_mock, mocker):
         """Testing the add source command process file."""
-        with pytest.raises(SystemExit):
-            sys.argv = [
+        requests_mock.get(
+            get_server_location() + CREDENTIAL_URI + "?name=cred1",
+            status_code=200,
+            json={"count": 1, "results": [{"id": 1, "name": "cred1"}]},
+        )
+        requests_mock.post(get_server_location() + SOURCE_URI, status_code=201)
+        mocker.patch.object(
+            sys,
+            "argv",
+            [
                 "/bin/qpc",
                 "source",
                 "add",
@@ -71,11 +65,19 @@ class TestSourceAddCli:
                 "--type",
                 "network",
                 "--hosts",
-                TMP_HOSTFILE,
+                hostsfile,
                 "--cred",
                 "cred1",
-            ]
-            CLI().main()
+            ],
+        )
+        CLI().main()
+        assert requests_mock.last_request.json() == {
+            "name": "source1",
+            "source_type": "network",
+            "hosts": ["1.2.3.4", "1.2.3.[1:10]"],
+            "credentials": [1],
+            "port": None,
+        }
 
     def test_validate_port_string(self):
         """Testing the add source command with port validation non-integer."""

@@ -1,7 +1,6 @@
 """Test the CLI module."""
 
 import logging
-import os
 import sys
 from argparse import ArgumentParser, Namespace
 from io import StringIO
@@ -16,12 +15,19 @@ from qpc.cred import CREDENTIAL_URI
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.edit import SourceEditCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, read_in_file, write_server_config
-
-TMP_HOSTFILE = "/tmp/testhostsfile"
+from qpc.tests_utilities import redirect_stdout
+from qpc.utils import get_server_location, read_in_file
 
 
+@pytest.fixture
+def hostsfile(tmp_path):
+    """Return the path to a hostsfile for testing."""
+    _file = tmp_path / "hostsfile"
+    _file.write_text("1.2.3.4\n1.2.3.[1:10]\n")
+    return str(_file)
+
+
+@pytest.mark.usefixtures("server_config")
 class TestSourceEditCli:
     """Class for testing the source edit commands for qpc."""
 
@@ -38,23 +44,6 @@ class TestSourceEditCli:
         # SourceEditCommand instance modifies req_path on the fly. This seems to be a
         # code smell to me, but I'm choosing to ignore it for now
         self.command = self._init_command()
-        write_server_config(DEFAULT_CONFIG)
-        # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
-        self.orig_stderr = sys.stderr
-        sys.stderr = HushUpStderr()
-        if os.path.isfile(TMP_HOSTFILE):
-            os.remove(TMP_HOSTFILE)
-        with open(TMP_HOSTFILE, "w", encoding="utf-8") as test_hostfile:
-            test_hostfile.write("1.2.3.4\n")
-            test_hostfile.write("1.2.3.[1:10]\n")
-
-    def teardown_method(self, _test_method):
-        """Remove test setup."""
-        # Restore stderr
-        sys.stderr = self.orig_stderr
-        if os.path.isfile(TMP_HOSTFILE):
-            os.remove(TMP_HOSTFILE)
 
     def test_edit_req_args_err(self):
         """Testing the add edit command required flags."""
@@ -68,7 +57,7 @@ class TestSourceEditCli:
                     == "No arguments provided to edit source source1"
                 )
 
-    def test_edit_process_file(self):
+    def test_edit_process_file(self, hostsfile):
         """Testing the add source command process file."""
         with pytest.raises(SystemExit):
             sys.argv = [
@@ -80,15 +69,15 @@ class TestSourceEditCli:
                 "--type",
                 "network",
                 "--hosts",
-                TMP_HOSTFILE,
+                hostsfile,
                 "--cred",
                 "credential1",
             ]
             CLI().main()
 
-    def test_read_input(self):
+    def test_read_input(self, hostsfile):
         """Test the input reading mechanism."""
-        vals = read_in_file(TMP_HOSTFILE)
+        vals = read_in_file(hostsfile)
         expected = ["1.2.3.4", "1.2.3.[1:10]"]
         assert expected == vals
 

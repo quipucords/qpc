@@ -1,5 +1,4 @@
 """Test the CLI module."""
-import os
 import sys
 
 import pytest
@@ -41,7 +40,7 @@ class TestInsightsConfigure:
         """Testing if method returns default config dict when no arguments."""
         config = read_insights_config()
         assert config == DEFAULT_INSIGHTS_CONFIG
-        assert not os.path.exists(utils.INSIGHTS_CONFIG)
+        assert not utils.INSIGHTS_CONFIG.exists()
 
     def test_success_config_insights(self):
         """Testing insights configure green path."""

@@ -1,7 +1,5 @@
 """Test the utils module."""
 
-import os
-
 from qpc import utils
 
 
@@ -11,7 +9,7 @@ class TestUtils:
     def test_read_client_token(self):
         """Testing the read client token function."""
         check_value = False
-        if not os.path.exists(utils.QPC_CLIENT_TOKEN):
+        if not utils.QPC_CLIENT_TOKEN.exists():
             check_value = True
             expected_token = "100"
             token_json = {"token": expected_token}

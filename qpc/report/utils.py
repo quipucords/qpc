@@ -1,19 +1,13 @@
 """Helper functions for processing reports."""
 
 import json
-import os
 from logging import getLogger
+from pathlib import Path
 
 from qpc import messages
 from qpc.translation import _
 
 logger = getLogger(__name__)
-
-
-try:
-    json_exception_class = json.decoder.JSONDecodeError
-except AttributeError:
-    json_exception_class = ValueError
 
 
 SOURCES_KEY = "sources"
@@ -33,12 +27,13 @@ def validate_and_create_json(file):
     """
     logger.info(_(messages.REPORT_UPLOAD_VALIDATE_JSON), file)
     sources = None
-    if os.path.isfile(file):
+    file = Path(file)
+    if file.is_file():
         details_report = None
-        with open(file, encoding="utf-8") as details_file:
+        with file.open(encoding="utf-8") as details_file:
             try:
                 details_report = json.load(details_file)
-            except json_exception_class:
+            except json.decoder.JSONDecodeError:
                 logger.error(_(messages.REPORT_UPLOAD_FILE_INVALID_JSON), file)
                 return None
 

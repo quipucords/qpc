@@ -1,7 +1,6 @@
 """test password encryption."""
 
 import json
-import os
 import secrets
 from pathlib import Path
 
@@ -49,17 +48,17 @@ def test_password_encryption_with_key_modified(insights_login_file: Path):
 
 def test_insights_encryption_file_is_created():
     """Test if insights encryption file is created if non-existent."""
-    assert not os.path.exists(utils.INSIGHTS_ENCRYPTION)
+    assert not utils.INSIGHTS_ENCRYPTION.exists()
 
     write_encryption_key_if_non_existent()
 
-    assert os.path.exists(utils.INSIGHTS_ENCRYPTION)
+    assert utils.INSIGHTS_ENCRYPTION.exists()
 
 
 def test_if_encryption_file_permission_is_set_to_600():
     """Assert encryption file permissions are set to 600 when created."""
     write_encryption_key_if_non_existent()
-    stats = os.stat(utils.INSIGHTS_ENCRYPTION)
+    stats = utils.INSIGHTS_ENCRYPTION.stat()
     print(stats.st_mode)
 
     assert "600" in oct(stats.st_mode)
@@ -68,7 +67,7 @@ def test_if_encryption_file_permission_is_set_to_600():
 def test_if_key_is_loaded_with_wrong_permissions():
     """Assert key is only loaded with right permissions."""
     write_encryption_key_if_non_existent()
-    os.chmod(utils.INSIGHTS_ENCRYPTION, 0o777)
+    utils.INSIGHTS_ENCRYPTION.chmod(0o777)
 
     with pytest.raises(QPCEncryptionKeyError):
         load_encryption_key()

@@ -2,11 +2,11 @@
 
 import json
 import logging
-import os
 import sys
 import time
-from argparse import ArgumentParser, Namespace  # noqa: I100
-from io import StringIO  # noqa: I100
+from argparse import ArgumentParser, Namespace
+from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -18,10 +18,23 @@ from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import create_tar_buffer, get_server_location, write_server_config
+from qpc.tests_utilities import redirect_stdout
+from qpc.utils import create_tar_buffer, get_server_location
 
 
+@pytest.fixture
+def json_file(tmp_path):
+    """Return a fake json file."""
+    return str(tmp_path / "test.json")
+
+
+@pytest.fixture
+def csv_file(tmp_path):
+    """Return a fake csv file."""
+    return str(tmp_path / "test.csv")
+
+
+@pytest.mark.usefixtures("server_config")
 class TestReportDeployments:
     """Class for testing the deployments report command."""
 
@@ -39,34 +52,13 @@ class TestReportDeployments:
         # code smell to me, but I'm choosing to ignore it for now
         self.command = self._init_command()
 
-        write_server_config(DEFAULT_CONFIG)
-        # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
-        self.orig_stderr = sys.stderr
-        self.test_json_filename = f"test_{time.time():.0f}.json"
-        self.test_csv_filename = f"test_{time.time():.0f}.csv"
-        sys.stderr = HushUpStderr()
-
-    def teardown_method(self, _test_method):
-        """Remove test setup."""
-        # Restore stderr
-        sys.stderr = self.orig_stderr
-        try:
-            os.remove(self.test_json_filename)
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(self.test_csv_filename)
-        except FileNotFoundError:
-            pass
-
-    def test_deployments_report_as_json(self, caplog):
+    def test_deployments_report_as_json(self, caplog, json_file):
         """Testing retrieving deployments report as json."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
@@ -82,22 +74,22 @@ class TestReportDeployments:
                 report_id=None,
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
+                with Path(json_file).open("r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_deployments_report_as_json_report_id(self, caplog):
+    def test_deployments_report_as_json_report_id(self, caplog, json_file):
         """Testing retrieving deployments report as json with report id."""
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -112,18 +104,18 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
+                with Path(json_file).open("r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_deployments_report_as_csv(self, caplog):
+    def test_deployments_report_as_csv(self, caplog, csv_file):
         """Testing retreiving deployments report as csv."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
@@ -148,13 +140,13 @@ class TestReportDeployments:
                 report_id=None,
                 output_json=False,
                 output_csv=True,
-                path=self.test_csv_filename,
+                path=csv_file,
                 mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with open(self.test_csv_filename, "r", encoding="utf-8") as json_file:
+                with Path(csv_file).open("r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_csv_data == file_content_dict
@@ -199,7 +191,7 @@ class TestReportDeployments:
             ]
             CLI().main()
 
-    def test_deployments_report_scan_job_not_exist(self):
+    def test_deployments_report_scan_job_not_exist(self, json_file):
         """Deployments report with nonexistent scanjob."""
         report_out = StringIO()
 
@@ -213,7 +205,7 @@ class TestReportDeployments:
                 output_json=True,
                 report_id=None,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with pytest.raises(SystemExit):
@@ -221,7 +213,7 @@ class TestReportDeployments:
                     self.command.main(args)
                     assert report_out.getvalue() == messages.REPORT_SJ_DOES_NOT_EXIST
 
-    def test_deployments_report_invalid_scan_job(self):
+    def test_deployments_report_invalid_scan_job(self, json_file):
         """Deployments report with scanjob but no report_id."""
         report_out = StringIO()
 
@@ -235,7 +227,7 @@ class TestReportDeployments:
                 report_id=None,
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with pytest.raises(SystemExit):
@@ -247,12 +239,12 @@ class TestReportDeployments:
                     )
 
     @patch("qpc.report.deployments.write_file")
-    def test_deployments_file_fails_to_write(self, file, caplog):
+    def test_deployments_file_fails_to_write(self, file, caplog, json_file):
         """Testing deployments failure while writing to file."""
         file.side_effect = EnvironmentError()
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -267,24 +259,24 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.WRITE_FILE_ERROR % {
-                    "path": self.test_json_filename,
+                    "path": json_file,
                     "error": "",
                 }
                 assert err_msg in caplog.text
 
-    def test_deployments_nonexistent_directory(self, caplog):
+    def test_deployments_nonexistent_directory(self, caplog, json_file):
         """Testing error for nonexistent directory in output."""
         fake_dir = "/cody/is/awesome/deployments.json"
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
@@ -300,17 +292,17 @@ class TestReportDeployments:
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
-                err_msg = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % os.path.dirname(
-                    fake_dir
+                err_msg = (
+                    messages.REPORT_DIRECTORY_DOES_NOT_EXIST % Path(fake_dir).parent
                 )
                 assert err_msg in caplog.text
 
-    def test_deployments_nonjson_directory(self, caplog):
+    def test_deployments_nonjson_directory(self, caplog, json_file):
         """Testing error for nonjson output path."""
         non_json_dir = "/Users/deployments.tar.gz"
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
@@ -329,12 +321,12 @@ class TestReportDeployments:
                 err_msg = messages.OUTPUT_FILE_TYPE % ".json"
                 assert err_msg in caplog.text
 
-    def test_deployments_noncsv_directory(self, caplog):
+    def test_deployments_noncsv_directory(self, caplog, json_file):
         """Testing error for noncsv output path."""
         non_csv_dir = "/cody/is/awesome/deployments.tar.gz"
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
@@ -353,11 +345,11 @@ class TestReportDeployments:
                 err_msg = messages.OUTPUT_FILE_TYPE % ".csv"
                 assert err_msg in caplog.text
 
-    def test_deployments_report_id_not_exist(self, caplog):
+    def test_deployments_report_id_not_exist(self, caplog, json_file):
         """Test deployments with nonexistent report id."""
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -372,7 +364,7 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.ERROR):
@@ -381,13 +373,13 @@ class TestReportDeployments:
                 err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID % 1
                 assert err_msg in caplog.text
 
-    def test_deployments_report_error_scan_job(self, caplog):
+    def test_deployments_report_error_scan_job(self, caplog, json_file):
         """Testing error with scan job id."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
@@ -403,7 +395,7 @@ class TestReportDeployments:
                 report_id=None,
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.ERROR):
@@ -412,13 +404,13 @@ class TestReportDeployments:
                 err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1
                 assert err_msg in caplog.text
 
-    def test_deployments_report_mask(self, caplog):
+    def test_deployments_report_mask(self, caplog, json_file):
         """Testing retrieving json deployments report with masked values."""
         get_report_url = (
             get_server_location() + REPORT_URI + "1/deployments/" + "?mask=True"
         )
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -433,24 +425,24 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=True,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
+                with Path(json_file).open("r", encoding="utf-8") as json_file:
                     data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_deployments_masked_sj_428(self, caplog):
+    def test_deployments_masked_sj_428(self, caplog, json_file):
         """Deployments report retrieved from sj returns 428."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
@@ -466,7 +458,7 @@ class TestReportDeployments:
                 report_id=None,
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=True,
             )
             with caplog.at_level(logging.ERROR):
@@ -475,13 +467,13 @@ class TestReportDeployments:
                 err_msg = messages.REPORT_COULD_NOT_BE_MASKED_SJ % 1
                 assert err_msg in caplog.text
 
-    def test_deployments_masked_report_428(self, caplog):
+    def test_deployments_masked_report_428(self, caplog, json_file):
         """Deployments report retrieved from report returns 428."""
         get_report_url = (
             get_server_location() + REPORT_URI + "1/deployments/" + "?mask=True"
         )
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {self.test_json_filename: get_report_json_data}
+        test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -496,7 +488,7 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=True,
             )
             with caplog.at_level(logging.ERROR):
@@ -505,7 +497,7 @@ class TestReportDeployments:
                 err_msg = messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID % 1
                 assert err_msg in caplog.text
 
-    def test_deployments_old_version(self, caplog):
+    def test_deployments_old_version(self, caplog, json_file):
         """Test too old server version."""
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
@@ -522,7 +514,7 @@ class TestReportDeployments:
                 report_id="1",
                 output_json=True,
                 output_csv=False,
-                path=self.test_json_filename,
+                path=json_file,
                 mask=False,
             )
             with caplog.at_level(logging.ERROR):

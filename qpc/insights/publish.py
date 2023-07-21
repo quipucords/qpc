@@ -1,6 +1,5 @@
 """InsightsPublishCommand is used to publish insights report to C.RH.C."""
 
-import os
 import sys
 import tarfile
 from logging import getLogger
@@ -53,16 +52,16 @@ class InsightsPublishCommand(CliCommand):
             help=_(messages.REPORT_REPORT_ID_HELP),
         )
 
-    def _validate_insights_report_name(self, input_file):
+    def _validate_insights_report_name(self, input_file: Path):
         """Validate if report file exists and its file extension (tar.gz)."""
-        if not os.path.isfile(input_file):
+        if not input_file.is_file():
             logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
-        if "tar.gz" not in input_file:
+        if not input_file.name.endswith("tar.gz"):
             logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
 
-    def _validate_insights_report_content(self, input_file):
+    def _validate_insights_report_content(self, input_file: Path):
         """Check if report tarball contains the expected json files."""
         filenames = self._get_filenames(input_file)
 
@@ -118,7 +117,7 @@ class InsightsPublishCommand(CliCommand):
 
     def _publish_to_ingress(self):
         if self.args.input_file:
-            input_file = self.args.input_file
+            input_file = Path(self.args.input_file)
         else:
             input_file = self._download_insights_report()
         self._validate_insights_report_name(input_file)
@@ -130,23 +129,23 @@ class InsightsPublishCommand(CliCommand):
         auth = (insights_login["username"], insights_login["password"])
 
         insights_client = InsightsClient(base_url=base_url, auth=auth)
-        file_to_be_uploaded = open(input_file, "rb")
         filename_without_extensions = self._remove_file_extension(input_file)
-        files = {
-            "file": (
-                filename_without_extensions,
-                file_to_be_uploaded,
-                insights.CONTENT_TYPE,
+        with input_file.open("rb") as file_to_be_uploaded:
+            files = {
+                "file": (
+                    filename_without_extensions,
+                    file_to_be_uploaded,
+                    insights.CONTENT_TYPE,
+                )
+            }
+            successfully_submitted = self._make_publish_request(
+                insights_client, insights.INGRESS_REPORT_URI, files
             )
-        }
-        successfully_submitted = self._make_publish_request(
-            insights_client, insights.INGRESS_REPORT_URI, files
-        )
         file_to_be_uploaded.close()
 
         if not self.args.input_file:
             # remove temporarily downloaded insights report
-            os.remove(input_file)
+            input_file.unlink()
 
         if not successfully_submitted:
             raise SystemExit(1)
@@ -177,7 +176,7 @@ class InsightsPublishCommand(CliCommand):
         output_file_path = Path(output_file.name)
         output_file_path.write_bytes(response.content)
 
-        return output_file.name
+        return output_file_path
 
     def _get_base_url(self):
         insights_config = read_insights_config()

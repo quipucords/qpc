@@ -7,6 +7,7 @@ import os
 import sys
 import tarfile
 from collections import defaultdict
+from pathlib import Path
 
 from cryptography.fernet import Fernet, InvalidToken
 
@@ -15,19 +16,19 @@ from qpc.insights.exceptions import QPCEncryptionKeyError, QPCLoginConfigError
 from qpc.translation import _ as t
 
 QPC_PATH = "qpc"
-CONFIG_HOME_PATH = "~/.config/"
-DATA_HOME_PATH = "~/.local/share/"
-CONFIG_HOME = os.path.expanduser(CONFIG_HOME_PATH)
-DATA_HOME = os.path.expanduser(DATA_HOME_PATH)
-CONFIG_DIR = os.path.join(CONFIG_HOME, QPC_PATH)
-DATA_DIR = os.path.join(DATA_HOME, QPC_PATH)
-QPC_LOG = os.path.join(DATA_DIR, "qpc.log")
-QPC_SERVER_CONFIG = os.path.join(CONFIG_DIR, "server.config")
-QPC_CLIENT_TOKEN = os.path.join(CONFIG_DIR, "client_token")
-INSIGHTS_CONFIG = os.path.join(CONFIG_DIR, "insights.config")
-INSIGHTS_LOGIN_CONFIG = os.path.join(CONFIG_DIR, "insights_login_config")
+CONFIG_HOME_PATH = Path("~/.config/")
+DATA_HOME_PATH = Path("~/.local/share/")
+CONFIG_HOME = CONFIG_HOME_PATH.expanduser()
+DATA_HOME = DATA_HOME_PATH.expanduser()
+CONFIG_DIR = CONFIG_HOME / QPC_PATH
+DATA_DIR = DATA_HOME / QPC_PATH
+QPC_LOG = DATA_DIR / "qpc.log"
+QPC_SERVER_CONFIG = CONFIG_DIR / "server.config"
+QPC_CLIENT_TOKEN = CONFIG_DIR / "client_token"
+INSIGHTS_CONFIG = CONFIG_DIR / "insights.config"
+INSIGHTS_LOGIN_CONFIG = CONFIG_DIR / "insights_login_config"
 
-INSIGHTS_ENCRYPTION = os.path.join(DATA_DIR, "insights_encryption")
+INSIGHTS_ENCRYPTION = DATA_DIR / "insights_encryption"
 
 CONFIG_HOST_KEY = "host"
 CONFIG_PORT_KEY = "port"
@@ -58,8 +59,8 @@ logger = logging.getLogger(__name__)
 
 def ensure_config_dir_exists():
     """Ensure the qpc configuration directory exists."""
-    if not os.path.exists(CONFIG_DIR):
-        os.makedirs(CONFIG_DIR)
+    if not CONFIG_DIR.exists():
+        CONFIG_DIR.mkdir(parents=True)
 
 
 def get_ssl_verify():
@@ -95,29 +96,19 @@ def get_server_location():
     return server_location
 
 
-try:
-    exception_class = json.decoder.JSONDecodeError
-except AttributeError:
-    exception_class = ValueError
-
-
 def read_client_token():
     """Retrieve client token for sonar server.
 
     :returns: The client token or None
     """
-    if not os.path.exists(QPC_CLIENT_TOKEN):
+    if not QPC_CLIENT_TOKEN.exists():
         return None
 
-    token = None
-    with open(QPC_CLIENT_TOKEN, encoding="utf-8") as client_token_file:
-        try:
-            token_json = json.load(client_token_file)
-            token = token_json.get("token")
-        except exception_class:
-            pass
-
-        return token
+    try:
+        token_json = json.loads(QPC_CLIENT_TOKEN.read_text())
+        return token_json.get("token")
+    except json.decoder.JSONDecodeError:
+        return None
 
 
 def read_require_auth():
@@ -137,14 +128,13 @@ def read_insights_config():
 
     :returns: The validated dictionary with configuration
     """
-    if not os.path.exists(INSIGHTS_CONFIG):
+    if not INSIGHTS_CONFIG.exists():
         return DEFAULT_INSIGHTS_CONFIG
 
-    with open(INSIGHTS_CONFIG, encoding="utf-8") as insights_config_file:
-        try:
-            config = json.load(insights_config_file)
-        except exception_class:
-            return DEFAULT_INSIGHTS_CONFIG
+    try:
+        config = json.loads(INSIGHTS_CONFIG.read_text())
+    except json.decoder.JSONDecodeError:
+        return DEFAULT_INSIGHTS_CONFIG
     insights_config = dict(DEFAULT_INSIGHTS_CONFIG, **config)
     return insights_config
 
@@ -154,97 +144,96 @@ def read_server_config():  # noqa: C901 PLR0911
 
     :returns: The validate dictionary with configuration
     """
-    if not os.path.exists(QPC_SERVER_CONFIG):
+    if not QPC_SERVER_CONFIG.exists():
         logger.error("Server config %s was not found.", QPC_SERVER_CONFIG)
         return None
 
-    with open(QPC_SERVER_CONFIG, encoding="utf-8") as server_config_file:
-        try:
-            config = json.load(server_config_file)
-        except exception_class:
-            return None
+    try:
+        config = json.loads(QPC_SERVER_CONFIG.read_text())
+    except json.decoder.JSONDecodeError:
+        return None
 
-        host = config.get(CONFIG_HOST_KEY)
-        port = config.get(CONFIG_PORT_KEY)
-        use_http = config.get(CONFIG_USE_HTTP)
-        ssl_verify = config.get(CONFIG_SSL_VERIFY, False)
-        require_token = config.get(CONFIG_REQUIRE_TOKEN)
+    host = config.get(CONFIG_HOST_KEY)
+    port = config.get(CONFIG_PORT_KEY)
+    use_http = config.get(CONFIG_USE_HTTP)
+    ssl_verify = config.get(CONFIG_SSL_VERIFY, False)
+    require_token = config.get(CONFIG_REQUIRE_TOKEN)
 
-        host_empty = host is None or host == ""
-        port_empty = port is None or port == ""
+    host_empty = host is None or host == ""
+    port_empty = port is None or port == ""
 
-        if host_empty or port_empty:
-            return None
+    if host_empty or port_empty:
+        return None
 
-        if not isinstance(host, str):
-            logger.error(
-                "Server config %s has invalid value for host %s",
-                QPC_SERVER_CONFIG,
-                host,
-            )
-            return None
+    if not isinstance(host, str):
+        logger.error(
+            "Server config %s has invalid value for host %s",
+            QPC_SERVER_CONFIG,
+            host,
+        )
+        return None
 
-        if not isinstance(port, int):
-            logger.error(
-                "Server config %s has invalid value for port %s",
-                QPC_SERVER_CONFIG,
-                port,
-            )
-            return None
+    if not isinstance(port, int):
+        logger.error(
+            "Server config %s has invalid value for port %s",
+            QPC_SERVER_CONFIG,
+            port,
+        )
+        return None
 
-        if use_http is None:
-            use_http = True
+    if use_http is None:
+        use_http = True
 
-        if require_token is None:
-            require_token = True
+    if require_token is None:
+        require_token = True
 
-        if not isinstance(use_http, bool):
-            logger.error(
-                "Server config %s has invalid value for use_http %s",
-                QPC_SERVER_CONFIG,
-                use_http,
-            )
-            return None
+    if not isinstance(use_http, bool):
+        logger.error(
+            "Server config %s has invalid value for use_http %s",
+            QPC_SERVER_CONFIG,
+            use_http,
+        )
+        return None
 
-        if not isinstance(require_token, bool):
-            logger.error(
-                "Server config %s has invalid value for require_token %s",
-                QPC_SERVER_CONFIG,
-                require_token,
-            )
-            return None
+    if not isinstance(require_token, bool):
+        logger.error(
+            "Server config %s has invalid value for require_token %s",
+            QPC_SERVER_CONFIG,
+            require_token,
+        )
+        return None
 
-        if (
-            ssl_verify is not None
-            and not isinstance(ssl_verify, bool)
-            and not isinstance(ssl_verify, str)
-        ):
-            logger.error(
-                "Server config %s has invalid value for ssl_verify %s",
-                QPC_SERVER_CONFIG,
-                ssl_verify,
-            )
-            return None
+    if (
+        ssl_verify is not None
+        and not isinstance(ssl_verify, bool)
+        and not isinstance(ssl_verify, str)
+    ):
+        logger.error(
+            "Server config %s has invalid value for ssl_verify %s",
+            QPC_SERVER_CONFIG,
+            ssl_verify,
+        )
+        return None
 
-        if (
-            ssl_verify is not None
-            and isinstance(ssl_verify, str)
-            and not os.path.exists(ssl_verify)
-        ):
-            logger.error(
-                "Server config %s has invalid path for ssl_verify %s",
-                QPC_SERVER_CONFIG,
-                ssl_verify,
-            )
-            return None
+    if (
+        ssl_verify is not None
+        and isinstance(ssl_verify, str)
+        and not Path(ssl_verify).exists()
+    ):
+        logger.error(
+            "Server config %s has invalid path for ssl_verify %s",
+            QPC_SERVER_CONFIG,
+            ssl_verify,
+        )
+        return None
 
-        return {
-            CONFIG_HOST_KEY: host,
-            CONFIG_PORT_KEY: port,
-            CONFIG_USE_HTTP: use_http,
-            CONFIG_SSL_VERIFY: ssl_verify,
-            CONFIG_REQUIRE_TOKEN: require_token,
-        }
+    return {
+        CONFIG_HOST_KEY: host,
+        CONFIG_PORT_KEY: port,
+        CONFIG_USE_HTTP: use_http,
+        CONFIG_SSL_VERIFY: ssl_verify,
+        CONFIG_REQUIRE_TOKEN: require_token,
+    }
 
 
 def write_config(config_file_path, config_dict):
@@ -255,7 +244,7 @@ def write_config(config_file_path, config_dict):
     """
     ensure_config_dir_exists()
 
-    with open(config_file_path, "w", encoding="utf-8") as config_file:
+    with Path(config_file_path).open("w", encoding="utf-8") as config_file:
         json.dump(config_dict, config_file, indent=4)
 
 
@@ -290,16 +279,15 @@ def read_insights_login_config():
 
     :returns: The validated dictionary with configuration
     """
-    if not os.path.exists(INSIGHTS_LOGIN_CONFIG):
+    if not INSIGHTS_LOGIN_CONFIG.exists():
         raise QPCLoginConfigError("Insights login config was not found.")
 
-    with open(INSIGHTS_LOGIN_CONFIG, encoding="utf-8") as insights_login_config_file:
-        try:
-            config = json.load(insights_login_config_file)
-        except exception_class as exc:
-            raise QPCLoginConfigError(
-                f"Unable to load {INSIGHTS_LOGIN_CONFIG} file."
-            ) from exc
+    try:
+        config = json.loads(INSIGHTS_LOGIN_CONFIG.read_text())
+    except json.decoder.JSONDecodeError as exc:
+        raise QPCLoginConfigError(
+            f"Unable to load {INSIGHTS_LOGIN_CONFIG} file."
+        ) from exc
 
     username = config[INSIGHTS_CONFIG_USERNAME_KEY]
     encrypted_password = config[INSIGHTS_CONFIG_PASSWORD_KEY]
@@ -318,23 +306,23 @@ def write_client_token(client_token):
     """
     ensure_config_dir_exists()
 
-    with open(QPC_CLIENT_TOKEN, "w", encoding="utf-8") as configFile:
-        json.dump(client_token, configFile)
+    with QPC_CLIENT_TOKEN.open("w", encoding="utf-8") as config_file:
+        json.dump(client_token, config_file)
 
 
 def delete_client_token():
     """Remove file client_token."""
     ensure_config_dir_exists()
     try:
-        os.remove(QPC_CLIENT_TOKEN)
+        QPC_CLIENT_TOKEN.unlink()
     except FileNotFoundError:
         pass
 
 
 def ensure_data_dir_exists():
     """Ensure the qpc data directory exists."""
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
+    if not DATA_DIR.exists():
+        DATA_DIR.mkdir(parents=True)
 
 
 def setup_logging(verbosity):
@@ -422,7 +410,7 @@ def handle_error_response(response):  # noqa: C901 PLR0912
                 logger.error("Error: %s", err)
         else:
             logger.error("Error: %s", str(response_data))
-    except exception_class:
+    except json.decoder.JSONDecodeError:
         pass
 
 
@@ -444,10 +432,10 @@ def read_in_file(filename):
     :raises: ValueError if incoming value is not a file that could be found
     """
     result = None
-    input_path = os.path.expanduser(os.path.expandvars(filename))
-    if os.path.isfile(input_path):
+    input_path = Path(os.path.expandvars(filename)).expanduser()
+    if input_path.is_file():
         try:
-            with open(input_path, "r", encoding="utf-8") as in_file:
+            with input_path.open("r", encoding="utf-8") as in_file:
                 result = in_file.read().splitlines()
         except EnvironmentError as err:
             logger.error(
@@ -466,15 +454,15 @@ def validate_write_file(filename, param_name):
     the filename
     :raises: ValueError for validation errors
     """
-    input_path = os.path.expanduser(os.path.expandvars(filename))
+    input_path = Path(os.path.expandvars(filename)).expanduser()
     if not input_path:
         raise ValueError(t(messages.REPORT_OUTPUT_CANNOT_BE_EMPTY % param_name))
-    if os.path.isdir(input_path):
+    if input_path.is_dir():
         raise ValueError(
             t(messages.REPORT_OUTPUT_IS_A_DIRECTORY % (param_name, input_path))
         )
-    directory = os.path.dirname(input_path)
-    if directory and not os.path.exists(directory):
+    directory = input_path.absolute().parent
+    if not directory.exists():
         raise ValueError(t(messages.REPORT_DIRECTORY_DOES_NOT_EXIST % directory))
 
 
@@ -489,11 +477,11 @@ def write_file(filename, content, binary=False):
     if filename is None:
         print(content)
     else:
-        input_path = os.path.expanduser(os.path.expandvars(filename))
+        input_path = Path(os.path.expandvars(filename)).expanduser()
         mode = "w"
         if binary:
             mode = "wb"
-        with open(input_path, mode) as out_file:
+        with input_path.open(mode) as out_file:
             out_file.write(content)
     return result
 
@@ -554,18 +542,17 @@ def write_encryption_key_if_non_existent():
     Key will be generated only once and saved at INSIGHTS_ENCRYPTION file,
     the function will check its existence every time it is called
     """
-    if not os.path.exists(INSIGHTS_ENCRYPTION):
+    if not INSIGHTS_ENCRYPTION.exists():
         key = Fernet.generate_key()
-        with open(INSIGHTS_ENCRYPTION, "wb") as key_file:
-            key_file.write(key)
-            os.chmod(INSIGHTS_ENCRYPTION, 0o600)
+        INSIGHTS_ENCRYPTION.write_bytes(key)
+        INSIGHTS_ENCRYPTION.chmod(0o600)
 
 
 def load_encryption_key():
     """Load encryption from insights_encryption file."""
-    stats = os.stat(INSIGHTS_ENCRYPTION)
+    stats = INSIGHTS_ENCRYPTION.stat()
     if oct(stats.st_mode).endswith("00"):
-        return open(INSIGHTS_ENCRYPTION, "rb").read()
+        return INSIGHTS_ENCRYPTION.read_bytes()
 
     raise QPCEncryptionKeyError(
         "There was a problem while trying to load the password encryption key."

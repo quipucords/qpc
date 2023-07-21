@@ -2,9 +2,7 @@
 
 import json
 import logging
-import os
 import sys
-import time
 from argparse import ArgumentParser, Namespace
 from io import StringIO
 
@@ -15,12 +13,11 @@ from qpc import messages
 from qpc.cli import CLI
 from qpc.server import STATUS_URI
 from qpc.server.status import ServerStatusCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, write_server_config
-
-TMP_KEY = "/tmp/testkey"
+from qpc.tests_utilities import redirect_stdout
+from qpc.utils import get_server_location
 
 
+@pytest.mark.usefixtures("server_config")
 class TestServerStatus:
     """Class for testing the server status command for qpc."""
 
@@ -30,26 +27,9 @@ class TestServerStatus:
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ServerStatusCommand(subparser)
 
-    def setup_method(self, _test_method):
-        """Create test setup."""
-        write_server_config(DEFAULT_CONFIG)
-        # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
-        self.orig_stderr = sys.stderr
-        self.test_json_filename = f"test_{time.time():.0f}.json"
-        sys.stderr = HushUpStderr()
-
-    def teardown_method(self, _test_method):
-        """Remove test setup."""
-        # Restore stderr
-        sys.stderr = self.orig_stderr
-        try:
-            os.remove(self.test_json_filename)
-        except FileNotFoundError:
-            pass
-
-    def test_download_server_status(self, caplog):
+    def test_download_server_status(self, caplog, tmp_path):
         """Testing recording server status command in a file."""
+        fake_json = tmp_path / "test.json"
         get_status_url = get_server_location() + STATUS_URI
         get_status_json_data = {
             "api_version": 1,
@@ -59,12 +39,12 @@ class TestServerStatus:
         with requests_mock.Mocker() as mocker:
             mocker.get(get_status_url, status_code=200, json=get_status_json_data)
 
-            args = Namespace(path=self.test_json_filename)
+            args = Namespace(path=str(fake_json))
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.STATUS_SUCCESSFULLY_WRITTEN
                 assert expected_message in caplog.text
-            with open(self.test_json_filename, "r", encoding="utf-8") as json_file:
+            with fake_json.open("r", encoding="utf-8") as json_file:
                 data = json_file.read()
                 file_content_dict = json.loads(data)
             assert get_status_json_data == file_content_dict

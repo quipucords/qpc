@@ -29,7 +29,7 @@ QPC_PATH_CONSTANTS = (
 def mock_path_constants(tmp_path, monkeypatch):
     """Mock path constants used on qpc."""
     for path in QPC_PATH_CONSTANTS:
-        monkeypatch.setattr(f"qpc.utils.{path}", str(tmp_path / path))
+        monkeypatch.setattr(f"qpc.utils.{path}", tmp_path / path)
 
 
 def _set_path_constants_to_none():
@@ -44,6 +44,10 @@ def pytest_collection(session):
 
     This function runs before collecting tests.
     """
+    # setting path constants to None on utils module is a dirty way to ensure
+    # no test will write on top of user config file. This is a last resort, as
+    # mock_path_constants fixture shall be doing the job of actually patching
+    # those to a usable value in tests
     _set_path_constants_to_none()
 
 

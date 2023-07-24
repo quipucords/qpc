@@ -29,7 +29,7 @@ def test_request_methods(server_config, method):
             None,
             None,
             {},
-            "0.9.0",
+            "1.3.0",
         )
 
 

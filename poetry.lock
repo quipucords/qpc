@@ -676,6 +676,23 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "pybuild-deps"
+version = "0.0.4"
+description = "A simple tool for detection of PEP-517 build dependencies."
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "pybuild_deps-0.0.4-py3-none-any.whl", hash = "sha256:68b04237aa7177ccf4d47d9198a8f8a8e87114dca70fac85cc974222c78167c7"},
+    {file = "pybuild_deps-0.0.4.tar.gz", hash = "sha256:c43d511468b033959caa8cfb9ce05785cceb6e5e74ef207cb78d1b13b93e436a"},
+]
+
+[package.dependencies]
+click = ">=8.0.1"
+requests = "*"
+tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
+xdg = "*"
+
+[[package]]
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
@@ -1151,6 +1168,17 @@ files = [
 test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 
 [[package]]
+name = "xdg"
+version = "6.0.0"
+description = "Variables defined by the XDG Base Directory Specification"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "xdg-6.0.0-py3-none-any.whl", hash = "sha256:df3510755b4395157fc04fc3b02467c777f3b3ca383257397f09ab0d4c16f936"},
+    {file = "xdg-6.0.0.tar.gz", hash = "sha256:24278094f2d45e846d1eb28a2ebb92d7b67fc0cab5249ee3ce88c95f649a1c92"},
+]
+
+[[package]]
 name = "xmltodict"
 version = "0.13.0"
 description = "Makes working with XML feel like you are working with JSON"
@@ -1164,4 +1192,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "f31a7565a81955de028626897cc05c7e5a810d43408baaf1c94c6d4f927cbc16"
+content-hash = "a8ed68a9d71983a79d3ed9e25ca5fd4ef6d5984a2e2b6f74e996ecc4617d6c32"

@@ -211,7 +211,7 @@ class ReportMergeCommand(CliCommand):
         json_data = self.response.json()
         reports = json_data.get("reports")
         if reports:
-            print(json_data.get("reports")[0])
+            logger.error(json_data.get("reports")[0])
             sys.exit(1)
 
         logger.error(_(messages.MERGE_ERROR), json_data)

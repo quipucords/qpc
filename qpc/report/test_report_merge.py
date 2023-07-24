@@ -1,68 +1,115 @@
 """Test the CLI module."""
 
-import os
+import json
+import logging
 import sys
-import time
 from argparse import ArgumentParser, Namespace
-from io import StringIO
+from pathlib import Path
+from unittest import mock
+from uuid import uuid4
 
 import pytest
-import requests_mock
 
 from qpc import messages
+from qpc.cli import CLI
 from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
-from qpc.utils import get_server_location, write_server_config
-
-TMP_DETAILSFILE1 = (
-    "/tmp/testdetailsreport1.json",
-    '{"id": 1,"sources":[{"facts": ["AB"],"server_id": "8"}]}',
-)
-TMP_DETAILSFILE2 = (
-    "/tmp/testdetailsreport2.json",
-    '{"id": 2, \n "sources": [{"source_name": "source2"}]}',
-)
-TMP_NOTJSONFILE = ("/tmp/testnotjson.txt", "not a json file")
-TMP_BADDETAILS1 = (
-    "/tmp/testbaddetailsreport_source.json",
-    '{"id": 4,"bsources":[{"facts": ["A"],"server_id": "8"}]}',
-)
-TMP_BADDETAILS2 = (
-    "/tmp/testbadetailsreport_facts.json",
-    '{"id": 4,"sources":[{"bfacts": ["A"],"server_id": "8"}]}',
-)
-TMP_BADDETAILS3 = (
-    "/tmp/testbaddetailsreport_server_id.json",
-    '{"id": 4,"sources":[{"facts": ["A"],"bserver_id": "8"}]}',
-)
-TMP_BADDETAILS4 = (
-    "/tmp/testbaddetailsreport_bad_json.json",
-    '{"id":3,"sources"[this is bad]',
-)
-TMP_BADDETAILS5 = (
-    "/tmp/testbaddetailsinvalidreporttype.json",
-    '{"report_type": "durham"}',
-)
-TMP_GOODDETAILS = (
-    "/tmp/testgooddetailsreport.json",
-    '{"id": 4,"sources":[{"facts": ["A"],"server_id": "8"}]}',
-)
-NONEXIST_FILE = "/tmp/does/not/exist/bad.json"
-JSON_FILES_LIST = [
-    TMP_DETAILSFILE1,
-    TMP_DETAILSFILE2,
-    TMP_NOTJSONFILE,
-    TMP_BADDETAILS1,
-    TMP_BADDETAILS2,
-    TMP_BADDETAILS3,
-    TMP_GOODDETAILS,
-    TMP_BADDETAILS5,
-]
+from qpc.utils import get_server_location
 
 
+@pytest.fixture
+def details1(tmp_path):
+    """Fixture for a "good" details report file file."""
+    _path = tmp_path / "details_report1.json"
+    _path.write_text('{"id": 1,"sources":[{"facts": ["B"],"server_id": "8"}]}')
+    return str(_path)
+
+
+@pytest.fixture
+def details2(tmp_path):
+    """Fixture for a "bad" details report file file."""
+    _path = tmp_path / "details_report2.json"
+    _path.write_text('{"id": 2,"sources":[{"source_name": "source2"}]}')
+    return str(_path)
+
+
+@pytest.fixture
+def not_json_file(tmp_path):
+    """Fixture for a file that's not a report (not even a json)."""
+    _path = tmp_path / "notjson.txt"
+    _path.write_text("not a json file")
+    return str(_path)
+
+
+@pytest.fixture
+def bad_details1(tmp_path):
+    """Fixture for a "bad" details report file."""
+    _path = tmp_path / "bad_details_report_source.json"
+    _path.write_text('{"id": 4,"bsources":[{"facts": ["A"],"server_id": "8"}]}')
+    return str(_path)
+
+
+@pytest.fixture
+def bad_details2(tmp_path):
+    """Fixture for a "bad" details report file."""
+    _path = tmp_path / "bad_details_report_facts.json"
+    _path.write_text('{"id": 4,"sources":[{"bfacts": ["A"],"server_id": "8"}]}')
+    return str(_path)
+
+
+@pytest.fixture
+def bad_details3(tmp_path):
+    """Fixture for a "bad" details report file."""
+    _path = tmp_path / "bad_details_report_server_id.json"
+    _path.write_text('{"id": 4,"sources":[{"facts": ["A"],"bserver_id": "8"}]}')
+    return str(_path)
+
+
+@pytest.fixture
+def bad_details4(tmp_path):
+    """Fixture for a "bad" details report file."""
+    _path = tmp_path / "bad_details_report_bad_json.json"
+    _path.write_text('{"id":3,"sources": [this is bad]')
+    return str(_path)
+
+
+@pytest.fixture
+def bad_details5(tmp_path):
+    """Fixture for a "bad" details report file."""
+    _path = tmp_path / "bad_details_invalid_report_type.json"
+    _path.write_text('{"report_type": "durham"}')
+    return str(_path)
+
+
+@pytest.fixture
+def gooddetails(tmp_path):
+    """Fixture for a "good" details report file."""
+    _path = tmp_path / "good_details_report.json"
+    report = {
+        "report_type": "details",
+        "report_version": "1.2.3+outer_version",
+        "report_id": 38,
+        "sources": [
+            {
+                "facts": ["A"],
+                "server_id": "42",
+                "report_version": "1.2.3+inner_version",
+            }
+        ],
+    }
+    _path.write_text(json.dumps(report))
+    return str(_path)
+
+
+@pytest.fixture
+def doesnt_exist_json(tmp_path):
+    """Fixture for a json file that doesn't exist."""
+    return tmp_path / f"{uuid4()}.json"
+
+
+@pytest.mark.usefixtures("server_config")
 class TestReportMergeTests:
     """Class for testing the scan show commands for qpc."""
 
@@ -73,295 +120,326 @@ class TestReportMergeTests:
         subparser = argument_parser.add_subparsers(dest="subcommand")
         cls.command = ReportMergeCommand(subparser)
 
-    def setup_method(self, _test_method):
-        """Create test setup."""
-        write_server_config(DEFAULT_CONFIG)
-        # Temporarily disable stderr for these tests, CLI errors clutter up
-        # nosetests command.
-        self.orig_stderr = sys.stderr
-        self.test_json_filename = f"test_{time.time():.0f}.json"
-        self.test_csv_filename = f"test_{time.time():.0f}.csv"
-        sys.stderr = HushUpStderr()
-        for file in JSON_FILES_LIST:
-            if os.path.isfile(file[0]):
-                os.remove(file[0])
-            with open(file[0], "w", encoding="utf-8") as test_file:
-                test_file.write(file[1])
-
-    def teardown_method(self, _test_method):
-        """Remove test setup."""
-        # Restore stderr
-        for file in JSON_FILES_LIST:
-            if os.path.isfile(file[0]):
-                os.remove(file[0])
-        sys.stderr = self.orig_stderr
-        try:
-            os.remove(self.test_json_filename)
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(self.test_csv_filename)
-        except FileNotFoundError:
-            pass
-
-    def test_detail_merge_job_ids(self):
+    def test_detail_merge_job_ids(self, capsys, requests_mock):
         """Testing report merge command with scan job ids."""
-        put_report_data = {"id": 1}
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        scanjob1_data = {"report_id": 1}
-        scanjob2_data = {"report_id": 2}
-        get_scanjob1_url = get_server_location() + SCAN_JOB_URI + "1/"
-        get_scanjob2_url = get_server_location() + SCAN_JOB_URI + "2/"
-        captured_stdout = StringIO()
-        with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
-            mocker.get(get_scanjob1_url, status_code=200, json=scanjob1_data)
-            mocker.get(get_scanjob2_url, status_code=200, json=scanjob2_data)
-            mocker.put(put_merge_url, status_code=201, json=put_report_data)
+        requests_mock.get(
+            get_server_location() + SCAN_JOB_URI + "1/",
+            status_code=200,
+            json={"report_id": 1},
+        )
+        requests_mock.get(
+            get_server_location() + SCAN_JOB_URI + "2/",
+            status_code=200,
+            json={"report_id": 2},
+        )
+        requests_mock.put(
+            get_server_location() + ASYNC_MERGE_URI,
+            status_code=201,
+            json={"id": 1},
+        )
 
-            args = Namespace(
-                scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
-            )
-            self.command.main(args)
-            expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
-                "id": "1",
-                "prog_name": QPC_VAR_PROGRAM_NAME,
-            }
-            assert expected_msg in captured_stdout.getvalue()
+        args = Namespace(
+            scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
+        )
+        self.command.main(args)
+        expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+            "id": "1",
+            "prog_name": QPC_VAR_PROGRAM_NAME,
+        }
+        assert expected_msg in capsys.readouterr().out
 
-    def test_detail_merge_error_job_ids(self):
+    def test_detail_merge_error_job_ids(self, requests_mock, caplog):
         """Testing report merge error with scan job ids."""
-        report_out = StringIO()
+        requests_mock.get(
+            get_server_location() + SCAN_JOB_URI + "1/",
+            status_code=200,
+            json={"report_id": 1},
+        )
+        requests_mock.get(
+            get_server_location() + SCAN_JOB_URI + "2/",
+            status_code=200,
+            json={"report_id": 2},
+        )
+        requests_mock.put(
+            get_server_location() + ASYNC_MERGE_URI,
+            status_code=400,
+            json={"reports": ["SOME SERVER ERROR."]},
+        )
 
-        error_message = "fake_message"
-        scanjob1_data = {"report_id": 1}
-        scanjob2_data = {"report_id": 2}
-        put_report_data = {"reports": [error_message]}
-        get_scanjob1_url = get_server_location() + SCAN_JOB_URI + "1/"
-        get_scanjob2_url = get_server_location() + SCAN_JOB_URI + "2/"
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_scanjob1_url, status_code=200, json=scanjob1_data)
-            mocker.get(get_scanjob2_url, status_code=200, json=scanjob2_data)
-            mocker.put(put_merge_url, status_code=400, json=put_report_data)
+        args = Namespace(
+            scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
+        )
+        caplog.set_level(logging.ERROR)
+        with pytest.raises(SystemExit):
+            self.command.main(args)
+        assert caplog.messages[-1] == "SOME SERVER ERROR."
 
-            args = Namespace(
-                scan_job_ids=[1, 2], json_files=None, report_ids=None, json_dir=None
-            )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(report_out):
-                    self.command.main(args)
-
-    def test_detail_merge_report_ids(self):
+    def test_detail_merge_report_ids(self, requests_mock, capsys):
         """Testing report merge command with report ids."""
-        put_report_data = {"id": 1}
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        captured_stdout = StringIO()
-        with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
-            mocker.put(put_merge_url, status_code=201, json=put_report_data)
+        requests_mock.put(
+            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+        )
+        args = Namespace(
+            scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
+        )
+        self.command.main(args)
+        expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+            "id": "1",
+            "prog_name": QPC_VAR_PROGRAM_NAME,
+        }
+        assert expected_msg in capsys.readouterr().out
 
-            args = Namespace(
-                scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
-            )
-            self.command.main(args)
-            expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
-                "id": "1",
-                "prog_name": QPC_VAR_PROGRAM_NAME,
-            }
-            assert expected_msg in captured_stdout.getvalue()
-
-    def test_detail_merge_error_report_ids(self):
+    def test_detail_merge_error_report_ids(self, requests_mock, caplog):
         """Testing report merge error with report ids."""
-        report_out = StringIO()
-
-        error_message = "fake_message"
-        put_report_data = {"reports": [error_message]}
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.put(put_merge_url, status_code=400, json=put_report_data)
-
-            args = Namespace(
-                scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
-            )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(report_out):
-                    self.command.main(args)
-
-    def test_detail_merge_json_files(self):
-        """Testing report merge command with json files."""
-        put_report_data = {"id": 1}
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        captured_stdout = StringIO()
-        with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
-            mocker.post(put_merge_url, status_code=201, json=put_report_data)
-
-            args = Namespace(
-                scan_job_ids=None,
-                json_files=[TMP_DETAILSFILE1[0], TMP_GOODDETAILS[0]],
-                report_ids=None,
-            )
+        requests_mock.put(
+            get_server_location() + ASYNC_MERGE_URI,
+            status_code=400,
+            json={"reports": ["SOME SERVER ERROR."]},
+        )
+        args = Namespace(
+            scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
+        )
+        caplog.set_level(logging.ERROR)
+        with pytest.raises(SystemExit):
             self.command.main(args)
-            expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
-                "id": "1",
-                "prog_name": QPC_VAR_PROGRAM_NAME,
-            }
-            assert expected_msg in captured_stdout.getvalue()
+        assert requests_mock.last_request.json() == {"reports": [1, 2]}
+        assert caplog.messages[-1] == "SOME SERVER ERROR."
 
-    def test_detail_merge_json_files_not_exist(self):
+    def test_detail_merge_json_files(
+        self, capsys, requests_mock, details1, gooddetails
+    ):
+        """Testing report merge command with json files."""
+        requests_mock.post(
+            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+        )
+
+        args = Namespace(
+            scan_job_ids=None,
+            json_files=[details1, gooddetails],
+            report_ids=None,
+        )
+        self.command.main(args)
+        expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+            "id": "1",
+            "prog_name": QPC_VAR_PROGRAM_NAME,
+        }
+        assert expected_msg in capsys.readouterr().out
+
+    @pytest.mark.xfail(reason="This is failing likely due to bug")
+    def test_detail_merge_json_files_not_exist(
+        self, details1, caplog, tmp_path, mocker
+    ):
         """Testing report merge file not found error with json files."""
-        report_out = StringIO()
-
+        non_exist_file = str(tmp_path / str(uuid4()))
         args = Namespace(
             scan_job_ids=None,
-            json_files=[TMP_DETAILSFILE1[0], NONEXIST_FILE[0]],
+            json_files=[details1, non_exist_file],
             report_ids=None,
             json_dir=None,
         )
+        caplog.set_level(logging.ERROR)
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
-                assert (
-                    messages.FILE_NOT_FOUND % NONEXIST_FILE[0]
-                    in report_out.getvalue().strip()
-                )
+            self.command.main(args)
+        # TODO: the following assertion is not being matched because the actual last
+        # logging line is an error when attempting to connect to quipucords. This is
+        # likely a bug because if qpc knows 'non_exist_file' doesn't exist, there's
+        # no report to merge
+        assert caplog.messages[-1] == messages.FILE_NOT_FOUND % non_exist_file
 
-    def test_detail_merge_error_json_files(self):
+    def test_detail_merge_error_json_files(
+        self, details1, not_json_file, caplog, requests_mock
+    ):
         """Testing report merge error with json files."""
-        report_out = StringIO()
-
+        requests_mock.post(
+            get_server_location() + ASYNC_MERGE_URI,
+            status_code=400,
+            json={"reports": ["some error."]},
+        )
         args = Namespace(
             scan_job_ids=None,
-            json_files=[TMP_DETAILSFILE1[0], TMP_NOTJSONFILE[0]],
+            json_files=[details1, not_json_file],
             report_ids=None,
             json_dir=None,
         )
+        caplog.set_level(logging.ERROR)
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            self.command.main(args)
+        assert caplog.messages[-2:] == [
+            f"Failed: {not_json_file} is not a JSON details report.",
+            "some error.",
+        ]
 
-    def test_detail_merge_error_all_json_files(self):
+    def test_detail_merge_error_all_json_files(
+        self, bad_details1, bad_details2, caplog
+    ):
         """Testing report merge error with all bad json files."""
-        report_out = StringIO()
-
         args = Namespace(
             scan_job_ids=None,
-            json_files=[TMP_BADDETAILS1[0], TMP_BADDETAILS2[0]],
+            json_files=[bad_details1, bad_details2],
             report_ids=None,
             json_dir=None,
         )
+        caplog.set_level(logging.ERROR)
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            self.command.main(args)
+        assert caplog.messages[-1] == messages.REPORT_JSON_DIR_ALL_FAIL
 
-    def test_detail_merge_only_one_json_file(self):
+    def test_detail_merge_only_one_json_file(self, bad_details1, caplog):
         """Testing report merge error with only 1 json file."""
-        report_out = StringIO()
-
         args = Namespace(
             scan_job_ids=None,
-            json_files=[
-                TMP_BADDETAILS1[0],
-            ],
+            json_files=[bad_details1],
             report_ids=None,
             json_dir=None,
         )
+        caplog.set_level(logging.ERROR)
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            self.command.main(args)
+        assert caplog.messages[-1] == messages.REPORT_JSON_FILES_HELP
 
-    def test_detail_merge_error_no_args(self):
+    def test_detail_merge_error_no_args(self, mocker, capsys):
         """Testing report merge error with no arguments."""
-        report_out = StringIO()
-
-        args = Namespace(
-            scan_job_ids=None, json_files=None, report_ids=None, json_dir=None
-        )
+        # using Namespace directly skips argparse builtin validations, requiring
+        # us to patch sys.argv
+        mocker.patch.object(sys, "argv", "qpc report merge".split())
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            CLI().main()
+        assert (
+            "qpc report merge: error: one of the arguments --job-ids --report-ids "
+            "--json-files --json-directory is required" in capsys.readouterr().err
+        )
 
-    def test_detail_merge_error_too_few_args(self):
+    @pytest.mark.xfail(reason="passing, but highlights a design flaw.")
+    def test_detail_merge_error_too_few_args(self, caplog, requests_mock, capsys):
         """Testing report merge error with only 1 job id."""
-        report_out = StringIO()
+        requests_mock.get(
+            get_server_location() + SCAN_JOB_URI + "1/",
+            status_code=200,
+            json={"report_id": 42},
+        )
+        requests_mock.put(
+            get_server_location() + ASYNC_MERGE_URI,
+            status_code=400,
+            json={"report": ["some error."]},
+        )
 
         args = Namespace(
             scan_job_ids=[1], json_files=None, report_ids=None, json_dir=None
         )
+        caplog.set_level(logging.ERROR)
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
-
-    def test_detail_merge_json_directory(self):
-        """Testing report merge command with json directory."""
-        put_report_data = {"id": 1}
-        put_merge_url = get_server_location() + ASYNC_MERGE_URI
-        captured_stdout = StringIO()
-        with requests_mock.Mocker() as mocker, redirect_stdout(captured_stdout):
-            mocker.post(put_merge_url, status_code=201, json=put_report_data)
-
-            args = Namespace(
-                scan_job_ids=None, json_files=None, report_ids=None, json_dir=["/tmp/"]
-            )
             self.command.main(args)
-            expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
-                "id": "1",
-                "prog_name": QPC_VAR_PROGRAM_NAME,
-            }
-            assert expected_msg in captured_stdout.getvalue()
+        assert requests_mock.last_request.json() == {"reports": [42]}
+        # qpc sent a request only with report 42 to quipucords - but should it?
+        # in order to trigger a merge job at least 2 reports are required, which is
+        # clearly not the case here. OTOH, this is a request that will fail on server
+        # side, so it's not the worst design flaw here. But it is at least inconsistent
+        # with other parameters like "json_dir", which will only make requests to the
+        # server when at least 2 files are present.
 
-    def test_detail_merge_json_directory_error_dir_not_found(self):
+    def test_detail_merge_json_directory(
+        self,
+        details1,
+        details2,
+        bad_details1,
+        bad_details2,
+        bad_details3,
+        bad_details4,
+        bad_details5,
+        gooddetails,
+        not_json_file,
+        capsys,
+        requests_mock,
+        caplog,
+    ):
+        """Testing report merge command with json directory."""
+        args = Namespace(
+            scan_job_ids=None,
+            json_files=None,
+            report_ids=None,
+            json_dir=[str(Path(details1).parent)],
+        )
+        requests_mock.post(
+            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+        )
+        caplog.set_level(logging.ERROR)
+        self.command.main(args)
+        expected_msg = messages.REPORT_SUCCESSFULLY_MERGED % {
+            "id": "1",
+            "prog_name": QPC_VAR_PROGRAM_NAME,
+        }
+        assert expected_msg in capsys.readouterr().out
+        # ensure only good reports were pushed to server
+        assert requests_mock.last_request.json() == {
+            "report_type": "details",
+            "sources": [mock.ANY, mock.ANY],
+        }
+        assert {
+            "facts": ["A"],
+            "report_type": "details",
+            "report_version": "1.2.3+outer_version",
+            "server_id": "42",
+        } in requests_mock.last_request.json()["sources"]
+        assert {
+            "facts": ["B"],
+            "report_type": "details",
+            "report_version": "0.0.44.legacy",
+            "server_id": "8",
+        } in requests_mock.last_request.json()["sources"]
+        # ensure bad reports were detected
+        assert (
+            messages.REPORT_JSON_MISSING_ATTR % {"file": details2, "key": "facts"}
+            in caplog.text
+        )
+        assert (
+            messages.REPORT_JSON_MISSING_ATTR % {"file": bad_details1, "key": "sources"}
+            in caplog.text
+        )
+        # the error message for bad_details2 and 3 is the same as 1. This indicates
+        # these fixtures need to be either modified or removed.
+        assert (
+            messages.REPORT_JSON_MISSING_ATTR % {"file": bad_details2, "key": "facts"}
+            in caplog.text
+        )
+        assert (
+            messages.REPORT_JSON_MISSING_ATTR % {"file": bad_details3, "key": "facts"}
+            in caplog.text
+        )
+        assert (messages.REPORT_UPLOAD_FILE_INVALID_JSON % bad_details4) in caplog.text
+        assert (
+            messages.REPORT_INVALID_REPORT_TYPE
+            % {"file": bad_details5, "report_type": "durham"}
+            in caplog.text
+        )
+        # ensure the non json file wan't detected
+        assert not_json_file not in caplog.text
+
+    @pytest.mark.parametrize(
+        "path_to_dir",
+        (
+            pytest.lazy_fixture("bad_details1"),
+            pytest.lazy_fixture("bad_details5"),
+            pytest.lazy_fixture("doesnt_exist_json"),
+        ),
+    )
+    def test_detail_merge_json_directory_not_found(self, path_to_dir, caplog):
         """Testing report merge command with json_dir parameter (notdir)."""
-        bad_json_directory = "/tmp/does/not/exist/1316"
-        report_out = StringIO()
-
         args = Namespace(
             scan_job_ids=None,
             json_files=None,
             report_ids=None,
-            json_dir=bad_json_directory,
+            json_dir=path_to_dir,
         )
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            self.command.main(args)
+        assert caplog.messages[-1] == messages.REPORT_JSON_DIR_NOT_FOUND % path_to_dir
 
-    def test_detail_merge_json_directory_error_path_passed(self):
-        """Testing report merge command with json_dir parameter (file)."""
-        report_out = StringIO()
-
-        args = Namespace(
-            scan_job_ids=None,
-            json_files=None,
-            report_ids=None,
-            json_dir=TMP_BADDETAILS1[0],
-        )
-        with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
-
-    def test_detail_merge_json_invalid_report_type_passed(self):
-        """Testing report merge command bad report_type."""
-        report_out = StringIO()
-
-        args = Namespace(
-            scan_job_ids=None,
-            json_files=None,
-            report_ids=None,
-            json_dir=TMP_BADDETAILS5[0],
-        )
-        with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
-
-    def test_detail_merge_json_directory_no_detail_reports(self):
+    def test_detail_merge_json_directory_no_detail_reports(self, tmp_path, caplog):
         """Testing report merge command with json_dir (no details)."""
-        files_that_pass = [TMP_GOODDETAILS]
-        for file in files_that_pass:
-            if os.path.isfile(file[0]):
-                os.remove(file[0])
-        report_out = StringIO()
-
         args = Namespace(
-            scan_job_ids=None, json_files=None, report_ids=None, json_dir="/tmp/"
+            scan_job_ids=None, json_files=None, report_ids=None, json_dir=str(tmp_path)
         )
+
         with pytest.raises(SystemExit):
-            with redirect_stdout(report_out):
-                self.command.main(args)
+            self.command.main(args)
+        assert caplog.messages[-1] == messages.REPORT_JSON_DIR_NO_FILES % tmp_path

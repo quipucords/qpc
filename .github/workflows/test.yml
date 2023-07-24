@@ -7,6 +7,22 @@ on:
     branches: [main]
 
 jobs:
+  check-dependencies:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Check dependencies
+        run: |
+          make lock-main-requirements
+          make check-requirements
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -41,4 +57,3 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
-  

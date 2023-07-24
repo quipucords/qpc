@@ -1,5 +1,5 @@
 DATE		= $(shell date)
-PYTHON		= $(shell which python)
+PYTHON		= $(shell poetry run which python 2>/dev/null || which python)
 PKG_VERSION = $(shell poetry -s version)
 BUILD_DATE  = $(shell date +'%B %d, %Y')
 QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), "qpc")

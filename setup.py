@@ -10,7 +10,6 @@ from qpc.release import (
     AUTHOR,
     AUTHOR_EMAIL,
     ENTRYPOINT,
-    QPC_VAR_PROGRAM_NAME,
     URL,
     VERSION,
 )
@@ -19,7 +18,7 @@ BASE_QPC_DIR = Path(__file__).absolute().parent
 sys.path.insert(0, BASE_QPC_DIR / "qpc")
 
 setup(
-    name=QPC_VAR_PROGRAM_NAME,
+    name="qpc",
     version=VERSION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,

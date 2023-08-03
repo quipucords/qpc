@@ -13,7 +13,7 @@ except metadata.PackageNotFoundError:
     # As a failsafe, try to load the version defined for poetry
     # from the pyproject.toml.
     toml_path = Path(__file__).absolute().parent.parent / "pyproject.toml"
-    with open(toml_path, "rb") as f:
+    with toml_path.open("rb") as f:
         toml_data = load(f)
         __package__version__ = (
             # Expect a value at this exact location.

@@ -60,9 +60,7 @@ class TestReportDownload:
                 content=buffer_content,
             )
 
-            args = Namespace(
-                scan_job_id="1", report_id=None, path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id="1", report_id=None, path=fake_tarball)
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
@@ -85,9 +83,7 @@ class TestReportDownload:
                 content=buffer_content,
             )
 
-            args = Namespace(
-                scan_job_id=None, report_id="1", path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id=None, report_id="1", path=fake_tarball)
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
@@ -135,9 +131,7 @@ class TestReportDownload:
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=400, json=get_scanjob_json_data)
 
-            args = Namespace(
-                scan_job_id="1", report_id=None, path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id="1", report_id=None, path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -151,9 +145,7 @@ class TestReportDownload:
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
 
-            args = Namespace(
-                scan_job_id="1", report_id=None, path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id="1", report_id=None, path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -170,7 +162,7 @@ class TestReportDownload:
         with requests_mock.Mocker() as mocker:
             mocker.get(get_report_url, status_code=200, content=buffer_content)
 
-            args = Namespace(scan_job_id=None, report_id="1", path=fake_dir, mask=False)
+            args = Namespace(scan_job_id=None, report_id="1", path=fake_dir)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -196,9 +188,7 @@ class TestReportDownload:
                 content=buffer_content,
             )
 
-            args = Namespace(
-                scan_job_id=None, report_id="1", path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id=None, report_id="1", path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -220,9 +210,7 @@ class TestReportDownload:
                 json=get_report_json_data,
             )
 
-            args = Namespace(
-                scan_job_id=None, report_id=1, path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id=None, report_id=1, path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -241,9 +229,7 @@ class TestReportDownload:
                 json=get_report_json_data,
             )
 
-            args = Namespace(
-                scan_job_id=None, report_id=1, path=fake_tarball, mask=False
-            )
+            args = Namespace(scan_job_id=None, report_id=1, path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
@@ -267,57 +253,9 @@ class TestReportDownload:
                 content=buffer_content,
             )
 
-            args = Namespace(
-                scan_job_id=None, report_id="1", path="test.json", mask=False
-            )
+            args = Namespace(scan_job_id=None, report_id="1", path="test.json")
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.OUTPUT_FILE_TYPE % "tar.gz"
-                assert err_msg in caplog.text
-
-    def test_download_report_id_masked(self, caplog, fake_tarball):
-        """Testing download with report id and mask set to true."""
-        get_report_url = get_server_location() + REPORT_URI + "1" + "?mask=True"
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {fake_tarball: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
-        with requests_mock.Mocker() as mocker:
-            mocker.get(
-                get_report_url,
-                status_code=200,
-                headers={"X-Server-Version": VERSION},
-                content=buffer_content,
-            )
-
-            args = Namespace(
-                scan_job_id=None, report_id="1", path=fake_tarball, mask=True
-            )
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                expected_msg = messages.DOWNLOAD_SUCCESSFULLY_WRITTEN % {
-                    "report": "1",
-                    "path": fake_tarball,
-                }
-                assert expected_msg in caplog.text
-
-    def test_download_report_id_428(self, caplog, fake_tarball):
-        """Test download with nonexistent report id."""
-        get_report_url = get_server_location() + REPORT_URI + "1"
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(
-                get_report_url,
-                status_code=428,
-                headers={"X-Server-Version": VERSION},
-                json=get_report_json_data,
-            )
-
-            args = Namespace(
-                scan_job_id=None, report_id="1", path=fake_tarball, mask=False
-            )
-            with caplog.at_level(logging.ERROR):
-                with pytest.raises(SystemExit):
-                    self.command.main(args)
-                err_msg = messages.DOWNLOAD_NO_MASK_REPORT % 1
                 assert err_msg in caplog.text

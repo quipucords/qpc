@@ -75,7 +75,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -105,7 +104,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -141,7 +139,6 @@ class TestReportDeployments:
                 output_json=False,
                 output_csv=True,
                 path=csv_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -206,7 +203,6 @@ class TestReportDeployments:
                 report_id=None,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
@@ -228,7 +224,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
@@ -260,7 +255,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -287,7 +281,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=fake_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -313,7 +306,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=non_json_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -337,7 +329,6 @@ class TestReportDeployments:
                 output_json=False,
                 output_csv=True,
                 path=non_csv_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -365,7 +356,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -396,105 +386,11 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1
-                assert err_msg in caplog.text
-
-    def test_deployments_report_mask(self, caplog, json_file):
-        """Testing retrieving json deployments report with masked values."""
-        get_report_url = (
-            get_server_location() + REPORT_URI + "1/deployments/" + "?mask=True"
-        )
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {json_file: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
-        with requests_mock.Mocker() as mocker:
-            mocker.get(
-                get_report_url,
-                status_code=200,
-                content=buffer_content,
-                headers={"X-Server-Version": VERSION},
-            )
-
-            args = Namespace(
-                scan_job_id=None,
-                report_id="1",
-                output_json=True,
-                output_csv=False,
-                path=json_file,
-                mask=True,
-            )
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with Path(json_file).open("r", encoding="utf-8") as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                assert get_report_json_data == file_content_dict
-
-    def test_deployments_masked_sj_428(self, caplog, json_file):
-        """Deployments report retrieved from sj returns 428."""
-        get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
-        get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {json_file: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-            mocker.get(
-                get_report_url,
-                status_code=428,
-                content=buffer_content,
-                headers={"X-Server-Version": VERSION},
-            )
-
-            args = Namespace(
-                scan_job_id="1",
-                report_id=None,
-                output_json=True,
-                output_csv=False,
-                path=json_file,
-                mask=True,
-            )
-            with caplog.at_level(logging.ERROR):
-                with pytest.raises(SystemExit):
-                    self.command.main(args)
-                err_msg = messages.REPORT_COULD_NOT_BE_MASKED_SJ % 1
-                assert err_msg in caplog.text
-
-    def test_deployments_masked_report_428(self, caplog, json_file):
-        """Deployments report retrieved from report returns 428."""
-        get_report_url = (
-            get_server_location() + REPORT_URI + "1/deployments/" + "?mask=True"
-        )
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {json_file: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
-        with requests_mock.Mocker() as mocker:
-            mocker.get(
-                get_report_url,
-                status_code=428,
-                content=buffer_content,
-                headers={"X-Server-Version": VERSION},
-            )
-
-            args = Namespace(
-                scan_job_id=None,
-                report_id="1",
-                output_json=True,
-                output_csv=False,
-                path=json_file,
-                mask=True,
-            )
-            with caplog.at_level(logging.ERROR):
-                with pytest.raises(SystemExit):
-                    self.command.main(args)
-                err_msg = messages.REPORT_COULD_NOT_BE_MASKED_REPORT_ID % 1
                 assert err_msg in caplog.text
 
     def test_deployments_old_version(self, caplog, json_file):
@@ -515,7 +411,6 @@ class TestReportDeployments:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):

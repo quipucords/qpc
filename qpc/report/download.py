@@ -54,20 +54,11 @@ class ReportDownloadCommand(CliCommand):
             help=_(messages.DOWNLOAD_PATH_HELP),
             required=True,
         )
-        self.parser.add_argument(
-            "--mask",
-            dest="mask",
-            action="store_true",
-            help=_(messages.REPORT_MASK_HELP),
-            required=False,
-        )
         self.min_server_version = "0.9.2"
         self.report_id = None
 
     def _validate_args(self):
         self.req_headers = {"Accept": "application/gzip"}
-        if self.args.mask:
-            self.req_params = {"mask": True}
         try:
             validate_write_file(self.args.path, "output-file")
         except ValueError as error:
@@ -116,8 +107,5 @@ class ReportDownloadCommand(CliCommand):
             sys.exit(1)
 
     def _handle_response_error(self):
-        if self.response.status_code == 428:
-            logger.error(_(messages.DOWNLOAD_NO_MASK_REPORT), self.args.report_id)
-        else:
-            logger.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report_id)
+        logger.error(_(messages.DOWNLOAD_NO_REPORT_FOUND), self.args.report_id)
         sys.exit(1)

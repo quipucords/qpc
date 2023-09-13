@@ -75,7 +75,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -105,7 +104,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -141,7 +139,6 @@ class TestReportDetails:
                 output_json=False,
                 output_csv=True,
                 path=csv_file,
-                mask=False,
             )
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
@@ -192,7 +189,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
@@ -214,7 +210,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with pytest.raises(SystemExit):
                 with redirect_stdout(report_out):
@@ -245,7 +240,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -272,7 +266,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=fake_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -298,7 +291,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=non_json_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -322,7 +314,6 @@ class TestReportDetails:
                 output_json=False,
                 output_csv=True,
                 path=non_csv_dir,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -348,7 +339,6 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -379,51 +369,12 @@ class TestReportDetails:
                 output_json=True,
                 output_csv=False,
                 path=json_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.REPORT_NO_DETAIL_REPORT_FOR_SJ % 1
                 assert err_msg in caplog.text
-
-    def test_detail_report_as_csv_masked(self, caplog, csv_file):
-        """Testing retrieving csv details report with masked query param."""
-        get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
-        get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = (
-            get_server_location() + REPORT_URI + "1/details/" + "?mask=True"
-        )
-        get_report_csv_data = "Report\n"
-        get_report_csv_data += "1\n\n\n"
-        get_report_csv_data += "key\n"
-        get_report_csv_data += "value\n"
-
-        get_report_csv_data = {"id": 1, "report": [{"key": "value"}]}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-            mocker.get(
-                get_report_url,
-                status_code=200,
-                json=get_report_csv_data,
-                headers={"X-Server-Version": VERSION},
-            )
-
-            args = Namespace(
-                scan_job_id="1",
-                report_id=None,
-                output_json=False,
-                output_csv=True,
-                path=csv_file,
-                mask=True,
-            )
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with Path(csv_file).open("r", encoding="utf-8") as file_buffer:
-                    data = file_buffer.read()
-                    file_content_dict = json.loads(data)
-                assert get_report_csv_data == file_content_dict
 
     def test_details_old_version(self, caplog, csv_file):
         """Test too old server version."""
@@ -443,7 +394,6 @@ class TestReportDetails:
                 output_json=False,
                 output_csv=True,
                 path=csv_file,
-                mask=False,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):

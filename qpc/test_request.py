@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from qpc.request import request
+from qpc.utils import QPC_MIN_SERVER_VERSION
 
 
 def test_request_invalid_method(server_config, caplog):
@@ -29,7 +30,7 @@ def test_request_methods(server_config, method):
             None,
             None,
             {},
-            "1.3.0",
+            QPC_MIN_SERVER_VERSION,
         )
 
 

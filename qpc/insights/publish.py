@@ -88,7 +88,7 @@ class InsightsPublishCommand(CliCommand):
         return filenames
 
     def _is_top_folder(self, top_folder):
-        expected_top_folder_parent = Path(".")
+        expected_top_folder_parent = Path()
         return top_folder.parent == expected_top_folder_parent
 
     def _separate_top_folder(self, filenames):

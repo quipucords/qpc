@@ -1,8 +1,7 @@
 """File to hold release constants."""
 import os
+import subprocess
 from pathlib import Path
-
-import git
 
 from . import __package__version__
 
@@ -20,7 +19,24 @@ def get_current_sha1() -> str:
         return qpc_commit
     try:
         repo_root = Path(__file__).absolute().parent.parent
-        repo = git.Repo(repo_root)
-    except git.exc.InvalidGitRepositoryError:
+        git_env = os.environ.copy()
+        git_env["LANG"] = "C"
+        git_env["LC_ALL"] = "C"
+        git_result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            env=git_env,
+            cwd=repo_root,
+            capture_output=True,
+            check=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        # FileNotFoundError raises when `git` program not found.
+        # CalledProcessError raises when `git` has non-zero return code.
         return "UNKNOWN"
-    return repo.rev_parse("HEAD").hexsha
+    git_sha1 = git_result.stdout.decode().split("\n")[0]
+    try:
+        int(git_sha1, 16)
+    except ValueError:
+        # ValueError raises when the string does not contain a hexadecimal value.
+        return "UNKNOWN"
+    return git_sha1

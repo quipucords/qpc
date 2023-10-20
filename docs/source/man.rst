@@ -85,7 +85,7 @@ To configure the connection to the server, supply the host address. Supplying a 
 
 
 Logging in to the server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 To log in to the server after the connection is configured, use the ``login`` subcommand. This command retrieves a token that is used for authentication with any command line interface commands that follow it.
 
@@ -101,7 +101,7 @@ To log in to the server after the connection is configured, use the ``login`` su
 
 
 Logging out of the server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To log out of the server, use the ``logout`` subcommand. This command removes the token that was created when the ``login`` command was used.
 
@@ -109,7 +109,7 @@ To log out of the server, use the ``logout`` subcommand. This command removes th
 
 
 Viewing the server status
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To view or save the status information for the server, use the ``status`` subcommand. This command returns data about your Quipucords server environment, such as server build and API versions, environment variable information, installed prerequisites and versions, and other server metadata that can help diagnose issues during troubleshooting.
 
@@ -185,7 +185,7 @@ The information in a credential might change, including passwords, become passwo
 **qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* | --sshkey **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 Listing and Showing Credentials
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``qpc cred list`` command returns the details for every credential that is configured for Quipucords. This output includes the name, username, password, SSH keyfile, sudo password, or token (if applicable) for each entry. Passwords and tokens are masked if provided, if not, they will appear as ``null``.
 
@@ -205,7 +205,7 @@ The ``qpc cred show`` command is the same as the ``qpc cred list`` command, exce
 
 
 Clearing Credentials
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 As the network infrastructure changes, it might be necessary to delete some credentials. Use the ``clear`` subcommand to delete credentials.
 
@@ -223,7 +223,7 @@ As the network infrastructure changes, it might be necessary to delete some cred
 
 
 Sources
-----------------
+-------
 
 Use the ``qpc source`` command to create and manage sources.
 
@@ -232,7 +232,7 @@ A source contains a single entity or a set of multiple entities that are to be i
 When you configure a scan, it contains references to one or more sources, including the credentials that are provided in each source. Therefore, you can reference sources in different scan configurations for various purposes, for example, to scan your entire infrastructure or a specific sector of that infrastructure.
 
 Creating and Editing Sources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To create a source, supply the type of source with the ``type`` option, one or more host names or IP addresses to connect to with the ``--hosts`` option, and the credentials needed to access those systems with the ``--cred`` option. The ``qpc source`` command allows multiple entries for the ``hosts`` and ``cred`` options. Therefore, a single source can access a collection of servers and subnets as needed to create an accurate and complete scan.
 
@@ -313,7 +313,7 @@ For example, if a source contains a value of ``server1creds`` for the ``--cred``
 **TIP:** After editing a source, use the ``qpc source show`` command to review those edits.
 
 Listing and Showing Sources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``qpc source list`` command returns the details for all configured sources. The output of this command includes the host names, IP addresses, or IP ranges, the credentials, and the ports that are configured for each source.
 
@@ -334,7 +334,7 @@ The ``qpc source show`` command is the same as the ``qpc source list`` command, 
 
 
 Clearing Sources
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 As the network infrastructure changes, it might be necessary to delete some sources. Use the ``qpc source clear`` command to delete sources.
 
@@ -359,7 +359,8 @@ A scan contains a set of one or more sources of any type, plus additional option
 The creation of a scan groups sources, the credentials contained within those sources, and the other options so that the act of running the scan is repeatable. When you run the scan, each instance is saved as a scan job.
 
 Creating and Editing Scans
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Use the ``qpc scan add`` command to create scan objects with one or more sources. This command creates a scan object that references the supplied sources and contains any options supplied by the user.
 
 **qpc scan add --name** *name* **--sources=** *source_list* **[--max-concurrency=** *concurrency* **]** **[--disabled-optional-products=** *products_list* **]** **[--enabled-ext-product-search=** *products_list* **]** **[--ext-product-search-dirs=** *search_dirs_list* **]**
@@ -501,13 +502,14 @@ The ``qpc scan cancel`` command cancels the execution of a scan job. A canceled 
 
 
 Reports
---------
+-------
 
 Use the ``qpc report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of reports that you can retrieve, a *details* report, a *deployments* report, and an *insights* report.
 
 
 Viewing the Details Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report details`` command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, Satellite, Openshift, Advanced Cluster Security and Ansible scans, as applicable.
 
 **qpc report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path* **[--mask]**
@@ -538,6 +540,7 @@ The ``qpc report details`` command retrieves a detailed report that contains the
 
 Viewing the Deployments Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report deployments`` command retrieves a report that contains the processed fingerprints from a scan. A *fingerprint* is the set of system, product, and entitlement facts for a particular physical or virtual machine. A processed fingerprint results from a procedure that merges facts from various sources, and, when possible, deduplicates redundant systems.
 
 For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine as a single set.
@@ -569,7 +572,8 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
   Displays the results of the report with sensitive data masked by a hash.
 
 Viewing the Insights Report
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report insights`` command retrieves a report that contains the hosts to be uploaded to the subscription insights service. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
 
 **qpc report insights (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
@@ -589,6 +593,7 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
 
 **qpc report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path* **[--mask]**
@@ -611,6 +616,7 @@ The ``qpc report download`` command downloads a set of reports, identified eithe
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report merge`` command merges report data and returns the report identifier of the merged report. You can use this report identifier and the ``qpc report`` command with the ``details`` or ``deployments`` subcommands to retrieve a report from the merged results.
 
 **qpc report merge (--job-ids** *scan_job_identifiers* **|** **--report-ids** *report_identifiers* **|** **--json-files** *json_details_report_files* **|** **--json-directory** *path_to_directory_of_json_files* **)**
@@ -637,6 +643,7 @@ The ``qpc report merge`` command runs an asynchronous job. The output of this co
 
 Viewing the Status of a Report Merge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command returns a merge job ID that you can use to access the status of the merge.
 
 **qpc report merge-status (--job** *report_job_identifier* **)**
@@ -648,6 +655,7 @@ The ``qpc report merge-status`` command can be used to check the status of a lar
 
 Manually Reprocessing Reports
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc report upload`` command uploads a details report to reprocess it.  This could be useful if a value in the details report caused a system to be excluded.  After modication of the details report, simply run the ``qpc report upload --json-file DETAILS_REPORT_JSON``.
 
 **qpc report upload (--json-file** *json_details_report_file* **)**
@@ -698,6 +706,7 @@ To configure Insights credentials, simply provide the appropriate username and p
 
 Publishing to Insights
 ~~~~~~~~~~~~~~~~~~~~~~
+
 The ``qpc insights publish`` command allows you to publish an Insights report to Red Hat Insights and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
 
 **qpc insights publish (--report** *report_identifiers* **| --input-file** *path_to_tar_gz* )

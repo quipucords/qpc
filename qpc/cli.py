@@ -12,8 +12,8 @@ from qpc.cred.commands import (
     CredShowCommand,
 )
 from qpc.insights.commands import (
-    InsightsAddLoginCommand,
     InsightsConfigureCommand,
+    InsightsLoginCommand,
     InsightsPublishCommand,
 )
 from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION, get_current_sha1
@@ -180,7 +180,7 @@ class CLI:
             insights.SUBCOMMAND,
             [
                 InsightsConfigureCommand,
-                InsightsAddLoginCommand,
+                InsightsLoginCommand,
                 InsightsPublishCommand,
             ],
         )

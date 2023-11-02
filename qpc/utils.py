@@ -26,6 +26,7 @@ QPC_LOG = DATA_DIR / "qpc.log"
 QPC_SERVER_CONFIG = CONFIG_DIR / "server.config"
 QPC_CLIENT_TOKEN = CONFIG_DIR / "client_token"
 INSIGHTS_CONFIG = CONFIG_DIR / "insights.config"
+INSIGHTS_AUTH_TOKEN = CONFIG_DIR / "insights_token"
 INSIGHTS_LOGIN_CONFIG = CONFIG_DIR / "insights_login_config"
 
 INSIGHTS_ENCRYPTION = DATA_DIR / "insights_encryption"
@@ -256,6 +257,14 @@ def write_server_config(server_config):
     write_config(QPC_SERVER_CONFIG, server_config)
 
 
+def write_insights_authentication(insights_authentication):
+    """Write insights user authentication.
+
+    :param insights_authentication: dict containing insights user token
+    """
+    write_config(INSIGHTS_LOGIN_CONFIG, insights_authentication)
+
+
 def write_insights_login_config(login_config):
     """Write insights login configuration to insights_login_config.
 
@@ -297,6 +306,37 @@ def read_insights_login_config():
         INSIGHTS_CONFIG_USERNAME_KEY: username,
         INSIGHTS_CONFIG_PASSWORD_KEY: password,
     }
+
+
+def clear_insights_auth_token():
+    """Delete the insights authentication token."""
+    ensure_config_dir_exists()
+    Path(INSIGHTS_AUTH_TOKEN).unlink(missing_ok=True)
+
+
+def read_insights_auth_token():
+    """Retrieve the insights authentication token.
+
+    :returns: The Insight's user JWT auth token
+    """
+    if not INSIGHTS_AUTH_TOKEN.exists():
+        return None
+
+    return decrypt_password(INSIGHTS_AUTH_TOKEN.read_text())
+
+
+def write_insights_auth_token(insights_auth_token):
+    """Write insights user authentication.
+
+    :param insights_auth_token: Insight's user JWT auth token
+    """
+    ensure_config_dir_exists()
+
+    if insights_auth_token:
+        with Path(INSIGHTS_AUTH_TOKEN).open("w", encoding="utf-8") as auth_token_file:
+            os.write(auth_token_file, encrypt_password(insights_auth_token))
+    else:
+        clear_insights_auth_token()
 
 
 def write_client_token(client_token):
@@ -560,7 +600,7 @@ def load_encryption_key():
 
 
 def encrypt_password(password):
-    """Encrypt password before saving it to insights_login_config file."""
+    """Encrypt password before saving it to a config file."""
     write_encryption_key_if_non_existent()
     key = load_encryption_key()
 

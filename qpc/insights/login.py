@@ -1,29 +1,24 @@
-"""InsightsAddLoginCommand is used to save insights login configuration."""
+"""InsightsLoginCommand is used to save an insights user authentication token."""
 
 from logging import getLogger
 
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
 from qpc.exceptions import QPCError
-from qpc.insights.utils import (
-    build_insights_login_config_dict,
-    validate_username_and_password,
-)
 from qpc.translation import _
-from qpc.utils import write_insights_login_config
+from qpc.utils import write_insights_auth_token
 
 logger = getLogger(__name__)
 
 
-class InsightsAddLoginCommand(CliCommand):
-    """Define insights add_login command.
+class InsightsLoginCommand(CliCommand):
+    """Define insights login command.
 
-    This command is for storing insights
-    login information, username and password
+    This command is for getting an insights user authentication token
     """
 
     SUBCOMMAND = insights.SUBCOMMAND
-    ACTION = insights.ADD_LOGIN
+    ACTION = insights.LOGIN
 
     def __init__(self, subparsers):
         """Create command."""
@@ -35,27 +30,12 @@ class InsightsAddLoginCommand(CliCommand):
             None,
             [],
         )
-        self.parser.add_argument(
-            "--username",
-            dest="username",
-            metavar="USERNAME",
-            type=validate_username_and_password,
-            help=_(messages.INSIGHTS_ADD_USERNAME_USER_HELP),
-            required=True,
-        )
-        self.parser.add_argument(
-            "--password",
-            dest="password",
-            help=_(messages.INSIGHTS_ADD_PASS_USER_HELP),
-            action="store_true",
-            required=True,
-        )
 
     def _do_command(self):
         """Persist insights login configuration."""
-        login_config = build_insights_login_config_dict(self.args)
+        user_token = None
         try:
-            write_insights_login_config(login_config)
+            write_insights_auth_token(user_token)
         except QPCError as err:
             logger.error(_(err.message))
             SystemExit(1)

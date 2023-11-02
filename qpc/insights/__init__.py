@@ -2,7 +2,7 @@
 
 SUBCOMMAND = "insights"
 CONFIG = "config"
-ADD_LOGIN = "add_login"
+LOGIN = "login"
 PUBLISH = "publish"
 
 REPORT_URI = "/api/v1/reports/"

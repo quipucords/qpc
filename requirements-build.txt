@@ -32,19 +32,18 @@ pycparser==2.21 ; python_version >= "3.11" and python_version < "4.0"
     # via cffi
 semantic-version==2.10.0
     # via setuptools-rust
-setuptools-rust==1.7.0
+setuptools-rust==1.8.1
     # via cryptography
 setuptools-scm==8.0.4
     # via
     #   pluggy
     #   setuptools-rust
+    #   setuptools-scm
 trove-classifiers==2023.10.18
     # via hatchling
 typing-extensions==4.8.0
-    # via
-    #   setuptools-rust
-    #   setuptools-scm
-wheel==0.41.2
+    # via setuptools-scm
+wheel==0.41.3
     # via cryptography
 
 # The following packages are considered to be unsafe in a requirements file:

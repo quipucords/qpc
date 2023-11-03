@@ -325,16 +325,16 @@ def read_insights_auth_token():
     return decrypt_password(INSIGHTS_AUTH_TOKEN.read_text())
 
 
-def write_insights_auth_token(insights_auth_token):
+def write_insights_auth_token(auth_token):
     """Write insights user authentication.
 
-    :param insights_auth_token: Insight's user JWT auth token
+    :param auth_token: Insight's user JWT auth token
     """
     ensure_config_dir_exists()
 
-    if insights_auth_token:
+    if auth_token:
         with Path(INSIGHTS_AUTH_TOKEN).open("w", encoding="utf-8") as auth_token_file:
-            os.write(auth_token_file, encrypt_password(insights_auth_token))
+            auth_token_file.write(encrypt_password(auth_token))
     else:
         clear_insights_auth_token()
 

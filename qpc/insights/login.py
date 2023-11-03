@@ -2,11 +2,12 @@
 
 from logging import getLogger
 
-from qpc import insights, messages
+from qpc import insights
 from qpc.clicommand import CliCommand
-from qpc.exceptions import QPCError
+from qpc.insights.auth import InsightsAuth
+from qpc.insights.exceptions import InsightsAuthError
 from qpc.translation import _
-from qpc.utils import write_insights_auth_token
+from qpc.utils import clear_insights_auth_token, write_insights_auth_token
 
 logger = getLogger(__name__)
 
@@ -32,11 +33,19 @@ class InsightsLoginCommand(CliCommand):
         )
 
     def _do_command(self):
-        """Persist insights login configuration."""
-        user_token = None
+        """Request Insights login authorization."""
+        auth_token = None
         try:
-            write_insights_auth_token(user_token)
-        except QPCError as err:
+            clear_insights_auth_token()
+            insights_auth = InsightsAuth()
+            auth_request = insights_auth.request_auth()
+            print("Insights login authorization requested")
+            print(f"User Code: {auth_request['user_code']}")
+            print(f"Authorization URL: {auth_request['verification_uri_complete']}")
+            print("Waiting for login authorization ...")
+            auth_token = insights_auth.wait_for_authorization()
+            print("Login authorization successful.")
+            write_insights_auth_token(auth_token)
+        except InsightsAuthError as err:
             logger.error(_(err.message))
             SystemExit(1)
-        logger.info(_(messages.INSIGHTS_LOGIN_CONFIG_SUCCESS))

@@ -12,7 +12,7 @@ from pathlib import Path
 from cryptography.fernet import Fernet, InvalidToken
 
 from qpc import messages
-from qpc.insights.exceptions import QPCEncryptionKeyError, QPCLoginConfigError
+from qpc.insights.exceptions import QPCEncryptionKeyError
 from qpc.translation import _ as t
 
 QPC_PATH = "qpc"
@@ -27,7 +27,6 @@ QPC_SERVER_CONFIG = CONFIG_DIR / "server.config"
 QPC_CLIENT_TOKEN = CONFIG_DIR / "client_token"
 INSIGHTS_CONFIG = CONFIG_DIR / "insights.config"
 INSIGHTS_AUTH_TOKEN = CONFIG_DIR / "insights_token"
-INSIGHTS_LOGIN_CONFIG = CONFIG_DIR / "insights_login_config"
 
 INSIGHTS_ENCRYPTION = DATA_DIR / "insights_encryption"
 
@@ -36,9 +35,6 @@ CONFIG_PORT_KEY = "port"
 CONFIG_USE_HTTP = "use_http"
 CONFIG_SSL_VERIFY = "ssl_verify"
 CONFIG_REQUIRE_TOKEN = "require_token"
-
-INSIGHTS_CONFIG_USERNAME_KEY = "username"
-INSIGHTS_CONFIG_PASSWORD_KEY = "password"
 
 DEFAULT_HOST_INSIGHTS_CONFIG = "console.redhat.com"
 DEFAULT_PORT_INSIGHTS_CONFIG = 443
@@ -257,55 +253,12 @@ def write_server_config(server_config):
     write_config(QPC_SERVER_CONFIG, server_config)
 
 
-def write_insights_authentication(insights_authentication):
-    """Write insights user authentication.
-
-    :param insights_authentication: dict containing insights user token
-    """
-    write_config(INSIGHTS_LOGIN_CONFIG, insights_authentication)
-
-
-def write_insights_login_config(login_config):
-    """Write insights login configuration to insights_login_config.
-
-    :param login_config: dict containing insights login configuration
-    """
-    encrypted_password = encrypt_password(login_config["password"])
-    login_config["password"] = encrypted_password
-    write_config(INSIGHTS_LOGIN_CONFIG, login_config)
-
-
 def write_insights_config(insights_config):
     """Write insights configuration to insights.config.
 
     :param insights_config: dict containing insights configuration
     """
     write_config(INSIGHTS_CONFIG, insights_config)
-
-
-def read_insights_login_config():
-    """Retrieve insights login configuration.
-
-    :returns: The validated dictionary with configuration
-    """
-    if not INSIGHTS_LOGIN_CONFIG.exists():
-        raise QPCLoginConfigError("Insights login config was not found.")
-
-    try:
-        config = json.loads(INSIGHTS_LOGIN_CONFIG.read_text())
-    except json.decoder.JSONDecodeError as exc:
-        raise QPCLoginConfigError(
-            f"Unable to load {INSIGHTS_LOGIN_CONFIG} file."
-        ) from exc
-
-    username = config[INSIGHTS_CONFIG_USERNAME_KEY]
-    encrypted_password = config[INSIGHTS_CONFIG_PASSWORD_KEY]
-    password = decrypt_password(encrypted_password)
-
-    return {
-        INSIGHTS_CONFIG_USERNAME_KEY: username,
-        INSIGHTS_CONFIG_PASSWORD_KEY: password,
-    }
 
 
 def clear_insights_auth_token():

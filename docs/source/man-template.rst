@@ -689,20 +689,15 @@ To configure the connection to Insights server, you may optionally provide the h
 
   Optional. Determines whether to use HTTP instead of HTTPS. The default value is ``False``.
 
-Adding Insights credentials information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Login to Insights
+~~~~~~~~~~~~~~~~~
 
-To configure Insights credentials, simply provide the appropriate username and password associated with your Insights account.
+To be able to publish reports to Insights, one must be authorized and successfully logged into Insights.
 
-**QPC_VAR_PROGRAM_NAME insights add_login [--username=** *username* **] [--password=** *password* **]**
+**QPC_VAR_PROGRAM_NAME insights login**
 
-``--username=username``
+This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use {{QPC_VAR_PROGRAM_NAME}} to publish reports.
 
-  Required. Sets the username that is used to log in to Insights.
-
-``--password=password``
-
-  Required. Prompts for the password for the ``--username`` identity.
 
 Publishing to Insights
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -896,9 +891,9 @@ Examples
 
   ``QPC_VAR_PROGRAM_NAME insights config --host stage.console.redhat.com --port 8080``
 
-* Adding Insights credentials
+* Login to Insights
 
-  ``QPC_VAR_PROGRAM_NAME insights add_login --username insights-user --password``
+  ``QPC_VAR_PROGRAM_NAME insights login``
 
 * Publishing to Insights using a report id
 

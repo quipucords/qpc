@@ -322,7 +322,10 @@ def read_insights_auth_token():
     if not INSIGHTS_AUTH_TOKEN.exists():
         return None
 
-    return decrypt_password(INSIGHTS_AUTH_TOKEN.read_text())
+    try:
+        return decrypt_password(INSIGHTS_AUTH_TOKEN.read_text())
+    except QPCEncryptionKeyError:
+        raise QPCEncryptionKeyError(t(messages.INSIGHTS_TOKEN_CORRUPT))
 
 
 def write_insights_auth_token(auth_token):

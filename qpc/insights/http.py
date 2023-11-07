@@ -7,16 +7,16 @@ import requests
 class InsightsClient(requests.Session):
     """An HTTP Client for C.RH.C. based on requests Session class."""
 
-    def __init__(self, *, base_url=None, auth=None, **kwargs):
+    def __init__(self, *, base_url=None, auth_token=None, **kwargs):
         """
         Initialize ApiClient.
 
         base_url: will be prepended to all requests urls
-        auth: basic auth, receives a tuple, insights username and password
+        auth_token: User's JWT to be used as the Bearer token
         """
         super().__init__(**kwargs)
         self.base_url = base_url
-        self.auth = auth
+        self.headers["Authorization"] = f"Bearer {auth_token}"
 
     def request(self, method, url, *args, **kwargs):
         """Prepare a request and send it."""

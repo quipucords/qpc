@@ -349,6 +349,11 @@ BAD_INSIGHTS_INSTALL = (
     "Insights installation check failed. Checked if "
     'Insights was installed and configured with command "%s"'
 )
+INSIGHTS_NOT_LOGGED_IN = "Must first login to authenticate"
+INSIGHTS_TOKEN_EXPIRED = "Authorization token expired, please re-login to Insights"
+INSIGHTS_TOKEN_CORRUPT = "Corrupt Authorization token, please re-login to Insights"
+INSIGHTS_TOKEN_INVALID = "Invalid Authorization token, please re-login to Insights"
+INSIGHTS_AUTH_ERROR = "Authorization failed, please re-login to Insights"
 INSIGHTS_UPLOAD_REPORT = "Uploading report %s to Insights service."
 BAD_INSIGHTS_UPLOAD = (
     "Failed to upload report %s to Insights."
@@ -430,10 +435,6 @@ INSIGHTS_CONFIG_SUCCESS = (
     "Insights configuration was successfully added. Captured values: %s"
 )
 INSIGHTS_PUBLISH_SUCCESSFUL = "The report was successfully published."
-INSIGHTS_PUBLISH_AUTH_ERROR = (
-    "The request you tried to make was unauthorized, "
-    "please check your insights credentials."
-)
 INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR = (
     "The server encountered an unexpected condition"
     " that prevented it from fulfilling the request."

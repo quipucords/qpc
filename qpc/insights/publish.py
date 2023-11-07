@@ -1,10 +1,13 @@
 """InsightsPublishCommand is used to publish insights report to C.RH.C."""
 
+import re
 import sys
 import tarfile
 from logging import getLogger
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+
+from requests.exceptions import JSONDecodeError
 
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
@@ -13,7 +16,7 @@ from qpc.insights.http import InsightsClient
 from qpc.request import GET
 from qpc.request import request as qpc_request
 from qpc.translation import _
-from qpc.utils import read_insights_config, read_insights_login_config
+from qpc.utils import read_insights_auth_token, read_insights_config
 
 logger = getLogger(__name__)
 
@@ -125,10 +128,11 @@ class InsightsPublishCommand(CliCommand):
 
         base_url = self._get_base_url()
 
-        insights_login = read_insights_login_config()
-        auth = (insights_login["username"], insights_login["password"])
+        auth_token = read_insights_auth_token()
+        if not auth_token:
+            raise QPCError(_(messages.INSIGHTS_NOT_LOGGED_IN))
 
-        insights_client = InsightsClient(base_url=base_url, auth=auth)
+        insights_client = InsightsClient(base_url=base_url, auth_token=auth_token)
         filename_without_extensions = self._remove_file_extension(input_file)
         with input_file.open("rb") as file_to_be_uploaded:
             files = {
@@ -199,7 +203,17 @@ class InsightsPublishCommand(CliCommand):
             logger.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
             print(response.text)
         elif response.status_code == 401:
-            logger.error(_(messages.INSIGHTS_PUBLISH_AUTH_ERROR))
+            try:
+                resp_json = response.json()
+                err_detail = resp_json["errors"][0]["detail"]
+            except JSONDecodeError:
+                err_detail = ""
+            if re.match(r"Invalid JWT token .*expired.*", err_detail):
+                logger.error(_(messages.INSIGHTS_TOKEN_EXPIRED))
+            elif re.match(r"JWT token header is malformed.*", err_detail):
+                logger.error(_(messages.INSIGHTS_TOKEN_INVALID))
+            else:
+                logger.error(_(messages.INSIGHTS_AUTH_ERROR))
         elif response.status_code == 404:
             logger.error(_(messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR))
         elif response.status_code == 500:

@@ -423,12 +423,6 @@ SERVER_TOO_OLD_FOR_CLI = (
     "Server is currently at version %(current_version)s."
 )
 OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."
-INSIGHTS_ADD_USERNAME_USER_HELP = "The username used to log in to insights."
-INSIGHTS_ADD_PASS_USER_HELP = "The password used to log in to insights."
-INSIGHTS_LOGIN_PASSWORD = "Provide a password for insights authentication: "
-INSIGHTS_LOGIN_CONFIG_SUCCESS = (
-    "Insights username and password were successfully saved."
-)
 INSIGHTS_CONFIG_HOST_HELP = "Host or IP address."
 INSIGHTS_CONFIG_PORT_HELP = "Port number."
 INSIGHTS_CONFIG_SUCCESS = (

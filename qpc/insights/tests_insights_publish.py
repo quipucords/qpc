@@ -29,17 +29,14 @@ def patched_insights_config():
 
 
 @pytest.fixture
-def patched_insights_credentials():
-    """Mock insights login config file values."""
-    credentials = {
-        "username": "john_doe",
-        "password": "shadowman",
-    }
+def patched_insights_auth_token():
+    """Mock insights auth token value."""
+    auth_token = {"auth_token": "userJWt"}
 
     with mock.patch(
-        "qpc.insights.publish.read_insights_login_config", return_value=credentials
-    ) as patched_credentials:
-        yield patched_credentials
+        "qpc.insights.publish.read_insights_auth_token", return_value=auth_token
+    ) as patched_auth_token:
+        yield patched_auth_token
 
 
 @pytest.fixture
@@ -175,7 +172,7 @@ class TestInsightsPublishCommand:
         self,
         payload_file,
         patched_insights_config,
-        patched_insights_credentials,
+        patched_insights_auth_token,
         caplog,
         requests_mock,
     ):
@@ -199,7 +196,7 @@ class TestInsightsPublishCommand:
     @pytest.mark.parametrize(
         "status_code,log_message",
         [
-            (401, messages.INSIGHTS_PUBLISH_AUTH_ERROR),
+            (401, messages.INSIGHTS_AUTH_ERROR),
             (404, messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR),
             (500, messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR),
         ],
@@ -208,7 +205,7 @@ class TestInsightsPublishCommand:
         self,
         payload_file,
         patched_insights_config,
-        patched_insights_credentials,
+        patched_insights_auth_token,
         caplog,
         requests_mock,
         status_code,
@@ -275,7 +272,7 @@ class TestInsightsPublishCommand:
         self,
         mocker,
         payload_file,
-        patched_insights_credentials,
+        patched_insights_auth_token,
         caplog,
         requests_mock,
     ):
@@ -338,7 +335,7 @@ class TestInsightsPublishCommand:
         self,
         mocker,
         caplog,
-        patched_insights_credentials,
+        patched_insights_auth_token,
         payload_file,
     ):
         """Testing if file created during report download is deleted after published."""

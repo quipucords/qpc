@@ -82,5 +82,6 @@ def test_extra_args_are_passed_to_request(
 
 def test_auth():
     """Test if auth is being passed with the right parameters."""
-    client = InsightsClient(auth=("test-username", "test-password"))
-    assert client.auth == ("test-username", "test-password")
+    test_token = "userJwt"
+    client = InsightsClient(auth_token=test_token)
+    assert client.headers["Authorization"] == f"Bearer {test_token}"

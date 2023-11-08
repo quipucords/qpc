@@ -57,26 +57,30 @@ test-coverage:
 	poetry run coverage report --show-missing
 	poetry run coverage xml
 
-generate-man:
+generate-man.rst:
 	@export QPC_VAR_CURRENT_YEAR=$(shell date +'%Y') \
 	&& export QPC_VAR_PROJECT=$${QPC_VAR_PROJECT:-Quipucords} \
 	&& export QPC_VAR_PROGRAM_NAME=$${QPC_VAR_PROGRAM_NAME:-qpc} \
 	&& poetry run python docs/jinja-render.py -e '^QPC_VAR.*' -t docs/source/man.j2 $(ARGS)
 
 update-man.rst:
-	$(MAKE) generate-man ARGS="-o docs/source/man.rst"
+	$(MAKE) generate-man.rst ARGS="-o docs/source/man.rst"
 
 manpage-test:
-	@poetry run $(MAKE) --no-print-directory generate-man | diff -u docs/source/man.rst -
+	@poetry run $(MAKE) --no-print-directory generate-man.rst | diff -u docs/source/man.rst -
+	@poetry run $(MAKE) --no-print-directory generate-manpage | diff -u docs/$(QPC_VAR_PROGRAM_NAME).1 -
 
-manpage:
-	@$(MAKE) --no-print-directory generate-man | \
+generate-manpage:
+	@$(MAKE) --no-print-directory generate-man.rst | \
 	$(pandoc) -s - \
-	  --standalone -t man -o docs/$(QPC_VAR_PROGRAM_NAME).1\
+	  --standalone -t man \
 	  --variable=section:1\
 	  --variable=date:'$(BUILD_DATE)'\
 	  --variable=footer:'version $(PKG_VERSION)'\
 	  --variable=header:'$(QPC_VAR_PROGRAM_NAME_UPPER) Command Line Guide'
+
+update-manpage:
+	@poetry run $(MAKE) generate-manpage > docs/$(QPC_VAR_PROGRAM_NAME).1
 
 build-container:
 	podman build -t ${QPC_VAR_PROGRAM_NAME} .

@@ -1,0 +1,45 @@
+= qpc(1)
+Red Hat
+:doctype: manpage
+:manmanual: qpc
+:mansource: qpc
+:QPC_VAR_PROJECT: Quipucords
+:QPC_VAR_PROGRAM_NAME: qpc
+:QPC_VAR_CURRENT_YEAR: 2023
+
+== Name
+
+{QPC_VAR_PROGRAM_NAME} - Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
+
+== Synopsis
+
+`{QPC_VAR_PROGRAM_NAME} command subcommand [options]`
+
+== Options for All Commands
+
+The following options are available for every {QPC_VAR_PROJECT} command.
+
+*-h, --help*::
+  Prints the help for the `{QPC_VAR_PROGRAM_NAME}` command or subcommand.
+
+*-v*::
+  Enables the verbose mode. More ``v``s increase verbosity. The `-vvv` option increases verbosity to show more information. The `-vvvv` option enables connection debugging.
+
+== Exit status
+
+*0*::
+  Success.
+  Something good happened
+
+*1*::
+  Failure.
+  Something bad happened
+
+== Authors
+
+{QPC_VAR_PROJECT} is written and maintained by Red Hat. Please refer to the commit history for a full list of contributors.
+
+
+== Copyright
+
+Copyright 2018-{QPC_VAR_CURRENT_YEAR} Red Hat, Inc. Licensed under the GNU Public License version 3.

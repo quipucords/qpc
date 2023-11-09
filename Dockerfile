@@ -1,4 +1,4 @@
-FROM fedora as manpage_builder
+FROM fedora:38 as manpage_builder
 RUN dnf install -y make pandoc python3.11-pip
 WORKDIR /app
 RUN pip install poetry

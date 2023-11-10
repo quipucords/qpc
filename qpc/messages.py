@@ -354,6 +354,11 @@ INSIGHTS_TOKEN_EXPIRED = "Authorization token expired, please re-login to Insigh
 INSIGHTS_TOKEN_CORRUPT = "Corrupt Authorization token, please re-login to Insights"
 INSIGHTS_TOKEN_INVALID = "Invalid Authorization token, please re-login to Insights"
 INSIGHTS_AUTH_ERROR = "Authorization failed, please re-login to Insights"
+INSIGHTS_LOGIN_REQUEST = "Requesting Login authorization from %s"
+INSIGHTS_LOGIN_REQUEST_FAILED = "Failed to request login authorization: %s"
+INSIGHTS_LOGIN_VERIFYING = "Verifying Login authorization at %s"
+INSIGHTS_LOGIN_VERIFICATION_FAILED = "Failed to verify Login authorization: %s"
+INSIGHTS_LOGIN_VERIFICATION_TIMEOUT = "Time-out while waiting for Login authorization"
 INSIGHTS_UPLOAD_REPORT = "Uploading report %s to Insights service."
 BAD_INSIGHTS_UPLOAD = (
     "Failed to upload report %s to Insights."
@@ -428,6 +433,8 @@ INSIGHTS_CONFIG_PORT_HELP = "Port number."
 INSIGHTS_CONFIG_SUCCESS = (
     "Insights configuration was successfully added. Captured values: %s"
 )
+INSIGHTS_PUBLISH_REPORT = "Publishing report to Insights at %s"
+INSIGHTS_PUBLISH_FAILED = "Failed to publish the report to Insights: %s"
 INSIGHTS_PUBLISH_SUCCESSFUL = "The report was successfully published."
 INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR = (
     "The server encountered an unexpected condition"
@@ -438,6 +445,7 @@ INSIGHTS_PUBLISH_NOT_FOUND_ERROR = (
     " Check your insights configuration."
 )
 INSIGHTS_PUBLISH_RESPONSE = "Response from insights: %s"
+INSIGHTS_RESPONSE = "Response from %s: %s"
 
 _INVALID_PREFIX = "Payload file is not valid, due to:"
 INSIGHTS_REPORT_CONTENT_MIN_NUMBER = (

@@ -7,7 +7,7 @@ from logging import getLogger
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from requests.exceptions import JSONDecodeError
+from requests.exceptions import BaseHTTPError, ConnectionError, JSONDecodeError
 
 from qpc import insights, messages
 from qpc.clicommand import CliCommand
@@ -197,8 +197,18 @@ class InsightsPublishCommand(CliCommand):
 
     def _make_publish_request(self, session_client, url, files):
         """Make insights client request and log status code."""
-        response = session_client.post(url=url, files=files)
-        logger.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
+        logger.info(
+            _(messages.INSIGHTS_PUBLISH_REPORT), f"{session_client.base_url}{url}"
+        )
+        try:
+            response = session_client.post(url=url, files=files)
+            logger.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
+        except ConnectionError as err:
+            logger.error(_(messages.INSIGHTS_PUBLISH_FAILED), err)
+            return False
+        except BaseHTTPError as err:
+            logger.error(_(messages.INSIGHTS_PUBLISH_FAILED), err)
+            return False
         if response.ok:
             logger.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
             print(response.text)

@@ -2,12 +2,16 @@
 
 import http
 import time
+from logging import getLogger
 
 import requests
-from requests.exceptions import BaseHTTPError
+from requests.exceptions import BaseHTTPError, ConnectionError
 
+from qpc import messages
 from qpc.insights.exceptions import InsightsAuthError
 from qpc.translation import _
+
+logger = getLogger(__name__)
 
 DISCOVERY_CLIENT_ID = "discovery-client-id"
 INSIGHTS_SSO_SERVER = "sso.redhat.com"
@@ -35,7 +39,8 @@ class InsightsAuth:
         """
         self.auth_request = None
 
-        url = f"https://{INSIGHTS_SSO_SERVER}/{DEVICE_AUTH_ENDPOINT}"  # Always SSL
+        insights_sso_server = INSIGHTS_SSO_SERVER
+        url = f"https://{insights_sso_server}/{DEVICE_AUTH_ENDPOINT}"  # Always SSL
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         params = {
             "grant_type": GRANT_TYPE,
@@ -43,17 +48,24 @@ class InsightsAuth:
             "client_id": DISCOVERY_CLIENT_ID,
         }
         try:
+            logger.info(_(messages.INSIGHTS_LOGIN_REQUEST), url)
             response = requests.post(url, headers=headers, data=params)
+        except ConnectionError as err:
+            raise InsightsAuthError(_(messages.INSIGHTS_LOGIN_REQUEST_FAILED % err))
         except BaseHTTPError as err:
-            raise InsightsAuthError(
-                _("Failed to request login authorization - %s"), err.message
-            )
+            raise InsightsAuthError(_(messages.INSIGHTS_LOGIN_REQUEST_FAILED % err))
 
         if response.status_code == http.HTTPStatus.OK:
             self.auth_request = response.json()
+            logger.debug(
+                _(messages.INSIGHTS_RESPONSE), insights_sso_server, self.auth_request
+            )
         else:
+            logger.debug(
+                _(messages.INSIGHTS_RESPONSE), insights_sso_server, response.text
+            )
             raise InsightsAuthError(
-                _("Failed to request login authorization - %s"), response.reason
+                _(messages.INSIGHTS_LOGIN_REQUEST_FAILED % response.reason)
             )
 
         return self.auth_request
@@ -71,7 +83,8 @@ class InsightsAuth:
             elapsed_time = 0
             self.auth_token = None
             while not self.auth_token:
-                url = f"https://{INSIGHTS_SSO_SERVER}/{TOKEN_ENDPOINT}"  # Always SSL
+                insights_sso_server = INSIGHTS_SSO_SERVER
+                url = f"https://{insights_sso_server}/{TOKEN_ENDPOINT}"  # Always SSL
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
                 params = {
                     "grant_type": GRANT_TYPE,
@@ -79,10 +92,15 @@ class InsightsAuth:
                     "device_code": device_code,
                 }
                 try:
+                    logger.debug(_(messages.INSIGHTS_LOGIN_VERIFYING), url)
                     response = requests.post(url, headers=headers, data=params)
+                except ConnectionError as err:
+                    raise InsightsAuthError(
+                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % err)
+                    )
                 except BaseHTTPError as err:
                     raise InsightsAuthError(
-                        _("Failed to verify login authorization - %s"), err.message
+                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % err)
                     )
 
                 if response.status_code == http.HTTPStatus.OK:
@@ -92,20 +110,38 @@ class InsightsAuth:
                 if response.status_code == http.HTTPStatus.BAD_REQUEST:
                     self.token_response = response.json()
                     if self.token_response.get("error") != "authorization_pending":
+                        logger.debug(
+                            _(messages.INSIGHTS_RESPONSE),
+                            insights_sso_server,
+                            response.text,
+                        )
                         raise InsightsAuthError(
-                            _("Failed to verify login authorization - %s"),
-                            response.reason,
+                            _(
+                                messages.INSIGHTS_LOGIN_VERIFICATION_FAILED
+                                % response.reason
+                            )
+                        )
+                    else:
+                        logger.debug(
+                            _(messages.INSIGHTS_RESPONSE),
+                            insights_sso_server,
+                            self.token_response,
                         )
                 else:
+                    logger.debug(
+                        _(messages.INSIGHTS_RESPONSE),
+                        insights_sso_server,
+                        response.text,
+                    )
                     raise InsightsAuthError(
-                        _("Failed to verify login authorization - %s"), response.reason
+                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % response.reason)
                     )
 
                 time.sleep(interval)
                 elapsed_time += interval
                 if elapsed_time > expires_in:
                     raise InsightsAuthError(
-                        _("Time-out while waiting for login authorization")
+                        _(messages.INSIGHTS_LOGIN_VERIFICATION_TIMEOUT)
                     )
 
         return self.auth_token

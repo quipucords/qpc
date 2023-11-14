@@ -10,11 +10,11 @@ from requests.exceptions import BaseHTTPError, ConnectionError
 from qpc import messages
 from qpc.insights.exceptions import InsightsAuthError
 from qpc.translation import _
+from qpc.utils import CONFIG_SSO_HOST_KEY, read_insights_config
 
 logger = getLogger(__name__)
 
 DISCOVERY_CLIENT_ID = "discovery-client-id"
-INSIGHTS_SSO_SERVER = "sso.redhat.com"
 INSIGHTS_REALM = "redhat-external"
 INSIGHTS_SCOPE = "api.console"
 GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code"
@@ -39,8 +39,9 @@ class InsightsAuth:
         """
         self.auth_request = None
 
-        insights_sso_server = INSIGHTS_SSO_SERVER
-        url = f"https://{insights_sso_server}/{DEVICE_AUTH_ENDPOINT}"  # Always SSL
+        config = read_insights_config()
+        insights_sso_server = config.get(CONFIG_SSO_HOST_KEY)
+        url = f"https://{insights_sso_server}{DEVICE_AUTH_ENDPOINT}"  # Always SSL
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         params = {
             "grant_type": GRANT_TYPE,
@@ -83,8 +84,9 @@ class InsightsAuth:
             elapsed_time = 0
             self.auth_token = None
             while not self.auth_token:
-                insights_sso_server = INSIGHTS_SSO_SERVER
-                url = f"https://{insights_sso_server}/{TOKEN_ENDPOINT}"  # Always SSL
+                config = read_insights_config()
+                insights_sso_server = config.get(CONFIG_SSO_HOST_KEY)
+                url = f"https://{insights_sso_server}{TOKEN_ENDPOINT}"  # Always SSL
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
                 params = {
                     "grant_type": GRANT_TYPE,

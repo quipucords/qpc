@@ -433,6 +433,7 @@ INSIGHTS_CONFIG_PORT_HELP = "Port number."
 INSIGHTS_CONFIG_SUCCESS = (
     "Insights configuration was successfully added. Captured values: %s"
 )
+INSIGHTS_CONFIG_SSO_HOST_HELP = "Insights SSO Host"
 INSIGHTS_PUBLISH_REPORT = "Publishing report to Insights at %s"
 INSIGHTS_PUBLISH_FAILED = "Failed to publish the report to Insights: %s"
 INSIGHTS_PUBLISH_SUCCESSFUL = "The report was successfully published."

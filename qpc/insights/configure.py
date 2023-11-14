@@ -9,6 +9,7 @@ from qpc.translation import _
 from qpc.utils import (
     DEFAULT_HOST_INSIGHTS_CONFIG,
     DEFAULT_PORT_INSIGHTS_CONFIG,
+    DEFAULT_SSO_HOST_INSIGHTS_CONFIG,
     write_insights_config,
 )
 
@@ -56,6 +57,15 @@ class InsightsConfigureCommand(CliCommand):
         self.parser.add_argument(
             "--use-http", dest="use_http", action="store_true", required=False
         )
+        self.parser.add_argument(
+            "--sso-host",
+            dest="sso_host",
+            metavar="SSO_HOST",
+            default=DEFAULT_SSO_HOST_INSIGHTS_CONFIG,
+            type=validate_host,
+            help=_(messages.INSIGHTS_CONFIG_SSO_HOST_HELP),
+            required=False,
+        )
 
     def _do_command(self):
         """Persist insights configuration."""
@@ -63,6 +73,7 @@ class InsightsConfigureCommand(CliCommand):
             "host": self.args.host,
             "port": int(self.args.port),
             "use_http": self.args.use_http,
+            "sso_host": self.args.sso_host,
         }
         write_insights_config(insights_config)
         logger.info(_(messages.INSIGHTS_CONFIG_SUCCESS), insights_config)

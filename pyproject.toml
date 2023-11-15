@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qpc"
-version = "1.4.1"
+version = "1.4.2"
 description = ""
 authors = ["QPC Team <quipucords@redhat.com>"]
 license = "GPLv3"

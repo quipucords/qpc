@@ -38,8 +38,7 @@ setuptools-scm==8.0.4
     # via
     #   pluggy
     #   setuptools-rust
-    #   setuptools-scm
-trove-classifiers==2023.10.18
+trove-classifiers==2023.11.14
     # via hatchling
 typing-extensions==4.8.0
     # via setuptools-scm

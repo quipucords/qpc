@@ -230,6 +230,44 @@ class TestInsightsPublishCommand:
         assert payload_file.exists(), "Input file should not be removed."
 
     @pytest.mark.parametrize(
+        "status_code,err_detail,log_message",
+        [
+            (401, "Invalid JWT token expired", messages.INSIGHTS_TOKEN_EXPIRED),
+            (401, "JWT token header is malformed", messages.INSIGHTS_TOKEN_INVALID),
+        ],
+    )
+    def test_insights_publish_token_authentication_errors(
+        self,
+        payload_file,
+        patched_insights_config,
+        patched_insights_auth_token,
+        caplog,
+        requests_mock,
+        status_code,
+        err_detail,
+        log_message,
+    ):
+        """Testing insights publish with several token authentication errors."""
+        caplog.set_level("ERROR")
+        error_json = {"errors": [{"detail": err_detail}]}
+        requests_mock.post(
+            f"https://insights.test:1111{INGRESS_REPORT_URI}",
+            status_code=status_code,
+            json=error_json,
+        )
+        sys.argv = [
+            "/bin/qpc",
+            "insights",
+            "publish",
+            "--input-file",
+            str(payload_file),
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        assert caplog.messages[-1] == log_message
+        assert payload_file.exists(), "Input file should not be removed."
+
+    @pytest.mark.parametrize(
         "payload,log_message",
         [
             (

@@ -37,6 +37,7 @@ setuptools-rust==1.8.1
 setuptools-scm==8.0.4
     # via
     #   pluggy
+    #   python-dateutil
     #   setuptools-rust
 trove-classifiers==2023.11.22
     # via hatchling
@@ -53,6 +54,7 @@ setuptools==69.0.2 ; python_version >= "3.11" and python_version < "4.0"
     #   cryptography
     #   pathspec
     #   pluggy
+    #   python-dateutil
     #   setuptools-rust
     #   setuptools-scm
     #   trove-classifiers

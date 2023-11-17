@@ -3,7 +3,7 @@ PYTHON		= $(shell poetry run which python 2>/dev/null || which python)
 PKG_VERSION = $(shell poetry -s version)
 BUILD_DATE  = $(shell date +'%B %d, %Y')
 PARALLEL_NUM ?= $(shell python -c 'import multiprocessing as m;print(int(max(m.cpu_count()/2, 2)))')
-QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), "qpc")
+QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), qpc)
 QPC_VAR_PROGRAM_NAME_UPPER := $(shell echo $(QPC_VAR_PROGRAM_NAME) | tr '[:lower:]' '[:upper:]')
 
 TOPDIR = $(shell pwd)
@@ -12,7 +12,7 @@ PYDIRS	= quipucords
 BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
-pandoc = pandoc
+SPHINX_BUILD = $(shell poetry run which sphinx-build)
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
@@ -70,13 +70,12 @@ manpage-test:
 	@poetry run $(MAKE) --no-print-directory generate-man | diff -u docs/source/man.rst -
 
 manpage:
-	@$(MAKE) --no-print-directory generate-man | \
-	$(pandoc) -s - \
-	  --standalone -t man -o docs/$(QPC_VAR_PROGRAM_NAME).1\
-	  --variable=section:1\
-	  --variable=date:'$(BUILD_DATE)'\
-	  --variable=footer:'version $(PKG_VERSION)'\
-	  --variable=header:'$(QPC_VAR_PROGRAM_NAME_UPPER) Command Line Guide'
+	@$(MAKE) --no-print-directory update-man.rst
+	$(SPHINX_BUILD) -b man \
+	  -D project='$(QPC_VAR_PROGRAM_NAME)' \
+	  -D release='$(PKG_VERSION)' \
+	  -D today='$(BUILD_DATE)' \
+	  docs docs/_build
 
 build-container:
 	podman build -t ${QPC_VAR_PROGRAM_NAME} .

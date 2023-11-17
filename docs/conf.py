@@ -1,20 +1,32 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
+Configuration file for the Sphinx documentation builder.
+
+For the full list of built-in configuration values, see the documentation:
+https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
 
 # project information
-project = 'Quipucords'
-#copyright = '2023, Red Hat'
-#author = 'Red Hat'
-release = '1.4.z'
+project = "FIXME_PROJECT"  # our call to sphinx-build should override this
+# author = ""  # just use what we already have in the RST
+# copyright = ""  # just use what we already have in the RST
+release = "FIXME_RELEASE"  # our call to sphinx-build should override this
 
 # general configuration
-extensions = []
-exclude_patterns = ['_build']
-docs/make.bat
-
+root_doc = "source/man"
+today = "FIXME_TODAY"  # our call to sphinx-build should override this
 
 # man page output options
-man_make_section_directory = False
-man_pages = [['index', 'qpc', None, None, 1],]
+_man_page_name = "qpc"  # drives the output file name
+_man_page_description = None  # just use what we already have in the RST
+_man_page_authors = None  # just use what we already have in the RST
+_man_page_section = "1"  # drives the output file name
+man_make_section_directory = False  # we do not need a directory
+man_pages = [
+    [
+        root_doc,
+        _man_page_name,
+        _man_page_description,
+        _man_page_authors,
+        _man_page_section,
+    ],
+]

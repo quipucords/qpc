@@ -4,6 +4,8 @@ WORKDIR /app
 RUN pip install poetry
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --only build
+COPY docs/conf.py docs/conf.py
+COPY docs/jinja-render.py docs/jinja-render.py
 COPY docs/source/man.j2 docs/source/man.j2
 COPY Makefile Makefile
 RUN make manpage
@@ -44,7 +46,7 @@ ENV VIRTUAL_ENV=/app/qpc/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # copy manpage
-COPY --from=manpage_builder /app/docs/*.1 /usr/local/share/man/man1/
+COPY --from=manpage_builder /app/docs/_build/*.1 /usr/local/share/man/man1/
 
 # copy the rest of the application
 COPY . .

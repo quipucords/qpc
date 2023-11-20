@@ -136,3 +136,22 @@ class TestInsightsAuth:
         with pytest.raises(InsightsAuthError) as err:
             insights_auth.wait_for_authorization()
             assert "Time-out while waiting for Login authorization" in err.value
+
+    def test_insights_wait_for_authorization_expired_from_sso(
+        self, login_auth_response, requests_mock
+    ):
+        """Testing that token authorization expired from the sso server."""
+        insights_auth = InsightsAuth()
+        insights_auth.auth_request = login_auth_response
+        sso_host = read_insights_config().get(CONFIG_SSO_HOST_KEY)
+        sso_token_url = f"https://{sso_host}{TOKEN_ENDPOINT}"
+        token_response = {
+            "error": "expired_token",
+            "error_description": "Device code is expired",
+        }
+        requests_mock.post(
+            sso_token_url, status_code=http.HTTPStatus.BAD_REQUEST, json=token_response
+        )
+        with pytest.raises(InsightsAuthError) as err:
+            insights_auth.wait_for_authorization()
+            assert "Time-out while waiting for Login authorization" in err.value

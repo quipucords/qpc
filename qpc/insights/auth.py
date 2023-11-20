@@ -111,7 +111,17 @@ class InsightsAuth:
                     break
                 if response.status_code == http.HTTPStatus.BAD_REQUEST:
                     self.token_response = response.json()
-                    if self.token_response.get("error") != "authorization_pending":
+                    response_error = self.token_response.get("error")
+                    if response_error == "expired_token":
+                        logger.debug(
+                            _(messages.INSIGHTS_RESPONSE),
+                            insights_sso_server,
+                            response.text,
+                        )
+                        raise InsightsAuthError(
+                            _(messages.INSIGHTS_LOGIN_VERIFICATION_TIMEOUT)
+                        )
+                    if response_error != "authorization_pending":
                         logger.debug(
                             _(messages.INSIGHTS_RESPONSE),
                             insights_sso_server,

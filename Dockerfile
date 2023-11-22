@@ -1,15 +1,3 @@
-FROM fedora:38 as manpage_builder
-RUN dnf install -y make pandoc python3.11-pip
-WORKDIR /app
-RUN pip install poetry
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --only build
-COPY docs/conf.py docs/conf.py
-COPY docs/jinja-render.py docs/jinja-render.py
-COPY docs/source/man.j2 docs/source/man.j2
-COPY Makefile Makefile
-RUN make manpage
-
 FROM redhat/ubi9-minimal
 
 WORKDIR /app/qpc
@@ -46,7 +34,7 @@ ENV VIRTUAL_ENV=/app/qpc/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # copy manpage
-COPY --from=manpage_builder /app/docs/_build/*.1 /usr/local/share/man/man1/
+COPY docs/_build/qpc.1 /usr/local/share/man/man1/
 
 # copy the rest of the application
 COPY . .

@@ -12,11 +12,11 @@ project = "FIXME_PROJECT"  # our call to sphinx-build should override this
 release = "FIXME_RELEASE"  # our call to sphinx-build should override this
 
 # general configuration
-root_doc = "source/man"
+root_doc = "source/man-template"
 today = "FIXME_TODAY"  # our call to sphinx-build should override this
 
 # man page output options
-_man_page_name = "qpc"  # drives the output file name
+_man_page_name = "QPC_VAR_PROGRAM_NAME"  # drives the output file name
 _man_page_description = None  # just use what we already have in the RST
 _man_page_authors = None  # just use what we already have in the RST
 _man_page_section = "1"  # drives the output file name

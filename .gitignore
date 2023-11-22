@@ -122,3 +122,6 @@ package-lock.json
 
 # asdf
 .tool-versions
+
+# sphinx-build
+docs/_build/.doctrees/

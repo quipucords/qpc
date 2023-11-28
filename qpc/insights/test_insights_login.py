@@ -1,6 +1,7 @@
 """Test the CLI module's Insights Login command."""
 
 import sys
+from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,8 +17,8 @@ class TestInsightsLogin:
 
     def test_insights_login_invalid_username_args_err(self, capsys):
         """Testing that insights login rejects older username args."""
-        sys.argv = ["/bin/qpc", "insights", "login", "--username", "invalid-user"]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "login", "--username", "invalid-user"]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         out, err = capsys.readouterr()
         assert out == ""
@@ -25,8 +26,8 @@ class TestInsightsLogin:
 
     def test_insights_login_invalid_password_args_err(self, capsys):
         """Testing that insights login rejects older password args."""
-        sys.argv = ["/bin/qpc", "insights", "login", "--password"]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "login", "--password"]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         out, err = capsys.readouterr()
         assert out == ""
@@ -44,8 +45,9 @@ class TestInsightsLogin:
         }
         insights_auth.wait_for_authorization.return_value = auth_token
         mocker.patch.object(InsightsAuth, "request_auth", return_value=insights_auth)
-        sys.argv = ["/bin/qpc", "insights", "login"]
-        CLI().main()
+        test_argv = ["/bin/qpc", "insights", "login"]
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         out, err = capsys.readouterr()
         stdout_lines = out.splitlines()
         assert "Insights login authorization requested" in stdout_lines[0]
@@ -60,7 +62,8 @@ class TestInsightsLogin:
         mocker.patch.object(
             InsightsAuth, "request_auth", side_effect=InsightsAuthError(err_message)
         )
-        sys.argv = ["/bin/qpc", "insights", "login"]
-        CLI().main()
+        test_argv = ["/bin/qpc", "insights", "login"]
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         out, err = capsys.readouterr()
         assert err_message in err

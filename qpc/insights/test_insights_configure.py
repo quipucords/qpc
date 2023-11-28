@@ -1,5 +1,6 @@
 """Test the CLI module."""
 import sys
+from unittest import mock
 
 import pytest
 
@@ -21,26 +22,26 @@ class TestInsightsConfigure:
 
     def test_insights_config_bad_port(self):
         """Testing insights configure when receiving bad port."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--port", "abc"]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "config", "--port", "abc"]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
     def test_insights_config_empty_host(self):
         """Testing insights configure when receiving empty host."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--host", ""]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "config", "--host", ""]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
     def test_insights_config_bad_host(self):
         """Testing insights configure when receiving bad host."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--host", None]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "config", "--host", None]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
     def test_insights_config_bad_sso_host(self):
         """Testing insights configure when receiving bad sso host."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--sso-host", None]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "config", "--sso-host", None]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
     def test_success_default_config_no_args(self):
@@ -51,7 +52,7 @@ class TestInsightsConfigure:
 
     def test_success_config_insights(self):
         """Testing insights configure green path."""
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "config",
@@ -61,7 +62,8 @@ class TestInsightsConfigure:
             "200",
             "--use-http",
         ]
-        CLI().main()
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         config = read_insights_config()
         assert config["host"] == "console.insights.test"
         assert config["port"] == 200
@@ -69,7 +71,7 @@ class TestInsightsConfigure:
 
     def test_success_config_insights_with_sso_host(self):
         """Testing insights configure green path with sso host."""
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "config",
@@ -81,7 +83,8 @@ class TestInsightsConfigure:
             "--sso-host",
             "sso.insights.test",
         ]
-        CLI().main()
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         config = read_insights_config()
         assert config["host"] == "console.insights.test"
         assert config["port"] == 200
@@ -90,8 +93,9 @@ class TestInsightsConfigure:
 
     def test_insights_config_default_host(self):
         """Testing insights configure default host."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--port", "200"]
-        CLI().main()
+        test_argv = ["/bin/qpc", "insights", "config", "--port", "200"]
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         config = read_insights_config()
         assert config["host"] == DEFAULT_HOST_INSIGHTS_CONFIG
         assert config["port"] == 200
@@ -99,8 +103,15 @@ class TestInsightsConfigure:
 
     def test_insights_config_default_port(self):
         """Testing insights configure default port."""
-        sys.argv = ["/bin/qpc", "insights", "config", "--host", "console.insights.test"]
-        CLI().main()
+        test_argv = [
+            "/bin/qpc",
+            "insights",
+            "config",
+            "--host",
+            "console.insights.test",
+        ]
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         config = read_insights_config()
         assert config["host"] == "console.insights.test"
         assert config["port"] == DEFAULT_PORT_INSIGHTS_CONFIG
@@ -108,7 +119,7 @@ class TestInsightsConfigure:
 
     def test_insights_config_default_sso_host(self):
         """Testing insights configure default sso host."""
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "config",
@@ -117,7 +128,8 @@ class TestInsightsConfigure:
             "--port",
             "200",
         ]
-        CLI().main()
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         config = read_insights_config()
         assert config["host"] == "console.insights.test"
         assert config["port"] == 200

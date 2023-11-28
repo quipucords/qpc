@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "November 27, 2023" "" "qpc"
+.TH "qpc" "1" "November 28, 2023" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -877,25 +877,13 @@ Optional. Sets the port to use to connect to Insights. The default port is \fB44
 Optional. Determines whether to use HTTP instead of HTTPS. The default value is \fBFalse\fP\&.
 .UNINDENT
 .UNINDENT
-.SS Adding Insights credentials information
+.SS Login to Insights
 .sp
-To configure Insights credentials, simply provide the appropriate username and password associated with your Insights account.
+To be able to publish reports to Insights, one must be authorized and successfully logged into Insights.
 .sp
-\fBqpc insights add_login [\-\-username=\fP \fIusername\fP \fB] [\-\-password=\fP \fIpassword\fP \fB]\fP
+\fBqpc insights login\fP
 .sp
-\fB\-\-username=username\fP
-.INDENT 0.0
-.INDENT 3.5
-Required. Sets the username that is used to log in to Insights.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-password=password\fP
-.INDENT 0.0
-.INDENT 3.5
-Required. Prompts for the password for the \fB\-\-username\fP identity.
-.UNINDENT
-.UNINDENT
+This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use {{qpc}} to publish reports.
 .SS Publishing to Insights
 .sp
 The \fBqpc insights publish\fP command allows you to publish an Insights report to Red Hat Insights and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
@@ -1095,9 +1083,9 @@ Configuring Insights
 .sp
 \fBqpc insights config \-\-host stage.console.redhat.com \-\-port 8080\fP
 .IP \(bu 2
-Adding Insights credentials
+Login to Insights
 .sp
-\fBqpc insights add_login \-\-username insights\-user \-\-password\fP
+\fBqpc insights login\fP
 .IP \(bu 2
 Publishing to Insights using a report id
 .sp

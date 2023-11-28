@@ -109,8 +109,8 @@ class TestInsightsPublishCommand:
 
     def test_insights_publish_req_args_err(self):
         """Testing if insights publish command requires args."""
-        sys.argv = ["/bin/qpc", "insights", "publish"]
-        with pytest.raises(SystemExit):
+        test_argv = ["/bin/qpc", "insights", "publish"]
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
     def test_insights_publish_args_are_mutually_exclusive(self, mocker):
@@ -118,7 +118,7 @@ class TestInsightsPublishCommand:
         mocker.patch.object(
             InsightsPublishCommand, "_publish_to_ingress", side_effect=RuntimeError()
         )
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
@@ -127,7 +127,9 @@ class TestInsightsPublishCommand:
             "--report",
             "1",
         ]
-        with pytest.raises(SystemExit) as exc_info:
+        with pytest.raises(SystemExit) as exc_info, mock.patch.object(
+            sys, "argv", test_argv
+        ):
             CLI().main()
         # argparse will always exit with value 2
         assert exc_info.value.code == 2
@@ -139,14 +141,14 @@ class TestInsightsPublishCommand:
     ):
         """Testing if--input-file will accept files with inappropriate extensions."""
         caplog.set_level("ERROR")
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             inapropriate_payload_file.name,
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert (
             caplog.messages[-1]
@@ -157,14 +159,14 @@ class TestInsightsPublishCommand:
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
         """Testing if insights publish --input-file will accept dir as file."""
         caplog.set_level("ERROR")
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             tmp_path.name,
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT % tmp_path.name
 
@@ -182,14 +184,15 @@ class TestInsightsPublishCommand:
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=202,
         )
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             str(payload_file),
         ]
-        CLI().main()
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
         assert caplog.messages[-1] == messages.INSIGHTS_PUBLISH_SUCCESSFUL
         assert payload_file.exists(), "Input file should not be removed."
 
@@ -217,14 +220,14 @@ class TestInsightsPublishCommand:
             f"https://insights.test:1111{INGRESS_REPORT_URI}",
             status_code=status_code,
         )
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             str(payload_file),
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert caplog.messages[-1] == log_message
         assert payload_file.exists(), "Input file should not be removed."
@@ -255,14 +258,14 @@ class TestInsightsPublishCommand:
             status_code=status_code,
             json=error_json,
         )
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             str(payload_file),
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert caplog.messages[-1] == log_message
         assert payload_file.exists(), "Input file should not be removed."
@@ -295,14 +298,14 @@ class TestInsightsPublishCommand:
     def test_invalid_payload_file(self, payload, caplog, log_message):
         """Test invalid tar.gz payloads."""
         caplog.set_level("INFO")
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--input-file",
             str(payload),
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert caplog.messages[-1] == log_message
 
@@ -358,14 +361,14 @@ class TestInsightsPublishCommand:
             url=f"{REPORT_URI}1{INSIGHTS_PATH_SUFFIX}",
             status_code=status_code,
         )
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--report",
             "1",
         ]
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
         assert caplog.messages[-1] == error_message
 
@@ -393,14 +396,15 @@ class TestInsightsPublishCommand:
             InsightsPublishCommand, "_make_publish_request", return_value=True
         )
 
-        sys.argv = [
+        test_argv = [
             "/bin/qpc",
             "insights",
             "publish",
             "--report",
             "1",
         ]
-        CLI().main()
+        with mock.patch.object(sys, "argv", test_argv):
+            CLI().main()
 
         mock_validate_report_name.assert_called_with(payload_file)
         mock_validate_report_content.assert_called_with(payload_file)

@@ -696,7 +696,7 @@ To be able to publish reports to Insights, one must be authorized and successful
 
 **qpc insights login**
 
-This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use qpc to publish reports.
+This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use {{qpc}} to publish reports.
 
 
 Publishing to Insights

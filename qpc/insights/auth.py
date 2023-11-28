@@ -95,8 +95,8 @@ class InsightsAuth:
         """
         if self.auth_request:
             device_code = self.auth_request["device_code"]
-            interval = self.auth_request.get("interval") or 5  # SSO default
-            expires_in = self.auth_request.get("expires_in") or 600  # SSO default
+            interval = self.auth_request.get("interval", 5)  # SSO default
+            expires_in = self.auth_request.get("expires_in", 600)  # SSO default
 
             elapsed_time = 0
             self.auth_token = None

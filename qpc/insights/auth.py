@@ -18,10 +18,29 @@ DISCOVERY_CLIENT_ID = "discovery-client-id"
 INSIGHTS_REALM = "redhat-external"
 INSIGHTS_SCOPE = "api.console"
 GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code"
-DEVICE_AUTH_ENDPOINT = (
-    f"/auth/realms/{INSIGHTS_REALM}/protocol/openid-connect/auth/device"
+OPENID_CONFIG_ENDPOINT = (
+    f"/auth/realms/{INSIGHTS_REALM}/.well-known/openid-configuration"
 )
-TOKEN_ENDPOINT = f"/auth/realms/{INSIGHTS_REALM}/protocol/openid-connect/token"
+DEVICE_AUTH_ENDPOINT_KEY = "device_authorization_endpoint"
+TOKEN_ENDPOINT_KEY = "token_endpoint"
+
+
+def get_sso_endpoint(endpoint):
+    """Get the SSO OpenID Configuration endpoint."""
+    insights_sso_server = read_insights_config().get(CONFIG_SSO_HOST_KEY)
+    url = f"https://{insights_sso_server}{OPENID_CONFIG_ENDPOINT}"  # Always SSL
+    try:
+        logger.info(_(messages.INSIGHTS_SSO_CONFIG_QUERY), url, endpoint)
+        response = requests.get(url)
+    except ConnectionError as err:
+        raise err
+    except BaseHTTPError as err:
+        raise err
+
+    config = response.json()
+    if endpoint not in config:
+        raise InsightsAuthError(_(messages.INSIGHTS_SSO_QUERY_FAILED % endpoint))
+    return config[endpoint]
 
 
 class InsightsAuth:
@@ -39,9 +58,6 @@ class InsightsAuth:
         """
         self.auth_request = None
 
-        config = read_insights_config()
-        insights_sso_server = config.get(CONFIG_SSO_HOST_KEY)
-        url = f"https://{insights_sso_server}{DEVICE_AUTH_ENDPOINT}"  # Always SSL
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         params = {
             "grant_type": GRANT_TYPE,
@@ -49,8 +65,9 @@ class InsightsAuth:
             "client_id": DISCOVERY_CLIENT_ID,
         }
         try:
-            logger.info(_(messages.INSIGHTS_LOGIN_REQUEST), url)
-            response = requests.post(url, headers=headers, data=params)
+            device_auth_endpoint = get_sso_endpoint(DEVICE_AUTH_ENDPOINT_KEY)
+            logger.info(_(messages.INSIGHTS_LOGIN_REQUEST), device_auth_endpoint)
+            response = requests.post(device_auth_endpoint, headers=headers, data=params)
         except ConnectionError as err:
             raise InsightsAuthError(_(messages.INSIGHTS_LOGIN_REQUEST_FAILED % err))
         except BaseHTTPError as err:
@@ -59,11 +76,11 @@ class InsightsAuth:
         if response.status_code == http.HTTPStatus.OK:
             self.auth_request = response.json()
             logger.debug(
-                _(messages.INSIGHTS_RESPONSE), insights_sso_server, self.auth_request
+                _(messages.INSIGHTS_RESPONSE), device_auth_endpoint, self.auth_request
             )
         else:
             logger.debug(
-                _(messages.INSIGHTS_RESPONSE), insights_sso_server, response.text
+                _(messages.INSIGHTS_RESPONSE), device_auth_endpoint, response.text
             )
             raise InsightsAuthError(
                 _(messages.INSIGHTS_LOGIN_REQUEST_FAILED % response.reason)
@@ -71,7 +88,7 @@ class InsightsAuth:
 
         return self.auth_request
 
-    def wait_for_authorization(self):
+    def wait_for_authorization(self):  # noqa: C901 PLR0912
         """Wait for the user to log in and authorize the request.
 
         :returns: user JWT token
@@ -83,10 +100,9 @@ class InsightsAuth:
 
             elapsed_time = 0
             self.auth_token = None
+
+            token_endpoint = None
             while not self.auth_token:
-                config = read_insights_config()
-                insights_sso_server = config.get(CONFIG_SSO_HOST_KEY)
-                url = f"https://{insights_sso_server}{TOKEN_ENDPOINT}"  # Always SSL
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
                 params = {
                     "grant_type": GRANT_TYPE,
@@ -94,8 +110,12 @@ class InsightsAuth:
                     "device_code": device_code,
                 }
                 try:
-                    logger.debug(_(messages.INSIGHTS_LOGIN_VERIFYING), url)
-                    response = requests.post(url, headers=headers, data=params)
+                    if not token_endpoint:
+                        token_endpoint = get_sso_endpoint(TOKEN_ENDPOINT_KEY)
+                    logger.debug(_(messages.INSIGHTS_LOGIN_VERIFYING), token_endpoint)
+                    response = requests.post(
+                        token_endpoint, headers=headers, data=params
+                    )
                 except ConnectionError as err:
                     raise InsightsAuthError(
                         _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % err)
@@ -115,7 +135,7 @@ class InsightsAuth:
                     if response_error == "expired_token":
                         logger.debug(
                             _(messages.INSIGHTS_RESPONSE),
-                            insights_sso_server,
+                            token_endpoint,
                             response.text,
                         )
                         raise InsightsAuthError(
@@ -124,7 +144,7 @@ class InsightsAuth:
                     if response_error != "authorization_pending":
                         logger.debug(
                             _(messages.INSIGHTS_RESPONSE),
-                            insights_sso_server,
+                            token_endpoint,
                             response.text,
                         )
                         raise InsightsAuthError(
@@ -136,13 +156,13 @@ class InsightsAuth:
                     else:
                         logger.debug(
                             _(messages.INSIGHTS_RESPONSE),
-                            insights_sso_server,
+                            token_endpoint,
                             self.token_response,
                         )
                 else:
                     logger.debug(
                         _(messages.INSIGHTS_RESPONSE),
-                        insights_sso_server,
+                        token_endpoint,
                         response.text,
                     )
                     raise InsightsAuthError(

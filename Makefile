@@ -96,11 +96,13 @@ update-man-qpc-roff:
 
 # regenerate and update all man page files
 manpage:
+	$(MAKE) update-man-template-roff
 	$(MAKE) update-man-qpc-rst
 	$(MAKE) update-man-qpc-roff
 
 # test if man page files have changed
 manpage-test:
+	$(MAKE) update-man-template-roff
 	$(MAKE) update-man-qpc-rst
 	$(MAKE) update-man-qpc-roff BUILD_DATE="${OLD_MAN_PAGE_BUILD_DATE}"
 	git diff --exit-code docs

@@ -12,7 +12,7 @@ import requests_mock
 from qpc import messages
 from qpc.cred import CREDENTIAL_URI
 from qpc.cred.clear import CredClearCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 

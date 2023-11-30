@@ -15,7 +15,7 @@ from qpc.cred import CREDENTIAL_URI
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.edit import SourceEditCommand
-from qpc.tests_utilities import redirect_stdout
+from qpc.tests.utilities import redirect_stdout
 from qpc.utils import get_server_location, read_in_file
 
 

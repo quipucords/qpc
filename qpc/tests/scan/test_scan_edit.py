@@ -13,7 +13,7 @@ from qpc.cli import CLI
 from qpc.scan import SCAN_URI
 from qpc.scan.edit import ScanEditCommand
 from qpc.source import SOURCE_URI
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_HOSTFILE = "/tmp/testhostsfile"

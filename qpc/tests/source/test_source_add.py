@@ -16,7 +16,7 @@ from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.add import SourceAddCommand
 from qpc.source.utils import validate_port
-from qpc.tests_utilities import redirect_stdout
+from qpc.tests.utilities import redirect_stdout
 from qpc.utils import get_server_location
 
 

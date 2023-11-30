@@ -11,7 +11,7 @@ from qpc import messages
 from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import ASYNC_MERGE_URI
 from qpc.report.merge_status import ReportMergeStatusCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 

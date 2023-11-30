@@ -17,7 +17,7 @@ from qpc.cli import CLI
 from qpc.report import REPORT_URI
 from qpc.report.insights import ReportInsightsCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import redirect_stdout
+from qpc.tests.utilities import redirect_stdout
 from qpc.utils import create_tar_buffer, get_server_location
 
 VERSION = "0.9.4"

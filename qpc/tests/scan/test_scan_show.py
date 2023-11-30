@@ -11,7 +11,7 @@ import requests_mock
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_URI
 from qpc.scan.show import ScanShowCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 

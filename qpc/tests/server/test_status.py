@@ -13,7 +13,7 @@ from qpc import messages
 from qpc.cli import CLI
 from qpc.server import STATUS_URI
 from qpc.server.status import ServerStatusCommand
-from qpc.tests_utilities import redirect_stdout
+from qpc.tests.utilities import redirect_stdout
 from qpc.utils import get_server_location
 
 

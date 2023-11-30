@@ -8,7 +8,7 @@ import requests_mock
 from qpc import utils
 from qpc.server import LOGOUT_URI
 from qpc.server.logout_host import LogoutHostCommand
-from qpc.tests_utilities import HushUpStderr
+from qpc.tests.utilities import HushUpStderr
 
 
 class TestLogout:

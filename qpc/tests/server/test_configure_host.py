@@ -7,7 +7,7 @@ import pytest
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.tests_utilities import HushUpStderr
+from qpc.tests.utilities import HushUpStderr
 from qpc.utils import read_server_config, write_server_config
 
 DEFAULT_PORT = 9443

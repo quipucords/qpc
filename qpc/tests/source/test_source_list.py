@@ -14,7 +14,7 @@ from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.list import SourceListCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 

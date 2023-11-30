@@ -11,7 +11,7 @@ import requests_mock
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.show import SourceShowCommand
-from qpc.tests_utilities import HushUpStderr, redirect_stdout
+from qpc.tests.utilities import HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 

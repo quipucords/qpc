@@ -16,9 +16,9 @@ from qpc import messages
 from qpc.cli import CLI
 from qpc.release import VERSION
 from qpc.report import REPORT_URI
-from qpc.report.details import ReportDetailsCommand
+from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.tests_utilities import redirect_stdout
+from qpc.tests.utilities import redirect_stdout
 from qpc.utils import create_tar_buffer, get_server_location
 
 
@@ -35,14 +35,14 @@ def csv_file(tmp_path):
 
 
 @pytest.mark.usefixtures("server_config")
-class TestReportDetails:
-    """Class for testing the details report command."""
+class TestReportDeployments:
+    """Class for testing the deployments report command."""
 
     def _init_command(self):
         """Initialize command."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
-        return ReportDetailsCommand(subparser)
+        return ReportDeploymentsCommand(subparser)
 
     def setup_method(self, _test_method):
         """Create test setup."""
@@ -52,11 +52,11 @@ class TestReportDetails:
         # code smell to me, but I'm choosing to ignore it for now
         self.command = self._init_command()
 
-    def test_detail_report_as_json(self, caplog, json_file):
-        """Testing retrieving detail report as json."""
+    def test_deployments_report_as_json(self, caplog, json_file):
+        """Testing retrieving deployments report as json."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -84,9 +84,9 @@ class TestReportDetails:
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_detail_report_as_json_report_id(self, caplog, json_file):
-        """Testing retrieving detail report as json with report id."""
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+    def test_deployments_report_as_json_report_id(self, caplog, json_file):
+        """Testing retrieving deployments report as json with report id."""
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -108,16 +108,16 @@ class TestReportDetails:
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with Path(json_file).open("r", encoding="utf-8") as file_buffer:
-                    data = file_buffer.read()
+                with Path(json_file).open("r", encoding="utf-8") as json_file:
+                    data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_detail_report_as_csv(self, caplog, csv_file):
-        """Testing retrieving detail report as csv."""
+    def test_deployments_report_as_csv(self, caplog, csv_file):
+        """Testing retreiving deployments report as csv."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_csv_data = "Report\n"
         get_report_csv_data += "1\n\n\n"
         get_report_csv_data += "key\n"
@@ -143,39 +143,53 @@ class TestReportDetails:
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with Path(csv_file).open("r", encoding="utf-8") as csv_buffer:
-                    data = csv_buffer.read()
+                with Path(csv_file).open("r", encoding="utf-8") as json_file:
+                    data = json_file.read()
                     file_content_dict = json.loads(data)
                 assert get_report_csv_data == file_content_dict
 
     # Test validation
-    def test_detail_report_output_directory(self):
+    def test_deployments_report_output_directory(self):
         """Testing fail because output directory."""
         with pytest.raises(SystemExit):
-            sys.argv = ["/bin/qpc", "report", "detail", "--json", "--output-file", "/"]
+            sys.argv = [
+                "/bin/qpc",
+                "report",
+                "deployments",
+                "--json",
+                "--output-file",
+                "/",
+            ]
             CLI().main()
 
-    def test_detail_report_output_directory_not_exist(self):
+    def test_deployments_report_output_directory_not_exist(self):
         """Testing fail because output directory does not exist."""
         with pytest.raises(SystemExit):
             sys.argv = [
                 "/bin/qpc",
                 "report",
-                "detail",
+                "deployments",
                 "--json",
                 "--output-file",
                 "/foo/bar/",
             ]
             CLI().main()
 
-    def test_detail_report_output_file_empty(self):
+    def test_deployments_report_output_file_empty(self):
         """Testing fail because output file empty."""
         with pytest.raises(SystemExit):
-            sys.argv = ["/bin/qpc", "report", "detail", "--json", "--output-file", ""]
+            sys.argv = [
+                "/bin/qpc",
+                "report",
+                "deployments",
+                "--json",
+                "--output-file",
+                "",
+            ]
             CLI().main()
 
-    def test_detail_report_scan_job_not_exist(self, json_file):
-        """Details report with nonexistent scanjob."""
+    def test_deployments_report_scan_job_not_exist(self, json_file):
+        """Deployments report with nonexistent scanjob."""
         report_out = StringIO()
 
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
@@ -185,8 +199,8 @@ class TestReportDetails:
 
             args = Namespace(
                 scan_job_id="1",
-                report_id=None,
                 output_json=True,
+                report_id=None,
                 output_csv=False,
                 path=json_file,
             )
@@ -195,8 +209,8 @@ class TestReportDetails:
                     self.command.main(args)
                     assert report_out.getvalue() == messages.REPORT_SJ_DOES_NOT_EXIST
 
-    def test_detail_report_invalid_scan_job(self, json_file):
-        """Details report with scanjob but no report_id."""
+    def test_deployments_report_invalid_scan_job(self, json_file):
+        """Deployments report with scanjob but no report_id."""
         report_out = StringIO()
 
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
@@ -215,14 +229,15 @@ class TestReportDetails:
                 with redirect_stdout(report_out):
                     self.command.main(args)
                     assert (
-                        report_out.getvalue() == messages.REPORT_NO_DETAIL_REPORT_FOR_SJ
+                        report_out.getvalue()
+                        == messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ
                     )
 
-    @patch("qpc.report.details.write_file")
-    def test_details_file_fails_to_write(self, file, caplog, json_file):
-        """Testing details failure while writing to file."""
+    @patch("qpc.report.deployments.write_file")
+    def test_deployments_file_fails_to_write(self, file, caplog, json_file):
+        """Testing deployments failure while writing to file."""
         file.side_effect = EnvironmentError()
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -250,10 +265,10 @@ class TestReportDetails:
                 }
                 assert err_msg in caplog.text
 
-    def test_details_nonexistent_directory(self, caplog, json_file):
+    def test_deployments_nonexistent_directory(self, caplog, json_file):
         """Testing error for nonexistent directory in output."""
-        fake_dir = "/cody/is/awesome/details.json"
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        fake_dir = "/cody/is/awesome/deployments.json"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -275,10 +290,10 @@ class TestReportDetails:
                 )
                 assert err_msg in caplog.text
 
-    def test_details_nonjson_path(self, caplog, json_file):
-        """Testing error for non json file path."""
-        non_json_dir = "/Users/details.tar.gz"
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+    def test_deployments_nonjson_directory(self, caplog, json_file):
+        """Testing error for nonjson output path."""
+        non_json_dir = "/Users/deployments.tar.gz"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -298,10 +313,10 @@ class TestReportDetails:
                 err_msg = messages.OUTPUT_FILE_TYPE % ".json"
                 assert err_msg in caplog.text
 
-    def test_details_noncsv_path(self, caplog, json_file):
-        """Testing error for noncsv file path."""
-        non_csv_dir = "/Users/details.tar.gz"
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+    def test_deployments_noncsv_directory(self, caplog, json_file):
+        """Testing error for noncsv output path."""
+        non_csv_dir = "/cody/is/awesome/deployments.tar.gz"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -321,15 +336,17 @@ class TestReportDetails:
                 err_msg = messages.OUTPUT_FILE_TYPE % ".csv"
                 assert err_msg in caplog.text
 
-    def test_details_report_id_not_exist(self, caplog, json_file):
-        """Test details with nonexistent report id."""
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+    def test_deployments_report_id_not_exist(self, caplog, json_file):
+        """Test deployments with nonexistent report id."""
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
+        test_dict = {json_file: get_report_json_data}
+        buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
             mocker.get(
                 get_report_url,
                 status_code=400,
-                json=get_report_json_data,
+                content=buffer_content,
                 headers={"X-Server-Version": VERSION},
             )
 
@@ -343,14 +360,14 @@ class TestReportDetails:
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
-                err_msg = messages.REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID % 1
+                err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID % 1
                 assert err_msg in caplog.text
 
-    def test_detail_report_error_scan_job(self, caplog, json_file):
+    def test_deployments_report_error_scan_job(self, caplog, json_file):
         """Testing error with scan job id."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {json_file: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -373,12 +390,12 @@ class TestReportDetails:
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
-                err_msg = messages.REPORT_NO_DETAIL_REPORT_FOR_SJ % 1
+                err_msg = messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ % 1
                 assert err_msg in caplog.text
 
-    def test_details_old_version(self, caplog, csv_file):
+    def test_deployments_old_version(self, caplog, json_file):
         """Test too old server version."""
-        get_report_url = get_server_location() + REPORT_URI + "1/details/"
+        get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         with requests_mock.Mocker() as mocker:
             mocker.get(
@@ -391,9 +408,9 @@ class TestReportDetails:
             args = Namespace(
                 scan_job_id=None,
                 report_id="1",
-                output_json=False,
-                output_csv=True,
-                path=csv_file,
+                output_json=True,
+                output_csv=False,
+                path=json_file,
             )
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
@@ -405,10 +422,10 @@ class TestReportDetails:
                 assert err_msg in caplog.text
 
 
-def test_details_report_as_json_no_output_file(caplog, capsys, requests_mock):
-    """Testing retrieving details report as json without output file."""
+def test_deployments_report_as_json_no_output_file(caplog, capsys, requests_mock):
+    """Testing retrieving deployments report as json without output file."""
     caplog.set_level("INFO")
-    report_url = get_server_location() + REPORT_URI + "1/details/"
+    report_url = get_server_location() + REPORT_URI + "1/deployments/"
     report_json_data = {"id": 1, "report": [{"key": "value"}]}
     json_filename = f"test_{time.time():.0f}.json"
     buffer_content = create_tar_buffer({json_filename: report_json_data})
@@ -422,12 +439,12 @@ def test_details_report_as_json_no_output_file(caplog, capsys, requests_mock):
     sys.argv = [
         "/bin/qpc",
         "report",
-        "details",
+        "deployments",
         "--json",
         "--report",
         "1",
     ]
     CLI().main()
-    assert caplog.messages[-1] == messages.REPORT_SUCCESSFULLY_WRITTEN
+    assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
     captured = capsys.readouterr()
     assert json.loads(captured.out)

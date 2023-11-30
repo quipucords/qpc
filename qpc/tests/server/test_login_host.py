@@ -12,7 +12,7 @@ import requests_mock
 from qpc import messages
 from qpc.server import LOGIN_URI
 from qpc.server.login_host import LoginHostCommand
-from qpc.tests_utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 TMP_KEY = "/tmp/testkey"

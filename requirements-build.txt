@@ -39,12 +39,14 @@ setuptools-scm==8.0.4
     #   pluggy
     #   python-dateutil
     #   setuptools-rust
-trove-classifiers==2023.11.22
+trove-classifiers==2023.11.29
     # via hatchling
 typing-extensions==4.8.0
     # via setuptools-scm
 wheel==0.42.0
-    # via cryptography
+    # via
+    #   cryptography
+    #   python-dateutil
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==69.0.2 ; python_version >= "3.11" and python_version < "4.0"

@@ -22,7 +22,7 @@ help:
 	@echo "Please use \`make <target>' where <target> is one of:"
 	@echo "  help                to show this message"
 	@echo "  install             to install the client egg"
-	@echo "  clean               to remove client egg"
+	@echo "  clean               to remove cache, dist, build, and egg files"
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
 	@echo "  lint-black          to run the black format checker"
@@ -37,6 +37,8 @@ help:
 
 clean:
 	-rm -rf dist/ build/ qpc.egg-info/
+	find . -type f -name '*.pyc' -delete
+	find . -type d -name __pycache__ -delete
 
 install:
 	$(PYTHON) setup.py build -f

@@ -12,3 +12,18 @@ files_to_sync:
 upstream_package_name: qpc
 # downstream (Fedora) RPM package name
 downstream_package_name: qpc
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    targets:
+      # we officially support rhel-8 and rhel-9 downstream.
+      - rhel-8
+      - rhel-9
+      # centos-stream is like a preview of upcoming rhel.
+      - centos-stream-8
+      - centos-stream-9
+      # fedora is like an even farther future preview.
+      - fedora-37
+      - fedora-38
+      # - fedora-39  # currently not supported due to python 3.11 vs 3.12

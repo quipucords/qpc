@@ -1,10 +1,6 @@
 [![GitHub license](https://img.shields.io/github/license/quipucords/qpc.svg)](https://github.com/quipucords/qpc/blob/main/LICENSE)
-[![Build Status](https://travis-ci.org/quipucords/qpc.svg?branch=main)](https://travis-ci.org/quipucords/qpc)
 [![Code Coverage](https://codecov.io/gh/quipucords/qpc/branch/main/graph/badge.svg)](https://codecov.io/gh/quipucords/qpc)
-[![Documentation Status](https://readthedocs.org/projects/qpc/badge/)](https://qpc.readthedocs.io/en/latest/)
-[![COPR Status](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc/package/qpc/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc/package/qpc/)
-[![Updates](https://pyup.io/repos/github/quipucords/qpc/shield.svg)](https://pyup.io/repos/github/quipucords/qpc/)
-[![Python 3](https://pyup.io/repos/github/quipucords/qpc/python-3-shield.svg)](https://pyup.io/repos/github/quipucords/qpc/)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc-latest/package/qpc/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc-latest/package/qpc/)
 
 
 # qpc - RPM command line tool for quipucords

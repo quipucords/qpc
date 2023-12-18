@@ -18,13 +18,13 @@ flit-core==3.9.0
     #   pathspec
     #   typing-extensions
     #   wheel
-hatchling==1.18.0
+hatchling==1.21.0
     # via urllib3
-packaging==23.2 ; python_version >= "3.11" and python_version < "4.0"
+packaging==23.2
     # via
     #   hatchling
     #   setuptools-scm
-pathspec==0.11.2
+pathspec==0.12.1
     # via hatchling
 pluggy==1.3.0
     # via hatchling
@@ -34,14 +34,15 @@ semantic-version==2.10.0
     # via setuptools-rust
 setuptools-rust==1.8.1
     # via cryptography
-setuptools-scm==8.0.4
+setuptools-scm @ https://files.pythonhosted.org/packages/0e/a3/b9a8b0adfe672bf0df5901707aa929d30a97ee390ba651910186776746d2/setuptools_scm-8.0.4-py3-none-any.whl#sha256=b47844cd2a84b83b3187a5782c71128c28b4c94cad8bfb871da2784a5cb54c4f
     # via
     #   pluggy
     #   python-dateutil
     #   setuptools-rust
+    #   setuptools-scm
 trove-classifiers==2023.11.29
     # via hatchling
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via setuptools-scm
 wheel==0.42.0
     # via

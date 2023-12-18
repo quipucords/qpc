@@ -4,9 +4,9 @@ import json
 import sys
 
 import requests
-from packaging.version import Version
 
 from qpc import messages
+from qpc._vendor.packaging.version import Version
 from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.translation import _
 from qpc.utils import (

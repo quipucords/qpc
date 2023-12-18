@@ -1317,6 +1317,17 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "vendorize"
+version = "0.3.0"
+description = "Vendorize packages from PyPI"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "vendorize-0.3.0-py3-none-any.whl", hash = "sha256:d6c163755369d4f6120f3a69b5d2112f04bb124555550b002813265463fb43c9"},
+    {file = "vendorize-0.3.0.tar.gz", hash = "sha256:d3fc6f1ce436887f46b80ed0c13fb546a8201906d6e763d9b2aaf7ec40193792"},
+]
+
+[[package]]
 name = "wheel"
 version = "0.42.0"
 description = "A built-package format for Python"
@@ -1344,4 +1355,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d1a67a54bd3a2b9f8e5db016e3feb2f5d40437c6c35c232f6d28293a8beb34c9"
+content-hash = "b7b799b7d876d14d259bdb69d272f2ad2bb2ba8e66f237f6ec3657b1691c5a49"

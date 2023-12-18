@@ -14,7 +14,6 @@ DIRS	= test bin locale src
 PYDIRS	= quipucords
 BINDIR  = bin
 
-OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 SPHINX_BUILD = $(shell poetry run which sphinx-build)
 SED = sed
 

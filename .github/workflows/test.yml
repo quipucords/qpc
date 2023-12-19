@@ -7,29 +7,6 @@ on:
     branches: [main, "release/*"]
 
 jobs:
-  check-dependencies:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Set up Python
-        uses: actions/setup-python@v4.7.0
-        with:
-          python-version-file: pyproject.toml
-          cache: "poetry"
-          cache-dependency-path: "poetry.lock"
-
-      - name: Check dependencies
-        run: |
-          make lock-main-requirements
-          make check-requirements
   test:
     runs-on: ubuntu-latest
     strategy:

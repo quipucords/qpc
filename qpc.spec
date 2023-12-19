@@ -17,7 +17,6 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 
 Requires:       python%{python3_pkgversion}
 Requires:       python%{python3_pkgversion}-cryptography
-Requires:       python%{python3_pkgversion}-packaging
 Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-setuptools
 

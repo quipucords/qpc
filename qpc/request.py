@@ -1,10 +1,10 @@
 """Common module for handling request calls to the server."""
 
 import json
+import re
 import sys
 
 import requests
-from packaging.version import Version
 
 from qpc import messages
 from qpc.release import QPC_VAR_PROGRAM_NAME
@@ -39,6 +39,21 @@ except AttributeError:
     exception_class = ValueError
 
 
+def version_tuple(version_str: str) -> tuple:
+    """
+    Parse a version string to a tuple containing its first three integer segments.
+
+    This is a crude simplification that does NOT fully support PEP-440. This function
+    expects the version string to have at least three positive integer segments, ignores
+    any additional segments, and ignores any non-numeric suffixes.
+    """
+    version_pattern = r"^(\d+)\.(\d+)\.(\d+)"
+    match = re.match(version_pattern, version_str)
+    if not match:
+        raise ValueError(f"Unsupported version string '{version_str}'")
+    return tuple(map(int, match.groups(0)))
+
+
 def handle_general_errors(response, min_server_version):
     """Handle general errors.
 
@@ -49,7 +64,7 @@ def handle_general_errors(response, min_server_version):
     if not server_version:
         server_version = QPC_MIN_SERVER_VERSION
 
-    if "0.0.0" not in server_version and Version(server_version) < Version(
+    if "0.0.0" not in server_version and version_tuple(server_version) < version_tuple(
         min_server_version
     ):
         logger.error(

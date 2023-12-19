@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from qpc.request import request
+from qpc.request import request, version_tuple
 from qpc.utils import QPC_MIN_SERVER_VERSION
 
 
@@ -58,3 +58,29 @@ def test_log_request_info_valid_json(server_config, caplog):
         request("GET", "/path")
 
     assert "Response: \"{'message': 'Success'}\"" in caplog.messages[-1]
+
+
+@pytest.mark.parametrize(
+    "version_string,expected_result",
+    [
+        ["1.2.3", (1, 2, 3)],
+        ["1.2.3.4", (1, 2, 3)],
+        ["010.20.3", (10, 20, 3)],
+        ["1.2.3+c0ff33", (1, 2, 3)],
+        ["1.2.3a1", (1, 2, 3)],
+        ["1.2.3.dev4", (1, 2, 3)],
+    ],
+)
+def test_version_tuple(version_string, expected_result):
+    """Test converting version strings to tuples."""
+    assert version_tuple(version_string) == expected_result
+
+
+@pytest.mark.parametrize(
+    "version_string",
+    ["1.2", "1.2.dev3", "1!2.3", "1.2a3.4", "1.2.post-3", "a.b.c"],
+)
+def test_version_tuple_invalid(version_string):
+    """Test failing to convert unsupported version strings to tuples."""
+    with pytest.raises(ValueError):
+        version_tuple(version_string)

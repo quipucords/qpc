@@ -3,7 +3,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        1.5.0a1
+Version:        1.5.0
 Release:        1%{?dist}
 Epoch:          0
 
@@ -49,5 +49,5 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
-* Thu Oct 12 2023 Brad Smith <brasmith@redhat.com> - 0:1.5.0a1-1
-- Initial prototype RPM for upcoming 1.5.0 release series.
+* Mon Jan 22 2024 Brad Smith <brasmith@redhat.com> - 0:1.5.0-1
+- Initial release of qpc CLI as an RPM.

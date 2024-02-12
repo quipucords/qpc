@@ -30,7 +30,7 @@ The Python packages that are required for running qpc on a system can be found i
 
 #  <a name="installation"></a> Installation
 ```
-dnf copr enable @quipucords/qpc 
+dnf copr enable @quipucords/qpc
 dnf install qpc
 ```
 
@@ -45,7 +45,11 @@ To work with the qpc code, begin by cloning the repository:
 git clone git@github.com:quipucords/qpc.git
 ```
 
-qpc currently supports Python 3.6. If you do not have Python on your system, follow these [instructions](https://www.python.org/downloads/>).
+qpc development requires Python 3.11 and Poetry. Install using your local pakage manager or manually from:
+
+* https://www.python.org/downloads/
+* https://python-poetry.org/
+* https://github.com/pyenv/pyenv/ (optional but encouraged)
 
 
 ## Installation with development dependencies
@@ -82,7 +86,7 @@ See the [CONTRIBUTING](CONTRIBUTING.md) guide for information about contributing
 
 
 # <a name="copyright"></a> Copyright and License
-Copyright 2017-2019, Red Hat, Inc.
+Copyright 2017-2024, Red Hat, Inc.
 
 quipucords is released under the [GNU Public License version 3](LICENSE)
 

@@ -1,6 +1,5 @@
 """ReportDeploymentsCommand is to show deployments report."""
 
-
 import sys
 from logging import getLogger
 

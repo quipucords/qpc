@@ -1,4 +1,5 @@
 """QPC Package Initialization."""
+
 from importlib import metadata
 from pathlib import Path
 from tomllib import load

@@ -1,4 +1,5 @@
 """Test the CLI module."""
+
 import logging
 import sys
 from argparse import ArgumentParser, Namespace  # noqa: I100

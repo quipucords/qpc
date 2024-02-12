@@ -1,4 +1,5 @@
 """Test the `qpc.release` module."""
+
 import subprocess
 from unittest import mock
 

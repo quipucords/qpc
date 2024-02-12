@@ -1,4 +1,5 @@
 """Test openshift source list in CLI."""
+
 import json
 import sys
 

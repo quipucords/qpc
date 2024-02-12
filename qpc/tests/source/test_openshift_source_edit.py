@@ -1,4 +1,5 @@
 """Test openshift source edit in CLI."""
+
 import sys
 
 import pytest

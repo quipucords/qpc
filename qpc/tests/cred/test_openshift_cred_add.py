@@ -1,4 +1,5 @@
 """Test openshift cred add in CLI."""
+
 import sys
 from unittest.mock import patch
 

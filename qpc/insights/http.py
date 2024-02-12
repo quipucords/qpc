@@ -1,4 +1,5 @@
 """HTTP Client for console.redhat.com."""
+
 from urllib.parse import urljoin
 
 import requests

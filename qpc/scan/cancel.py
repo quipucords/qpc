@@ -1,4 +1,5 @@
 """ScanCancelCommand is used to cancel a specific system scan."""
+
 from logging import getLogger
 
 from requests import codes

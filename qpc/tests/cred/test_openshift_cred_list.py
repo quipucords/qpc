@@ -1,4 +1,5 @@
 """Test openshift cred list in CLI."""
+
 import json
 import sys
 

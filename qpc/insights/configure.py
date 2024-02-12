@@ -1,4 +1,5 @@
 """InsightsConfigureCommand is used to set target host and port for insights publish."""
+
 from logging import getLogger
 
 from qpc import insights, messages

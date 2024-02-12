@@ -1,4 +1,5 @@
 """Test insights utilities functions."""
+
 from argparse import ArgumentTypeError
 
 import pytest

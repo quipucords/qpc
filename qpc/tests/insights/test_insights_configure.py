@@ -1,4 +1,5 @@
 """Test the CLI module."""
+
 import sys
 from unittest import mock
 

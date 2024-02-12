@@ -1,4 +1,5 @@
 """Tests for the HTTP Client for console.redhat.com."""
+
 from unittest import mock
 
 import pytest

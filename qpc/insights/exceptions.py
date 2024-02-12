@@ -1,6 +1,5 @@
 """Errors for insights module."""
 
-
 from qpc.exceptions import QPCError
 
 

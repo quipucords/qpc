@@ -98,10 +98,14 @@ class TestSourceAddCli:
     def test_validate_port_range_err(self):
         """Test the add source command with port validation out of range."""
         source_out = StringIO()
+        msg = (
+            "Port value {port} should be a positive integer"
+            " in the valid range (0-65535)"
+        )
         with pytest.raises(ArgumentTypeError):
             with redirect_stdout(source_out):
                 validate_port("65537")
-                assert "Port value 65537" in source_out.getvalue()
+                assert msg.format(port="65537") in source_out.getvalue()
 
     def test_validate_port_good(self):
         """Testing the add source command with port validation success."""

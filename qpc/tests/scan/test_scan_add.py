@@ -174,6 +174,32 @@ class TestScanAddCli:
                 expected_message = messages.SCAN_ADDED % "scan1"
                 assert expected_message in caplog.text
 
+    @pytest.mark.parametrize(
+        "disable_opt_products_value", ("1", "-100", "redhat_packages", "ifconfig")
+    )
+    def test_disable_optional_products_negative(
+        self, capsys, disable_opt_products_value
+    ):
+        """Test add scan with unknown disabled-optional-products value."""
+        sys.argv = [
+            "/bin/qpc",
+            "scan",
+            "add",
+            "--name",
+            "scan_1",
+            "--sources",
+            "source_1",
+            "--disabled-optional-products",
+            disable_opt_products_value,
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+
+        expected_output = "--disabled-optional-products: invalid choice: '{}'"
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert expected_output.format(disable_opt_products_value) in err
+
     def test_enabled_products_and_dirs(self, caplog):
         """Testing that the ext products & search dirs flags work correctly."""
         url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
@@ -244,6 +270,30 @@ class TestScanAddCli:
                 self.command.main(args)
                 expected_message = messages.SCAN_ADDED % "scan1"
                 assert expected_message in caplog.text
+
+    @pytest.mark.parametrize(
+        "enabled_ext_products_value", ("1", "-100", "redhat_packages", "ifconfig")
+    )
+    def test_enabled_ext_products_negative(self, capsys, enabled_ext_products_value):
+        """Test add scan with unknown enabled-ext-product-search value."""
+        sys.argv = [
+            "/bin/qpc",
+            "scan",
+            "add",
+            "--name",
+            "scan_1",
+            "--sources",
+            "source_1",
+            "--enabled-ext-product-search",
+            enabled_ext_products_value,
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+
+        expected_output = "--enabled-ext-product-search: invalid choice: '{}'"
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert expected_output.format(enabled_ext_products_value) in err
 
     def test_disable_optional_products_empty(self, caplog):
         """Testing that the disable-optional-products flag works correctly."""

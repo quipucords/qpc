@@ -125,6 +125,58 @@ class TestOpenShiftAddSource:
         assert out == ""
         assert expected_output in err
 
+    def test_add_with_unknown_ssl_cert_verify_param(self, capsys, ocp_credential_mock):
+        """Test ocp add source w/ unknown ssl-cert-verify param."""
+        sys.argv = [
+            "/bin/qpc",
+            "source",
+            "add",
+            "--name",
+            "ocp_source_1",
+            "--type",
+            OPENSHIFT_SOURCE_TYPE,
+            "--cred",
+            "ocp_cred_1",
+            "--hosts",
+            "[1.2.3.4]",
+            "--ssl-cert-verify",
+            "maybe",
+            "--disable-ssl",
+            "false",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        expected_output = "--ssl-cert-verify: invalid choice: 'maybe'"
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert expected_output in err
+
+    def test_add_with_unknown_disable_ssl_param(self, capsys, ocp_credential_mock):
+        """Test ocp add source w/ unknown ssl-disable param."""
+        sys.argv = [
+            "/bin/qpc",
+            "source",
+            "add",
+            "--name",
+            "ocp_source_1",
+            "--type",
+            OPENSHIFT_SOURCE_TYPE,
+            "--cred",
+            "ocp_cred_1",
+            "--hosts",
+            "[1.2.3.4]",
+            "--ssl-cert-verify",
+            "false",
+            "--disable-ssl",
+            "maybe",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        expected_output = "--disable-ssl: invalid choice: 'maybe'"
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert expected_output in err
+
     @pytest.mark.parametrize(
         "status_code, err_log_message",
         [

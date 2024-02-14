@@ -178,10 +178,10 @@ class TestScanAddCli:
         "disable_opt_products_value", ("1", "-100", "redhat_packages", "ifconfig")
     )
     def test_disable_optional_products_negative(
-        self, capsys, disable_opt_products_value
+        self, capsys, mocker, disable_opt_products_value
     ):
         """Test add scan with unknown disabled-optional-products value."""
-        sys.argv = [
+        fake_sys_argv = [
             "/bin/qpc",
             "scan",
             "add",
@@ -192,6 +192,7 @@ class TestScanAddCli:
             "--disabled-optional-products",
             disable_opt_products_value,
         ]
+        mocker.patch.object(sys, "argv", fake_sys_argv)
         with pytest.raises(SystemExit):
             CLI().main()
 
@@ -274,9 +275,11 @@ class TestScanAddCli:
     @pytest.mark.parametrize(
         "enabled_ext_products_value", ("1", "-100", "redhat_packages", "ifconfig")
     )
-    def test_enabled_ext_products_negative(self, capsys, enabled_ext_products_value):
+    def test_enabled_ext_products_negative(
+        self, capsys, mocker, enabled_ext_products_value
+    ):
         """Test add scan with unknown enabled-ext-product-search value."""
-        sys.argv = [
+        fake_sys_argv = [
             "/bin/qpc",
             "scan",
             "add",
@@ -287,6 +290,7 @@ class TestScanAddCli:
             "--enabled-ext-product-search",
             enabled_ext_products_value,
         ]
+        mocker.patch.object(sys, "argv", fake_sys_argv)
         with pytest.raises(SystemExit):
             CLI().main()
 

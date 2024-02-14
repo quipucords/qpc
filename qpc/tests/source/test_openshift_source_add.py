@@ -125,9 +125,9 @@ class TestOpenShiftAddSource:
         assert out == ""
         assert expected_output in err
 
-    def test_add_with_unknown_ssl_cert_verify_param(self, capsys, ocp_credential_mock):
+    def test_add_with_unknown_ssl_cert_verify_param(self, capsys, mocker):
         """Test ocp add source w/ unknown ssl-cert-verify param."""
-        sys.argv = [
+        fake_sys_argv = [
             "/bin/qpc",
             "source",
             "add",
@@ -144,6 +144,7 @@ class TestOpenShiftAddSource:
             "--disable-ssl",
             "false",
         ]
+        mocker.patch.object(sys, "argv", fake_sys_argv),
         with pytest.raises(SystemExit):
             CLI().main()
         expected_output = "--ssl-cert-verify: invalid choice: 'maybe'"
@@ -151,9 +152,9 @@ class TestOpenShiftAddSource:
         assert out == ""
         assert expected_output in err
 
-    def test_add_with_unknown_disable_ssl_param(self, capsys, ocp_credential_mock):
+    def test_add_with_unknown_disable_ssl_param(self, capsys, mocker):
         """Test ocp add source w/ unknown ssl-disable param."""
-        sys.argv = [
+        fake_sys_argv = [
             "/bin/qpc",
             "source",
             "add",
@@ -170,6 +171,7 @@ class TestOpenShiftAddSource:
             "--disable-ssl",
             "maybe",
         ]
+        mocker.patch.object(sys, "argv", fake_sys_argv),
         with pytest.raises(SystemExit):
             CLI().main()
         expected_output = "--disable-ssl: invalid choice: 'maybe'"

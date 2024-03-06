@@ -24,14 +24,17 @@ CRED_FAILED_TO_REMOVE = (
     'Failed to remove credential "%s". For more '
     "information, see the server log file."
 )
+CRED_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SOURCE = (
+    "Could not delete credential ID %(credential_id)s "
+    "because it is assigned to at least one source "
+    "(source ID %(source_ids)s)."
+)
+CRED_CLEAR_ALL_SUMMARY = (
+    "Successfully deleted %(deleted_count)s credentials. "
+    "%(skipped_count)s credentials could not be deleted."
+)
 CRED_NOT_FOUND = 'Credential "%s" was not found.'
 CRED_NO_CREDS_TO_REMOVE = "No credentials exist to be removed."
-CRED_PARTIAL_REMOVE = (
-    "Some credentials were removed. However, an error "
-    "occurred while removing the following credentials: %s. For more "
-    "information, see the server log file."
-)
-CRED_CLEAR_ALL_SUCCESS = "All credentials were removed."
 
 CRED_TYPE_REQUIRED = (
     "The --type option is required. The value must be set to vcenter or network."

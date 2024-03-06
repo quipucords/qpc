@@ -8,7 +8,7 @@ from requests import codes
 import qpc.cred as credential
 from qpc import messages
 from qpc.clicommand import CliCommand
-from qpc.request import DELETE, GET, request
+from qpc.request import DELETE, GET, POST, request
 from qpc.translation import _
 from qpc.utils import handle_error_response
 
@@ -65,6 +65,39 @@ class CredClearCommand(CliCommand):
                 logger.error(_(messages.CRED_FAILED_TO_REMOVE), name)
         return deleted
 
+    def _delete_all(self) -> bool:
+        """
+        Delete all credentials.
+
+        :returns: True if all are deleted, or False if error or any are not deleted.
+        """
+        delete_uri = credential.CREDENTIAL_BULK_DELETE_URI
+        response = request(POST, delete_uri, payload={"ids": "all"}, parser=self.parser)
+        # Note: `request` handles most HTTP errors.
+        # So, we can trust response.status_code == codes.ok at this point.
+
+        response_json = response.json()
+        deleted = response_json.get("deleted", [])
+        skipped = response_json.get("skipped", [])
+        for skipped_info in skipped:
+            logger.error(
+                _(messages.CRED_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SOURCE),
+                {
+                    "credential_id": skipped_info["credential"],
+                    "source_ids": ", ".join(
+                        (str(source) for source in skipped_info["sources"])
+                    ),
+                },
+            )
+        logger_summary, success = (
+            (logger.error, False) if len(skipped) else (logger.info, True)
+        )
+        logger_summary(
+            messages.CRED_CLEAR_ALL_SUMMARY,
+            {"deleted_count": len(deleted), "skipped_count": len(skipped)},
+        )
+        return success
+
     def _handle_response_success(self):
         json_data = self.response.json()
         count = json_data.get("count", 0)
@@ -79,19 +112,5 @@ class CredClearCommand(CliCommand):
         elif count == 0:
             logger.error(_(messages.CRED_NO_CREDS_TO_REMOVE))
             sys.exit(1)
-        else:
-            # remove all entries
-            remove_error = []
-            next_link = json_data.get("next")
-            results = json_data.get("results")
-            for entry in results:
-                if self._delete_entry(entry, print_out=False) is False:
-                    remove_error.append(entry["name"])
-            if remove_error:
-                cred_err = ",".join(remove_error)
-                logger.error(_(messages.CRED_PARTIAL_REMOVE), cred_err)
-                sys.exit(1)
-            elif not next_link:
-                logger.info(_(messages.CRED_CLEAR_ALL_SUCCESS))
-            else:
-                self._do_command()
+        elif not self._delete_all():
+            sys.exit(1)

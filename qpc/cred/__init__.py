@@ -34,3 +34,4 @@ BECOME_CHOICES = [
 ]
 
 CREDENTIAL_URI = "/api/v1/credentials/"
+CREDENTIAL_BULK_DELETE_URI = "/api/v1/credentials/bulk_delete/"

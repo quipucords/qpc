@@ -10,13 +10,18 @@ jobs:
     trigger: pull_request
     targets: &targets_list
       # we officially support rhel-8 and rhel-9 downstream.
-      - rhel-8
-      - rhel-9
+      - rhel-8-x86_64
+      - rhel-8-aarch64
+      - rhel-9-x86_64
+      - rhel-9-aarch64
       # centos-stream is like a preview of upcoming rhel.
-      - centos-stream-8
-      - centos-stream-9
+      - centos-stream-8-x86_64
+      - centos-stream-8-aarch64
+      - centos-stream-9-x86_64
+      - centos-stream-9-aarch64
       # fedora is like an even farther future preview.
-      - fedora-38
+      - fedora-38-x86_64
+      - fedora-38-aarch64
       # - fedora-39  # currently not supported due to python 3.11 vs 3.12 issues
 
   - job: copr_build

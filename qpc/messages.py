@@ -118,12 +118,15 @@ SOURCE_REMOVED = 'Source "%s" was removed.'
 SOURCE_FAILED_TO_REMOVE = 'Failed to remove source "%s".'
 SOURCE_NOT_FOUND = 'Source "%s" was not found.'
 SOURCE_NO_SOURCES_TO_REMOVE = "No sources exist to be removed."
-SOURCE_PARTIAL_REMOVE = (
-    "Some sources were removed. However, an error "
-    "occurred while removing the following sources: %s. For more "
-    "information, see the server log file."
+SOURCE_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SCAN = (
+    "Could not delete source ID %(source_id)s "
+    "because it is assigned to at least one scan "
+    "(scan ID %(scan_ids)s)."
 )
-SOURCE_CLEAR_ALL_SUCCESS = "All sources were removed."
+SOURCE_CLEAR_ALL_SUMMARY = (
+    "Successfully deleted %(deleted_count)s sources. "
+    "%(skipped_count)s sources could not be deleted."
+)
 SOURCE_EDIT_NO_ARGS = "No arguments were provided to edit source %s."
 SOURCE_DOES_NOT_EXIST = 'Source "%s" does not exist.'
 

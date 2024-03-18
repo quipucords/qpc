@@ -7,7 +7,7 @@ from requests import codes
 
 from qpc import messages, scan
 from qpc.clicommand import CliCommand
-from qpc.request import DELETE, GET, request
+from qpc.request import DELETE, GET, POST, request
 from qpc.translation import _
 from qpc.utils import handle_error_response
 
@@ -64,6 +64,17 @@ class ScanClearCommand(CliCommand):
                 logger.error(_(messages.SCAN_FAILED_TO_REMOVE), name)
         return deleted
 
+    def _delete_all(self) -> bool:
+        """Delete all sources."""
+        delete_uri = scan.SCAN_BULK_DELETE_URI
+        response = request(POST, delete_uri, payload={"ids": "all"}, parser=self.parser)
+        # Note: `request` handles most HTTP errors.
+        # So, we can trust response.status_code == codes.ok at this point.
+
+        response_json = response.json()
+        deleted = response_json.get("deleted", [])
+        logger.info(messages.SCAN_CLEAR_ALL_SUMMARY, {"deleted_count": len(deleted)})
+
     def _handle_response_success(self):  # noqa: C901 PLR0912
         json_data = self.response.json()
         count = json_data.get("count", 0)
@@ -85,17 +96,4 @@ class ScanClearCommand(CliCommand):
             logger.error(_(messages.SCAN_NO_SCANS_TO_REMOVE))
             sys.exit(1)
         else:
-            # remove all scan entries
-            remove_error = []
-            next_link = json_data.get("next")
-            for entry in results:
-                if self._delete_entry(entry, print_out=False) is False:
-                    remove_error.append(entry["id"])
-            if remove_error:
-                scan_err = ",".join(str(remove_error))
-                logger.error(_(messages.SCAN_PARTIAL_REMOVE), scan_err)
-                sys.exit(1)
-            elif not next_link:
-                logger.info(messages.SCAN_CLEAR_ALL_SUCCESS)
-            else:
-                self._do_command()
+            self._delete_all()

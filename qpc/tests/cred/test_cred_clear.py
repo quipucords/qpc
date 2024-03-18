@@ -1,4 +1,4 @@
-"""Test the CLI module."""
+"""Test the "cred clear" command"."""
 
 import logging
 import sys

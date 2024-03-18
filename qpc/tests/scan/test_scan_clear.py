@@ -1,4 +1,4 @@
-"""Test the CLI module."""
+"""Test the "scan clear" commands."""
 
 import logging
 import sys
@@ -11,7 +11,7 @@ import requests_mock
 
 from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
-from qpc.scan import SCAN_URI
+from qpc.scan import SCAN_BULK_DELETE_URI, SCAN_URI
 from qpc.scan.clear import ScanClearCommand
 from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
@@ -152,51 +152,33 @@ class TestScanClearCli:
                     expected = "No scans exist to be removed\n"
                     assert scan_out.getvalue() == expected
 
-    def test_clear_all_with_error(self):
-        """Testing the clear scan command successfully.
-
-        With stubbed data list of scans with delete error
-        """
-        scan_out = StringIO()
+    def test_clear_all_but_unexpected_error_in_initial_get(self, caplog, faker):
+        """Test "clear all" when the GET fails unexpectedly before the delete POST."""
         get_url = get_server_location() + SCAN_URI
-        delete_url = get_server_location() + SCAN_URI + "1/"
-        delete_url2 = get_server_location() + SCAN_URI + "2/"
-        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
-        scan_entry2 = {"id": 2, "name": "scan2", "sources": ["source1"]}
-        results = [scan_entry, scan_entry2]
-        data = {"count": 2, "results": results}
-        err_data = {"error": ["Server Error"]}
+        server_error_message = faker.sentence()
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=data)
-            mocker.delete(delete_url, status_code=500, json=err_data)
-            mocker.delete(delete_url2, status_code=204)
-
+            mocker.get(get_url, status_code=500, json=server_error_message)
             args = Namespace(name=None)
-            with pytest.raises(SystemExit):
-                with redirect_stdout(scan_out):
-                    self.command.main(args)
-                    expected = (
-                        "Some scans were removed, however and"
-                        " error occurred removing the following"
-                        " credentials:"
-                    )
-                    assert expected in scan_out.getvalue()
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert server_error_message in caplog.text
 
-    def test_clear_all(self, caplog):
-        """Testing the clear scan command successfully with stubbed data."""
+    def test_clear_all(self, caplog, faker):
+        """Test "clear all" when all scans are successfully deleted."""
         get_url = get_server_location() + SCAN_URI
-        delete_url = get_server_location() + SCAN_URI + "1/"
-        delete_url2 = get_server_location() + SCAN_URI + "2/"
-        scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
-        scan_entry2 = {"id": 2, "name": "scan2", "sources": ["source1"]}
-        results = [scan_entry, scan_entry2]
-        data = {"count": 2, "results": results}
+        delete_url = get_server_location() + SCAN_BULK_DELETE_URI
+        all_scan_ids = [
+            faker.random_int() for _ in range(faker.random_int(min=2, max=10))
+        ]
+        get_response = {"count": len(all_scan_ids)}
+        bulk_delete_response = {"deleted": all_scan_ids}
         with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=data)
-            mocker.delete(delete_url, status_code=204)
-            mocker.delete(delete_url2, status_code=204)
-
+            mocker.get(get_url, status_code=200, json=get_response)
+            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
             args = Namespace(name=None)
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
-                assert messages.SCAN_CLEAR_ALL_SUCCESS in caplog.text
+                expected_message = messages.SCAN_CLEAR_ALL_SUMMARY % {
+                    "deleted_count": len(all_scan_ids)
+                }
+                assert expected_message in caplog.text

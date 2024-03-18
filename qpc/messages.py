@@ -174,12 +174,7 @@ SCAN_REMOVED = 'Scan "%s" was removed.'
 SCAN_FAILED_TO_REMOVE = 'Failed to remove scan "%s".'
 SCAN_NOT_FOUND = 'Scan "%s" was not found.'
 SCAN_NO_SCANS_TO_REMOVE = "No scans exist to be removed."
-SCAN_PARTIAL_REMOVE = (
-    "Some scans were removed. However, an error "
-    "occurred while removing the following scan: %s. For more "
-    "information, see the server log file."
-)
-SCAN_CLEAR_ALL_SUCCESS = "All scans were removed."
+SCAN_CLEAR_ALL_SUMMARY = "Successfully deleted %(deleted_count)s scans."
 SCAN_EDIT_NO_ARGS = "No arguments were provided to edit scan %s."
 SCAN_JOB_ID_STATUS = (
     'Provide the "--status" filter with a scan name to '

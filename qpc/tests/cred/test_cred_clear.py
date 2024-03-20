@@ -10,14 +10,23 @@ import requests
 import requests_mock
 
 from qpc import messages
-from qpc.cred import CREDENTIAL_URI
+from qpc.cred import CREDENTIAL_BULK_DELETE_URI, CREDENTIAL_URI
 from qpc.cred.clear import CredClearCommand
+from qpc.tests.mixins import BulkClearTestsMixin
 from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class TestCredentialClearCli:
+class TestCredentialClearCli(BulkClearTestsMixin):
     """Class for testing the credential clear commands for qpc."""
+
+    _uri_object_root = CREDENTIAL_URI
+    _uri_bulk_delete = CREDENTIAL_BULK_DELETE_URI
+    _message_no_objects_to_remove = messages.CRED_NO_CREDS_TO_REMOVE
+    _message_clear_all_summary = messages.CRED_CLEAR_ALL_SUMMARY
+    _message_clear_all_skipped = messages.CRED_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SOURCE
+    _bulk_delete_name = "credential"
+    _bulk_delete_skipped_because_name = "source"
 
     def setup_class(cls):
         """Set up test case."""
@@ -127,96 +136,3 @@ class TestCredentialClearCli:
             with pytest.raises(SystemExit):
                 with redirect_stdout(cred_out):
                     self.command.main(args)
-
-    def test_clear_all_empty(self):
-        """Testing the clear credential command successfully with stubbed data.
-
-        With empty list of credentials.
-        """
-        cred_out = StringIO()
-        get_url = get_server_location() + CREDENTIAL_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json={"count": 0})
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit):
-                with redirect_stdout(cred_out):
-                    self.command.main(args)
-
-    def test_clear_all_but_some_are_skipped(self, faker, caplog):
-        """Test "clear all" when some credentials are not deleted."""
-        get_url = get_server_location() + CREDENTIAL_URI
-        delete_url = get_server_location() + CREDENTIAL_URI + "bulk_delete/"
-        all_credential_ids = [
-            faker.random_int() for _ in range(faker.random_int(min=5, max=15))
-        ]
-        get_response = {"count": len(all_credential_ids)}
-        skipped = [
-            {"credential": cred_id, "sources": [faker.random_int()]}
-            for cred_id in faker.random_sample(all_credential_ids)
-        ]
-        deleted = list(
-            set(all_credential_ids)
-            - set([skipped_cred["credential"] for skipped_cred in skipped])
-        )
-        bulk_delete_response = {"deleted": deleted, "skipped": skipped}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            for skipped_cred in skipped:
-                assert messages.CRED_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SOURCE % {
-                    "credential_id": skipped_cred["credential"],
-                    "source_ids": skipped_cred["sources"],
-                }
-            expected_message = messages.CRED_CLEAR_ALL_SUMMARY % {
-                "deleted_count": len(deleted),
-                "skipped_count": len(skipped),
-            }
-            assert expected_message in caplog.text
-
-    def test_clear_all_but_unexpected_error_in_initial_get(self, caplog, faker):
-        """Test "clear all" when the GET fails unexpectedly before the delete POST."""
-        get_url = get_server_location() + CREDENTIAL_URI
-        server_error_message = faker.sentence()
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=500, json=server_error_message)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            assert server_error_message in caplog.text
-
-    def test_clear_all_but_unexpected_error_in_bulk_delete(self, caplog):
-        """Test "clear all" when an unexpected server error occurs during deletion."""
-        get_url = get_server_location() + CREDENTIAL_URI
-        delete_url = get_server_location() + CREDENTIAL_URI + "bulk_delete/"
-        get_response = {"count": 1}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=500)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            assert messages.SERVER_INTERNAL_ERROR in caplog.text
-
-    def test_clear_all(self, caplog, faker):
-        """Test "clear all" when all credentials are successfully deleted."""
-        get_url = get_server_location() + CREDENTIAL_URI
-        delete_url = get_server_location() + CREDENTIAL_URI + "bulk_delete/"
-        all_credential_ids = [
-            faker.random_int() for _ in range(faker.random_int(min=2, max=10))
-        ]
-        get_response = {"count": len(all_credential_ids)}
-        bulk_delete_response = {"deleted": all_credential_ids, "skipped": []}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
-            args = Namespace(name=None)
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                expected_message = messages.CRED_CLEAR_ALL_SUMMARY % {
-                    "deleted_count": len(all_credential_ids),
-                    "skipped_count": 0,
-                }
-                assert expected_message in caplog.text

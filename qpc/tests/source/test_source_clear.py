@@ -13,12 +13,21 @@ from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_BULK_DELETE_URI, SOURCE_URI
 from qpc.source.clear import SourceClearCommand
+from qpc.tests.mixins import BulkClearTestsMixin
 from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class TestSourceClearCli:
+class TestSourceClearCli(BulkClearTestsMixin):
     """Class for testing the source clear commands for qpc."""
+
+    _uri_object_root = SOURCE_URI
+    _uri_bulk_delete = SOURCE_BULK_DELETE_URI
+    _message_no_objects_to_remove = messages.SOURCE_NO_SOURCES_TO_REMOVE
+    _message_clear_all_summary = messages.SOURCE_CLEAR_ALL_SUMMARY
+    _message_clear_all_skipped = messages.SOURCE_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SCAN
+    _bulk_delete_name = "source"
+    _bulk_delete_skipped_because_name = "scan"
 
     def setup_class(cls):
         """Set up test case."""
@@ -145,86 +154,3 @@ class TestSourceClearCli:
                     self.command.main(args)
                     expected = 'Failed to remove source "source1"'
                     assert expected in source_out.getvalue()
-
-    def test_clear_all_empty(self):
-        """Test the clear source command successfully.
-
-        With stubbed data empty list of sources
-        """
-        source_out = StringIO()
-        get_url = get_server_location() + SOURCE_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json={"count": 0})
-
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    expected = "No sources exist to be removed\n"
-                    assert source_out.getvalue() == expected
-
-    def test_clear_all_but_some_are_skipped(self, faker, caplog):
-        """Test "clear all" when some sources are not deleted."""
-        get_url = get_server_location() + SOURCE_URI
-        delete_url = get_server_location() + SOURCE_URI + "bulk_delete/"
-        all_source_ids = [
-            faker.random_int() for _ in range(faker.random_int(min=5, max=15))
-        ]
-        get_response = {"count": len(all_source_ids)}
-        skipped = [
-            {"source": source_id, "scans": [faker.random_int()]}
-            for source_id in faker.random_sample(all_source_ids)
-        ]
-        deleted = list(
-            set(all_source_ids)
-            - set([skipped_source["source"] for skipped_source in skipped])
-        )
-        bulk_delete_response = {"deleted": deleted, "skipped": skipped}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            for skipped_source in skipped:
-                assert messages.SOURCE_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SCAN % {
-                    "source_id": skipped_source["source"],
-                    "scan_ids": skipped_source["scans"],
-                }
-            expected_message = messages.SOURCE_CLEAR_ALL_SUMMARY % {
-                "deleted_count": len(deleted),
-                "skipped_count": len(skipped),
-            }
-            assert expected_message in caplog.text
-
-    def test_clear_all_but_unexpected_error_in_initial_get(self, caplog, faker):
-        """Test "clear all" when the GET fails unexpectedly before the delete POST."""
-        get_url = get_server_location() + SOURCE_URI
-        server_error_message = faker.sentence()
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=500, json=server_error_message)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            assert server_error_message in caplog.text
-
-    def test_clear_all(self, caplog, faker):
-        """Test "clear all" when all sources are successfully deleted."""
-        get_url = get_server_location() + SOURCE_URI
-        delete_url = get_server_location() + SOURCE_BULK_DELETE_URI
-        all_source_ids = [
-            faker.random_int() for _ in range(faker.random_int(min=2, max=10))
-        ]
-        get_response = {"count": len(all_source_ids)}
-        bulk_delete_response = {"deleted": all_source_ids, "skipped": []}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
-            args = Namespace(name=None)
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                expected_message = messages.SOURCE_CLEAR_ALL_SUMMARY % {
-                    "deleted_count": len(all_source_ids),
-                    "skipped_count": 0,
-                }
-                assert expected_message in caplog.text

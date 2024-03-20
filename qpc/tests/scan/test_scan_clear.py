@@ -13,12 +13,21 @@ from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.scan import SCAN_BULK_DELETE_URI, SCAN_URI
 from qpc.scan.clear import ScanClearCommand
+from qpc.tests.mixins import BulkClearTestsMixin
 from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
 
 
-class TestScanClearCli:
+class TestScanClearCli(BulkClearTestsMixin):
     """Class for testing the scan clear commands for qpc."""
+
+    _uri_object_root = SCAN_URI
+    _uri_bulk_delete = SCAN_BULK_DELETE_URI
+    _message_no_objects_to_remove = messages.SCAN_NO_SCANS_TO_REMOVE
+    _message_clear_all_summary = messages.SCAN_CLEAR_ALL_SUMMARY
+    _message_clear_all_skipped = None  # does not apply for scans
+    _bulk_delete_name = "scan"
+    _bulk_delete_skipped_because_name = None  # does not apply for scans
 
     @classmethod
     def setup_class(cls):
@@ -134,51 +143,3 @@ class TestScanClearCli:
                     self.command.main(args)
                     expected = 'Failed to remove scan "scan1"'
                     assert expected in scan_out.getvalue()
-
-    def test_clear_all_empty(self):
-        """Test the clear scan command successfully.
-
-        With stubbed data empty list of scans
-        """
-        scan_out = StringIO()
-        get_url = get_server_location() + SCAN_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json={"count": 0})
-
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit):
-                with redirect_stdout(scan_out):
-                    self.command.main(args)
-                    expected = "No scans exist to be removed\n"
-                    assert scan_out.getvalue() == expected
-
-    def test_clear_all_but_unexpected_error_in_initial_get(self, caplog, faker):
-        """Test "clear all" when the GET fails unexpectedly before the delete POST."""
-        get_url = get_server_location() + SCAN_URI
-        server_error_message = faker.sentence()
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=500, json=server_error_message)
-            args = Namespace(name=None)
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            assert server_error_message in caplog.text
-
-    def test_clear_all(self, caplog, faker):
-        """Test "clear all" when all scans are successfully deleted."""
-        get_url = get_server_location() + SCAN_URI
-        delete_url = get_server_location() + SCAN_BULK_DELETE_URI
-        all_scan_ids = [
-            faker.random_int() for _ in range(faker.random_int(min=2, max=10))
-        ]
-        get_response = {"count": len(all_scan_ids)}
-        bulk_delete_response = {"deleted": all_scan_ids}
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_url, status_code=200, json=get_response)
-            mocker.post(delete_url, status_code=200, json=bulk_delete_response)
-            args = Namespace(name=None)
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                expected_message = messages.SCAN_CLEAR_ALL_SUMMARY % {
-                    "deleted_count": len(all_scan_ids)
-                }
-                assert expected_message in caplog.text

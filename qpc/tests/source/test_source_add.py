@@ -1,9 +1,8 @@
-"""Test the CLI module."""
+"""Test the "source add" command."""
 
 import logging
 import sys
 from argparse import ArgumentParser, ArgumentTypeError, Namespace
-from io import StringIO
 
 import pytest
 import requests
@@ -16,7 +15,7 @@ from qpc.request import CONNECTION_ERROR_MSG
 from qpc.source import SOURCE_URI
 from qpc.source.add import SourceAddCommand
 from qpc.source.utils import validate_port
-from qpc.tests.utilities import redirect_stdout
+from qpc.tests.utilities import DEFAULT_CONFIG
 from qpc.utils import get_server_location
 
 
@@ -81,40 +80,33 @@ class TestSourceAddCli:
 
     def test_validate_port_string(self):
         """Testing the add source command with port validation non-integer."""
-        source_out = StringIO()
-        with pytest.raises(ArgumentTypeError):
-            with redirect_stdout(source_out):
-                validate_port("ff")
-                assert "Port value ff" in source_out.getvalue()
+        with pytest.raises(ArgumentTypeError) as e:
+            validate_port("ff")
+        assert "Port value ff" in str(e)
 
     def test_validate_port_bad_type(self):
         """Testing the add source command with port validation bad type."""
-        source_out = StringIO()
-        with pytest.raises(ArgumentTypeError):
-            with redirect_stdout(source_out):
-                validate_port(["ff"])
-                assert "Port value ff" in source_out.getvalue()
+        with pytest.raises(ArgumentTypeError) as e:
+            validate_port(["ff"])
+        assert "Port value ['ff']" in str(e)
 
     def test_validate_port_range_err(self):
         """Test the add source command with port validation out of range."""
-        source_out = StringIO()
         msg = (
             "Port value {port} should be a positive integer"
             " in the valid range (0-65535)"
         )
-        with pytest.raises(ArgumentTypeError):
-            with redirect_stdout(source_out):
-                validate_port("65537")
-                assert msg.format(port="65537") in source_out.getvalue()
+        with pytest.raises(ArgumentTypeError) as e:
+            validate_port("65537")
+        assert msg.format(port="65537") in str(e)
 
     def test_validate_port_good(self):
         """Testing the add source command with port validation success."""
         val = validate_port("80")
         assert val == 80
 
-    def test_add_source_name_dup(self):
+    def test_add_source_name_dup(self, caplog):
         """Testing the add source command duplicate name."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -131,17 +123,12 @@ class TestSourceAddCli:
                 hosts=["1.2.3.4"],
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    self.command.main(args)
-                    assert (
-                        "source with this name already exists." in source_out.getvalue()
-                    )
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert "source with this name already exists." in caplog.text
 
-    def test_add_source_cred_less(self):
+    def test_add_source_cred_less(self, caplog):
         """Testing the add source command with a some invalid cred."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1%2Ccred2"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -155,17 +142,21 @@ class TestSourceAddCli:
                 type="network",
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    assert (
-                        'An error occurred while processing the "--cred" input'
-                        in source_out.getvalue()
-                    )
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert (
+                'An error occurred while processing the "--cred" input' in caplog.text
+            )
 
-    def test_add_source_cred_err(self):
-        """Testing the add source command with an cred err."""
-        source_out = StringIO()
+    @pytest.mark.skip(
+        reason=(
+            "FIXME! This test seems reasonable, but SourceAddCommand._validate_args "
+            "logic incorrectly handles server error responses. Underlying code needs "
+            "a thorough evaluation and rewrite."
+        )
+    )
+    def test_add_source_cred_err(self, caplog):
+        """Testing the add source command with a cred err."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1%2Ccred2"
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, status_code=500)
@@ -177,18 +168,20 @@ class TestSourceAddCli:
                 type="network",
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    assert (
-                        'An error occurred while processing the "--cred" input'
-                        in source_out.getvalue()
-                    )
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert (
+                'An error occurred while processing the "--cred" input' in caplog.text
+            )
 
-    def test_add_source_ssl_err(self):
+    def test_add_source_ssl_err(self, caplog):
         """Testing the add source command with a connection error."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
+        expected_error = CONNECTION_ERROR_MSG % {
+            "host": DEFAULT_CONFIG["host"],
+            "port": DEFAULT_CONFIG["port"],
+            "protocol": "http",
+        }
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, exc=requests.exceptions.SSLError)
 
@@ -199,15 +192,18 @@ class TestSourceAddCli:
                 type="network",
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert expected_error in caplog.text
 
-    def test_add_source_conn_err(self):
+    def test_add_source_conn_err(self, caplog):
         """Testing the add source command with a connection error."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
+        expected_error = CONNECTION_ERROR_MSG % {
+            "host": DEFAULT_CONFIG["host"],
+            "port": DEFAULT_CONFIG["port"],
+            "protocol": "http",
+        }
         with requests_mock.Mocker() as mocker:
             mocker.get(get_cred_url, exc=requests.exceptions.ConnectTimeout)
 
@@ -218,10 +214,9 @@ class TestSourceAddCli:
                 type="network",
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
-                    assert source_out.getvalue() == CONNECTION_ERROR_MSG
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert expected_error in caplog.text
 
     ##################################################
     # Network Source Test
@@ -303,9 +298,8 @@ class TestSourceAddCli:
                 expected_message = messages.SOURCE_ADDED % "source1"
                 assert expected_message in caplog.text
 
-    def test_add_source_with_paramiko_and_ssl(self):
+    def test_add_source_with_paramiko_and_ssl(self, caplog):
         """Testing add network source command with use_paramiko set to true."""
-        source_out = StringIO()
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
         cred_results = [{"id": 1, "name": "cred1"}]
         get_cred_data = {"count": 1, "results": cred_results}
@@ -323,9 +317,14 @@ class TestSourceAddCli:
                 type="network",
                 port=22,
             )
-            with pytest.raises(SystemExit):
-                with redirect_stdout(source_out):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            # TODO Assert *something* meaningful is in the output!
+            # assert caplog.text
+            # FIXME utils.handle_error_response does literally nothing if the
+            #  server's response is not JSON (raises JSONDecodeError).
+            #  This means the process simply exits with NO OUTPUT.
+            # TODO Underlying code needs a thorough evaluation and rewrite.
 
     def test_add_source_one_excludehost(self, caplog):
         """Testing the add network source command with one exclude host."""

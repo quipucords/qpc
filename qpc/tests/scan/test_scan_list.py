@@ -4,7 +4,6 @@ import logging
 import sys
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
-from unittest.mock import ANY, patch
 
 import pytest
 import requests
@@ -91,8 +90,7 @@ class TestScanListCli:
                 self.command.main(args)
                 assert messages.SCAN_LIST_NO_SCANS in caplog.text
 
-    @patch("builtins.input", return_value="yes")
-    def test_list_scan_data(self, b_input):
+    def test_list_scan_data(self):
         """Testing the list scan command successfully with stubbed data."""
         scan_out = StringIO()
         url = get_server_location() + SCAN_URI
@@ -121,7 +119,6 @@ class TestScanListCli:
                     scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected + expected
                 )
-                b_input.assert_called_with(ANY)
 
     def test_list_filter_type(self):
         """Testing the list scan with filter by type."""

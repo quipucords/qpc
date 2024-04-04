@@ -4,7 +4,6 @@ import logging
 import sys
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
-from unittest.mock import ANY, patch
 
 import pytest
 import requests
@@ -86,8 +85,7 @@ class TestSourceListCli:
                 self.command.main(args)
                 assert messages.SOURCE_LIST_NO_SOURCES in caplog.text
 
-    @patch("builtins.input", return_value="yes")
-    def test_list_source_data(self, b_input):
+    def test_list_source_data(self):
         """Testing the list source command successfully with stubbed data."""
         source_out = StringIO()
         url = get_server_location() + SOURCE_URI
@@ -115,7 +113,6 @@ class TestSourceListCli:
                     source_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected + expected
                 )
-                b_input.assert_called_with(ANY)
 
     def test_list_filtered_source_data(self):
         """Testing the list source with filter by source_type."""

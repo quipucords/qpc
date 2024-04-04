@@ -4,7 +4,6 @@ import logging
 import sys
 from argparse import ArgumentParser, Namespace  # noqa: I100
 from io import StringIO
-from unittest.mock import ANY, patch
 
 import pytest
 import requests
@@ -87,8 +86,7 @@ class TestCredentialListCli:
                 expected_message = messages.CRED_LIST_NO_CREDS
                 assert expected_message in caplog.text
 
-    @patch("builtins.input", return_value="yes")
-    def test_list_cred_data(self, b_input):
+    def test_list_cred_data(self):
         """Testing the list credential command with stubbed data."""
         cred_out = StringIO()
         url = get_server_location() + CREDENTIAL_URI
@@ -117,7 +115,6 @@ class TestCredentialListCli:
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected + expected
                 )
-                b_input.assert_called_with(ANY)
 
     def test_list_filtered_cred_data(self):
         """Testing the list credential with filter by cred type."""

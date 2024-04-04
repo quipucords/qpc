@@ -70,5 +70,4 @@ class CredListCommand(CliCommand):
                 self.req_params["page"] = page
             else:
                 self.req_params = {"page": page}
-            input(_(messages.NEXT_RESULTS))
             self._do_command()

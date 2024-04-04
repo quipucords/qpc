@@ -109,7 +109,6 @@ class ScanJobCommand(CliCommand):
                     self.req_params["page"] = page
                 else:
                     self.req_params = {"page": page}
-                input(_(messages.NEXT_RESULTS))
                 self._do_command()
         else:
             logger.error(_(messages.SCAN_LIST_NO_SCANS))

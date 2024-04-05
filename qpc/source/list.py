@@ -1,5 +1,6 @@
 """SourceListCommand is used to list sources for system scans."""
 
+import time
 import urllib.parse as urlparse
 from logging import getLogger
 
@@ -68,4 +69,5 @@ class SourceListCommand(CliCommand):
                 self.req_params["page"] = page
             else:
                 self.req_params = {"page": page}
+            time.sleep(1)
             self._do_command()

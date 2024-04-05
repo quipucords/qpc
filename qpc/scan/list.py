@@ -1,5 +1,6 @@
 """ScanListCommand is used to list system scans."""
 
+import time
 import urllib.parse as urlparse
 from logging import getLogger
 
@@ -67,4 +68,5 @@ class ScanListCommand(CliCommand):
                 self.req_params["page"] = page
             else:
                 self.req_params = {"page": page}
+            time.sleep(1)
             self._do_command()

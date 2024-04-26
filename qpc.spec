@@ -3,7 +3,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        1.6.0
+Version:        1.7.0
 Release:        1%{?dist}
 Epoch:          0
 
@@ -49,6 +49,9 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Fri Apr 26 2024 Brad Smith <brasmith@redhat.com> - 0:1.7.0-1
+- Improve user experience with paginated results.
+
 * Tue Mar 26 2024 Brad Smith <brasmith@redhat.com> - 0:1.6.0-1
 - Optimize "clear --all" commands by using new bulk delete APIs.
 

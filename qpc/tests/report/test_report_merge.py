@@ -13,7 +13,7 @@ import pytest
 from qpc import messages
 from qpc.cli import CLI
 from qpc.release import QPC_VAR_PROGRAM_NAME
-from qpc.report import ASYNC_MERGE_URI
+from qpc.report import ASYNC_MERGE_URI, ASYNC_UPLOAD_URI
 from qpc.report.merge import ReportMergeCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.utils import get_server_location
@@ -132,10 +132,10 @@ class TestReportMergeTests:
             status_code=200,
             json={"report_id": 2},
         )
-        requests_mock.put(
+        requests_mock.post(
             get_server_location() + ASYNC_MERGE_URI,
             status_code=201,
-            json={"id": 1},
+            json={"job_id": 1},
         )
 
         args = Namespace(
@@ -160,7 +160,7 @@ class TestReportMergeTests:
             status_code=200,
             json={"report_id": 2},
         )
-        requests_mock.put(
+        requests_mock.post(
             get_server_location() + ASYNC_MERGE_URI,
             status_code=400,
             json={"reports": ["SOME SERVER ERROR."]},
@@ -176,8 +176,8 @@ class TestReportMergeTests:
 
     def test_detail_merge_report_ids(self, requests_mock, capsys):
         """Testing report merge command with report ids."""
-        requests_mock.put(
-            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+        requests_mock.post(
+            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"job_id": 1}
         )
         args = Namespace(
             scan_job_ids=None, json_files=None, report_ids=[1, 2], json_dir=None
@@ -191,7 +191,7 @@ class TestReportMergeTests:
 
     def test_detail_merge_error_report_ids(self, requests_mock, caplog):
         """Testing report merge error with report ids."""
-        requests_mock.put(
+        requests_mock.post(
             get_server_location() + ASYNC_MERGE_URI,
             status_code=400,
             json={"reports": ["SOME SERVER ERROR."]},
@@ -210,7 +210,9 @@ class TestReportMergeTests:
     ):
         """Testing report merge command with json files."""
         requests_mock.post(
-            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+            get_server_location() + ASYNC_UPLOAD_URI,
+            status_code=201,
+            json={"job_id": 1},
         )
 
         args = Namespace(
@@ -251,7 +253,7 @@ class TestReportMergeTests:
     ):
         """Testing report merge error with json files."""
         requests_mock.post(
-            get_server_location() + ASYNC_MERGE_URI,
+            get_server_location() + ASYNC_UPLOAD_URI,
             status_code=400,
             json={"reports": ["some error."]},
         )
@@ -317,7 +319,7 @@ class TestReportMergeTests:
             status_code=200,
             json={"report_id": 42},
         )
-        requests_mock.put(
+        requests_mock.post(
             get_server_location() + ASYNC_MERGE_URI,
             status_code=400,
             json={"report": ["some error."]},
@@ -360,7 +362,9 @@ class TestReportMergeTests:
             json_dir=[str(Path(details1).parent)],
         )
         requests_mock.post(
-            get_server_location() + ASYNC_MERGE_URI, status_code=201, json={"id": 1}
+            get_server_location() + ASYNC_UPLOAD_URI,
+            status_code=201,
+            json={"job_id": 1},
         )
         caplog.set_level(logging.ERROR)
         self.command.main(args)

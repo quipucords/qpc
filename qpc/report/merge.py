@@ -11,9 +11,10 @@ from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import utils
-from qpc.request import GET, POST, PUT, request
+from qpc.request import GET, POST, request
 from qpc.scan import SCAN_JOB_URI
 from qpc.translation import _
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -41,8 +42,8 @@ class ReportMergeCommand(CliCommand):
             self.SUBCOMMAND,
             self.ACTION,
             subparsers.add_parser(self.ACTION),
-            PUT,
-            report.ASYNC_MERGE_URI,
+            POST,
+            None,
             [codes.created],
         )
         group = self.parser.add_mutually_exclusive_group(required=True)
@@ -191,21 +192,21 @@ class ReportMergeCommand(CliCommand):
         :returns: a dictionary representing the jobs to merge
         """
         if self.args.json_files or self.args.json_dir:
-            self.req_method = POST
+            self.req_path = report.ASYNC_UPLOAD_URI
             self.req_payload = self.json
         else:
-            self.req_method = PUT
+            self.req_path = report.ASYNC_MERGE_URI
             self.req_payload = {
                 "reports": self.report_ids,
             }
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        if json_data.get("id"):
-            print(
-                _(messages.REPORT_SUCCESSFULLY_MERGED)
-                % {"id": json_data.get("id"), "prog_name": QPC_VAR_PROGRAM_NAME},
-            )
+        logger.debug(pretty_format(json_data))
+        print(
+            _(messages.REPORT_SUCCESSFULLY_MERGED)
+            % {"id": json_data["job_id"], "prog_name": QPC_VAR_PROGRAM_NAME},
+        )
 
     def _handle_response_error(self):
         json_data = self.response.json()

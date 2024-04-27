@@ -621,18 +621,18 @@ The ``qpc report merge`` command merges report data and returns the report ident
 
 The ``qpc report merge`` command runs an asynchronous job. The output of this command provides a job ID that you can use to check the status of the merge job. To check the status of a merge job, run the following command, where the example job ID is ``1``::
 
-# qpc report merge-status --job 1
+# qpc job status --id 1
 
-Viewing the Status of a Report Merge
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Viewing the Status of an asynchronous Job
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``qpc report merge-status`` command can be used to check the status of a large merge of JSON details report files. A large merge is created with the ``qpc report merge --json-directory=path_to_directory_of_json_files`` command. This command returns a merge job ID that you can use to access the status of the merge.
+The ``qpc job status`` command can be used to check the status of a any asynchronous job (like report upload or merge).
 
-**qpc report merge-status (--job** *report_job_identifier* **)**
+**qpc job status (--id** *report_job_identifier* **)**
 
-``--job=report_job_identifier``
+``--id=report_job_identifier``
 
-  Contains the job identifier to use to check for the status of a merge.
+  Contains the job identifier to use to check for the status of a asynchronous job.
 
 
 Manually Reprocessing Reports
@@ -646,6 +646,9 @@ The ``qpc report upload`` command uploads a details report to reprocess it.  Thi
 
   Contains the JSON details report file path to upload for reprocessing.
 
+The ``qpc report upload`` command runs an asynchronous job. The output of this command provides a job ID that you can use to check the status of the merge job. To check the status of a merge job, run the following command, where the example job ID is ``1``::
+
+# qpc job status --id 1
 
 Insights
 --------

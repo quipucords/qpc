@@ -12,6 +12,7 @@ from qpc.release import QPC_VAR_PROGRAM_NAME
 from qpc.report import utils
 from qpc.request import POST
 from qpc.translation import _
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -40,7 +41,7 @@ class ReportUploadCommand(CliCommand):
             self.ACTION,
             subparsers.add_parser(self.ACTION),
             POST,
-            report.ASYNC_MERGE_URI,
+            report.ASYNC_UPLOAD_URI,
             [codes.created],
         )
         self.parser.add_argument(
@@ -82,11 +83,11 @@ class ReportUploadCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        if json_data.get("id"):
-            logger.info(
-                _(messages.REPORT_SUCCESSFULLY_UPLOADED),
-                {"id": json_data.get("id"), "prog_name": QPC_VAR_PROGRAM_NAME},
-            )
+        logger.debug(pretty_format(json_data))
+        print(
+            _(messages.REPORT_SUCCESSFULLY_UPLOADED)
+            % {"id": json_data["job_id"], "prog_name": QPC_VAR_PROGRAM_NAME},
+        )
 
     def _handle_response_error(self):
         json_data = self.response.json()

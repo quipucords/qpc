@@ -23,7 +23,6 @@ from qpc.report.commands import (
     ReportDownloadCommand,
     ReportInsightsCommand,
     ReportMergeCommand,
-    ReportMergeStatusCommand,
     ReportUploadCommand,
 )
 from qpc.scan.commands import (
@@ -168,7 +167,6 @@ class CLI:
                 ReportInsightsCommand,
                 ReportDownloadCommand,
                 ReportMergeCommand,
-                ReportMergeStatusCommand,
                 ReportUploadCommand,
             ],
         )

@@ -249,7 +249,7 @@ REPORT_JSON_DIR_NOT_FOUND = "%s is not a directory"
 REPORT_SUCCESSFULLY_WRITTEN = "Report written successfully."
 REPORT_SUCCESSFULLY_MERGED = (
     "Report merge job %(id)s created. "
-    'To check merge status, run "%(prog_name)s report merge-status --job %(id)s"'
+    'To check processing status, run "%(prog_name)s scan job --id %(id)s"'
 )
 REPORT_UPLOAD_VALIDATE_JSON = "Checking file for valid JSON details report. %s"
 REPORT_UPLOAD_FILE_INVALID_JSON = "Failed: %s is not a JSON details report."

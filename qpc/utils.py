@@ -413,8 +413,8 @@ def handle_error_response(response):  # noqa: C901 PLR0912
         pass
 
 
-def pretty_print(json_data):
-    """Provide pretty printing of output json data.
+def pretty_format(json_data):
+    """Provide pretty formatting of output json data.
 
     :param json_data: the json data to pretty print
     :returns: the pretty print string of the json data
@@ -497,7 +497,7 @@ def extract_json_from_tar(fileobj_content, print_pretty=True):
         tar_info = tar.extractfile(json_file)
         json_data = json.loads(tar_info.read().decode("utf-8"))
         if print_pretty:
-            return pretty_print(json_data)
+            return pretty_format(json_data)
         return json_data
 
 

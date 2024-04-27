@@ -9,7 +9,7 @@ from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -56,7 +56,7 @@ class ScanListCommand(CliCommand):
         if count == 0:
             logger.error(_(messages.SCAN_LIST_NO_SCANS))
         else:
-            data = pretty_print(results)
+            data = pretty_format(results)
             print(data)
 
         if json_data.get("next"):

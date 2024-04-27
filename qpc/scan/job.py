@@ -11,7 +11,7 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.scan.utils import get_scan_object_id
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -93,13 +93,13 @@ class ScanJobCommand(CliCommand):
                 # if GET is used for single scan job,
                 # count doesn't exist and will be 0
                 if "id" in self.args and self.args.id:
-                    data = pretty_print(json_data)
+                    data = pretty_format(json_data)
                     print(data)
                 else:
                     logger.error(_(messages.SCAN_LIST_NO_SCANS))
                     sys.exit(1)
             else:
-                data = pretty_print(results)
+                data = pretty_format(results)
                 print(data)
             if json_data.get("next"):
                 next_link = json_data.get("next")

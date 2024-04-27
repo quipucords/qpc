@@ -9,7 +9,7 @@ from qpc import messages, source
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -52,7 +52,7 @@ class SourceShowCommand(CliCommand):
         results = json_data.get("results", [])
         if count == 1:
             cred_entry = results[0]
-            data = pretty_print(cred_entry)
+            data = pretty_format(cred_entry)
             print(data)
         else:
             logger.error(_(messages.SOURCE_DOES_NOT_EXIST), self.args.name)

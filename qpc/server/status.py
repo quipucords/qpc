@@ -9,7 +9,7 @@ from qpc import messages, server
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import pretty_print, validate_write_file, write_file
+from qpc.utils import pretty_format, validate_write_file, write_file
 
 logger = getLogger(__name__)
 
@@ -56,7 +56,7 @@ class ServerStatusCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        status = pretty_print(json_data)
+        status = pretty_format(json_data)
         if self.args.path:
             try:
                 write_file(self.args.path, status)

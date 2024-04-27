@@ -11,7 +11,7 @@ from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.source import SOURCE_TYPE_CHOICES
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -59,7 +59,7 @@ class CredListCommand(CliCommand):
         if count == 0:
             logger.error(_(messages.CRED_LIST_NO_CREDS))
         else:
-            data = pretty_print(results)
+            data = pretty_format(results)
             print(data)
 
         if json_data.get("next"):

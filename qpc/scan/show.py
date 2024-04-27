@@ -9,7 +9,7 @@ from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -68,7 +68,7 @@ class ScanShowCommand(CliCommand):
 
     def _handle_response_success(self):
         json_data = self.response.json()
-        data = pretty_print(json_data)
+        data = pretty_format(json_data)
         print(data)
 
     def _handle_response_error(self):

@@ -10,7 +10,7 @@ from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import pretty_print
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -52,7 +52,7 @@ class CredShowCommand(CliCommand):
         count = json_data.get("count", 0)
         if count == 1:
             cred_entry = json_data.get("results")[0]
-            data = pretty_print(cred_entry)
+            data = pretty_format(cred_entry)
             print(data)
         else:
             logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)

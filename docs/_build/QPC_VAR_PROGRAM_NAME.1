@@ -796,20 +796,20 @@ The \fBQPC_VAR_PROGRAM_NAME report merge\fP command runs an asynchronous job. Th
 .INDENT 3.5
 .sp
 .EX
-# QPC_VAR_PROGRAM_NAME report merge\-status \-\-job 1
+# QPC_VAR_PROGRAM_NAME job status \-\-id 1
 .EE
 .UNINDENT
 .UNINDENT
-.SS Viewing the Status of a Report Merge
+.SS Viewing the Status of an asynchronous Job
 .sp
-The \fBQPC_VAR_PROGRAM_NAME report merge\-status\fP command can be used to check the status of a large merge of JSON details report files. A large merge is created with the \fBQPC_VAR_PROGRAM_NAME report merge \-\-json\-directory=path_to_directory_of_json_files\fP command. This command returns a merge job ID that you can use to access the status of the merge.
+The \fBQPC_VAR_PROGRAM_NAME job status\fP command can be used to check the status of a any asynchronous job (like report upload or merge).
 .sp
-\fBQPC_VAR_PROGRAM_NAME report merge\-status (\-\-job\fP \fIreport_job_identifier\fP \fB)\fP
+\fBQPC_VAR_PROGRAM_NAME job status (\-\-id\fP \fIreport_job_identifier\fP \fB)\fP
 .sp
-\fB\-\-job=report_job_identifier\fP
+\fB\-\-id=report_job_identifier\fP
 .INDENT 0.0
 .INDENT 3.5
-Contains the job identifier to use to check for the status of a merge.
+Contains the job identifier to use to check for the status of a asynchronous job.
 .UNINDENT
 .UNINDENT
 .SS Manually Reprocessing Reports
@@ -822,6 +822,16 @@ The \fBQPC_VAR_PROGRAM_NAME report upload\fP command uploads a details report to
 .INDENT 0.0
 .INDENT 3.5
 Contains the JSON details report file path to upload for reprocessing.
+.UNINDENT
+.UNINDENT
+.sp
+The \fBQPC_VAR_PROGRAM_NAME report upload\fP command runs an asynchronous job. The output of this command provides a job ID that you can use to check the status of the merge job. To check the status of a merge job, run the following command, where the example job ID is \fB1\fP:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+# QPC_VAR_PROGRAM_NAME job status \-\-id 1
+.EE
 .UNINDENT
 .UNINDENT
 .SH INSIGHTS

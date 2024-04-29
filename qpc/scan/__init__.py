@@ -7,9 +7,7 @@ START = "start"
 LIST = "list"
 JOB = "job"
 SHOW = "show"
-PAUSE = "pause"
 CANCEL = "cancel"
-RESTART = "restart"
 CLEAR = "clear"
 
 # Status values

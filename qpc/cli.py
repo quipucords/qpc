@@ -33,8 +33,6 @@ from qpc.scan.commands import (
     ScanEditCommand,
     ScanJobCommand,
     ScanListCommand,
-    ScanPauseCommand,
-    ScanRestartCommand,
     ScanShowCommand,
     ScanStartCommand,
 )
@@ -156,9 +154,7 @@ class CLI:
                 ScanStartCommand,
                 ScanListCommand,
                 ScanShowCommand,
-                ScanPauseCommand,
                 ScanCancelCommand,
-                ScanRestartCommand,
                 ScanEditCommand,
                 ScanClearCommand,
                 ScanJobCommand,

@@ -469,30 +469,12 @@ The ``QPC_VAR_PROGRAM_NAME scan job`` command returns the list of scan jobs for 
 
   Optional. Filters the results by scan job state. This value must be ``created``, ``pending``, ``running``, ``paused``, ``canceled``, ``completed``, or ``failed``.
 
-Controlling Scans
-~~~~~~~~~~~~~~~~~
+Canceling Scans
+~~~~~~~~~~~~~~~
 
-When scan jobs are queued and running, you might need to control the execution of scan jobs due to the needs of other business processes in your organization. The ``pause``, ``restart``, and ``cancel`` subcommands enable you to control scan job execution.
+When scan jobs are queued and running, you might need to stop the execution of scan jobs due to the needs of other business processes in your organization. The ``cancel`` subcommand enable you to control scan job execution.
 
-The ``QPC_VAR_PROGRAM_NAME scan pause`` command halts the execution of a scan job, but enables it to be restarted at a later time.
-
-**QPC_VAR_PROGRAM_NAME scan pause --id=** *scan_job_identifier*
-
-``--id=scan_job_identifier``
-
-  Required. Contains the identifier of the scan job to pause.
-
-
-The ``QPC_VAR_PROGRAM_NAME scan restart`` command restarts the execution of a scan job that is paused.
-
-**QPC_VAR_PROGRAM_NAME scan restart --id=** *scan_job_identifier*
-
-``--id=scan_job_identifier``
-
-  Required. Contains the identifier of the scan job to restart.
-
-
-The ``QPC_VAR_PROGRAM_NAME scan cancel`` command cancels the execution of a scan job. A canceled scan job cannot be restarted.
+The ``QPC_VAR_PROGRAM_NAME scan cancel`` command cancels the execution of a scan job.
 
 **QPC_VAR_PROGRAM_NAME scan cancel --id=** *scan_job_identifier*
 

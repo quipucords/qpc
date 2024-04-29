@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "April 26, 2024" "" "qpc"
+.TH "qpc" "1" "April 29, 2024" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -585,33 +585,11 @@ Contains the identifier of a specified scan job to display. Mutually exclusive w
 Optional. Filters the results by scan job state. This value must be \fBcreated\fP, \fBpending\fP, \fBrunning\fP, \fBpaused\fP, \fBcanceled\fP, \fBcompleted\fP, or \fBfailed\fP\&.
 .UNINDENT
 .UNINDENT
-.SS Controlling Scans
+.SS Canceling Scans
 .sp
-When scan jobs are queued and running, you might need to control the execution of scan jobs due to the needs of other business processes in your organization. The \fBpause\fP, \fBrestart\fP, and \fBcancel\fP subcommands enable you to control scan job execution.
+When scan jobs are queued and running, you might need to stop the execution of scan jobs due to the needs of other business processes in your organization. The \fBcancel\fP subcommand enable you to control scan job execution.
 .sp
-The \fBqpc scan pause\fP command halts the execution of a scan job, but enables it to be restarted at a later time.
-.sp
-\fBqpc scan pause \-\-id=\fP \fIscan_job_identifier\fP
-.sp
-\fB\-\-id=scan_job_identifier\fP
-.INDENT 0.0
-.INDENT 3.5
-Required. Contains the identifier of the scan job to pause.
-.UNINDENT
-.UNINDENT
-.sp
-The \fBqpc scan restart\fP command restarts the execution of a scan job that is paused.
-.sp
-\fBqpc scan restart \-\-id=\fP \fIscan_job_identifier\fP
-.sp
-\fB\-\-id=scan_job_identifier\fP
-.INDENT 0.0
-.INDENT 3.5
-Required. Contains the identifier of the scan job to restart.
-.UNINDENT
-.UNINDENT
-.sp
-The \fBqpc scan cancel\fP command cancels the execution of a scan job. A canceled scan job cannot be restarted.
+The \fBqpc scan cancel\fP command cancels the execution of a scan job.
 .sp
 \fBqpc scan cancel \-\-id=\fP \fIscan_job_identifier\fP
 .sp

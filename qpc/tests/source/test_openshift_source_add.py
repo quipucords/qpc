@@ -144,7 +144,7 @@ class TestOpenShiftAddSource:
             "--disable-ssl",
             "false",
         ]
-        mocker.patch.object(sys, "argv", fake_sys_argv),
+        mocker.patch.object(sys, "argv", fake_sys_argv)
         with pytest.raises(SystemExit):
             CLI().main()
         expected_output = "--ssl-cert-verify: invalid choice: 'maybe'"
@@ -171,7 +171,7 @@ class TestOpenShiftAddSource:
             "--disable-ssl",
             "maybe",
         ]
-        mocker.patch.object(sys, "argv", fake_sys_argv),
+        mocker.patch.object(sys, "argv", fake_sys_argv)
         with pytest.raises(SystemExit):
             CLI().main()
         expected_output = "--disable-ssl: invalid choice: 'maybe'"

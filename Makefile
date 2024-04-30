@@ -25,7 +25,6 @@ help:
 	@echo "  clean               to remove cache, dist, build, and egg files"
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
-	@echo "  lint-black          to run the black format checker"
 	@echo "  lint-docs           to run rstcheck against docs"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
@@ -43,13 +42,11 @@ install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
-lint: lint-ruff lint-black lint-docs
+lint: lint-ruff lint-docs
 
 lint-ruff:
 	poetry run ruff .
-
-lint-black:
-	poetry run black --diff --check .
+	poetry run ruff format --check .
 
 lint-docs:
 	poetry run rstcheck docs/source/man-template.rst

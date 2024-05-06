@@ -85,7 +85,6 @@ def get_optional_products(disabled_optional_products):
     disabled_default = {
         scan.JBOSS_FUSE: False,
         scan.JBOSS_EAP: False,
-        scan.JBOSS_BRMS: False,
         scan.JBOSS_WS: False,
     }
 
@@ -118,7 +117,6 @@ def get_enabled_products(  # noqa: C901
         enabled_default = {
             scan.JBOSS_FUSE: False,
             scan.JBOSS_EAP: False,
-            scan.JBOSS_BRMS: False,
             scan.JBOSS_WS: False,
             "search_directories": [],
         }
@@ -134,7 +132,6 @@ def get_enabled_products(  # noqa: C901
         enabled_default = {
             scan.JBOSS_FUSE: False,
             scan.JBOSS_EAP: False,
-            scan.JBOSS_BRMS: False,
             scan.JBOSS_WS: False,
         }
         # if just the products are reset, check if dirs are provided

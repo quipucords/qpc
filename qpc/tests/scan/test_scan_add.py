@@ -113,11 +113,7 @@ class TestScanAddCli:
                 "id": 1,
                 "name": "scan1",
                 "sources": ["source1"],
-                "disable-optional-products": {
-                    "jboss-eap": False,
-                    "jboss-fuse": False,
-                    "jboss-brms": False,
-                },
+                "disable-optional-products": {"jboss-eap": False, "jboss-fuse": False},
             }
         ]
         source_data = {"count": 1, "results": results}
@@ -129,11 +125,7 @@ class TestScanAddCli:
                 name="scan1",
                 sources=["source1"],
                 max_concurrency=50,
-                disabled_optional_products={
-                    "jboss-eap": False,
-                    "jboss-fuse": False,
-                    "jboss-brms": False,
-                },
+                disabled_optional_products={"jboss-eap": False, "jboss-fuse": False},
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
@@ -164,11 +156,7 @@ class TestScanAddCli:
                 name="scan1",
                 sources=["source1"],
                 max_concurrency=50,
-                disabled_optional_products={
-                    "jboss-eap": True,
-                    "jboss-fuse": False,
-                    "jboss-brms": True,
-                },
+                disabled_optional_products={"jboss-eap": True, "jboss-fuse": False},
                 enabled_ext_product_search=None,
                 ext_product_search_dirs=None,
             )
@@ -217,7 +205,6 @@ class TestScanAddCli:
                 "enabled_extended_product_search": {
                     "jboss-eap": True,
                     "jboss-fuse": False,
-                    "jboss-brms": True,
                     "search_directories": ["/foo/bar/"],
                 },
             }
@@ -232,7 +219,7 @@ class TestScanAddCli:
                 sources=["source1"],
                 max_concurrency=50,
                 disabled_optional_products=None,
-                enabled_ext_product_search=["jboss-eap", "jboss-brms"],
+                enabled_ext_product_search=["jboss-eap"],
                 ext_product_search_dirs="/foo/bar/",
             )
             with caplog.at_level(logging.INFO):
@@ -253,7 +240,6 @@ class TestScanAddCli:
                 "enabled_extended_product_search": {
                     "jboss_eap": True,
                     "jboss_fuse": False,
-                    "jboss_brms": True,
                 },
             }
         ]
@@ -267,7 +253,7 @@ class TestScanAddCli:
                 sources=["source1"],
                 max_concurrency=50,
                 disabled_optional_products=None,
-                enabled_ext_product_search=["jboss_eap", "jboss_brms"],
+                enabled_ext_product_search=["jboss_eap"],
                 ext_product_search_dirs=None,
             )
             with caplog.at_level(logging.INFO):

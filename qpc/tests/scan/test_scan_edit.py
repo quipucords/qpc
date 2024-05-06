@@ -136,7 +136,7 @@ class TestSourceEditCli:
                 assert expected_message in caplog.text
 
     def test_edit_scan_ext_products(self, caplog):
-        """Testing the edit scanvcommand with enabled products successfully."""
+        """Testing the edit scan command with enabled products successfully."""
         url_get_scan = get_server_location() + SCAN_URI + "?name=scan1"
         url_patch = get_server_location() + SCAN_URI + "1/"
         scan_entry = {"id": 1, "name": "scan1", "sources": ["source1"]}
@@ -148,7 +148,6 @@ class TestSourceEditCli:
                 "enabled_extended_product_search": {
                     "jboss_eap": True,
                     "jboss_fuse": False,
-                    "jboss_brms": True,
                 }
             },
         }
@@ -163,7 +162,7 @@ class TestSourceEditCli:
                 sources=None,
                 max_concurrency=50,
                 disabled_optional_products=None,
-                enabled_ext_product_search=["jboss_eap", "jboss_brms"],
+                enabled_ext_product_search=["jboss_eap"],
                 ext_product_search_dirs=None,
             )
             with caplog.at_level(logging.INFO):
@@ -216,7 +215,6 @@ class TestSourceEditCli:
                 "enabled_extended_product_search": {
                     "jboss_eap": False,
                     "jboss_fuse": False,
-                    "jboss_brms": False,
                 }
             },
         }
@@ -252,7 +250,6 @@ class TestSourceEditCli:
                 "enabled_extended_product_search": {
                     "jboss_eap": False,
                     "jboss_fuse": False,
-                    "jboss_brms": False,
                 }
             },
         }
@@ -288,7 +285,6 @@ class TestSourceEditCli:
                 "disabled_optional_products": {
                     "jboss_eap": True,
                     "jboss_fuse": True,
-                    "jboss_brms": True,
                 }
             },
         }

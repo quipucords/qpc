@@ -1,6 +1,6 @@
 """Test the CLI module."""
 
-from qpc.scan import JBOSS_BRMS, JBOSS_EAP, JBOSS_FUSE, JBOSS_WS
+from qpc.scan import JBOSS_EAP, JBOSS_FUSE, JBOSS_WS
 from qpc.scan.utils import get_enabled_products, get_optional_products
 
 
@@ -12,7 +12,6 @@ class TestScanUtils:
         disabled_default = {
             JBOSS_FUSE: False,
             JBOSS_EAP: False,
-            JBOSS_BRMS: False,
             JBOSS_WS: False,
         }
         result = get_optional_products([])
@@ -23,7 +22,6 @@ class TestScanUtils:
         disabled_default = {
             JBOSS_FUSE: False,
             JBOSS_EAP: False,
-            JBOSS_BRMS: False,
             JBOSS_WS: False,
             "search_directories": [],
         }

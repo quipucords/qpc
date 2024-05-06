@@ -68,11 +68,7 @@ class TestScanStartCli:
                 "id": 1,
                 "name": "scan1",
                 "sources": ["source1"],
-                "disable-optional-products": {
-                    "jboss-eap": False,
-                    "jboss-fuse": False,
-                    "jboss-brms": False,
-                },
+                "disable-optional-products": {"jboss-eap": False, "jboss-fuse": False},
             }
         ]
         scan_data = {"count": 1, "results": results}
@@ -96,11 +92,7 @@ class TestScanStartCli:
                 "id": 1,
                 "name": "scan1",
                 "sources": ["source1"],
-                "disable-optional-products": {
-                    "jboss-eap": False,
-                    "jboss-fuse": False,
-                    "jboss-brms": False,
-                },
+                "disable-optional-products": {"jboss-eap": False, "jboss-fuse": False},
             }
         ]
         scan_data = {"count": 1, "results": results}

@@ -375,15 +375,15 @@ Use the ``qpc scan add`` command to create scan objects with one or more sources
 
 ``--disabled-optional-products=products_list``
 
-  Optional. Contains the list of products to exclude from inspection. Valid values are ``jboss_eap``, ``jboss_fuse``, ``jboss_ws``, and ``jboss_brms``.
+  Optional. Contains the list of products to exclude from inspection. Valid values are ``jboss_eap``, ``jboss_fuse``, and ``jboss_ws``.
 
 ``--enabled-ext-product-search=products_list``
 
-  Optional. Contains the list of products to include for the extended product search. Extended product search is used to find products that might be installed in non-default locations. Valid values are ``jboss_eap``, ``jboss_fuse``, ``jboss_ws``, and ``jboss_brms``.
+  Optional. Contains the list of products to include for the extended product search. Extended product search is used to find products that might be installed in non-default locations. Valid values are ``jboss_eap``, ``jboss_fuse``, and ``jboss_ws``.
 
 ``--ext-product-search-dirs=search_dirs_list``
 
-  Optional. Contains a list of absolute paths of directories to search with the extended product search. This option uses the provided list of directories to search for the presence of Red Hat JBoss Enterprise Application Platform (JBoss EAP), Red Hat Fuse (formerly Red Hat JBoss Fuse), Red Hat JBoss Web Server (JBoss Web Server), and Red Hat Decision Manager (formerly Red Hat JBoss BRMS).
+  Optional. Contains a list of absolute paths of directories to search with the extended product search. This option uses the provided list of directories to search for the presence of Red Hat JBoss Enterprise Application Platform (JBoss EAP), Red Hat Fuse (formerly Red Hat JBoss Fuse), and Red Hat JBoss Web Server (JBoss Web Server).
 
 The information in a scan might change as the structure of the network changes. Use the ``qpc scan edit`` command to edit an existing scan to accommodate those changes.
 

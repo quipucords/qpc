@@ -3,7 +3,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        1.7.0
+Version:        1.8.0
 Release:        1%{?dist}
 Epoch:          0
 
@@ -49,6 +49,12 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Mon May 13 2024 Bruno Ciconelle <bciconel@redhat.com> - 0:1.8.0-1
+- Drop support to Decision Manager (BRMS).
+- Refactor report upload to use the async view.
+- Optimize report merge.
+- Deprecate report merge-status; scan job should be used instead.
+
 * Fri Apr 26 2024 Brad Smith <brasmith@redhat.com> - 0:1.7.0-1
 - Improve user experience with paginated results.
 

@@ -3,7 +3,7 @@ requires-python = ">=3.11, <3.12"
 
 [tool.poetry]
 name = "qpc"
-version = "1.7.0"
+version = "1.8.0"
 description = ""
 authors = ["QPC Team <quipucords@redhat.com>"]
 license = "GPLv3"

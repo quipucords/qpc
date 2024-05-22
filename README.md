@@ -45,7 +45,7 @@ To work with the qpc code, begin by cloning the repository:
 git clone git@github.com:quipucords/qpc.git
 ```
 
-qpc development requires Python 3.11 and Poetry. Install using your local pakage manager or manually from:
+qpc development requires Python 3.12 and Poetry. Install using your local pakage manager or manually from:
 
 * https://www.python.org/downloads/
 * https://python-poetry.org/

@@ -1,5 +1,5 @@
-%global __python3 /usr/bin/python3.11
-%global python3_pkgversion 3.11
+%global __python3 /usr/bin/python3.12
+%global python3_pkgversion 3.12
 Name:           qpc
 Summary:        command-line client interface for quipucords
 

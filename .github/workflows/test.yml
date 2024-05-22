@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        python-version: ["3.11", "3.12"]
         type:
           [
             manpage-test,
@@ -29,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4.7.0
         with:
-          python-version-file: pyproject.toml
+          python-version: ${{ matrix.python-version }}
           cache: "poetry"
           cache-dependency-path: "poetry.lock"
 

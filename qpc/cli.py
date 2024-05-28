@@ -17,6 +17,7 @@ from qpc.insights.commands import (
     InsightsPublishCommand,
 )
 from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION, get_current_sha1
+from qpc.report.aggregate import ReportAggregateCommand
 from qpc.report.commands import (
     ReportDeploymentsCommand,
     ReportDetailsCommand,
@@ -162,6 +163,7 @@ class CLI:
         self._add_subcommand(
             report.SUBCOMMAND,
             [
+                ReportAggregateCommand,
                 ReportDeploymentsCommand,
                 ReportDetailsCommand,
                 ReportInsightsCommand,

@@ -13,12 +13,19 @@ Source0:        %{url}/archive/%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-wheel
+BuildRequires:  python%{python3_pkgversion}-poetry_core
+BuildRequires:  pyproject-rpm-macros
 
 Requires:       python%{python3_pkgversion}
 Requires:       python%{python3_pkgversion}-cryptography
 Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-setuptools
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %description
 qpc is the command-line client interface for the quipucords server.
@@ -27,10 +34,10 @@ qpc is the command-line client interface for the quipucords server.
 %autosetup -n qpc-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-QPC_VAR_PROGRAM_NAME=qpc %py3_install
+QPC_VAR_PROGRAM_NAME=qpc %pyproject_install
 mkdir -p %{buildroot}%{_mandir}/man1/
 sed \
   -e "s/QPC_VAR_PROGRAM_NAME/qpc/g" \

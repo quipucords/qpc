@@ -1,6 +1,4 @@
 [project]
-name = "qpc"
-version = "1.8.0"
 license = {file = "LICENSE"}
 requires-python = ">=3.11,<3.13"
 dynamic = ["scripts"]
@@ -26,7 +24,7 @@ qpc = 'qpc.__main__:main'
 python = ">=3.11,<3.13"
 requests = ">=2.28.1"
 cryptography = ">=37.0.4"
-setuptools = "^70.0.0"
+setuptools = "69.0.3"
 faker = "^20.0.3"
 
 [tool.poetry.group.dev.dependencies]

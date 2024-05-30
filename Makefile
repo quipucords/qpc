@@ -39,8 +39,7 @@ clean:
 	find . -type d -name __pycache__ -delete
 
 install:
-	$(PYTHON) setup.py build -f
-	$(PYTHON) setup.py install -f
+	poetry run pipx install .
 
 lint: lint-ruff lint-docs
 

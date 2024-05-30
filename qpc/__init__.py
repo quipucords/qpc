@@ -9,8 +9,7 @@ try:
     __package__version__ = metadata.version(__package__)
 except metadata.PackageNotFoundError:
     # PackageNotFoundError may be raised if *not* called from
-    # within a poetry environment, such as during execution of
-    # `python setup.py install` in downstream builds.
+    # within a poetry environment.
     # As a failsafe, try to load the version defined for poetry
     # from the pyproject.toml.
     toml_path = Path(__file__).absolute().parent.parent / "pyproject.toml"

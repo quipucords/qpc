@@ -60,6 +60,10 @@ test-coverage:
 	poetry run coverage report --show-missing
 	poetry run coverage xml
 
+# verify the pyproject.toml configuration file integrity
+config-verify:
+	$(PYTHON) config-verify.py
+
 # write a man page (roff format) with placeholders for names, version, and dates
 update-man-template-roff:
 	@$(SPHINX_BUILD) -b man -q \

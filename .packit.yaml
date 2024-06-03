@@ -10,20 +10,42 @@ jobs:
     trigger: pull_request
     targets: &targets_list
       # we officially support rhel-8 and rhel-9 downstream.
-      - rhel-8-x86_64
-      - rhel-8-aarch64
-      - rhel-9-x86_64
-      - rhel-9-aarch64
+      rhel-8-x86_64:
+        additional_repos:
+           - https://yum.theforeman.org/releases/nightly/el8/x86_64/
+           - https://yum.theforeman.org/plugins/nightly/el8/x86_64/
+           - https://yum.theforeman.org/katello/nightly/katello/el8/x86_64/
+        # rhel-8-aarch64:
+      rhel-9-x86_64:
+        additional_repos:
+           - https://yum.theforeman.org/releases/nightly/el9/x86_64/
+           - https://yum.theforeman.org/plugins/nightly/el9/x86_64/
+           - https://yum.theforeman.org/katello/nightly/katello/el9/x86_64/
+        # rhel-9-aarch64:
       # centos-stream is like a preview of upcoming rhel.
-      - centos-stream-8-x86_64
-      - centos-stream-8-aarch64
-      - centos-stream-9-x86_64
-      - centos-stream-9-aarch64
+      # centos-stream-8-x86_64:
+      #  additional_repos:
+      #     - https://yum.theforeman.org/releases/nightly/el8/x86_64/
+        # centos-stream-8-aarch64:
+      centos-stream-9-x86_64:
+        additional_repos:
+           - https://yum.theforeman.org/releases/nightly/el9/x86_64/
+           - https://yum.theforeman.org/plugins/nightly/el9/x86_64/
+           - https://yum.theforeman.org/katello/nightly/katello/el9/x86_64/
+        # centos-stream-9-aarch64:
       # fedora is like an even farther future preview.
-      - fedora-39-x86_64
-      - fedora-39-aarch64
-      - fedora-40-x86_64
-      - fedora-40-aarch64
+      fedora-39-x86_64:
+        additional_repos:
+           - https://yum.theforeman.org/releases/nightly/el8/x86_64/
+           - https://yum.theforeman.org/plugins/nightly/el8/x86_64/
+           - https://yum.theforeman.org/katello/nightly/katello/el8/x86_64/
+        # fedora-39-aarch64:
+      fedora-40-x86_64:
+        additional_repos:
+           - https://yum.theforeman.org/releases/nightly/el9/x86_64/
+           - https://yum.theforeman.org/plugins/nightly/el9/x86_64/
+           - https://yum.theforeman.org/katello/nightly/katello/el9/x86_64/
+        # fedora-40-aarch64:
 
   - job: copr_build
     trigger: commit

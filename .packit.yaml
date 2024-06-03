@@ -15,8 +15,6 @@ jobs:
       - rhel-9-x86_64
       - rhel-9-aarch64
       # centos-stream is like a preview of upcoming rhel.
-      - centos-stream-8-x86_64
-      - centos-stream-8-aarch64
       - centos-stream-9-x86_64
       - centos-stream-9-aarch64
       # fedora is like an even farther future preview.

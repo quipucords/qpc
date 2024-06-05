@@ -115,3 +115,52 @@ def test_aggregate_report_but_report_does_not_exist(faker, caplog):
         messages.REPORT_NO_AGGREGATE_REPORT_FOR_REPORT_ID % unknown_report_id
     )
     assert expected_error in caplog.text
+
+
+def test_aggregate_report_output_directory(caplog):
+    """Testing fail because output directory."""
+    args = Namespace(path="/")
+    with pytest.raises(SystemExit):
+        get_command().main(args)
+    expected_error = messages.REPORT_OUTPUT_IS_A_DIRECTORY % ("output-file", "/")
+    assert expected_error in caplog.text
+
+
+def test_aggregate_report_output_directory_not_exist(caplog):
+    """Testing fail because output directory does not exist."""
+    args = Namespace(path="/foo/bar")
+    with pytest.raises(SystemExit):
+        get_command().main(args)
+    expected_error = messages.REPORT_DIRECTORY_DOES_NOT_EXIST % "/foo"
+    assert expected_error in caplog.text
+
+
+def test_aggregate_report_output_file_empty(faker, caplog):
+    """Testing fail because output file empty."""
+    report_id = faker.pyint()
+    report_uri = get_aggregate_report_uri(report_id)
+    report_json_data = {faker.slug(): faker.slug()}
+    with requests_mock.Mocker() as mocker:
+        mocker.get(report_uri, status_code=200, json=report_json_data)
+        args = Namespace(path="", report_id=report_id)
+        with pytest.raises(SystemExit):
+            get_command().main(args)
+    expected_error = messages.REPORT_OUTPUT_IS_A_DIRECTORY % ("output-file", ".")
+    assert expected_error in caplog.text
+
+
+@patch("qpc.report.aggregate.write_file")
+def test_aggregate_file_fails_to_write(file, faker, caplog):
+    """Testing deployments failure while writing to file."""
+    file.side_effect = EnvironmentError()
+    output_file = "./foobar.json"
+    report_id = faker.pyint()
+    report_uri = get_aggregate_report_uri(report_id)
+    report_json_data = {faker.slug(): faker.slug()}
+    with requests_mock.Mocker() as mocker:
+        mocker.get(report_uri, status_code=200, json=report_json_data)
+        args = Namespace(path=output_file, report_id=report_id)
+        with pytest.raises(SystemExit):
+            get_command().main(args)
+    expected_error = messages.WRITE_FILE_ERROR % {"path": output_file, "error": ""}
+    assert expected_error in caplog.text

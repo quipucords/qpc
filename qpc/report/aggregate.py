@@ -9,7 +9,11 @@ from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
 from qpc.translation import _
-from qpc.utils import pretty_format
+from qpc.utils import (
+    pretty_format,
+    validate_write_file,
+    write_file,
+)
 
 logger = getLogger(__name__)
 
@@ -44,10 +48,23 @@ class ReportAggregateCommand(CliCommand):
             metavar="REPORT_ID",
             help=_(messages.REPORT_REPORT_ID_HELP),
         )
+        self.parser.add_argument(
+            "--output-file",
+            dest="path",
+            metavar="PATH",
+            help=_(messages.REPORT_PATH_HELP),
+        )
         self.report_id = None
 
     def _validate_args(self):
         CliCommand._validate_args(self)
+
+        try:
+            if (args_path := getattr(self.args, "path", None)) is not None:
+                validate_write_file(args_path, "output-file")
+        except ValueError as error:
+            logger.error(error)
+            sys.exit(1)
 
         if not (report_id := self.args.report_id):
             response = request(
@@ -76,7 +93,15 @@ class ReportAggregateCommand(CliCommand):
     def _handle_response_success(self):
         json_data = self.response.json()
         data = pretty_format(json_data)
-        print(data)
+        try:
+            args_path = getattr(self.args, "path", None)
+            write_file(args_path, data)
+            logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
+        except EnvironmentError as err:
+            logger.error(
+                _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
+            )
+            sys.exit(1)
 
     def _handle_response_error(self):
         if self.args.report_id is None:

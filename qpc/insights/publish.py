@@ -145,7 +145,6 @@ class InsightsPublishCommand(CliCommand):
             successfully_submitted = self._make_publish_request(
                 insights_client, insights.INGRESS_REPORT_URI, files
             )
-        file_to_be_uploaded.close()
 
         if not self.args.input_file:
             # remove temporarily downloaded insights report

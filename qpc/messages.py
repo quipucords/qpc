@@ -14,7 +14,6 @@ CRED_PWD_HELP = "Password for authenticating against the target system."
 CRED_SSH_FILE_HELP = "File that contains the SSH key."
 CRED_SSH_KEY_HELP = "The SSH Private Key."
 CRED_SSH_PSPH_HELP = "SSH passphrase for authenticating against the target system."
-CRED_SUDO_HELP = "Password for running sudo."
 CRED_CLEAR_ALL_HELP = "Remove all credentials."
 
 CRED_ADDED = 'Credential "%s" was added.'
@@ -36,17 +35,6 @@ CRED_CLEAR_ALL_SUMMARY = (
 CRED_NOT_FOUND = 'Credential "%s" was not found.'
 CRED_NO_CREDS_TO_REMOVE = "No credentials exist to be removed."
 
-CRED_TYPE_REQUIRED = (
-    "The --type option is required. The value must be set to vcenter or network."
-)
-CRED_VC_PWD_AND_USERNAME = "vCenter Server requires both a user name and a password."
-CRED_VC_EDIT_PWD_OR_USERNAME = (
-    "You must update either the user name or the "
-    "password for the vCenter Server credential."
-)
-CRED_VC_KEY_FILE_NOT_ALLOWED = (
-    "vCenter Server cannot use a sudo password, SSH keyfile, or SSH passphrase."
-)
 CRED_EDIT_NO_ARGS = 'No arguments were provided to edit credential "%s".'
 CRED_DOES_NOT_EXIST = 'Credential "%s" does not exist.'
 CRED_UPDATED = 'Credential "%s" was updated.'
@@ -151,7 +139,6 @@ SOURCE_TYPE_FILTER_HELP = (
 SCAN_NAME_HELP = "Scan name."
 SCAN_ADDED = 'Scan "%s" was added.'
 SCAN_UPDATED = 'Scan "%s" was updated.'
-SCAN_ID_HELP = "Scan identifier."
 SCAN_JOB_ID_HELP = "Scan job identifier."
 SCAN_TYPE_FILTER_HELP = (
     "Filter for listing scan jobs by type. Valid values: connect, inspect."
@@ -161,13 +148,9 @@ SCAN_STATUS_FILTER_HELP = (
     "values: created, pending, running, paused, canceled, completed, failed."
 )
 SCAN_MAX_CONCURRENCY_HELP = "Maximum number of concurrent scans; default is 25."
-SCAN_RESULTS_HELP = "View results of the specified scan."
 SCAN_DOES_NOT_EXIST = 'Scan "%s" does not exist.'
-SCAN_JOB_DOES_NOT_EXIST = 'Scan job "%s" does not exist.'
 SCAN_LIST_NO_SCANS = "No scans found."
 SCAN_STARTED = 'Scan "%s" started.'
-SCAN_PAUSED = 'Scan "%s" paused.'
-SCAN_RESTARTED = 'Scan "%s" restarted.'
 SCAN_CANCELED = 'Scan "%s" canceled.'
 SCAN_CLEAR_ALL_HELP = "Remove all scans."
 SCAN_REMOVED = 'Scan "%s" was removed.'
@@ -179,17 +162,6 @@ SCAN_EDIT_NO_ARGS = "No arguments were provided to edit scan %s."
 SCAN_JOB_ID_STATUS = (
     'Provide the "--status" filter with a scan name to '
     "filter the list of related scan jobs."
-)
-SCAN_EDIT_SOURCES_NOT_FOUND = (
-    "An error occurred while processing the "
-    '"--sources" input values. References for the following sources '
-    'could not be found: %s. Failed to edit scan "%s". For more '
-    "information, see the server log file."
-)
-SCAN_EDIT_SOURCES_PROCESS_ERR = (
-    "An error occurred while processing the "
-    '"--sources" input values. Failed to edit scan "%s". For more '
-    "information, see the server log file."
 )
 SCAN_ENABLED_PRODUCT_HELP = (
     "Contains the list of products to include for extended product search. "
@@ -205,7 +177,6 @@ REPORT_JSON_DIR_HELP = (
     "The path to a directory that contain files of json details reports to merge"
 )
 REPORT_JSON_FILES_HELP = "At least two json details report files are required to merge."
-REPORT_INVALID_JSON_FILE = "The file %s does not contain a valid json details report."
 REPORT_MISSING_REPORT_VERSION = (
     "WARNING: "
     "The file %s is missing report_version.  "
@@ -216,9 +187,6 @@ REPORT_INVALID_REPORT_TYPE = (
 )
 REPORT_JSON_DIR_NO_FILES = "No files with extension .json found in %s."
 REPORT_VALIDATE_JSON = "Checking files for valid json details report. %s"
-REPORT_JSON_DIR_FILE_FAILED = (
-    "Failed: %s is not a details report. Excluding from merge."
-)
 REPORT_JSON_MISSING_ATTR = (
     "Failed: %(file)s is not a details report. Missing %(key)s. Excluding from merge."
 )
@@ -226,7 +194,6 @@ REPORT_JSON_DIR_FILE_SUCCESS = "Success: %s is a valid details report."
 REPORT_JSON_DIR_ALL_FAIL = "No details reports were found."
 REPORTS_REPORTS_DO_NOT_EXIST = "The following scan jobs did not produce reports: %s."
 REPORT_SCAN_JOB_ID_HELP = "Scan job identifier."
-REPORT_JOB_ID_HELP = "Merge report job identifier"
 REPORT_REPORT_ID_HELP = "Report identifier."
 REPORT_REPORT_IDS_HELP = "Report identifiers."
 REPORT_SCAN_JOB_IDS_HELP = "Scan job identifiers."
@@ -243,7 +210,6 @@ REPORT_NO_DETAIL_REPORT_FOR_SJ = "No report detail available for scan job %s."
 REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID = "No report detail available for report id %s."
 REPORT_NO_INSIGHTS_REPORT_FOR_SJ = "No Insights report available for scan job %s."
 REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID = "Insights report %s does not exist."
-REPORT_INSIGHTS_REPORT_SUCCESSFULLY_UPLOADED = "Successfully uploaded report"
 REPORT_OUTPUT_CANNOT_BE_EMPTY = "%s cannot be empty string."
 REPORT_OUTPUT_IS_A_DIRECTORY = "%s %s was a directory."
 REPORT_DIRECTORY_DOES_NOT_EXIST = "The directory %s does not exist.  Cannot write here."
@@ -283,18 +249,12 @@ WRITE_FILE_ERROR = "Error writing to %(path)s: %(error)s."
 NOT_A_FILE = "Input %s was not a file."
 FILE_NOT_FOUND = "Input %s was not found."
 
-VALIDATE_SSHKEY = (
-    "The file path provided, %s, could not be found on the "
-    'system. Provide a valid path for the "--sshkeyfile" argument.'
-)
-
 PROMPT_INPUT = "Provide a valid input."
 PASSWORD_PROMPT_WITH_NO_TTY = (
     "Cannot prompt for password, sshpassphrase, become_password"
     " or auth_token if not connected to a tty."
 )
 CONN_PASSWORD = "Provide a connection password."
-SUDO_PASSWORD = "Provide a password for sudo."
 SSH_PASSPHRASE = "Provide a passphrase for the SSH Key."
 SSH_KEY = "Provide a Private SSH Key followed by a Control-D."
 SSH_KEY_PROMPT = "Private SSH Key: "
@@ -303,14 +263,7 @@ BECOME_PASSWORD = (
 )
 AUTH_TOKEN = "Provide a token for authentication.\nToken: "
 
-MERGE_JOB_ID_NOT_FOUND = "Report merge job %s not found."
-MERGE_JOB_ID_STATUS = "Report merge job %(job_id)s is %(status)s."
 MERGE_ERROR = "No reports found. Error json: %s"
-DISPLAY_REPORT_ID = (
-    'Created merge report with id: "%(report_id)s".'
-    ' To download report, run "%(prog_name)s report'
-    ' deployments --report %(report_id)s --csv --output-file temp.csv"'
-)
 SERVER_CONFIG_REQUIRED = (
     "Configure server using command below: \n$ %s server"
     " config --host HOST --port PORT"
@@ -347,10 +300,6 @@ LOGIN_SUCCESS = "Login successful."
 
 LOGOUT_SUCCESS = "Logged out."
 
-BAD_INSIGHTS_INSTALL = (
-    "Insights installation check failed. Checked if "
-    'Insights was installed and configured with command "%s"'
-)
 INSIGHTS_NOT_LOGGED_IN = "Must first login to authenticate"
 INSIGHTS_TOKEN_EXPIRED = "Authorization token expired, please re-login to Insights"
 INSIGHTS_TOKEN_CORRUPT = "Corrupt Authorization token, please re-login to Insights"
@@ -363,61 +312,9 @@ INSIGHTS_LOGIN_REQUEST_FAILED = "Failed to request login authorization: %s"
 INSIGHTS_LOGIN_VERIFYING = "Verifying Login authorization at %s"
 INSIGHTS_LOGIN_VERIFICATION_FAILED = "Failed to verify Login authorization: %s"
 INSIGHTS_LOGIN_VERIFICATION_TIMEOUT = "Time-out while waiting for Login authorization"
-INSIGHTS_UPLOAD_REPORT = "Uploading report %s to Insights service."
-BAD_INSIGHTS_UPLOAD = (
-    "Failed to upload report %s to Insights."
-    ' Attempted to upload report with command "%s"'
-)
-INVALID_REPORT_INSIGHTS_UPLOAD = (
-    "Not attempting to upload report %s to Insights because %s"
-)
-INSIGHTS_REPORT_MISSING_FIELDS = "the report is missing required fields: %s."
-INSIGHTS_INVALID_REPORT_TYPE = (
-    "the report has an invalid report_type: %s. Must be an Insights report."
-)
-INSIGHTS_REPORT_NO_VALID_HOST = "the report did not contain any valid hosts."
-INSIGHTS_INVALID_HOST_NAME = (
-    'Host produced by source "%s" from system "%s" is missing all canonical facts.'
-)
-INSIGHTS_INVALID_HOST_DICT_TYPE = (
-    "hosts must be a dictionary that is not empty.  "
-    "All keys must be strings and all values must be dictionaries."
-)
-INSIGHTS_TOTAL_VALID_HOST = "Report %s contains %s/%s valid hosts."
-INSIGHTS_TOTAL_INVALID_HOST = (
-    "Report %s contains the following invalid"
-    " hosts. Fingerprints must contain"
-    " one of the following: %s"
-)
-INSIGHTS_REPORT_NOT_FOUND = "No Insights report could be found for report id: %s"
-INSIGHTS_REPORT_ID_HELP = "Report identifier."
-INSIGHTS_SCAN_JOB_ID_HELP = "Scan job identifier."
 INSIGHTS_INPUT_GZIP_HELP = "Path to local tar.gz file containing an Insights report."
 INSIGHTS_LOCAL_REPORT_NOT = "%s file cannot be found."
 INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ = "%s file is not a tar.gz."
-BAD_CORE_VERSION = (
-    "Insights version check failed. Your Insights core "
-    "version (%s) does not meet the requirements of %s or greater."
-)
-BAD_CLIENT_VERSION = (
-    "Insights version check failed. Your Insights client"
-    "version (%s) does not meet the requirements of %s or greater."
-)
-CHECK_VERSION = (
-    "You can check your Insights version with this Insights client command: (%s)."
-)
-ERROR_INSIGHTS_VERSION = (
-    "An error occurred while trying to retrieve the Insights versions. %s"
-)
-INSIGHTS_IS_VERIFIED = "Insights is installed and properly configured."
-INSIGHTS_RETRIEVE_REPORT = "Retrieving report %s."
-INSIGHTS_SCAN_JOB_ID_PRODUCED = "Scan job %s produced report %s."
-INSIGHTS_TMP_ERROR = (
-    "An error occurred while saving a temporary copy of"
-    " the report.  Cannot write file to %s."
-)
-INSIGHTS_REQUIRE_SUDO = "Insights upload command requires sudo access."
-INSIGHTS_NO_GPG_HELP = "Upload to Insights without GNU Privacy Guard."
 DOWNLOAD_NO_REPORT_FOR_SJ = "No reports available for scan job %s."
 DOWNLOAD_NO_REPORT_FOUND = "Report %s not found."
 DOWNLOAD_PATH_HELP = (
@@ -466,7 +363,6 @@ INSIGHTS_REPORT_CONTENT_UNEXPECTED = (
     f"{_INVALID_PREFIX} Insights report tarball contains an unexpected file structure."
 )
 INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL = "The report was successfully downloaded."
-INSIGHTS_REPORT_DOWNLOAD_ERROR = "There was a problem while downloading your report."
 
 CREATE_TAR_ERROR_FILE = "ERROR: files_data is not a dict"
 CREATE_TAR_ERROR_INCORRECT_STRUCTURE = "ERROR: Not correct structure for tar"

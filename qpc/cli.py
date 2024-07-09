@@ -113,6 +113,9 @@ class CLI:
             default=0,
             help=_(messages.VERBOSITY_HELP),
         )
+        # Note: We deliberately omit "required=True" from this specific subparser.
+        # This means a bare "qpc" call with no arguments will still be handled by our
+        # code, not argparse's input validation, and result in us calling print_help.
         self.subparsers = self.parser.add_subparsers(dest="subcommand")
         self.name = name
         self.args = None
@@ -186,7 +189,9 @@ class CLI:
 
     def _add_subcommand(self, subcommand, actions):
         subcommand_parser = self.subparsers.add_parser(subcommand)
-        action_subparsers = subcommand_parser.add_subparsers(dest="action")
+        action_subparsers = subcommand_parser.add_subparsers(
+            dest="action", required=True
+        )
         self.subcommands[subcommand] = {}
         for action in actions:
             action_inst = action(action_subparsers)

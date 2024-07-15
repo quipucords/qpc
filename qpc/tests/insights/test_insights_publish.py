@@ -127,8 +127,9 @@ class TestInsightsPublishCommand:
             "--report",
             "1",
         ]
-        with pytest.raises(SystemExit) as exc_info, mock.patch.object(
-            sys, "argv", test_argv
+        with (
+            pytest.raises(SystemExit) as exc_info,
+            mock.patch.object(sys, "argv", test_argv),
         ):
             CLI().main()
         # argparse will always exit with value 2

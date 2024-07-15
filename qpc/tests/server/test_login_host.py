@@ -48,8 +48,9 @@ class TestLoginCli:
         server_out = StringIO()
         e_msg = "Unable to log in with provided credentials."
         error = {"detail": [e_msg]}
-        with requests_mock.Mocker() as mocker, patch.object(
-            self.command, "password", "password"
+        with (
+            requests_mock.Mocker() as mocker,
+            patch.object(self.command, "password", "password"),
         ):
             mocker.post(self.login_url, status_code=400, json=error)
             args = Namespace(username="admin")
@@ -62,8 +63,9 @@ class TestLoginCli:
     @patch("getpass._raw_input")
     def test_login_good(self, do_mock_raw_input, caplog):
         """Testing the login with good creds."""
-        with requests_mock.Mocker() as mocker, patch.object(
-            self.command, "password", "password"
+        with (
+            requests_mock.Mocker() as mocker,
+            patch.object(self.command, "password", "password"),
         ):
             mocker.post(self.login_url, status_code=200, json=self.success_json)
             args = Namespace(username="admin")

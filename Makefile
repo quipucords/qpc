@@ -45,7 +45,7 @@ install:
 lint: lint-ruff lint-docs
 
 lint-ruff:
-	poetry run ruff .
+	poetry run ruff check .
 	poetry run ruff format --check .
 
 lint-docs:

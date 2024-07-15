@@ -113,23 +113,19 @@ class TestReportDeployments:
                     file_content_dict = json.loads(data)
                 assert get_report_json_data == file_content_dict
 
-    def test_deployments_report_as_csv(self, caplog, csv_file_path):
-        """Testing retreiving deployments report as csv."""
+    def test_deployments_report_as_csv(self, faker, caplog, csv_file_path):
+        """Testing retrieving deployments report as csv."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
         get_report_url = get_server_location() + REPORT_URI + "1/deployments/"
-        get_report_csv_data = "Report\n"
-        get_report_csv_data += "1\n\n\n"
-        get_report_csv_data += "key\n"
-        get_report_csv_data += "value\n"
+        get_report_response = faker.slug()  # actual content is irrelevant
 
-        get_report_csv_data = {"id": 1, "report": [{"key": "value"}]}
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
             mocker.get(
                 get_report_url,
                 status_code=200,
-                json=get_report_csv_data,
+                content=get_report_response.encode("utf-8"),
                 headers={"X-Server-Version": VERSION},
             )
 
@@ -143,10 +139,9 @@ class TestReportDeployments:
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
-                with Path(csv_file_path).open("r", encoding="utf-8") as json_file:
-                    data = json_file.read()
-                    file_content_dict = json.loads(data)
-                assert get_report_csv_data == file_content_dict
+        with Path(csv_file_path).open("r", encoding="utf-8") as csv_file:
+            data = csv_file.read()
+        assert get_report_response == data
 
     # Test validation
     def test_deployments_report_output_directory(self):

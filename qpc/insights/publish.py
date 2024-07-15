@@ -240,4 +240,4 @@ class InsightsPublishCommand(CliCommand):
             self._publish_to_ingress()
         except QPCError as err:
             logger.error(_(err.message))
-            SystemExit(1)
+            raise SystemExit(1)

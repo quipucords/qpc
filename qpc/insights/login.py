@@ -48,4 +48,4 @@ class InsightsLoginCommand(CliCommand):
             write_insights_auth_token(auth_token)
         except InsightsAuthError as err:
             logger.error(_(err.message))
-            SystemExit(1)
+            raise SystemExit(1)

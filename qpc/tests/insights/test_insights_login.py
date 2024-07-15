@@ -56,14 +56,14 @@ class TestInsightsLogin:
         assert "Waiting for login authorization ..." in stdout_lines[3]
         assert "Login authorization successful." in stdout_lines[4]
 
-    def test_insights_login_auth_error(self, faker, mocker, capsys):
+    def test_insights_login_auth_error(self, mocker, capsys):
         """Testing that insights login catches auth errors."""
         err_message = messages.INSIGHTS_LOGIN_REQUEST_FAILED % "Network Error"
         mocker.patch.object(
             InsightsAuth, "request_auth", side_effect=InsightsAuthError(err_message)
         )
         test_argv = ["/bin/qpc", "insights", "login"]
-        with mock.patch.object(sys, "argv", test_argv):
+        with mock.patch.object(sys, "argv", test_argv), pytest.raises(SystemExit):
             CLI().main()
         out, err = capsys.readouterr()
         assert err_message in err

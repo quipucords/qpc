@@ -118,13 +118,13 @@ class ScanAddCommand(CliCommand):
             False,
         )
         if disabled_optional_products is not None:
-            self.req_payload["options"][
-                "disabled_optional_products"
-            ] = disabled_optional_products
+            self.req_payload["options"]["disabled_optional_products"] = (
+                disabled_optional_products
+            )
         if enabled_ext_product_search is not None:
-            self.req_payload["options"][
-                "enabled_extended_product_search"
-            ] = enabled_ext_product_search
+            self.req_payload["options"]["enabled_extended_product_search"] = (
+                enabled_ext_product_search
+            )
 
     def _handle_response_success(self):
         json_data = self.response.json()

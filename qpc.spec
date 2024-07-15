@@ -3,7 +3,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        1.8.1
+Version:        1.8.2
 Release:        1%{?dist}
 Epoch:          0
 
@@ -49,6 +49,10 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Mon Jul 15 2024 Brad Smith <brasmith@redhat.com> - 0:1.8.2-1
+- Better output and exit code from incomplete commands.
+- Minor performance updates and cleanup.
+
 * Tue Jun 11 2024 Bruno Ciconelle <bciconel@redhat.com> - 0:1.8.1-1
 - Add support for aggregate report (Brad Smith)
 - Upgrade python version to 3.12

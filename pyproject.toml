@@ -40,6 +40,7 @@ rstcheck = "^6.1.1"
 ruff = "^0"
 pip-tools = "^7.1.0"
 pybuild-deps = "^0.1.1"
+packitos = "^0.99.0"
 
 
 [tool.poetry.group.build.dependencies]

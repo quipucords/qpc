@@ -25,6 +25,7 @@ help:
 	@echo "  clean               to remove cache, dist, build, and egg files"
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
+	@echo "  lint-packit         to run packit validate-config"
 	@echo "  lint-docs           to run rstcheck against docs"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
@@ -42,7 +43,7 @@ install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
-lint: lint-ruff lint-docs
+lint: lint-ruff lint-docs lint-packit
 
 lint-ruff:
 	poetry run ruff check .
@@ -51,6 +52,9 @@ lint-ruff:
 lint-docs:
 	poetry run rstcheck docs/source/man-template.rst
 	poetry run rstcheck docs/_build/man-qpc.rst
+
+lint-packit:
+	poetry run packit -d validate-config
 
 test:
 	poetry run pytest

@@ -1,13 +1,13 @@
 [project]
 name = "qpc"
-version = "1.9.0"
+version = "1.10.0"
 license = {file = "LICENSE"}
 requires-python = ">=3.11,<3.13"
 dynamic = ["scripts"]
 
 [tool.poetry]
 name = "qpc"
-version = "1.9.0"
+version = "1.10.0"
 description = ""
 classifiers=[
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

@@ -97,7 +97,7 @@ class TestCredentialListCli:
             "password": "********",
         }
         results = [credential_entry]
-        next_link = "http://127.0.0.1:8000/api/v1/credentials/?page=2"
+        next_link = "http://127.0.0.1:8000/api/v2/credentials/?page=2"
         data = {"count": 1, "next": next_link, "results": results}
         data2 = {"count": 1, "next": None, "results": results}
         with requests_mock.Mocker() as mocker:

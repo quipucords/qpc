@@ -51,7 +51,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = [
+lint.select = [
     "C90", # mccabe complexity
     "D",   # pydocstyle
     "E",   # pycodestyle
@@ -63,7 +63,7 @@ select = [
     "BLE", # flake8-blind-except
     "PTH", # flake8-use-pathlib
 ]
-ignore = [
+lint.ignore = [
     "D107",
     "D203",
     "D403",
@@ -73,7 +73,7 @@ ignore = [
 src = ["qpc"]
 target-version = "py311"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "**/commands.py" = ["F401"]
 "**/test_*.py" = [
     "PLR0913"
@@ -82,13 +82,13 @@ target-version = "py311"
     "PLR0913"
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["qpc"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "pep257"
 
 [tool.pytest.ini_options]

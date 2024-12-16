@@ -97,7 +97,6 @@ class TestCredentialClearCli(BulkClearTestsMixin):
             "id": 1,
             "name": "credential1",
             "username": "root",
-            "password": "********",
         }
         results = [credential_entry]
         data = {"count": 1, "results": results}
@@ -128,7 +127,6 @@ class TestCredentialClearCli(BulkClearTestsMixin):
             "id": 1,
             "name": "credential1",
             "username": "root",
-            "password": "********",
         }
         results = [credential_entry]
         data = {"count": 1, "results": results}

@@ -157,7 +157,6 @@ class TestCredentialEditCli:
                 "name": "cred1",
                 "cred_type": NETWORK_CRED_TYPE,
                 "username": "root",
-                "password": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -189,7 +188,6 @@ class TestCredentialEditCli:
                 "name": "cred1",
                 "cred_type": VCENTER_CRED_TYPE,
                 "username": "root",
-                "password": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -211,7 +209,6 @@ class TestCredentialEditCli:
                 "id": 1,
                 "name": "cred1",
                 "cred_type": VCENTER_CRED_TYPE,
-                "password": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -249,7 +246,6 @@ class TestCredentialEditCli:
                 "name": "cred1",
                 "cred_type": SATELLITE_CRED_TYPE,
                 "username": "root",
-                "password": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -271,7 +267,6 @@ class TestCredentialEditCli:
                 "id": 1,
                 "name": "cred1",
                 "cred_type": SATELLITE_CRED_TYPE,
-                "password": "********",
             }
         ]
         data = {"count": 1, "results": results}

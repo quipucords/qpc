@@ -92,7 +92,6 @@ class TestCredentialShowCli:
             "id": 1,
             "name": "cred1",
             "username": "root",
-            "password": "********",
         }
         results = [credential_entry]
         data = {"count": 1, "results": results}
@@ -102,9 +101,7 @@ class TestCredentialShowCli:
             args = Namespace(name="cred1")
             with redirect_stdout(cred_out):
                 self.command.main(args)
-                expected = (
-                    '{"id":1,"name":"cred1","password":"********","username":"root"}'
-                )
+                expected = '{"id":1,"name":"cred1","username":"root"}'
                 assert (
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected

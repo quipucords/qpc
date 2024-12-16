@@ -32,7 +32,6 @@ class TestOpenShiftEditCredential:
                 "id": 1,
                 "name": "openshift_cred",
                 "cred_type": OPENSHIFT_CRED_TYPE,
-                "token": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -67,7 +66,6 @@ class TestOpenShiftEditCredential:
                 "id": 1,
                 "name": "openshift_cred",
                 "cred_type": OPENSHIFT_CRED_TYPE,
-                "token": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -129,7 +127,6 @@ class TestOpenShiftEditCredential:
                 "id": 1,
                 "name": "openshift_cred",
                 "cred_type": OPENSHIFT_CRED_TYPE,
-                "token": "********",
             }
         ]
         data = {"count": 1, "results": results}
@@ -162,7 +159,6 @@ class TestOpenShiftEditCredential:
                 "id": 1,
                 "name": "openshift_cred",
                 "cred_type": OPENSHIFT_CRED_TYPE,
-                "token": "********",
             }
         ]
         data = {"count": 1, "results": results}

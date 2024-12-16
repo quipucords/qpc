@@ -26,13 +26,11 @@ class TestOpenShiftListCredential:
             "id": 1,
             "name": "openshift_1",
             "cred_type": OPENSHIFT_CRED_TYPE,
-            "token": "********",
         }
         openshift_cred_2 = {
             "id": 2,
             "name": "openshift_2",
             "cred_type": OPENSHIFT_CRED_TYPE,
-            "token": "********",
         }
         results = [openshift_cred_1, openshift_cred_2]
         data = {"count": 2, "results": results}
@@ -44,13 +42,11 @@ class TestOpenShiftListCredential:
                 "cred_type": "openshift",
                 "id": 1,
                 "name": "openshift_1",
-                "token": "********",
             },
             {
                 "cred_type": "openshift",
                 "id": 2,
                 "name": "openshift_2",
-                "token": "********",
             },
         ]
         out, err = capsys.readouterr()

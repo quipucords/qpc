@@ -599,7 +599,7 @@ Use the \fBQPC_VAR_PROGRAM_NAME report\fP command to retrieve a report from a sc
 .sp
 The \fBQPC_VAR_PROGRAM_NAME report details\fP command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, Satellite, Openshift, Red Hat Advanced Cluster Security and Ansible scans, as applicable.
 .sp
-\fBQPC_VAR_PROGRAM_NAME report details (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB(\-\-json|\-\-csv)\fP \fB\-\-output\-file\fP \fIpath\fP \fB[\-\-mask]\fP
+\fBQPC_VAR_PROGRAM_NAME report details (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB(\-\-json|\-\-csv)\fP \fB\-\-output\-file\fP \fIpath\fP
 .sp
 \fB\-\-scan\-job=scan_job_identifier\fP
 .INDENT 0.0
@@ -633,13 +633,6 @@ Displays the results of the report in CSV format. Mutually exclusive with the \f
 .INDENT 0.0
 .INDENT 3.5
 Optional. Sets the path to a file location where the report data is saved. The file extension must be \fB\&.json\fP for the JSON report or \fB\&.csv\fP for the CSV report. When the field is not provided and \fI\-\-json\fP specified, a JSON report will be generated to stdout.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-mask\fP
-.INDENT 0.0
-.INDENT 3.5
-Displays the results of the report with sensitive data masked by a hash.
 .UNINDENT
 .UNINDENT
 .SS Viewing the Deployments Report
@@ -648,7 +641,7 @@ The \fBQPC_VAR_PROGRAM_NAME report deployments\fP command retrieves a report tha
 .sp
 For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine as a single set.
 .sp
-\fBQPC_VAR_PROGRAM_NAME report deployments (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB(\-\-json|\-\-csv)\fP \fB\-\-output\-file\fP \fIpath\fP \fB[\-\-mask]\fP
+\fBQPC_VAR_PROGRAM_NAME report deployments (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB(\-\-json|\-\-csv)\fP \fB\-\-output\-file\fP \fIpath\fP
 .sp
 \fB\-\-scan\-job=scan_job_identifier\fP
 .INDENT 0.0
@@ -682,13 +675,6 @@ Displays the results of the report in CSV format. Mutually exclusive with the \f
 .INDENT 0.0
 .INDENT 3.5
 Optional. Sets the path to a file location where the report data is saved. The file extension must be \fB\&.json\fP for the JSON report or \fB\&.csv\fP for the CSV report. When the field is not provided and \fI\-\-json\fP specified, a JSON report will be generated to stdout.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-mask\fP
-.INDENT 0.0
-.INDENT 3.5
-Displays the results of the report with sensitive data masked by a hash.
 .UNINDENT
 .UNINDENT
 .SS Viewing the Insights Report
@@ -721,7 +707,7 @@ Optional. Sets the path to a file location where the report data is saved. The f
 .sp
 The \fBQPC_VAR_PROGRAM_NAME report download\fP command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
 .sp
-\fBQPC_VAR_PROGRAM_NAME report download (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB\-\-output\-file\fP \fIpath\fP \fB[\-\-mask]\fP
+\fBQPC_VAR_PROGRAM_NAME report download (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB\-\-output\-file\fP \fIpath\fP
 .sp
 \fB\-\-scan\-job=scan_job_identifier\fP
 .INDENT 0.0
@@ -741,13 +727,6 @@ Contains the report identifier to use to download the reports. Mutually exclusiv
 .INDENT 0.0
 .INDENT 3.5
 Required. Sets the path to a file location where the report data is saved. The file extension must be \fB\&.tar.gz\fP\&.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-mask\fP
-.INDENT 0.0
-.INDENT 3.5
-Download the reports with sensitive data masked by a hash.
 .UNINDENT
 .UNINDENT
 .SS Merging Scan Job Results

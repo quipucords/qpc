@@ -490,7 +490,7 @@ Viewing the Details Report
 
 The ``QPC_VAR_PROGRAM_NAME report details`` command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, Satellite, Openshift, Red Hat Advanced Cluster Security and Ansible scans, as applicable.
 
-**QPC_VAR_PROGRAM_NAME report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path* **[--mask]**
+**QPC_VAR_PROGRAM_NAME report details (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
@@ -511,10 +511,6 @@ The ``QPC_VAR_PROGRAM_NAME report details`` command retrieves a detailed report 
 ``--output-file=path``
 
   Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report. When the field is not provided and `--json` specified, a JSON report will be generated to stdout.
-
-``--mask``
-
-  Displays the results of the report with sensitive data masked by a hash.
 
 Viewing the Deployments Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -523,7 +519,7 @@ The ``QPC_VAR_PROGRAM_NAME report deployments`` command retrieves a report that 
 
 For example, the raw facts of a scan that includes both Network and vCenter sources could show two instances of a machine, indicated by an identical MAC address. The deployments report results in a deduplicated and merged fingerprint that shows both the Network and vCenter facts for that machine as a single set.
 
-**QPC_VAR_PROGRAM_NAME report deployments (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path* **[--mask]**
+**QPC_VAR_PROGRAM_NAME report deployments (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **(--json|--csv)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
@@ -544,10 +540,6 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
 ``--output-file=path``
 
   Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report. When the field is not provided and `--json` specified, a JSON report will be generated to stdout.
-
-``--mask``
-
-  Displays the results of the report with sensitive data masked by a hash.
 
 Viewing the Insights Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -574,7 +566,7 @@ Downloading Reports
 
 The ``QPC_VAR_PROGRAM_NAME report download`` command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
 
-**QPC_VAR_PROGRAM_NAME report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path* **[--mask]**
+**QPC_VAR_PROGRAM_NAME report download (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
@@ -587,10 +579,6 @@ The ``QPC_VAR_PROGRAM_NAME report download`` command downloads a set of reports,
 ``--output-file=path``
 
   Required. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.
-
-``--mask``
-
-  Download the reports with sensitive data masked by a hash.
 
 Merging Scan Job Results
 ~~~~~~~~~~~~~~~~~~~~~~~~

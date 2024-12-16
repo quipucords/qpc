@@ -94,7 +94,6 @@ class TestCredentialListCli:
             "id": 1,
             "name": "cred1",
             "username": "root",
-            "password": "********",
         }
         results = [credential_entry]
         next_link = "http://127.0.0.1:8000/api/v2/credentials/?page=2"
@@ -107,10 +106,7 @@ class TestCredentialListCli:
             args = Namespace()
             with redirect_stdout(cred_out):
                 self.command.main(args)
-                expected = (
-                    '[{"id":1,"name":"cred1","password":"********",'
-                    '"username":"root"}]'
-                )
+                expected = '[{"id":1,"name":"cred1",' '"username":"root"}]'
                 assert (
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected + expected
@@ -125,7 +121,6 @@ class TestCredentialListCli:
             "name": "cred1",
             "cred_type": "network",
             "username": "root",
-            "password": "********",
         }
         results = [credential_entry]
         data = {"count": 1, "next": None, "results": results}
@@ -137,7 +132,7 @@ class TestCredentialListCli:
                 self.command.main(args)
                 expected = (
                     '[{"cred_type":"network","id":1,'
-                    '"name":"cred1","password":"********",'
+                    '"name":"cred1",'
                     '"username":"root"}]'
                 )
                 assert (

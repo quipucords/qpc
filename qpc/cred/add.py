@@ -68,12 +68,6 @@ class CredAddCommand(CliCommand):
             help=_(messages.CRED_PWD_HELP),
         )
         group.add_argument(
-            "--sshkeyfile",
-            dest="filename",
-            metavar="FILENAME",
-            help=_(messages.CRED_SSH_FILE_HELP),
-        )
-        group.add_argument(
             "--sshkey",
             dest="ssh_key",
             action="store_true",

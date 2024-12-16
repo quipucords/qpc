@@ -22,14 +22,6 @@ from qpc.cred.edit import CredEditCommand
 from qpc.utils import get_server_location
 
 
-@pytest.fixture
-def ssh_key(tmp_path) -> str:
-    """Return the path to a fake ssh keyfile."""
-    sshkey = tmp_path / "ssh_key"
-    sshkey.write_text("fake ssh keyfile.")
-    return str(sshkey)
-
-
 @pytest.mark.usefixtures("server_config")
 class TestCredentialEditCli:
     """Class for testing the credential edit commands for qpc."""
@@ -54,24 +46,7 @@ class TestCredentialEditCli:
         with pytest.raises(SystemExit), patch.object(sys, "argv", args):
             CLI().main()
 
-    def test_edit_bad_key(self):
-        """Testing the credential edit command.
-
-        When providing an invalid path for the sshkeyfile.
-        """
-        args = [
-            "/bin/qpc",
-            "credential",
-            "edit",
-            "--name",
-            "cred1",
-            "--sshkeyfile",
-            "bad_path",
-        ]
-        with pytest.raises(SystemExit), patch.object(sys, "argv", args):
-            CLI().main()
-
-    def test_edit_cred_none(self, ssh_key):
+    def test_edit_cred_none(self):
         """Testing the edit credential command for non-existing credential."""
         url = get_server_location() + CREDENTIAL_URI + "?name=cred_none"
         with requests_mock.Mocker() as mocker:
@@ -79,14 +54,13 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="cred_none",
                 username="root",
-                filename=ssh_key,
                 password=None,
                 become_password=None,
             )
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_edit_cred_ssl_err(self, ssh_key):
+    def test_edit_cred_ssl_err(self):
         """Testing the edit credential command with a connection error."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -94,14 +68,13 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="credential1",
                 username="root",
-                filename=ssh_key,
                 password=None,
                 become_password=None,
             )
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_edit_cred_conn_err(self, ssh_key):
+    def test_edit_cred_conn_err(self):
         """Testing the edit credential command with a connection error."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -109,14 +82,13 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="credential1",
                 username="root",
-                filename=ssh_key,
                 password=None,
                 become_password=None,
             )
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_edit_host_cred(self, caplog, ssh_key):
+    def test_edit_host_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -126,7 +98,6 @@ class TestCredentialEditCli:
                 "name": "cred1",
                 "cred_type": NETWORK_CRED_TYPE,
                 "username": "root",
-                "sshkeyfile": "/foo/bar",
             }
         ]
         data = {"count": 1, "results": results}
@@ -136,8 +107,6 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="cred1",
                 username="root",
-                filename=ssh_key,
-                sshkeyfile="/woot/ness",
                 become_password=None,
                 ssh_passphrase=None,
             )
@@ -146,7 +115,7 @@ class TestCredentialEditCli:
                 expected_message = messages.CRED_UPDATED % "cred1"
                 assert expected_message in caplog.text
 
-    def test_partial_edit_host_cred(self, caplog, ssh_key):
+    def test_partial_edit_host_cred(self, caplog):
         """Testing the edit credential command successfully."""
         url_get = get_server_location() + CREDENTIAL_URI
         url_patch = get_server_location() + CREDENTIAL_URI + "1/"
@@ -165,7 +134,6 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="cred1",
                 username="root",
-                filename=ssh_key,
                 password=None,
                 become_password=None,
                 ssh_passphrase=None,
@@ -256,7 +224,7 @@ class TestCredentialEditCli:
                 expected_message = messages.CRED_UPDATED % "cred1"
                 assert expected_message in caplog.text
 
-    def test_edit_cred_get_error(self, ssh_key):
+    def test_edit_cred_get_error(self):
         """Testing the edit credential command server error occurs."""
         StringIO()
         url_get = get_server_location() + CREDENTIAL_URI
@@ -265,7 +233,6 @@ class TestCredentialEditCli:
             args = Namespace(
                 name="cred1",
                 username="root",
-                filename=ssh_key,
                 password=None,
                 become_password=None,
             )

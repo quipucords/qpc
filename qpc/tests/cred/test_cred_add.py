@@ -21,14 +21,6 @@ from qpc.cred.add import CredAddCommand
 from qpc.utils import get_server_location
 
 
-@pytest.fixture
-def ssh_key(tmp_path):
-    """Return the path to a fake ssh keyfile."""
-    sshkey = tmp_path / "ssh_key"
-    sshkey.write_text("fake ssh keyfile.")
-    return str(sshkey)
-
-
 @pytest.mark.usefixtures("server_config")
 class TestCredentialAddCli:
     """Class for testing the credential add commands for qpc."""
@@ -61,26 +53,7 @@ class TestCredentialAddCli:
         with pytest.raises(SystemExit), patch.object(sys, "argv", args):
             CLI().main()
 
-    def test_add_bad_keyfile(self):
-        """Testing the add credential command.
-
-        When providing an invalid path for the sshkeyfile.
-        """
-        args = [
-            "/bin/qpc",
-            "credential",
-            "add",
-            "--name",
-            "credential1",
-            "--username",
-            "root",
-            "--sshkeyfile",
-            "bad_path",
-        ]
-        with pytest.raises(SystemExit), patch.object(sys, "argv", args):
-            CLI().main()
-
-    def test_add_cred_name_dup(self, ssh_key):
+    def test_add_cred_name_dup(self):
         """Testing the add credential command duplicate name."""
         url = get_server_location() + CREDENTIAL_URI
         error = {"name": ["credential with this name already exists."]}
@@ -90,7 +63,6 @@ class TestCredentialAddCli:
                 name="cred_dup",
                 username="root",
                 type=NETWORK_CRED_TYPE,
-                filename=ssh_key,
                 password=None,
                 become_password=None,
                 ssh_passphrase=None,
@@ -98,7 +70,7 @@ class TestCredentialAddCli:
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_add_cred_ssl_err(self, ssh_key):
+    def test_add_cred_ssl_err(self):
         """Testing the add credential command with a connection error."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -107,7 +79,6 @@ class TestCredentialAddCli:
                 name="credential1",
                 username="root",
                 type=NETWORK_CRED_TYPE,
-                filename=ssh_key,
                 password=None,
                 become_password=None,
                 ssh_passphrase=None,
@@ -115,7 +86,7 @@ class TestCredentialAddCli:
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_add_cred_conn_err(self, ssh_key):
+    def test_add_cred_conn_err(self):
         """Testing the add credential command with a connection error."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -124,7 +95,6 @@ class TestCredentialAddCli:
                 name="credential1",
                 username="root",
                 type=NETWORK_CRED_TYPE,
-                filename=ssh_key,
                 password=None,
                 become_password=None,
                 ssh_passphrase=None,
@@ -132,7 +102,7 @@ class TestCredentialAddCli:
             with pytest.raises(SystemExit):
                 self.command.main(args)
 
-    def test_add_host_cred(self, caplog, ssh_key):
+    def test_add_host_cred(self, caplog):
         """Testing the add host cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -141,7 +111,6 @@ class TestCredentialAddCli:
                 name="credential1",
                 username="root",
                 type=NETWORK_CRED_TYPE,
-                filename=ssh_key,
                 password=None,
                 ssh_passphrase=None,
                 become_method=None,
@@ -228,7 +197,7 @@ class TestCredentialAddCli:
                 expected_message = messages.CRED_ADDED % "credential1"
                 assert expected_message in caplog.text
 
-    def test_add_host_cred_with_become(self, caplog, ssh_key):
+    def test_add_host_cred_with_become(self, caplog):
         """Testing the add host cred command successfully."""
         url = get_server_location() + CREDENTIAL_URI
         with requests_mock.Mocker() as mocker:
@@ -237,7 +206,6 @@ class TestCredentialAddCli:
                 name="credential1",
                 username="root",
                 type=NETWORK_CRED_TYPE,
-                filename=ssh_key,
                 password=None,
                 ssh_passphrase=None,
                 become_method="sudo",

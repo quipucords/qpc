@@ -64,12 +64,6 @@ class CredEditCommand(CliCommand):
             help=_(messages.CRED_TOKEN_HELP),
         )
         group.add_argument(
-            "--sshkeyfile",
-            dest="filename",
-            metavar="FILENAME",
-            help=_(messages.CRED_SSH_FILE_HELP),
-        )
-        group.add_argument(
             "--sshkey",
             dest="ssh_key",
             action="store_true",
@@ -108,7 +102,6 @@ class CredEditCommand(CliCommand):
         if not (
             self.args.username
             or self.args.password
-            or self.args.filename
             or self.args.ssh_key
             or self.args.ssh_passphrase
             or self.args.become_method

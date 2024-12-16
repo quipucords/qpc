@@ -134,7 +134,7 @@ Creating and Editing Credentials
 
 To create a credential, supply the type of credential and supply SSH credentials as either a username-password pair, a username-key pair, or an access token. The QPC_VAR_PROJECT tool stores each set of credentials in a separate credential entry.
 
-**QPC_VAR_PROGRAM_NAME cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--username=** *username* **(--password | --sshkeyfile=** *key_file* | --sshkey**)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**QPC_VAR_PROGRAM_NAME cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--username=** *username* **(--password | --sshkey**)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 ``--name=name``
 
@@ -150,19 +150,15 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--password``
 
-  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile``, ``--sshkey`` and ``--token`` options.
-
-``--sshkeyfile=key_file``
-
-  Sets the path of the file that contains the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password``, ``--ssh-key`` and ``--token`` options.
+  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkey`` and ``--token`` options.
 
 ``--sshkey``
 
-  Prompts for the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password``, ``--token`` and ``--sshkeyfile`` options.
+  Prompts for the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` and ``--token`` options.
 
 ``--sshpassphrase``
 
-  Prompts for the passphrase to be used when connecting with an SSH keyfile or SSH key that requires a passphrase. Can only be used with the ``--sshkeyfile`` or ``--sshkey`` option.
+  Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the ``--sshkey`` option.
 
 ``--become-method=become_method``
 
@@ -178,16 +174,16 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--token``
 
-  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile``, ``--sshkey`` and ``--password`` options.
+  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkey`` and ``--password`` options.
 
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the ``QPC_VAR_PROGRAM_NAME cred edit`` command to change credential information. The parameters for ``QPC_VAR_PROGRAM_NAME cred edit`` are the same as those for ``QPC_VAR_PROGRAM_NAME cred add``.
 
-**QPC_VAR_PROGRAM_NAME cred edit --name=** *name* **--username=** *username* **(--password | --sshkeyfile=** *key_file* | --sshkey **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**QPC_VAR_PROGRAM_NAME cred edit --name=** *name* **--username=** *username* **(--password | --sshkey **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 Listing and Showing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``QPC_VAR_PROGRAM_NAME cred list`` command returns the details for every credential that is configured for QPC_VAR_PROJECT. This output includes the name, username, password, SSH keyfile, sudo password, or token (if applicable) for each entry. Passwords and tokens are masked if provided, if not, they will appear as ``null``.
+The ``QPC_VAR_PROGRAM_NAME cred list`` command returns the details for every credential that is configured for QPC_VAR_PROJECT. This output includes the name and username for each entry. Secret values such as passwords and tokens are never displated in the output.
 
 **QPC_VAR_PROGRAM_NAME cred list --type=** *(network | vcenter | satellite | openshift | rhacs | ansible)*
 
@@ -719,14 +715,6 @@ Examples
 * Creating a new network type credential with a password
 
   ``QPC_VAR_PROGRAM_NAME cred add --name net_cred --type network --username QPC_VAR_PROGRAM_NAME_user --password``
-
-* Creating a new network type credential with a keyfile
-
-  ``QPC_VAR_PROGRAM_NAME cred add --name net_cred2 --type network --username QPC_VAR_PROGRAM_NAME_user --sshkeyfile /etc/ssh/ssh_host_rsa_key``
-
-* Creating a new network type credential with a keyfile requiring a passphrase
-
-  ``QPC_VAR_PROGRAM_NAME cred add --name net_cred3 --type network --username QPC_VAR_PROGRAM_NAME_user --sshkeyfile /etc/ssh/ssh_host_rsa_key --sshpassphrase``
 
 * Creating a new network type credential with an SSH key
 

@@ -152,7 +152,7 @@ When a scan runs, it uses a source that contains information such as the host na
 .sp
 To create a credential, supply the type of credential and supply SSH credentials as either a username\-password pair, a username\-key pair, or an access token. The QPC_VAR_PROJECT tool stores each set of credentials in a separate credential entry.
 .sp
-\fBQPC_VAR_PROGRAM_NAME cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkeyfile=\fP \fIkey_file\fP | \-\-sshkey**)** \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBQPC_VAR_PROGRAM_NAME cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkey\fP)** \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -178,28 +178,21 @@ Required for both password and SSH key authentication. Sets the username of the 
 \fB\-\-password\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the password for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-sshkeyfile\fP, \fB\-\-sshkey\fP and \fB\-\-token\fP options.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-sshkeyfile=key_file\fP
-.INDENT 0.0
-.INDENT 3.5
-Sets the path of the file that contains the private SSH key for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-password\fP, \fB\-\-ssh\-key\fP and \fB\-\-token\fP options.
+Prompts for the password for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-sshkey\fP and \fB\-\-token\fP options.
 .UNINDENT
 .UNINDENT
 .sp
 \fB\-\-sshkey\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the private SSH key for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-password\fP, \fB\-\-token\fP and \fB\-\-sshkeyfile\fP options.
+Prompts for the private SSH key for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-password\fP and \fB\-\-token\fP options.
 .UNINDENT
 .UNINDENT
 .sp
 \fB\-\-sshpassphrase\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the passphrase to be used when connecting with an SSH keyfile or SSH key that requires a passphrase. Can only be used with the \fB\-\-sshkeyfile\fP or \fB\-\-sshkey\fP option.
+Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the \fB\-\-sshkey\fP option.
 .UNINDENT
 .UNINDENT
 .sp
@@ -227,16 +220,16 @@ Prompts for the privilege escalation password to be used when running a network 
 \fB\-\-token\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkeyfile\fP, \fB\-\-sshkey\fP and \fB\-\-password\fP options.
+Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkey\fP and \fB\-\-password\fP options.
 .UNINDENT
 .UNINDENT
 .sp
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the \fBQPC_VAR_PROGRAM_NAME cred edit\fP command to change credential information. The parameters for \fBQPC_VAR_PROGRAM_NAME cred edit\fP are the same as those for \fBQPC_VAR_PROGRAM_NAME cred add\fP\&.
 .sp
-\fBQPC_VAR_PROGRAM_NAME cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkeyfile=\fP \fIkey_file\fP | \-\-sshkey \fB)\fP \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBQPC_VAR_PROGRAM_NAME cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkey **)\fP \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
 .SS Listing and Showing Credentials
 .sp
-The \fBQPC_VAR_PROGRAM_NAME cred list\fP command returns the details for every credential that is configured for QPC_VAR_PROJECT. This output includes the name, username, password, SSH keyfile, sudo password, or token (if applicable) for each entry. Passwords and tokens are masked if provided, if not, they will appear as \fBnull\fP\&.
+The \fBQPC_VAR_PROGRAM_NAME cred list\fP command returns the details for every credential that is configured for QPC_VAR_PROJECT. This output includes the name and username for each entry. Secret values such as passwords and tokens are never displated in the output.
 .sp
 \fBQPC_VAR_PROGRAM_NAME cred list \-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP
 .sp
@@ -912,14 +905,6 @@ Enables the verbose mode. The \fB\-vvv\fP option increases verbosity to show mor
 Creating a new network type credential with a password
 .sp
 \fBQPC_VAR_PROGRAM_NAME cred add \-\-name net_cred \-\-type network \-\-username QPC_VAR_PROGRAM_NAME_user \-\-password\fP
-.IP \(bu 2
-Creating a new network type credential with a keyfile
-.sp
-\fBQPC_VAR_PROGRAM_NAME cred add \-\-name net_cred2 \-\-type network \-\-username QPC_VAR_PROGRAM_NAME_user \-\-sshkeyfile /etc/ssh/ssh_host_rsa_key\fP
-.IP \(bu 2
-Creating a new network type credential with a keyfile requiring a passphrase
-.sp
-\fBQPC_VAR_PROGRAM_NAME cred add \-\-name net_cred3 \-\-type network \-\-username QPC_VAR_PROGRAM_NAME_user \-\-sshkeyfile /etc/ssh/ssh_host_rsa_key \-\-sshpassphrase\fP
 .IP \(bu 2
 Creating a new network type credential with an SSH key
 .sp

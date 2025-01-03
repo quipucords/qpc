@@ -1,5 +1,16 @@
-%global __python3 /usr/bin/python3.12
-%global python3_pkgversion 3.12
+%if 0%{?fedora} >= 41
+    # Fedora 41 with Python 3.13
+    # When will RHEL have 3.13? TBD
+    # Add condition like this when necessary:
+    # || 0%{?rhel} >= 11
+    %global python3_pkgversion 3.13
+    %global __python3 /usr/bin/python3.13
+%else
+    # older distros with Python 3.12
+    %global python3_pkgversion 3.12
+    %global __python3 /usr/bin/python3.12
+%endif
+
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
@@ -49,6 +60,9 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Fri Jan 3 2025 Brad Smith <brasmith@redhat.com> - 0:1.12.0-1
+- Support python 3.13 on fedora >= 41
+
 * Mon Jul 15 2024 Brad Smith <brasmith@redhat.com> - 0:1.8.2-1
 - Better output and exit code from incomplete commands.
 - Minor performance updates and cleanup.

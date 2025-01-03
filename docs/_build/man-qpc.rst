@@ -878,4 +878,4 @@ Quipucords is written and maintained by Red Hat. Please refer to the commit hist
 Copyright
 ---------
 
-Copyright 2018-2024 Red Hat, Inc. Licensed under the GNU Public License version 3.
+Copyright 2018-2025 Red Hat, Inc. Licensed under the GNU Public License version 3.

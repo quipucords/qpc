@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0 # fetches all commits/tags
 
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install "poetry<2"
 
       - name: Set up Python
         uses: actions/setup-python@v4.7.0

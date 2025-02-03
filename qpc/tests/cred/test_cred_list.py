@@ -106,7 +106,7 @@ class TestCredentialListCli:
             args = Namespace()
             with redirect_stdout(cred_out):
                 self.command.main(args)
-                expected = '[{"id":1,"name":"cred1",' '"username":"root"}]'
+                expected = '[{"id":1,"name":"cred1","username":"root"}]'
                 assert (
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip()
                     == expected + expected
@@ -131,9 +131,7 @@ class TestCredentialListCli:
             with redirect_stdout(cred_out):
                 self.command.main(args)
                 expected = (
-                    '[{"cred_type":"network","id":1,'
-                    '"name":"cred1",'
-                    '"username":"root"}]'
+                    '[{"cred_type":"network","id":1,"name":"cred1","username":"root"}]'
                 )
                 assert (
                     cred_out.getvalue().replace("\n", "").replace(" ", "").strip()

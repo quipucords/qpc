@@ -20,8 +20,7 @@ CRED_ADDED = 'Credential "%s" was added.'
 
 CRED_REMOVED = 'Credential "%s" was removed.'
 CRED_FAILED_TO_REMOVE = (
-    'Failed to remove credential "%s". For more '
-    "information, see the server log file."
+    'Failed to remove credential "%s". For more information, see the server log file.'
 )
 CRED_CLEAR_ALL_SKIPPED_ASSIGNED_TO_SOURCE = (
     "Could not delete credential ID %(credential_id)s "
@@ -265,8 +264,7 @@ AUTH_TOKEN = "Provide a token for authentication.\nToken: "
 
 MERGE_ERROR = "No reports found. Error json: %s"
 SERVER_CONFIG_REQUIRED = (
-    "Configure server using command below: \n$ %s server"
-    " config --host HOST --port PORT"
+    "Configure server using command below: \n$ %s server config --host HOST --port PORT"
 )
 SERVER_LOGIN_REQUIRED = "Log in using the command below: \n$ %s server login"
 SERVER_CONFIG_HOST_HELP = "Host or IP address for the server."
@@ -280,8 +278,7 @@ SERVER_CONFIG_SUCCESS = (
     ' with port "%(port)s".'
 )
 SERVER_INTERNAL_ERROR = (
-    "An internal server error occurred. For more "
-    "information, see the server log file."
+    "An internal server error occurred. For more information, see the server log file."
 )
 SERVER_STATUS_FAILURE = (
     "Unexpected failure occurred when accessing the status endpoint."

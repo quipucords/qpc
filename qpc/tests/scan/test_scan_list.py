@@ -111,9 +111,7 @@ class TestScanListCli:
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = (
-                    '[{"id":1,"scan_type":"inspect"'
-                    ',"source":{"id":1,"name":"scan1"}'
-                    "}]"
+                    '[{"id":1,"scan_type":"inspect","source":{"id":1,"name":"scan1"}}]'
                 )
                 assert (
                     scan_out.getvalue().replace("\n", "").replace(" ", "").strip()
@@ -138,9 +136,7 @@ class TestScanListCli:
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = (
-                    '[{"id":1,"scan_type":"inspect"'
-                    ',"source":{"id":1,"name":"scan1"}'
-                    "}]"
+                    '[{"id":1,"scan_type":"inspect","source":{"id":1,"name":"scan1"}}]'
                 )
                 assert (
                     scan_out.getvalue().replace("\n", "").replace(" ", "").strip()

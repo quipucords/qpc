@@ -14,7 +14,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        1.12.0
+Version:        1.13.0
 Release:        1%{?dist}
 Epoch:          0
 

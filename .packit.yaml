@@ -18,8 +18,6 @@ jobs:
       - centos-stream-9-x86_64
       - centos-stream-9-aarch64
       # fedora is like an even farther future preview.
-      - fedora-40-x86_64
-      - fedora-40-aarch64
       - fedora-41-x86_64
       - fedora-41-aarch64
 

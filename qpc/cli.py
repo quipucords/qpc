@@ -218,10 +218,12 @@ class CLI:
                 logger.error(_(messages.SERVER_CONFIG_REQUIRED), QPC_VAR_PROGRAM_NAME)
                 sys.exit(1)
 
-        if read_require_auth():
-            if (not is_server_cmd or is_server_logout) and not read_client_token():
-                logger.error(_(messages.SERVER_LOGIN_REQUIRED), QPC_VAR_PROGRAM_NAME)
-                sys.exit(1)
+            if read_require_auth():
+                if (not is_server_cmd or is_server_logout) and not read_client_token():
+                    logger.error(
+                        _(messages.SERVER_LOGIN_REQUIRED), QPC_VAR_PROGRAM_NAME
+                    )
+                    sys.exit(1)
 
         if self.args.subcommand in self.subcommands:
             subcommand = self.subcommands[self.args.subcommand]

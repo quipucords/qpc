@@ -211,7 +211,7 @@ REPORT_NO_INSIGHTS_REPORT_FOR_SJ = "No Insights report available for scan job %s
 REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID = "Insights report %s does not exist."
 REPORT_NO_INSIGHTS_CLARIFICATION = (
     "Insights report can be generated only if at least one source type "
-    "is network, satellite or vcenter."
+    "is network, satellite, or vcenter."
 )
 REPORT_OUTPUT_CANNOT_BE_EMPTY = "%s cannot be empty string."
 REPORT_OUTPUT_IS_A_DIRECTORY = "%s %s was a directory."

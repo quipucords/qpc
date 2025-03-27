@@ -8,7 +8,13 @@ from qpc import messages
 from qpc.clicommand import CliCommand
 from qpc.source.utils import validate_port
 from qpc.translation import _
-from qpc.utils import write_server_config
+from qpc.utils import (
+    CONFIG_HOST_KEY,
+    CONFIG_PORT_KEY,
+    CONFIG_SSL_VERIFY,
+    CONFIG_USE_HTTP,
+    write_server_config,
+)
 
 logger = getLogger(__name__)
 
@@ -64,22 +70,14 @@ class ConfigureHostCommand(CliCommand):
             help=SUPPRESS,
             required=False,
         )
-        self.parser.add_argument(
-            "--disable-auth",
-            dest="require_token",
-            action="store_false",
-            help=SUPPRESS,
-            required=False,
-        )
 
     def _do_command(self):
         """Persist the server configuration."""
         server_config = {
-            "host": self.args.host,
-            "port": int(self.args.port),
-            "use_http": self.args.use_http,
-            "ssl_verify": self.args.ssl_verify,
-            "require_token": self.args.require_token,
+            CONFIG_HOST_KEY: self.args.host,
+            CONFIG_PORT_KEY: int(self.args.port),
+            CONFIG_USE_HTTP: self.args.use_http,
+            CONFIG_SSL_VERIFY: self.args.ssl_verify,
         }
         write_server_config(server_config)
         protocol = "https"

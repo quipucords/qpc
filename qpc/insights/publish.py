@@ -16,7 +16,13 @@ from qpc.insights.http import InsightsClient
 from qpc.request import GET
 from qpc.request import request as qpc_request
 from qpc.translation import _
-from qpc.utils import read_insights_auth_token, read_insights_config
+from qpc.utils import (
+    CONFIG_HOST_KEY,
+    CONFIG_PORT_KEY,
+    CONFIG_USE_HTTP,
+    read_insights_auth_token,
+    read_insights_config,
+)
 
 logger = getLogger(__name__)
 
@@ -184,12 +190,12 @@ class InsightsPublishCommand(CliCommand):
     def _get_base_url(self):
         insights_config = read_insights_config()
 
-        if insights_config["use_http"]:
+        if insights_config[CONFIG_USE_HTTP]:
             protocol = "http://"
         else:
             protocol = "https://"
-        host = insights_config["host"]
-        port = insights_config["port"]
+        host = insights_config[CONFIG_HOST_KEY]
+        port = insights_config[CONFIG_PORT_KEY]
 
         base_url = f"{protocol}{host}:{port}"
         return base_url

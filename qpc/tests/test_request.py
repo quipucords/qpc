@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from qpc.request import request, version_tuple
-from qpc.utils import QPC_MIN_SERVER_VERSION
+from qpc.utils import CLIENT_TOKEN_TEST_VALUE, QPC_MIN_SERVER_VERSION
 
 
 def test_request_invalid_method(server_config, caplog):
@@ -20,7 +20,7 @@ def test_request_invalid_method(server_config, caplog):
 
 
 @pytest.mark.parametrize("method", ["GET", "DELETE", "PUT", "POST", "PATCH"])
-def test_request_methods(server_config, method):
+def test_request_methods(authenticated_client, method):
     """Test request with valid http methods."""
     with patch("qpc.request.perform_request") as mock_perform_request:
         request(method, "/path")
@@ -29,7 +29,7 @@ def test_request_methods(server_config, method):
             "http://127.0.0.1:8000/path",
             None,
             None,
-            {},
+            {"Authorization": f"Token {CLIENT_TOKEN_TEST_VALUE}"},
             QPC_MIN_SERVER_VERSION,
         )
 

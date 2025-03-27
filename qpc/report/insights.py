@@ -120,7 +120,7 @@ class ReportInsightsCommand(CliCommand):
             response = request(
                 parser=self.parser,
                 method=GET,
-                path=f"{scan.SCAN_JOB_V2_URI}",
+                path=f"{scan.SCAN_JOB_URI}",
                 params={"report_id": self.args.report_id},
                 payload=None,
             )

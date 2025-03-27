@@ -17,7 +17,7 @@ from qpc.cli import CLI
 from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.insights import ReportInsightsCommand
-from qpc.scan import SCAN_JOB_URI, SCAN_JOB_V2_URI
+from qpc.scan import SCAN_JOB_URI
 from qpc.tests.utilities import redirect_stdout
 from qpc.utils import create_tar_buffer, get_server_location
 
@@ -78,7 +78,7 @@ class TestReportInsights:
 
     def test_insights_report_as_json_report_id(self, caplog, fake_tarball):
         """Testing retreiving insights report as json with report id."""
-        scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
         scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {
@@ -163,7 +163,7 @@ class TestReportInsights:
     def test_insights_file_fails_to_write(self, file, caplog, fake_tarball):
         """Testing insights failure while writing to file."""
         file.side_effect = EnvironmentError()
-        scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
         scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
@@ -236,7 +236,7 @@ class TestReportInsights:
 
     def test_insights_report_id_not_exist(self, caplog, fake_tarball):
         """Test insights with nonexistent report id."""
-        scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
         get_report_url = get_server_location() + REPORT_URI + "1/insights/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {fake_tarball: get_report_json_data}
@@ -289,7 +289,7 @@ class TestReportInsights:
 def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
     """Testing retrieving insights report as json without output file."""
     caplog.set_level("INFO")
-    scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+    scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
     scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
     requests_mock.get(
         scanjob_report_url,
@@ -364,7 +364,7 @@ def test_insights_not_available_report_id(caplog, capsys, requests_mock):
     using --report param.
     """
     caplog.set_level("INFO")
-    scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+    scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
     scanjob_data = {"results": [{"sources": [{"source_type": "ansible"}]}]}
     requests_mock.get(
         scanjob_report_url,
@@ -437,7 +437,7 @@ def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
     using --report param.
     """
     caplog.set_level("INFO")
-    scanjob_report_url = get_server_location() + SCAN_JOB_V2_URI + "?report_id=1"
+    scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
     scanjob_data = {
         "results": [
             {"sources": [{"source_type": "ansible"}, {"source_type": "satellite"}]}

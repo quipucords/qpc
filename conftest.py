@@ -54,18 +54,40 @@ def pytest_collection(session):
 @pytest.fixture
 def server_config():
     """
-    Create server config with require_token set to False.
+    Create server config.
 
-    Since all cli commands require qpc config and qpc login to be executed,
-    require_token must be False, to avoid passing login info
+    Tests that want to pass the initial login check, should also use client_token
+    fixture, or use only authenticated_client fixture (which pulls both server_config
+    and client_token).
     """
-    from qpc.utils import write_server_config
+    from qpc.utils import (
+        CONFIG_HOST_KEY,
+        CONFIG_PORT_KEY,
+        CONFIG_USE_HTTP,
+        write_server_config,
+    )
 
     return write_server_config(
         {
-            "host": "127.0.0.1",
-            "port": 8000,
-            "use_http": True,
-            "require_token": False,
+            CONFIG_HOST_KEY: "127.0.0.1",
+            CONFIG_PORT_KEY: 8000,
+            CONFIG_USE_HTTP: True,
         }
     )
+
+
+@pytest.fixture
+def client_token():
+    """Create fake client token."""
+    from qpc.utils import CLIENT_TOKEN_KEY, CLIENT_TOKEN_TEST_VALUE, write_client_token
+
+    write_client_token({CLIENT_TOKEN_KEY: CLIENT_TOKEN_TEST_VALUE})
+
+
+@pytest.fixture
+def authenticated_client(server_config, client_token):
+    """Create server config and client token, providing authenticated client setup.
+
+    Tests that wish to use unauthenticated client, should use server_config fixture.
+    """
+    pass

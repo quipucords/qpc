@@ -12,7 +12,7 @@ class TestUtils:
         if not utils.QPC_CLIENT_TOKEN.exists():
             check_value = True
             expected_token = "100"
-            token_json = {"token": expected_token}
+            token_json = {utils.CLIENT_TOKEN_KEY: expected_token}
             utils.write_client_token(token_json)
         token = utils.read_client_token()
         assert isinstance(token, str)

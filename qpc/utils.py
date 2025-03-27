@@ -34,8 +34,11 @@ CONFIG_HOST_KEY = "host"
 CONFIG_PORT_KEY = "port"
 CONFIG_USE_HTTP = "use_http"
 CONFIG_SSL_VERIFY = "ssl_verify"
-CONFIG_REQUIRE_TOKEN = "require_token"
 CONFIG_SSO_HOST_KEY = "sso_host"
+
+CLIENT_TOKEN_KEY = "token"
+CLIENT_TOKEN_TEST_VALUE = "abc123"
+
 
 DEFAULT_HOST_INSIGHTS_CONFIG = "console.redhat.com"
 DEFAULT_PORT_INSIGHTS_CONFIG = 443
@@ -106,21 +109,9 @@ def read_client_token():
 
     try:
         token_json = json.loads(QPC_CLIENT_TOKEN.read_text())
-        return token_json.get("token")
+        return token_json.get(CLIENT_TOKEN_KEY)
     except json.decoder.JSONDecodeError:
         return None
-
-
-def read_require_auth():
-    """Determine if CLI should require token.
-
-    :returns: True is auth token required.
-    """
-    config = read_server_config()
-    if config is None:
-        # No configuration so True
-        return True
-    return config.get(CONFIG_REQUIRE_TOKEN)
 
 
 def read_insights_config():
@@ -157,7 +148,6 @@ def read_server_config():  # noqa: C901 PLR0911
     port = config.get(CONFIG_PORT_KEY)
     use_http = config.get(CONFIG_USE_HTTP)
     ssl_verify = config.get(CONFIG_SSL_VERIFY, False)
-    require_token = config.get(CONFIG_REQUIRE_TOKEN)
 
     host_empty = host is None or host == ""
     port_empty = port is None or port == ""
@@ -184,22 +174,11 @@ def read_server_config():  # noqa: C901 PLR0911
     if use_http is None:
         use_http = True
 
-    if require_token is None:
-        require_token = True
-
     if not isinstance(use_http, bool):
         logger.error(
             "Server config %s has invalid value for use_http %s",
             QPC_SERVER_CONFIG,
             use_http,
-        )
-        return None
-
-    if not isinstance(require_token, bool):
-        logger.error(
-            "Server config %s has invalid value for require_token %s",
-            QPC_SERVER_CONFIG,
-            require_token,
         )
         return None
 
@@ -232,7 +211,6 @@ def read_server_config():  # noqa: C901 PLR0911
         CONFIG_PORT_KEY: port,
         CONFIG_USE_HTTP: use_http,
         CONFIG_SSL_VERIFY: ssl_verify,
-        CONFIG_REQUIRE_TOKEN: require_token,
     }
 
 

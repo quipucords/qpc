@@ -56,7 +56,6 @@ from qpc.utils import (
     get_server_location,
     logger,
     read_client_token,
-    read_require_auth,
     setup_logging,
 )
 
@@ -208,22 +207,17 @@ class CLI:
         self.args = self.parser.parse_args()
         setup_logging(self.args.verbosity)
         is_server_cmd = self.args.subcommand == server.SUBCOMMAND
-        is_server_logout = is_server_cmd and self.args.action == server.LOGOUT
         is_server_config = is_server_cmd and self.args.action == server.CONFIG
 
         if not is_server_config:
             # Before attempting to run command, check server location
-            server_location = get_server_location()
-            if server_location is None or server_location == "":
+            if not get_server_location():
                 logger.error(_(messages.SERVER_CONFIG_REQUIRED), QPC_VAR_PROGRAM_NAME)
                 sys.exit(1)
 
-            if read_require_auth():
-                if (not is_server_cmd or is_server_logout) and not read_client_token():
-                    logger.error(
-                        _(messages.SERVER_LOGIN_REQUIRED), QPC_VAR_PROGRAM_NAME
-                    )
-                    sys.exit(1)
+            if not is_server_cmd and not read_client_token():
+                logger.error(_(messages.SERVER_LOGIN_REQUIRED), QPC_VAR_PROGRAM_NAME)
+                sys.exit(1)
 
         if self.args.subcommand in self.subcommands:
             subcommand = self.subcommands[self.args.subcommand]

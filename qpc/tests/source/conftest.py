@@ -6,7 +6,7 @@ from qpc.cred import CREDENTIAL_URI
 
 
 @pytest.fixture(autouse=True)
-def _setup_server_config_file(server_config): ...
+def _setup_server_config_file(authenticated_client): ...
 
 
 @pytest.fixture

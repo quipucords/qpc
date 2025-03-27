@@ -22,8 +22,8 @@ SCAN_STATUS_FAILED = "failed"
 
 SCAN_URI = "/api/v1/scans/"
 SCAN_BULK_DELETE_URI = "/api/v1/scans/bulk_delete/"
-SCAN_JOB_URI = "/api/v1/jobs/"
-SCAN_JOB_V2_URI = "/api/v2/jobs/"
+SCAN_JOB_V1_URI = "/api/v1/jobs/"
+SCAN_JOB_URI = "/api/v2/jobs/"
 
 SCAN_TYPE_CONNECT = "connect"
 SCAN_TYPE_INSPECT = "inspect"

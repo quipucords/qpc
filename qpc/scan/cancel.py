@@ -29,7 +29,7 @@ class ScanCancelCommand(CliCommand):
             self.ACTION,
             subparsers.add_parser(self.ACTION),
             PUT,
-            scan.SCAN_JOB_URI,
+            scan.SCAN_JOB_V1_URI,
             [codes.ok],
         )
         self.parser.add_argument(

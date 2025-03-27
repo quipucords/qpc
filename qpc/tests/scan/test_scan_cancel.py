@@ -11,7 +11,7 @@ import requests_mock
 
 from qpc import messages
 from qpc.request import CONNECTION_ERROR_MSG
-from qpc.scan import SCAN_JOB_URI
+from qpc.scan import SCAN_JOB_V1_URI
 from qpc.scan.cancel import ScanCancelCommand
 from qpc.tests.utilities import DEFAULT_CONFIG, HushUpStderr, redirect_stdout
 from qpc.utils import get_server_location, write_server_config
@@ -48,7 +48,7 @@ class TestScanCancelCli:
     def test_cancel_scan_ssl_err(self):
         """Testing the cancel scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
+        url = get_server_location() + SCAN_JOB_V1_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.SSLError)
 
@@ -61,7 +61,7 @@ class TestScanCancelCli:
     def test_cancel_scan_conn_err(self):
         """Testing the cancel scan command with a connection error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
+        url = get_server_location() + SCAN_JOB_V1_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
 
@@ -74,7 +74,7 @@ class TestScanCancelCli:
     def test_cancel_scan_internal_err(self):
         """Testing the cancel scan command with an internal error."""
         scan_out = StringIO()
-        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
+        url = get_server_location() + SCAN_JOB_V1_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=500, json={"error": ["Server Error"]})
 
@@ -86,7 +86,7 @@ class TestScanCancelCli:
 
     def test_cancel_scan_data(self, caplog):
         """Testing the cancel scan command successfully with stubbed data."""
-        url = get_server_location() + SCAN_JOB_URI + "1/cancel/"
+        url = get_server_location() + SCAN_JOB_V1_URI + "1/cancel/"
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200, json=None)
 

@@ -29,7 +29,6 @@ help:
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
-	@echo "  build-container     to build the quipucords-cli container image"
 	@echo "  lock-requirements   to lock all python dependencies"
 	@echo "  update-requirements to update all python dependencies"
 
@@ -109,9 +108,6 @@ manpage-test:
 	$(MAKE) update-man-qpc-roff BUILD_DATE="${OLD_MAN_PAGE_BUILD_DATE}"
 	git diff --exit-code docs
 	git diff --staged --exit-code docs
-
-build-container:
-	podman build -t ${QPC_VAR_PROGRAM_NAME} .
 
 lock-requirements:
 	poetry lock --no-update

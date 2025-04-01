@@ -20,7 +20,7 @@ except metadata.PackageNotFoundError:
             # Expect a value at this exact location.
             # Yes, this will raise KeyError if absent.
             # We want to know ASAP if this breaks.
-            toml_data["tool"]["poetry"]["version"]
+            toml_data["project"]["version"]
         )
 
 del load

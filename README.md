@@ -26,7 +26,7 @@ Before installing qpc on a system, review the following guidelines about install
  * The user account that qpc uses for the SSH connection into the target systems must have adequate permissions to run commands and read certain files, such as privilege escalation required for the `systemctl` command.
  * The user account that qpc uses for a machine requires an sh shell or a similar shell. For example, the shell *cannot* be a /sbin/nologin or /bin/false shell.
 
-The Python packages that are required for running qpc on a system can be found in the `pyyproject.toml` and `poetry.lock` file under "main" group. Development packages are under "dev" group.
+The Python packages that are required for running and developing qpc are in the `pyproject.toml` file.
 
 #  <a name="installation"></a> Installation
 ```
@@ -45,20 +45,18 @@ To work with the qpc code, begin by cloning the repository:
 git clone git@github.com:quipucords/qpc.git
 ```
 
-qpc development requires Python 3.12 and Poetry. Install using your local pakage manager or manually from:
+qpc development requires Python 3.12 and uv. Install using your local pakage manager or manually from:
 
 * https://www.python.org/downloads/
-* https://python-poetry.org/
-* https://github.com/pyenv/pyenv/ (optional but encouraged)
-
+* https://docs.astral.sh/uv/
 
 ## Installation with development dependencies
 
-This project uses poetry to manage python dependencies and virtual environment. Having
-poetry installed, just run the following to install the project:
+This project uses uv to manage python dependencies and virtual environment. Having
+uv installed, just run the following to install the project:
 
 ```
-poetry install
+uv sync
 ```
 
 ## Linting
@@ -86,7 +84,7 @@ See the [CONTRIBUTING](CONTRIBUTING.md) guide for information about contributing
 
 
 # <a name="copyright"></a> Copyright and License
-Copyright 2017-2024, Red Hat, Inc.
+Copyright 2017-2025, Red Hat, Inc.
 
 quipucords is released under the [GNU Public License version 3](LICENSE)
 

@@ -1,6 +1,6 @@
 DATE		= $(shell date)
-PYTHON		= $(shell poetry run which python 2>/dev/null || which python)
-PKG_VERSION = $(shell poetry -s version)
+PYTHON		= $(shell uv run which python 2>/dev/null || which python)
+PKG_VERSION = $(shell uv run python get-version.py)
 BUILD_DATE  = $(shell date +'%B %d, %Y')
 PARALLEL_NUM ?= $(shell python -c 'import multiprocessing as m;print(int(max(m.cpu_count()/2, 2)))')
 QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), qpc)
@@ -15,7 +15,7 @@ PYDIRS	= quipucords
 BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
-SPHINX_BUILD = $(shell poetry run which sphinx-build)
+SPHINX_BUILD = $(shell uv run which sphinx-build)
 SED = sed
 
 help:
@@ -44,20 +44,20 @@ install:
 lint: lint-ruff lint-docs
 
 lint-ruff:
-	poetry run ruff check .
-	poetry run ruff format --check .
+	uv run ruff check .
+	uv run ruff format --check .
 
 lint-docs:
-	poetry run rstcheck docs/source/man-template.rst
-	poetry run rstcheck docs/_build/man-qpc.rst
+	uv run rstcheck docs/source/man-template.rst
+	uv run rstcheck docs/_build/man-qpc.rst
 
 test:
-	poetry run pytest
+	uv run pytest
 
 test-coverage:
-	poetry run pytest --cov=qpc
-	poetry run coverage report --show-missing
-	poetry run coverage xml
+	uv run pytest --cov=qpc
+	uv run coverage report --show-missing
+	uv run coverage xml
 
 # verify the pyproject.toml configuration file integrity
 config-verify:
@@ -110,9 +110,9 @@ manpage-test:
 	git diff --staged --exit-code docs
 
 lock-requirements:
-	poetry lock --no-update
+	uv lock
 
 update-requirements:
-	poetry update --no-cache
-	$(MAKE) lock-requirements PIP_COMPILE_ARGS="--upgrade"
+	uv lock --upgrade
+	$(MAKE) lock-requirements
 

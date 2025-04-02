@@ -36,6 +36,7 @@ default-groups = [
     "dev",
     "build",
 ]
+required-version = ">=0.6.11,<0.7"
 
 [tool.hatch.build.targets.sdist]
 exclude = [

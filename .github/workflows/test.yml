@@ -25,18 +25,18 @@ jobs:
         with:
           fetch-depth: 0 # fetches all commits/tags
 
-      - name: Install poetry
-        run: pipx install "poetry<2"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          pyproject-file: "pyproject.toml"
 
       - name: Set up Python
         uses: actions/setup-python@v4.7.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
-          cache-dependency-path: "poetry.lock"
 
-      - name: Install dependencies
-        run: poetry install --with build
+      - name: Install Python dependencies
+        run: uv sync
 
       - name: Test phase
         run: make ${{ matrix.type }}

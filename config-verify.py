@@ -16,23 +16,11 @@ toml_path = Path(__file__).absolute().parent / "pyproject.toml"
 with toml_path.open("rb") as toml_file:
     toml_data = load(toml_file)
     project = toml_data["project"]
-    tool_poetry = toml_data["tool"]["poetry"]
 
-    if project["name"] != tool_poetry["name"]:
+    if spec_version != project["version"]:
         print(
-            "Project name {n1} does not match tool.poetry name {n2}".format(
-                n1=project["name"], n2=tool_poetry["name"]
-            ),
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    if spec_version != project["version"] or spec_version != tool_poetry["version"]:
-        print(
-            "Versions {v1} (project) and {v2} (tool.poetry) in pyproject.toml, and "
-            "{v3} in qpc.spec are inconsistent.".format(
-                v1=project["version"], v2=tool_poetry["version"], v3=spec_version
-            ),
+            f"Versions '{project['version']}' in pyproject.toml and "
+            f"'{spec_version}' in qpc.spec are inconsistent.",
             file=sys.stderr,
         )
         sys.exit(1)

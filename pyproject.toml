@@ -9,10 +9,8 @@ classifiers = ["License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 dependencies = [
     "requests>=2.28.1",
     "cryptography>=37.0.4",
-    "setuptools>=70.0.0,<71",
-    "faker>=20.0.3,<21",
+    "setuptools>=68.2.2,<71",
 ]
-#dynamic = ["scripts"]
 
 [project.scripts]
 qpc = "qpc.__main__:main"
@@ -20,6 +18,7 @@ qpc = "qpc.__main__:main"
 [dependency-groups]
 dev = [
     "coverage>=6.4.2",
+    "faker>=20.0.3,<21",
     "pytest>=7.1.2,<8.0.0",
     "pytest-cov>=3.0.0",
     "pytest-lazy-fixture>=0.6.3",

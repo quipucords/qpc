@@ -26,10 +26,7 @@ BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-Requires:       python%{python3_pkgversion}
-Requires:       python%{python3_pkgversion}-cryptography
-Requires:       python%{python3_pkgversion}-requests
-Requires:       python%{python3_pkgversion}-setuptools
+# Note: "Requires" are loaded dynamically from pyproject.toml via autosetup.
 
 %description
 qpc is the command-line client interface for the quipucords server.

@@ -10,6 +10,7 @@
     %global python3_pkgversion 3.12
     %global __python3 /usr/bin/python3.12
 %endif
+%global binname qpc
 
 Name:           qpc
 Summary:        command-line client interface for quipucords
@@ -39,28 +40,34 @@ qpc is the command-line client interface for the quipucords server.
 %autosetup -n qpc-%{version}
 
 %build
+sed -i \
+  -e 's/^qpc = "qpc.__main__:main"$/%{binname} = "qpc.__main__:main"/' \
+  %{_builddir}/qpc-%{version}/pyproject.toml
 %py3_build
 
 %install
-QPC_VAR_PROGRAM_NAME=qpc %py3_install
+QPC_VAR_PROGRAM_NAME=%{binname} %py3_install
 mkdir -p %{buildroot}%{_mandir}/man1/
 sed \
-  -e "s/QPC_VAR_PROGRAM_NAME/qpc/g" \
+  -e "s/QPC_VAR_PROGRAM_NAME/%{binname}/g" \
   -e "s/QPC_VAR_PROJECT/quipucords/g" \
   -e "s/QPC_VAR_CURRENT_YEAR/$(date +'%Y')/g" \
   -e "s/BUILD_DATE/$(date +'%B %d, %Y')/g" \
   docs/_build/QPC_VAR_PROGRAM_NAME.1 > \
-  %{buildroot}%{_mandir}/man1/qpc.1
+  %{buildroot}%{_mandir}/man1/%{binname}.1
 
 %files
 %license LICENSE
 %doc README.md
-%doc %{_mandir}/man1/qpc.*
-%{_bindir}/qpc
+%doc %{_mandir}/man1/%{binname}.*
+%{_bindir}/%{binname}
 %{python3_sitelib}/qpc/
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Fri Apr 4 2025 Brad Smith <brasmith@redhat.com> - 0:1.13.1-1
+- Pattern replace build bin name more consistently.
+
 * Fri Jan 3 2025 Brad Smith <brasmith@redhat.com> - 0:1.12.0-1
 - Support python 3.13 on fedora >= 41
 

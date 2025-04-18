@@ -41,6 +41,9 @@ qpc is the command-line client interface for the quipucords server.
 
 %build
 sed -i \
+  -e 's/^QPC_VAR_PROGRAM_NAME = os.environ.get("QPC_VAR_PROGRAM_NAME", "qpc")/QPC_VAR_PROGRAM_NAME = os.environ.get("QPC_VAR_PROGRAM_NAME", "%{binname}")/' \
+  %{_builddir}/qpc-%{version}/qpc/release.py
+sed -i \
   -e 's/^qpc = "qpc.__main__:main"$/%{binname} = "qpc.__main__:main"/' \
   %{_builddir}/qpc-%{version}/pyproject.toml
 %py3_build

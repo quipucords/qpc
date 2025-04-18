@@ -9,8 +9,12 @@ from . import __package__version__
 VERSION = __package__version__
 AUTHOR = "QPC Team"
 AUTHOR_EMAIL = "qpc@redhat.com"
+# BEGIN IMPORTANT NOTE: Do not change these lines.
+# Downstream builds may patch these lines to change the program name.
+# See also: https://issues.redhat.com/browse/DISCOVERY-785
 QPC_VAR_PROGRAM_NAME = os.environ.get("QPC_VAR_PROGRAM_NAME", "qpc")
 ENTRYPOINT = f"{QPC_VAR_PROGRAM_NAME}=qpc.__main__:main"
+# END IMPORTANT NOTE.
 URL = "https://github.com/quipucords/qpc"
 
 

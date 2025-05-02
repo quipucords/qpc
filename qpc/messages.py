@@ -11,8 +11,11 @@ CRED_TYPE_FILTER_HELP = (
 )
 CRED_USER_HELP = "User name for authenticating against the target system."
 CRED_PWD_HELP = "Password for authenticating against the target system."
-CRED_SSH_FILE_HELP = "File that contains the SSH key."
-CRED_SSH_KEY_HELP = "The SSH Private Key."
+CRED_SSH_KEYFILE_HELP = "The SSH Private Key file path or - for stdin."
+CRED_SSH_KEYFILE_DOES_NOT_EXIST = (
+    "The SSH Private Key file %s specified does not exist."
+)
+CRED_SSH_KEYFILE_FAILED_TO_READ = "Failed to read the SSH Private Key file %s."
 CRED_SSH_PSPH_HELP = "SSH passphrase for authenticating against the target system."
 CRED_CLEAR_ALL_HELP = "Remove all credentials."
 
@@ -259,7 +262,7 @@ PASSWORD_PROMPT_WITH_NO_TTY = (
 )
 CONN_PASSWORD = "Provide a connection password."
 SSH_PASSPHRASE = "Provide a passphrase for the SSH Key."
-SSH_KEY = "Provide a Private SSH Key followed by a Control-D."
+SSH_KEY = "Provide a Private SSH Key followed by a Control-D on a new-line."
 SSH_KEY_PROMPT = "Private SSH Key: "
 BECOME_PASSWORD = (
     "Provide a privilege escalation password to be used when running a network scan."

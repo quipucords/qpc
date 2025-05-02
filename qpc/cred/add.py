@@ -83,7 +83,7 @@ class CredAddCommand(CliCommand):
             "--sshpassphrase",
             dest="ssh_passphrase",
             action="store_true",
-            help=_(messages.CRED_SSH_PSPH_HELP),
+            help=_(messages.CRED_SSH_PASSPHRASE_HELP),
         )
         self.parser.add_argument(
             "--become-method",

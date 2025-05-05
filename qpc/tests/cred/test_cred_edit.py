@@ -4,6 +4,7 @@ import logging
 import sys
 from argparse import ArgumentParser, Namespace
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -168,11 +169,50 @@ class TestCredentialEditCli:
                 username=None,
                 password=None,
                 filename=None,
-                ssh_key=True,
+                ssh_keyfile="-",
                 ssh_passphrase=None,
             )
             mock_isatty.return_value = True
             mock_multiline_pass.return_value = "Multi-line\nOpenSSH Key\n"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_UPDATED % "cred1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    def test_partial_edit_host_cred_ssh_key_from_file(
+        self, mock_isatty, caplog, tmp_path
+    ):
+        """Testing cred edit partial command for an ssh_key from file successfully."""
+        url_get = get_server_location() + CREDENTIAL_URI
+        url_patch = get_server_location() + CREDENTIAL_URI + "1/"
+        results = [
+            {
+                "id": 1,
+                "name": "cred1",
+                "cred_type": NETWORK_CRED_TYPE,
+                "username": "root",
+            }
+        ]
+        data = {"count": 1, "results": results}
+
+        ssh_key_content = "Multi-Line\nOpenSSH Key\nFrom File\n"
+        ssh_file_path = tmp_path / "test_ssh_key"
+        with Path.open(ssh_file_path, "w") as ssh_file:
+            ssh_file.write(ssh_key_content)
+
+        with requests_mock.Mocker() as mocker:
+            mocker.get(url_get, status_code=200, json=data)
+            mocker.patch(url_patch, status_code=200)
+            args = Namespace(
+                name="cred1",
+                username=None,
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 expected_message = messages.CRED_UPDATED % "cred1"

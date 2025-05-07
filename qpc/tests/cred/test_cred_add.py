@@ -3,6 +3,7 @@
 import logging
 import sys
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -135,7 +136,7 @@ class TestCredentialAddCli:
                 username="root",
                 password=None,
                 filename=None,
-                ssh_key=True,
+                ssh_keyfile="-",
                 ssh_passphrase=None,
             )
             mock_isatty.return_value = True
@@ -160,7 +161,7 @@ class TestCredentialAddCli:
                 username="root",
                 password=None,
                 filename=None,
-                ssh_key=True,
+                ssh_keyfile="-",
                 ssh_passphrase=None,
             )
             mock_isatty.return_value = False
@@ -186,7 +187,7 @@ class TestCredentialAddCli:
                 username="root",
                 password=None,
                 filename=None,
-                ssh_key=True,
+                ssh_keyfile="-",
                 ssh_passphrase=True,
             )
             mock_isatty.return_value = True
@@ -196,6 +197,124 @@ class TestCredentialAddCli:
                 self.command.main(args)
                 expected_message = messages.CRED_ADDED % "credential1"
                 assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    def test_add_host_cred_with_sshkey_from_file(self, mock_isatty, caplog, tmp_path):
+        """Testing the add host cred command with an ssh_key from file successfully."""
+        url = get_server_location() + CREDENTIAL_URI
+
+        ssh_key_content = "Multi-Line\nOpenSSH Key\nFrom File\n"
+        ssh_file_path = tmp_path / "test_ssh_key"
+        with Path.open(ssh_file_path, "w") as ssh_file:
+            ssh_file.write(ssh_key_content)
+
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    @patch("getpass._raw_input")
+    def test_add_host_cred_with_sshkey_from_file_and_passphrase(
+        self, mock_isatty, mock_raw_input, caplog, tmp_path
+    ):
+        """Testing adding host cred with an ssh_key from file and a passphrase."""
+        url = get_server_location() + CREDENTIAL_URI
+
+        ssh_key_content = "Multi-Line\nOpenSSH Key\nFrom File\n"
+        ssh_file_path = tmp_path / "test_ssh_key"
+        with Path.open(ssh_file_path, "w") as ssh_file:
+            ssh_file.write(ssh_key_content)
+
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=True,
+            )
+            mock_isatty.return_value = True
+            mock_raw_input.return_value = "This is the passphrase"
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.CRED_ADDED % "credential1"
+                assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    def test_add_host_cred_with_sshkey_from_non_existent_file(
+        self, mock_isatty, caplog, tmp_path
+    ):
+        """Testing adding cred with an ssh_key from a non-existent file fails."""
+        url = get_server_location() + CREDENTIAL_URI
+
+        ssh_file_path = tmp_path / "nonexistent_ssh_key"
+
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            with pytest.raises(SystemExit):
+                self.command.main(args)
+            expected_message = (
+                f"The SSH Private Key file {ssh_file_path} specified does not exist"
+            )
+            assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    def test_add_host_cred_with_sshkey_from_unreadable_file(
+        self, mock_isatty, caplog, tmp_path
+    ):
+        """Testing adding cred with an ssh_key from an unreadable file fails."""
+        url = get_server_location() + CREDENTIAL_URI
+
+        ssh_key_content = "Multi-Line\nOpenSSH Key\nFrom File\n"
+        ssh_file_path = tmp_path / "test_ssh_key"
+        with Path.open(ssh_file_path, "w") as ssh_file:
+            ssh_file.write(ssh_key_content)
+        Path.chmod(ssh_file_path, 000)
+
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            with pytest.raises(SystemExit):
+                self.command.main(args)
+            expected_message = (
+                f"Failed to read the SSH Private Key file {ssh_file_path}"
+            )
+            assert expected_message in caplog.text
 
     def test_add_host_cred_with_become(self, caplog):
         """Testing the add host cred command successfully."""

@@ -68,10 +68,10 @@ class CredAddCommand(CliCommand):
             help=_(messages.CRED_PWD_HELP),
         )
         group.add_argument(
-            "--sshkey",
-            dest="ssh_key",
-            action="store_true",
-            help=_(messages.CRED_SSH_KEY_HELP),
+            "--sshkeyfile",
+            dest="ssh_keyfile",
+            metavar="SSH_KEYFILE",
+            help=_(messages.CRED_SSH_KEYFILE_HELP),
         )
         group.add_argument(
             "--token",
@@ -83,7 +83,7 @@ class CredAddCommand(CliCommand):
             "--sshpassphrase",
             dest="ssh_passphrase",
             action="store_true",
-            help=_(messages.CRED_SSH_PSPH_HELP),
+            help=_(messages.CRED_SSH_PASSPHRASE_HELP),
         )
         self.parser.add_argument(
             "--become-method",

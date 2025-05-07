@@ -134,7 +134,7 @@ Creating and Editing Credentials
 
 To create a credential, supply the type of credential and supply SSH credentials as either a username-password pair, a username-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 
-**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--username=** *username* **(--password | --sshkey**)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)*) **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 ``--name=name``
 
@@ -150,15 +150,15 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--password``
 
-  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkey`` and ``--token`` options.
+  Prompts for the password for the ``--username`` identity. Mutually exclusive with the ``--sshkeyfile`` and ``--token`` options.
 
-``--sshkey``
+``--sshkeyfile (ssh_keyfile | -)``
 
-  Prompts for the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` and ``--token`` options.
+  Reads the private SSH key for the ``--username`` identity from the ``ssh_keyfile`` path specified. If the ``ssh_keyfile`` specified is ``-``, prompts for the private SSH key for the ``--username`` identity. Mutually exclusive with the ``--password`` and ``--token`` options.
 
 ``--sshpassphrase``
 
-  Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the ``--sshkey`` option.
+  Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the ``--sshkeyfile`` option.
 
 ``--become-method=become_method``
 
@@ -174,11 +174,11 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--token``
 
-  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkey`` and ``--password`` options.
+  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile`` and ``--password`` options.
 
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
 
-**qpc cred edit --name=** *name* **--username=** *username* **(--password | --sshkey **)** **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred edit --name=** *name* **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)*) **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
 
 Listing and Showing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -704,13 +704,17 @@ Examples
 
   ``qpc cred add --name net_cred --type network --username qpc_user --password``
 
-* Creating a new network type credential with an SSH key
+* Creating a new network type credential with an SSH key from file
 
-  ``qpc cred add --name net_cred4 --type network --username qpc_user --sshkey``
+  ``qpc cred add --name net_cred4 --type network --username qpc_user --sshkeyfile $HOME/.ssh/user_ssh_key``
 
-* Creating a new network type credential with an SSH key requiring a passphrase
+* Creating a new network type credential and prompt for an SSH key
 
-  ``qpc cred add --name net_cred5 --type network --username qpc_user --sshkey --sshpassphrase``
+  ``qpc cred add --name net_cred4 --type network --username qpc_user --sshkeyfile -``
+
+* Creating a new network type credential with an SSH key from file requiring a passphrase
+
+  ``qpc cred add --name net_cred5 --type network --username qpc_user --sshkeyfile $HOME/.ssh/user_ssh_key --sshpassphrase``
 
 * Creating a new openshift type credential with a token
 

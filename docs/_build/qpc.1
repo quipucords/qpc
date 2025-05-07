@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "January 03, 2025" "" "qpc"
+.TH "qpc" "1" "May 07, 2025" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -152,7 +152,7 @@ When a scan runs, it uses a source that contains information such as the host na
 .sp
 To create a credential, supply the type of credential and supply SSH credentials as either a username\-password pair, a username\-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 .sp
-\fBqpc cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkey\fP)** \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBqpc cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -178,21 +178,21 @@ Required for both password and SSH key authentication. Sets the username of the 
 \fB\-\-password\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the password for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-sshkey\fP and \fB\-\-token\fP options.
+Prompts for the password for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-sshkeyfile\fP and \fB\-\-token\fP options.
 .UNINDENT
 .UNINDENT
 .sp
-\fB\-\-sshkey\fP
+\fB\-\-sshkeyfile (ssh_keyfile | \-)\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the private SSH key for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-password\fP and \fB\-\-token\fP options.
+Reads the private SSH key for the \fB\-\-username\fP identity from the \fBssh_keyfile\fP path specified. If the \fBssh_keyfile\fP specified is \fB\-\fP, prompts for the private SSH key for the \fB\-\-username\fP identity. Mutually exclusive with the \fB\-\-password\fP and \fB\-\-token\fP options.
 .UNINDENT
 .UNINDENT
 .sp
 \fB\-\-sshpassphrase\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the \fB\-\-sshkey\fP option.
+Prompts for the passphrase to be used when connecting with an SSH key that requires a passphrase. Can only be used with the \fB\-\-sshkeyfile\fP option.
 .UNINDENT
 .UNINDENT
 .sp
@@ -220,13 +220,13 @@ Prompts for the privilege escalation password to be used when running a network 
 \fB\-\-token\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkey\fP and \fB\-\-password\fP options.
+Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkeyfile\fP and \fB\-\-password\fP options.
 .UNINDENT
 .UNINDENT
 .sp
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the \fBqpc cred edit\fP command to change credential information. The parameters for \fBqpc cred edit\fP are the same as those for \fBqpc cred add\fP\&.
 .sp
-\fBqpc cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP \fB(\-\-password | \-\-sshkey **)\fP \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBqpc cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
 .SS Listing and Showing Credentials
 .sp
 The \fBqpc cred list\fP command returns the details for every credential that is configured for Quipucords. This output includes the name and username for each entry. Secret values such as passwords and tokens are never displated in the output.
@@ -885,13 +885,17 @@ Creating a new network type credential with a password
 .sp
 \fBqpc cred add \-\-name net_cred \-\-type network \-\-username qpc_user \-\-password\fP
 .IP \(bu 2
-Creating a new network type credential with an SSH key
+Creating a new network type credential with an SSH key from file
 .sp
-\fBqpc cred add \-\-name net_cred4 \-\-type network \-\-username qpc_user \-\-sshkey\fP
+\fBqpc cred add \-\-name net_cred4 \-\-type network \-\-username qpc_user \-\-sshkeyfile $HOME/.ssh/user_ssh_key\fP
 .IP \(bu 2
-Creating a new network type credential with an SSH key requiring a passphrase
+Creating a new network type credential and prompt for an SSH key
 .sp
-\fBqpc cred add \-\-name net_cred5 \-\-type network \-\-username qpc_user \-\-sshkey \-\-sshpassphrase\fP
+\fBqpc cred add \-\-name net_cred4 \-\-type network \-\-username qpc_user \-\-sshkeyfile \-\fP
+.IP \(bu 2
+Creating a new network type credential with an SSH key from file requiring a passphrase
+.sp
+\fBqpc cred add \-\-name net_cred5 \-\-type network \-\-username qpc_user \-\-sshkeyfile $HOME/.ssh/user_ssh_key \-\-sshpassphrase\fP
 .IP \(bu 2
 Creating a new openshift type credential with a token
 .sp

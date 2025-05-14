@@ -16,6 +16,7 @@ CRED_SSH_KEYFILE_DOES_NOT_EXIST = (
     "The SSH Private Key file %s specified does not exist."
 )
 CRED_SSH_KEYFILE_FAILED_TO_READ = "Failed to read the SSH Private Key file %s."
+CRED_SSH_KEY_CANNOT_BE_DECODED = "The SSH Private Key specified cannot be decoded."
 CRED_SSH_PASSPHRASE_HELP = (
     "SSH passphrase for authenticating against the target system."
 )

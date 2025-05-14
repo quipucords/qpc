@@ -3,6 +3,7 @@
 import logging
 import sys
 from argparse import ArgumentParser, Namespace
+from builtins import UnicodeDecodeError
 from pathlib import Path
 from unittest.mock import patch
 
@@ -172,6 +173,33 @@ class TestCredentialAddCli:
                 assert expected_message in caplog.text
 
     @patch("sys.stdin.isatty")
+    @patch("sys.stdin.readlines")
+    def test_add_host_cred_with_sshkey_as_binary_from_stdin(
+        self, mock_readlines, mock_isatty, caplog
+    ):
+        """Testing add host cred command fails with an ssh_key from stdin as binary."""
+        url = get_server_location() + CREDENTIAL_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile="-",
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = False
+            mock_readlines.side_effect = UnicodeDecodeError(
+                "utf-8", b"\x83\x83\x72 Binary OpenSSH Key File\n", 1, 2, "binary data"
+            )
+            with pytest.raises(SystemExit):
+                self.command.main(args)
+            expected_message = "The SSH Private Key specified cannot be decoded"
+            assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
     @patch("getpass._raw_input")
     @patch("qpc.cred.utils.get_multiline_pass")
     def test_add_host_cred_with_sshkey_and_passphrase(
@@ -314,6 +342,35 @@ class TestCredentialAddCli:
             expected_message = (
                 f"Failed to read the SSH Private Key file {ssh_file_path}"
             )
+            assert expected_message in caplog.text
+
+    @patch("sys.stdin.isatty")
+    def test_add_host_cred_with_sshkey_with_binary_file(
+        self, mock_isatty, caplog, tmp_path
+    ):
+        """Testing adding cred with an ssh_key from a binary file fails."""
+        url = get_server_location() + CREDENTIAL_URI
+
+        ssh_key_content = b"\x83\x83\x72 Binary OpenSSH Key File\n"
+        ssh_file_path = tmp_path / "test_ssh_key"
+        with Path.open(ssh_file_path, "wb") as ssh_file:
+            ssh_file.write(ssh_key_content)
+
+        with requests_mock.Mocker() as mocker:
+            mocker.post(url, status_code=201)
+            args = Namespace(
+                type=NETWORK_CRED_TYPE,
+                name="credential1",
+                username="root",
+                password=None,
+                filename=None,
+                ssh_keyfile=ssh_file_path,
+                ssh_passphrase=None,
+            )
+            mock_isatty.return_value = True
+            with pytest.raises(SystemExit):
+                self.command.main(args)
+            expected_message = "The SSH Private Key specified cannot be decoded"
             assert expected_message in caplog.text
 
     def test_add_host_cred_with_become(self, caplog):

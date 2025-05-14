@@ -64,27 +64,33 @@ def _get_attribute_value(attribute, prompt, args, req_payload, add_none):
 def _get_ssh_key_value(args, req_payload, add_none):
     """Collect the ssh_key value and place in credential dictionary."""
     if "ssh_keyfile" in args and args.ssh_keyfile:
-        if args.ssh_keyfile == "-":
-            if sys.stdin.isatty():
-                print(_(messages.SSH_KEY))
-                pass_prompt = get_multiline_pass(prompt=f"{messages.SSH_KEY_PROMPT}")
-                check_if_prompt_is_not_empty(pass_prompt)
+        try:
+            if args.ssh_keyfile == "-":
+                if sys.stdin.isatty():
+                    print(_(messages.SSH_KEY))
+                    pass_prompt = get_multiline_pass(
+                        prompt=f"{messages.SSH_KEY_PROMPT}"
+                    )
+                    check_if_prompt_is_not_empty(pass_prompt)
+                else:
+                    pass_prompt = "".join(sys.stdin.readlines())
+                req_payload["ssh_key"] = pass_prompt
             else:
-                pass_prompt = "".join(sys.stdin.readlines())
-            req_payload["ssh_key"] = pass_prompt
-        else:
-            try:
-                req_payload["ssh_key"] = Path(args.ssh_keyfile).read_text()
-            except FileNotFoundError:
-                logger.error(
-                    _(messages.CRED_SSH_KEYFILE_DOES_NOT_EXIST), args.ssh_keyfile
-                )
-                sys.exit(1)
-            except PermissionError:
-                logger.error(
-                    _(messages.CRED_SSH_KEYFILE_FAILED_TO_READ), args.ssh_keyfile
-                )
-                sys.exit(1)
+                try:
+                    req_payload["ssh_key"] = Path(args.ssh_keyfile).read_text()
+                except FileNotFoundError:
+                    logger.error(
+                        _(messages.CRED_SSH_KEYFILE_DOES_NOT_EXIST), args.ssh_keyfile
+                    )
+                    sys.exit(1)
+                except PermissionError:
+                    logger.error(
+                        _(messages.CRED_SSH_KEYFILE_FAILED_TO_READ), args.ssh_keyfile
+                    )
+                    sys.exit(1)
+        except UnicodeDecodeError:
+            logger.error(messages.CRED_SSH_KEY_CANNOT_BE_DECODED)
+            sys.exit(1)
 
     elif add_none:
         req_payload["ssh_key"] = None

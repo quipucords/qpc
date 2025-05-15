@@ -377,3 +377,47 @@ class TestSourceEditCli:
                         'An error occurred while processing the "--cred" input'
                         in source_out.getvalue()
                     )
+
+    @pytest.mark.skip(
+        reason=(
+            "FIXME! qpc.source.utils::validate_port explicitly allows port=0. "
+            "However, since 0 is False when used in boolean context, "
+            "`build_source_payload()` will always ignore it, and "
+            "`SourceEditCommand._validate_args()` will ignore it if --port is "
+            "only argument."
+        )
+    )
+    def test_edit_source_port_0(self, caplog):
+        """Make sure that editing source to set port to 0 works."""
+        url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
+        url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
+        url_patch = get_server_location() + SOURCE_URI + "1/"
+        cred_results = [{"id": 1, "name": "credential1", "username": "root"}]
+        cred_data = {"count": 1, "results": cred_results}
+        results = [
+            {
+                "id": 1,
+                "name": "source1",
+                "hosts": ["1.2.3.4"],
+                "credentials": [{"id": 1, "name": "credential1"}],
+            }
+        ]
+        source_data = {"count": 1, "results": results}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(url_get_source, status_code=200, json=source_data)
+            mocker.get(url_get_cred, status_code=200, json=cred_data)
+            mocker.patch(url_patch, status_code=200)
+
+            with caplog.at_level(logging.INFO):
+                sys.argv = [
+                    "/bin/qpc",
+                    "source",
+                    "edit",
+                    "--name",
+                    "source1",
+                    "--port",
+                    "0",
+                ]
+                CLI().main()
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                assert expected_message in caplog.text

@@ -2,7 +2,6 @@
 [![Code Coverage](https://codecov.io/gh/quipucords/qpc/branch/main/graph/badge.svg)](https://codecov.io/gh/quipucords/qpc)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc-latest/package/qpc/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/g/quipucords/qpc-latest/package/qpc/)
 
-
 # qpc - RPM command line tool for quipucords
 qpc is the RPM command line tool for quipucords. To learn more about quipucords visit [qpc man page](docs/source/man.rst).
 

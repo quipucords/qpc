@@ -14,7 +14,7 @@ SATELLITE_SOURCE_TYPE = "satellite"
 VCENTER_SOURCE_TYPE = "vcenter"
 RHACS_SOURCE_TYPE = "rhacs"
 
-SOURCE_URI = "/api/v1/sources/"
+SOURCE_URI = "/api/v2/sources/"
 SOURCE_BULK_DELETE_URI = "/api/v1/sources/bulk_delete/"
 SOURCE_TYPE_CHOICES = [
     ANSIBLE_SOURCE_TYPE,

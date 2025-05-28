@@ -86,9 +86,11 @@ class TestSourceListCli:
                 assert messages.SOURCE_LIST_NO_SOURCES in caplog.text
 
     def test_list_source_data(self):
-        """Testing the list source command successfully with stubbed data."""
+        """Test retrieval of sources with pagination."""
         source_out = StringIO()
-        url = get_server_location() + SOURCE_URI
+        base_url = get_server_location() + SOURCE_URI
+        page_2_url = f"{base_url}?page=2"
+
         source_entry = {
             "id": 1,
             "name": "source1",
@@ -96,22 +98,32 @@ class TestSourceListCli:
             "credentials": [{"id": 1, "name": "cred1"}],
         }
         results = [source_entry]
-        next_link = "http://127.0.0.1:8000/api/v1/sources/?page=2"
-        data = {"count": 1, "next": next_link, "results": results}
-        data2 = {"count": 1, "next": None, "results": results}
+        data_page_1 = {
+            "count": 2,
+            "next": page_2_url,
+            "results": results,
+        }
+        data_page_2 = {
+            "count": 2,
+            "next": None,
+            "results": results,
+        }
+
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=200, json=data)
-            mocker.get(next_link, status_code=200, json=data2)
+            mocker.get(base_url, status_code=200, json=data_page_1)
+            mocker.get(page_2_url, status_code=200, json=data_page_2)
+
             args = Namespace()
             with redirect_stdout(source_out):
                 self.command.main(args)
-                expected = (
+
+                expected_output = (
                     '[{"credentials":[{"id":1,"name":"cred1"}],'
                     '"hosts":["1.2.3.4"],"id":1,"name":"source1"}]'
                 )
                 assert (
                     source_out.getvalue().replace("\n", "").replace(" ", "").strip()
-                    == expected + expected
+                    == expected_output + expected_output
                 )
 
     def test_list_filtered_source_data(self):

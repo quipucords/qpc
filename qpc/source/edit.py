@@ -107,6 +107,13 @@ class SourceEditCommand(CliCommand):
             help=_(messages.SOURCE_PARAMIKO_HELP),
             required=False,
         )
+        self.parser.add_argument(
+            "--proxy-url",
+            dest="proxy_url",
+            metavar="PROXY_URL",
+            help=_(messages.SOURCE_PROXY_URL_HELP),
+            required=False,
+        )
 
     def _validate_args(self):  # noqa: C901 PLR0912
         CliCommand._validate_args(self)
@@ -120,6 +127,7 @@ class SourceEditCommand(CliCommand):
             or self.args.ssl_cert_verify
             or self.args.disable_ssl
             or self.args.ssl_protocol
+            or self.args.proxy_url
         ):
             logger.error(_(messages.SOURCE_EDIT_NO_ARGS), (self.args.name))
             self.parser.print_help()

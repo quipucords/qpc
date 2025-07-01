@@ -139,6 +139,9 @@ SOURCE_LIST_NO_SOURCES = "No sources exist yet."
 SOURCE_TYPE_FILTER_HELP = (
     "Filter for listing sources by type. Valid values: vcenter, network."
 )
+SOURCE_PROXY_URL_HELP = (
+    "Optional proxy to use for this source in the format http(s)://host:port"
+)
 
 
 SCAN_NAME_HELP = "Scan name."

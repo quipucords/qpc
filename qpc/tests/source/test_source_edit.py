@@ -421,3 +421,74 @@ class TestSourceEditCli:
                 CLI().main()
                 expected_message = messages.SOURCE_UPDATED % "source1"
                 assert expected_message in caplog.text
+
+    def test_edit_proxy_url(self, caplog):
+        """Testing the edit source command with proxy_url argument."""
+        url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
+        url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
+        url_patch = get_server_location() + SOURCE_URI + "1/"
+        cred_results = [{"id": 1, "name": "credential1", "username": "root"}]
+        cred_data = {"count": 1, "results": cred_results}
+        results = [
+            {
+                "id": 1,
+                "name": "source1",
+                "hosts": ["1.2.3.4"],
+                "credentials": [{"id": 2, "name": "cred2"}],
+            }
+        ]
+        source_data = {"count": 1, "results": results}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(url_get_source, status_code=200, json=source_data)
+            mocker.get(url_get_cred, status_code=200, json=cred_data)
+            mocker.patch(url_patch, status_code=200)
+
+            args = Namespace(
+                name="source1",
+                hosts=["1.2.3.4"],
+                cred=["credential1"],
+                proxy_url="http://proxy.example.com:3128",
+            )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                assert expected_message in caplog.text
+
+                request_json = mocker.request_history[-1].json()
+                assert request_json["proxy_url"] == "http://proxy.example.com:3128"
+
+    def test_edit_skips_proxy_url_if_none(self, caplog):
+        """Test that edit skips proxy_url update if None is passed."""
+        url_get_cred = get_server_location() + CREDENTIAL_URI + "?name=credential1"
+        url_get_source = get_server_location() + SOURCE_URI + "?name=source1"
+        url_patch = get_server_location() + SOURCE_URI + "1/"
+        cred_results = [{"id": 1, "name": "credential1", "username": "root"}]
+        cred_data = {"count": 1, "results": cred_results}
+        results = [
+            {
+                "id": 1,
+                "name": "source1",
+                "hosts": ["1.2.3.4"],
+                "credentials": [{"id": 2, "name": "cred2"}],
+                "proxy_url": "http://proxy.example.com:3128",
+            }
+        ]
+        source_data = {"count": 1, "results": results}
+        with requests_mock.Mocker() as mocker:
+            mocker.get(url_get_source, status_code=200, json=source_data)
+            mocker.get(url_get_cred, status_code=200, json=cred_data)
+            mocker.patch(url_patch, status_code=200)
+
+            args = Namespace(
+                name="source1",
+                hosts=["1.2.3.4"],
+                cred=["credential1"],
+                proxy_url=None,
+            )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.SOURCE_UPDATED % "source1"
+                assert expected_message in caplog.text
+
+                request_json = mocker.request_history[-1].json()
+                assert "proxy_url" not in request_json

@@ -232,7 +232,7 @@ Creating and Editing Sources
 
 To create a source, supply the type of source with the ``type`` option, one or more host names or IP addresses to connect to with the ``--hosts`` option, and the credentials needed to access those systems with the ``--cred`` option. The ``qpc source`` command allows multiple entries for the ``hosts`` and ``cred`` options. Therefore, a single source can access a collection of servers and subnets as needed to create an accurate and complete scan.
 
-**qpc source add --name=** *name*  **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--hosts** *ip_address* **--cred** *credential* **[--exclude-hosts** *ip_address* **]** **[--port=** *port* **]** **[--use-paramiko=** *(True | False)* **]** **[--ssl-cert-verify=** *(True | False)* **]** **[--ssl-protocol=** *protocol* **]** **[--disable-ssl=** *(True | False)* **]**
+**qpc source add --name=** *name*  **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--hosts** *ip_address* **--cred** *credential* **[--exclude-hosts** *ip_address* **]** **[--port=** *port* **]** **[--use-paramiko=** *(True | False)* **]** **[--ssl-cert-verify=** *(True | False)* **]** **[--ssl-protocol=** *protocol* **]** **[--disable-ssl=** *(True | False)* **]** **[--proxy-url=** *proxy url* **]**
 
 ``--name=name``
 
@@ -295,6 +295,11 @@ To create a source, supply the type of source with the ``type`` option, one or m
 ``--disable-ssl=(True | False)``
 
   Optional. Determines whether SSL communication will be disabled for the scan.
+
+``--proxy-url=url``
+
+  Optional. Sets a proxy server to be used for connecting to the source. This can be helpful in environments that require outbound requests to go through a proxy.
+  Use the format protocol://host:port.
 
 The information in a source might change as the structure of the network changes. Use the ``qpc source edit`` command to edit a source to accommodate those changes.
 
@@ -771,6 +776,10 @@ Examples
 * Creating a new vcenter source specifying a SSL protocol
 
   ``qpc source add --name vcenter_source --type vcenter --hosts 1.192.0.19 --cred vcenter_cred --ssl-protocol SSLv23``
+
+* Creating a new openShift source using a proxy
+
+  ``qpc source add --name ocp_source --type openshift --hosts api.openshift.example.com --cred ocp_cred --proxy-url http://proxy.example.com:3128``
 
 * Creating a new satellite source disabling SSL
 

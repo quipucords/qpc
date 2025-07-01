@@ -76,6 +76,7 @@ class TestSourceAddCli:
             "hosts": ["1.2.3.4", "1.2.3.[1:10]"],
             "credentials": [1],
             "port": None,
+            "proxy_url": None,
         }
 
     def test_validate_port_string(self):
@@ -475,3 +476,52 @@ class TestSourceAddCli:
                 self.command.main(args)
                 expected_message = messages.SOURCE_ADDED % "source1"
                 assert expected_message in caplog.text
+
+    def test_add_source_with_proxy_url(self, caplog):
+        """Testing add source command with a valid proxy_url."""
+        get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
+        cred_results = [{"id": 1, "name": "cred1"}]
+        get_cred_data = {"count": 1, "results": cred_results}
+        post_source_url = get_server_location() + SOURCE_URI
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_cred_url, status_code=200, json=get_cred_data)
+            mocker.post(post_source_url, status_code=201)
+
+            args = Namespace(
+                name="source1",
+                cred=["cred1"],
+                hosts=["1.2.3.4"],
+                type="network",
+                port=22,
+                proxy_url="http://proxy.local:8080",
+            )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                expected_message = messages.SOURCE_ADDED % "source1"
+                assert expected_message in caplog.text
+                request_body = mocker.request_history[1].json()
+                assert request_body["proxy_url"] == "http://proxy.local:8080"
+
+    def test_add_source_with_invalid_proxy_url(self, caplog):
+        """Testing add source command with invalid proxy_url rejected by server."""
+        get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
+        cred_results = [{"id": 1, "name": "cred1"}]
+        get_cred_data = {"count": 1, "results": cred_results}
+        post_source_url = get_server_location() + SOURCE_URI
+        error_response = {"proxy_url": ["Enter a valid proxy URL."]}
+
+        with requests_mock.Mocker() as mocker:
+            mocker.get(get_cred_url, status_code=200, json=get_cred_data)
+            mocker.post(post_source_url, status_code=400, json=error_response)
+
+            args = Namespace(
+                name="source1",
+                cred=["cred1"],
+                hosts=["1.2.3.4"],
+                type="network",
+                port=22,
+                proxy_url="ftp://bad-proxy",  # invalid
+            )
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
+            assert "Enter a valid proxy URL" in caplog.text

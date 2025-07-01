@@ -282,7 +282,7 @@ When you configure a scan, it contains references to one or more sources, includ
 .sp
 To create a source, supply the type of source with the \fBtype\fP option, one or more host names or IP addresses to connect to with the \fB\-\-hosts\fP option, and the credentials needed to access those systems with the \fB\-\-cred\fP option. The \fBQPC_VAR_PROGRAM_NAME source\fP command allows multiple entries for the \fBhosts\fP and \fBcred\fP options. Therefore, a single source can access a collection of servers and subnets as needed to create an accurate and complete scan.
 .sp
-\fBQPC_VAR_PROGRAM_NAME source add \-\-name=\fP \fIname\fP  \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-hosts\fP \fIip_address\fP \fB\-\-cred\fP \fIcredential\fP \fB[\-\-exclude\-hosts\fP \fIip_address\fP \fB]\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-paramiko=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP
+\fBQPC_VAR_PROGRAM_NAME source add \-\-name=\fP \fIname\fP  \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-hosts\fP \fIip_address\fP \fB\-\-cred\fP \fIcredential\fP \fB[\-\-exclude\-hosts\fP \fIip_address\fP \fB]\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-paramiko=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-proxy\-url=\fP \fIproxy url\fP \fB]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -375,6 +375,14 @@ Optional. Determines the SSL protocol to be used for a secure connection during 
 .INDENT 0.0
 .INDENT 3.5
 Optional. Determines whether SSL communication will be disabled for the scan.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-\-proxy\-url=url\fP
+.INDENT 0.0
+.INDENT 3.5
+Optional. Sets a proxy server to be used for connecting to the source. This can be helpful in environments that require outbound requests to go through a proxy.
+Use the format protocol://host:port.
 .UNINDENT
 .UNINDENT
 .sp
@@ -952,6 +960,10 @@ Creating a new network source with an excluded host
 Creating a new vcenter source specifying a SSL protocol
 .sp
 \fBQPC_VAR_PROGRAM_NAME source add \-\-name vcenter_source \-\-type vcenter \-\-hosts 1.192.0.19 \-\-cred vcenter_cred \-\-ssl\-protocol SSLv23\fP
+.IP \(bu 2
+Creating a new openShift source using a proxy
+.sp
+\fBQPC_VAR_PROGRAM_NAME source add \-\-name ocp_source \-\-type openshift \-\-hosts api.openshift.example.com \-\-cred ocp_cred \-\-proxy\-url http://proxy.example.com:3128\fP
 .IP \(bu 2
 Creating a new satellite source disabling SSL
 .sp

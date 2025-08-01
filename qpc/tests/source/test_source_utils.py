@@ -34,6 +34,7 @@ class TestBuildSourcePayloadV2:
             "hosts": ["host1"],
             "credentials": [1],
             "port": None,
+            "proxy_url": None,
         }
 
     def test_add_none_false_omits_missing_fields(self):
@@ -67,6 +68,7 @@ class TestBuildSourcePayloadV2:
             "disable_ssl": False,
             "ssl_protocol": "TLSv1_1",
             "use_paramiko": "true",
+            "proxy_url": None,
         }
 
     @pytest.mark.parametrize(

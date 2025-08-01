@@ -117,6 +117,13 @@ class SourceAddCommand(CliCommand):
             help=_(messages.SOURCE_PARAMIKO_HELP),
             required=False,
         )
+        self.parser.add_argument(
+            "--proxy-url",
+            dest="proxy_url",
+            metavar="PROXY_URL",
+            help=_(messages.SOURCE_PROXY_URL_HELP),
+            required=False,
+        )
 
     def _validate_args(self):
         CliCommand._validate_args(self)

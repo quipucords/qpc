@@ -60,7 +60,7 @@ def server_config():
     fixture, or use only authenticated_client fixture (which pulls both server_config
     and client_token).
     """
-    from qpc.utils import (
+    from qpc.utils import (  # noqa: PLC0415
         CONFIG_HOST_KEY,
         CONFIG_PORT_KEY,
         CONFIG_USE_HTTP,
@@ -79,7 +79,11 @@ def server_config():
 @pytest.fixture
 def client_token():
     """Create fake client token."""
-    from qpc.utils import CLIENT_TOKEN_KEY, CLIENT_TOKEN_TEST_VALUE, write_client_token
+    from qpc.utils import (  # noqa: PLC0415
+        CLIENT_TOKEN_KEY,
+        CLIENT_TOKEN_TEST_VALUE,
+        write_client_token,
+    )
 
     write_client_token({CLIENT_TOKEN_KEY: CLIENT_TOKEN_TEST_VALUE})
 

@@ -12,7 +12,7 @@ def _setup_server_config_file(authenticated_client): ...
 @pytest.fixture
 def ocp_credential_mock(requests_mock):
     """Return ocp credential."""
-    from qpc.utils import get_server_location
+    from qpc.utils import get_server_location  # noqa: PLC0415
 
     get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=ocp_cred_1"
     cred_results = [{"id": 1, "name": "ocp_cred_1"}]

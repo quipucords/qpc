@@ -2,7 +2,7 @@
 
 import logging
 import sys
-from argparse import ArgumentParser, Namespace  # noqa: I100
+from argparse import ArgumentParser, Namespace  # noqa: I001
 from io import StringIO
 from unittest.mock import patch
 

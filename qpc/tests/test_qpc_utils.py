@@ -33,3 +33,38 @@ class TestUtils:
         fileobj = utils.create_tar_buffer(test_file)
         json = utils.extract_json_from_tar(fileobj, print_pretty=False)
         assert json == report_json
+
+    def test_tabular_format(self):
+        """Test tabular output from json_data."""
+        json_data = []
+        output = utils.tabular_format(json_data, {})
+        assert output == "No data to display."
+        json_data = [
+            {
+                "id": "1",
+                "name": "scan1",
+                "most_recent": {"report_id": "1", "status": "completed"},
+            },
+            {
+                "id": "2",
+                "name": "scan1",
+                "most_recent": {"report_id": "2", "status": "completed"},
+            },
+            {"id": "3", "name": "scan3"},
+        ]
+        fields = {
+            "scan_id": "id",
+            "scan_name": "name",
+            "report_id": "most_recent.report_id",
+            "status": "most_recent.status",
+        }
+        output = utils.tabular_format(json_data, fields)
+        output = output.split("\n")
+        # Test table headers
+        for field in fields.keys():
+            assert field in output[0]
+        # Test the presence of data in rows
+        for index, data in enumerate(json_data):
+            for path in fields.values():
+                value = utils.json_data_deep_get(data, path)
+                assert str(value) in output[index + 2]

@@ -9,7 +9,7 @@ from qpc import messages, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import pretty_format
+from qpc.utils import pretty_format, tabular_format
 
 logger = getLogger(__name__)
 
@@ -35,6 +35,12 @@ class ScanListCommand(CliCommand):
             [codes.ok],
         )
         self.parser.add_argument(
+            "--table",
+            dest="output_table",
+            action="store_true",
+            help="Provide tabular formatting of output data (human-readable format).",
+        )
+        self.parser.add_argument(
             "--type",
             dest="type",
             choices=[scan.SCAN_TYPE_CONNECT, scan.SCAN_TYPE_INSPECT],
@@ -55,6 +61,15 @@ class ScanListCommand(CliCommand):
         results = json_data.get("results", [])
         if count == 0:
             logger.error(_(messages.SCAN_LIST_NO_SCANS))
+        elif self.args.output_table:
+            fields = {
+                "scan_id": "id",
+                "scan_name": "name",
+                "report_id": "most_recent.report_id",
+                "status": "most_recent.status",
+            }
+            table = tabular_format(results, fields)
+            print(table)
         else:
             data = pretty_format(results)
             print(data)

@@ -400,6 +400,63 @@ def pretty_format(json_data):
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(",", ": "))
 
 
+def tabular_format(json_data: list[dict], fields: dict) -> str:
+    """Provide tabular formatting of output json data.
+
+    :param json_data: the json data to tabular print
+    :param fields: the fields (name:path) to include in the tabular print
+    :returns: the tabular print string of the json data
+    """
+    rows = []
+    for row in json_data:
+        data = {
+            key: str(json_data_deep_get(row, value)) for key, value in fields.items()
+        }
+        rows.append(data)
+    if not rows:
+        return t("No data to display.")
+    column_widths = {key: len(key) for key in rows[0].keys()}
+    for row in rows:
+        for key, value in row.items():
+            column_widths[key] = max(column_widths[key], len(str(value)))
+    output = (
+        "|".join((f" {key.ljust(value)} " for key, value in column_widths.items()))
+        + "\n"
+    )
+    output += (
+        "+".join(("-" * (value + 2) for key, value in column_widths.items())) + "\n"
+    )
+    for row in rows:
+        output += (
+            "|".join(
+                (f" {row[key].ljust(value)} " for key, value in column_widths.items())
+            )
+            + "\n"
+        )
+    return output
+
+
+def json_data_deep_get(json_data: dict, key_path: str = "", default=None):
+    """Get data from json_data based on key path.
+
+    :param json_data: the json_data to get data from
+    :param key_path: the key path to get data from.
+    It is a string of keys separated by dots.
+    :param default: the default value to return if the key path is not found
+    :returns: the data from the json_data based on the key path
+    """
+    if not key_path:
+        return default
+    key_path = key_path.split(".")
+    data = json_data
+    for key in key_path:
+        if isinstance(data, dict) and key in data:
+            data = data[key]
+        else:
+            return default
+    return data
+
+
 # Read in a file and make it a list
 def read_in_file(filename):
     """Read values from file into a list object. Expecting newline delimited.

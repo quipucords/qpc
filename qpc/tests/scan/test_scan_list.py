@@ -108,6 +108,7 @@ class TestScanListCli:
             mocker.get(next_link, status_code=200, json=data2)
 
             args = Namespace()
+            args.output_table = False
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = (
@@ -133,6 +134,7 @@ class TestScanListCli:
             mocker.get(url, status_code=200, json=data)
 
             args = Namespace(type="inspect")
+            args.output_table = False
             with redirect_stdout(scan_out):
                 self.command.main(args)
                 expected = (

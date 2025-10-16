@@ -54,7 +54,7 @@ DEFAULT_INSIGHTS_CONFIG = {
 
 LOG_LEVEL_INFO = 0
 
-QPC_MIN_SERVER_VERSION = "2.2.0"
+QPC_MIN_SERVER_VERSION = "2.3.0"
 
 logging.captureWarnings(True)
 logger = logging.getLogger(__name__)

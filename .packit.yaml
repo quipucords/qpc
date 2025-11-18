@@ -9,14 +9,19 @@ jobs:
   - job: copr_build
     trigger: pull_request
     targets: &targets_list
-      # we officially support rhel-8 and rhel-9 downstream.
+      # we officially support RHEL 8 and RHEL 9 downstream.
       - rhel-8-x86_64
       - rhel-8-aarch64
       - rhel-9-x86_64
       - rhel-9-aarch64
+      # we also build for RHEL 10
+      - rhel-10-x86_64
+      - rhel-10-aarch64
       # centos-stream is like a preview of upcoming rhel.
       - centos-stream-9-x86_64
       - centos-stream-9-aarch64
+      - centos-stream-10-x86_64
+      - centos-stream-10-aarch64
       # fedora is like an even farther future preview.
       - fedora-41-x86_64
       - fedora-41-aarch64

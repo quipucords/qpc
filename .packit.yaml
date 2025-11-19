@@ -23,8 +23,6 @@ jobs:
       - centos-stream-10-x86_64
       - centos-stream-10-aarch64
       # fedora is like an even farther future preview.
-      - fedora-41-x86_64
-      - fedora-41-aarch64
       - fedora-42-x86_64
       - fedora-42-aarch64
 

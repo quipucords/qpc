@@ -17,11 +17,6 @@ jobs:
       # we also build for RHEL 10
       - rhel-10-x86_64
       - rhel-10-aarch64
-      # centos-stream is like a preview of upcoming rhel.
-      - centos-stream-9-x86_64
-      - centos-stream-9-aarch64
-      - centos-stream-10-x86_64
-      - centos-stream-10-aarch64
       # fedora is like an even farther future preview.
       - fedora-42-x86_64
       - fedora-42-aarch64

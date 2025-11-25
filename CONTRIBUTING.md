@@ -37,6 +37,8 @@ You can run the lint command on your branch to check compliance.
 make lint
 ```
 
+**Note**: If you use AI tools to generate code, please review our [Policy for AI-Generated Code](AI_POLICY.md) for disclosure and quality requirements.
+
 ### Testing
 Before opening a pull requests, please make sure the tests pass
 in a Python 3.6 environments.

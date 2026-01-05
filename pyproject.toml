@@ -1,6 +1,6 @@
 [project]
 name = "qpc"
-version = "2.4.0"
+version = "2.4.1"
 description = "The command-line client for quipucords servers"
 authors = [{ name = "QPC Team", email = "quipucords@redhat.com" }]
 requires-python = ">=3.12,<3.14"

@@ -6,4 +6,5 @@ from qpc.report.details import ReportDetailsCommand
 from qpc.report.download import ReportDownloadCommand
 from qpc.report.insights import ReportInsightsCommand
 from qpc.report.merge import ReportMergeCommand
+from qpc.report.show import ReportShowCommand
 from qpc.report.upload import ReportUploadCommand

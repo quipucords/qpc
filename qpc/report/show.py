@@ -19,6 +19,8 @@ from qpc.utils import (
 
 logger = getLogger(__name__)
 
+MIN_SERVER_VERSION = "2.4.3"
+
 
 class ReportShowCommand(CliCommand):
     """Defines the report show command.
@@ -55,7 +57,7 @@ class ReportShowCommand(CliCommand):
             help=_(messages.REPORT_PATH_HELP),
         )
         self.report_id = None
-        self.min_server_version = "0.9.2"
+        self.min_server_version = MIN_SERVER_VERSION
 
     def _validate_args(self):  # noqa: PLR0912
         CliCommand._validate_args(self)

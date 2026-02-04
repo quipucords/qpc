@@ -12,10 +12,11 @@ import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_V2_URI
-from qpc.report.show import ReportShowCommand
+from qpc.report.show import MIN_SERVER_VERSION, ReportShowCommand
 from qpc.utils import get_server_location
+
+VERSION = MIN_SERVER_VERSION
 
 
 @pytest.fixture
@@ -225,7 +226,7 @@ class TestReportShowCommand:
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
-                    "min_version": "0.9.2",
+                    "min_version": MIN_SERVER_VERSION,
                     "current_version": "0.0.45",
                 }
                 assert err_msg in caplog.text

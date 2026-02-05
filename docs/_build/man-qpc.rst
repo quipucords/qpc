@@ -61,6 +61,10 @@ The ``qpc`` command has several subcommands that encompass the inspection and re
 
   ``qpc report deployments --id 1 --csv --output-file=~/scan_result.csv``
 
+* Listing reports:
+
+  ``qpc report list --output-file=~/report_list.json``
+
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
 
 Server Authentication
@@ -565,6 +569,29 @@ The ``qpc report insights`` command retrieves a report that contains the hosts t
 
   Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.tar.gz``.  If this field is not provided, it will automatically generate a JSON report to stdout.
 
+Listing and Showing Reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``qpc report list`` command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of a report, whether it is a local, uploaded or merged report, a report version and related scan identifier for each report.
+
+**qpc report list** **--output-file** *path*
+
+``--output-file=path``
+
+  Optional. Sets the path to a file location where the list of reports is saved. The file extension must be ``.json``. If this field is not specified, the list of reports is sent to stdout.
+
+The ``qpc report show`` shows the information about a single report.
+
+**qpc report show --report** *report_identifier* **--output-file** *path*
+
+``--report=report_identifier``
+
+  Required. Contains the identifier of the report to retrieve.
+
+``--output-file=path``
+
+  Optional. Sets the path to a file location where the report is saved. The file extension must be ``.json``. If this field is not specified, the report is sent to stdout.
+
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
@@ -848,6 +875,14 @@ Examples
 * Downloading a set of reports
 
   ``qpc report download --report 1 --output-file path_to_your_file.tar.gz``
+
+* Show information about a single report
+
+  ``qpc report show --report 1``
+
+* Get a list of reports
+
+  ``qpc report list --output-file path_to_list_of_reports.json``
 
 * Merging scan job results using ids
 

@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "January 05, 2026" "" "qpc"
+.TH "qpc" "1" "February 05, 2026" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -80,6 +80,10 @@ Working with scan jobs:
 Generating reports:
 .sp
 \fBqpc report deployments \-\-id 1 \-\-csv \-\-output\-file=~/scan_result.csv\fP
+.IP \(bu 2
+Listing reports:
+.sp
+\fBqpc report list \-\-output\-file=~/report_list.json\fP
 .UNINDENT
 .sp
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
@@ -711,6 +715,36 @@ Contains the report identifier to use to retrieve the report. Mutually exclusive
 Optional. Sets the path to a file location where the report data is saved. The file extension must be \fB\&.tar.gz\fP\&.  If this field is not provided, it will automatically generate a JSON report to stdout.
 .UNINDENT
 .UNINDENT
+.SS Listing and Showing Reports
+.sp
+The \fBqpc report list\fP command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of a report, whether it is a local, uploaded or merged report, a report version and related scan identifier for each report.
+.sp
+\fBqpc report list\fP \fB\-\-output\-file\fP \fIpath\fP
+.sp
+\fB\-\-output\-file=path\fP
+.INDENT 0.0
+.INDENT 3.5
+Optional. Sets the path to a file location where the list of reports is saved. The file extension must be \fB\&.json\fP\&. If this field is not specified, the list of reports is sent to stdout.
+.UNINDENT
+.UNINDENT
+.sp
+The \fBqpc report show\fP shows the information about a single report.
+.sp
+\fBqpc report show \-\-report\fP \fIreport_identifier\fP \fB\-\-output\-file\fP \fIpath\fP
+.sp
+\fB\-\-report=report_identifier\fP
+.INDENT 0.0
+.INDENT 3.5
+Required. Contains the identifier of the report to retrieve.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-\-output\-file=path\fP
+.INDENT 0.0
+.INDENT 3.5
+Optional. Sets the path to a file location where the report is saved. The file extension must be \fB\&.json\fP\&. If this field is not specified, the report is sent to stdout.
+.UNINDENT
+.UNINDENT
 .SS Downloading Reports
 .sp
 The \fBqpc report download\fP command downloads a set of reports, identified either by scan job identifer or report identifier, as a TAR.GZ file.  The report TAR.GZ file contains the details and deployments reports in both their JSON and CSV formats.
@@ -1032,6 +1066,14 @@ Retrieves a tar.gz Insights report
 Downloading a set of reports
 .sp
 \fBqpc report download \-\-report 1 \-\-output\-file path_to_your_file.tar.gz\fP
+.IP \(bu 2
+Show information about a single report
+.sp
+\fBqpc report show \-\-report 1\fP
+.IP \(bu 2
+Get a list of reports
+.sp
+\fBqpc report list \-\-output\-file path_to_list_of_reports.json\fP
 .IP \(bu 2
 Merging scan job results using ids
 .sp

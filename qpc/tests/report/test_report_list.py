@@ -1,7 +1,6 @@
 """Test the CLI report list subcommand."""
 
 import json
-import logging
 import sys
 from argparse import ArgumentParser, Namespace
 from io import StringIO
@@ -9,14 +8,12 @@ from io import StringIO
 import pytest
 import requests_mock
 
-from qpc import messages
 from qpc.cli import CLI
+from qpc.release import VERSION
 from qpc.report import REPORT_V2_URI
-from qpc.report.list import MIN_SERVER_VERSION, ReportListCommand
+from qpc.report.list import ReportListCommand
 from qpc.tests.utilities import redirect_stdout
 from qpc.utils import get_server_location
-
-VERSION = MIN_SERVER_VERSION
 
 
 @pytest.fixture
@@ -71,26 +68,6 @@ class TestReportListCommand:
                 assert json.loads(report_out.getvalue()) == report_json_data
 
     # Test validation
-
-    def test_list_old_version(self, caplog, get_report_url, report_json_data):
-        """Test server version is too old."""
-        with requests_mock.Mocker() as mocker:
-            mocker.get(
-                get_report_url,
-                status_code=400,
-                headers={"X-Server-Version": "0.0.45"},
-                json=report_json_data,
-            )
-
-            args = Namespace()
-            with caplog.at_level(logging.ERROR):
-                with pytest.raises(SystemExit):
-                    self.command.main(args)
-                err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
-                    "min_version": MIN_SERVER_VERSION,
-                    "current_version": "0.0.45",
-                }
-                assert err_msg in caplog.text
 
 
 def test_list_report_as_json(

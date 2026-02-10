@@ -12,8 +12,6 @@ from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
-MIN_SERVER_VERSION = "2.4.3"
-
 
 class ReportListCommand(CliCommand):
     """Defines the report list command.
@@ -35,8 +33,6 @@ class ReportListCommand(CliCommand):
             report.REPORT_V2_URI,
             [codes.ok],
         )
-
-        self.min_server_version = MIN_SERVER_VERSION
 
     def _validate_args(self):  # noqa: PLR0912
         CliCommand._validate_args(self)

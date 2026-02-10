@@ -10,12 +10,7 @@ from qpc import messages, report
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 from qpc.translation import _
-from qpc.utils import (
-    check_extension,
-    pretty_format,
-    validate_write_file,
-    write_file,
-)
+from qpc.utils import pretty_format
 
 logger = getLogger(__name__)
 
@@ -50,41 +45,19 @@ class ReportShowCommand(CliCommand):
             help=_(messages.REPORT_REPORT_ID_HELP),
         )
 
-        self.parser.add_argument(
-            "--output-file",
-            dest="path",
-            metavar="PATH",
-            help=_(messages.REPORT_PATH_HELP),
-        )
         self.report_id = None
         self.min_server_version = MIN_SERVER_VERSION
 
     def _validate_args(self):  # noqa: PLR0912
         CliCommand._validate_args(self)
-        extension = ".json"
         self.req_headers = {"Accept": "application/json"}
-        check_extension(extension, self.args.path)
-        try:
-            if self.args.path:
-                validate_write_file(self.args.path, "output-file")
-        except ValueError as error:
-            logger.error(error)
-            sys.exit(1)
-
         self.report_id = self.args.report_id
         self.req_path = f"{self.req_path}{self.report_id}/"
 
     def _handle_response_success(self):
-        try:
-            json_data = json.loads(self.response.text)
-            response_json = pretty_format(json_data)
-            write_file(self.args.path, response_json)
-            logger.info(_(messages.REPORT_SUCCESSFULLY_WRITTEN))
-        except EnvironmentError as err:
-            logger.error(
-                _(messages.WRITE_FILE_ERROR), {"path": self.args.path, "error": err}
-            )
-            sys.exit(1)
+        json_data = json.loads(self.response.text)
+        response_json = pretty_format(json_data)
+        print(response_json)
 
     def _handle_response_error(self):
         logger.error(_(messages.REPORT_ID_DOES_NOT_EXIST), self.args.report_id)

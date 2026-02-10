@@ -63,7 +63,7 @@ The ``QPC_VAR_PROGRAM_NAME`` command has several subcommands that encompass the 
 
 * Listing reports:
 
-  ``QPC_VAR_PROGRAM_NAME report list --output-file=~/report_list.json``
+  ``QPC_VAR_PROGRAM_NAME report list``
 
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
 
@@ -574,24 +574,15 @@ Listing and Showing Reports
 
 The ``QPC_VAR_PROGRAM_NAME report list`` command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of a report, whether it is a local, uploaded or merged report, a report version and related scan identifier for each report.
 
-**QPC_VAR_PROGRAM_NAME report list** **--output-file** *path*
-
-``--output-file=path``
-
-  Optional. Sets the path to a file location where the list of reports is saved. The file extension must be ``.json``. If this field is not specified, the list of reports is sent to stdout.
+**QPC_VAR_PROGRAM_NAME report list**
 
 The ``QPC_VAR_PROGRAM_NAME report show`` shows the information about a single report.
 
-**QPC_VAR_PROGRAM_NAME report show --report** *report_identifier* **--output-file** *path*
+**QPC_VAR_PROGRAM_NAME report show --report** *report_identifier*
 
 ``--report=report_identifier``
 
   Required. Contains the identifier of the report to retrieve.
-
-``--output-file=path``
-
-  Optional. Sets the path to a file location where the report is saved. The file extension must be ``.json``. If this field is not specified, the report is sent to stdout.
-
 
 Downloading Reports
 ~~~~~~~~~~~~~~~~~~~
@@ -882,7 +873,7 @@ Examples
 
 * Get a list of reports
 
-  ``QPC_VAR_PROGRAM_NAME report list --output-file path_to_list_of_reports.json``
+  ``QPC_VAR_PROGRAM_NAME report list``
 
 * Merging scan job results using ids
 

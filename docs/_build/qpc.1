@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "February 05, 2026" "" "qpc"
+.TH "qpc" "1" "February 10, 2026" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -83,7 +83,7 @@ Generating reports:
 .IP \(bu 2
 Listing reports:
 .sp
-\fBqpc report list \-\-output\-file=~/report_list.json\fP
+\fBqpc report list\fP
 .UNINDENT
 .sp
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
@@ -719,30 +719,16 @@ Optional. Sets the path to a file location where the report data is saved. The f
 .sp
 The \fBqpc report list\fP command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of a report, whether it is a local, uploaded or merged report, a report version and related scan identifier for each report.
 .sp
-\fBqpc report list\fP \fB\-\-output\-file\fP \fIpath\fP
-.sp
-\fB\-\-output\-file=path\fP
-.INDENT 0.0
-.INDENT 3.5
-Optional. Sets the path to a file location where the list of reports is saved. The file extension must be \fB\&.json\fP\&. If this field is not specified, the list of reports is sent to stdout.
-.UNINDENT
-.UNINDENT
+\fBqpc report list\fP
 .sp
 The \fBqpc report show\fP shows the information about a single report.
 .sp
-\fBqpc report show \-\-report\fP \fIreport_identifier\fP \fB\-\-output\-file\fP \fIpath\fP
+\fBqpc report show \-\-report\fP \fIreport_identifier\fP
 .sp
 \fB\-\-report=report_identifier\fP
 .INDENT 0.0
 .INDENT 3.5
 Required. Contains the identifier of the report to retrieve.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-output\-file=path\fP
-.INDENT 0.0
-.INDENT 3.5
-Optional. Sets the path to a file location where the report is saved. The file extension must be \fB\&.json\fP\&. If this field is not specified, the report is sent to stdout.
 .UNINDENT
 .UNINDENT
 .SS Downloading Reports
@@ -1073,7 +1059,7 @@ Show information about a single report
 .IP \(bu 2
 Get a list of reports
 .sp
-\fBqpc report list \-\-output\-file path_to_list_of_reports.json\fP
+\fBqpc report list\fP
 .IP \(bu 2
 Merging scan job results using ids
 .sp

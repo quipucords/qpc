@@ -572,7 +572,7 @@ The ``QPC_VAR_PROGRAM_NAME report insights`` command retrieves a report that con
 Listing and Showing Reports
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``QPC_VAR_PROGRAM_NAME report list`` command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of a report, whether it is a local, uploaded or merged report, a report version and related scan identifier for each report.
+The ``QPC_VAR_PROGRAM_NAME report list`` command returns the list of reports. The output of this command includes the identifier, whether a report can be published or not, the origin of the report (local, uploaded or merged), the report version, and the related scan identifier for each report.
 
 **QPC_VAR_PROGRAM_NAME report list**
 

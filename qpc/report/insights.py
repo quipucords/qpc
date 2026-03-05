@@ -55,8 +55,6 @@ class ReportInsightsCommand(CliCommand):
             metavar="PATH",
             help=_(messages.REPORT_PATH_HELP),
         )
-        # Don't change this when you upgrade versions
-        self.min_server_version = "0.9.0"
         self.report_id = None
 
     def _insights_report_available(self, sources):

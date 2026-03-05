@@ -54,7 +54,6 @@ class ReportDownloadCommand(CliCommand):
             help=_(messages.DOWNLOAD_PATH_HELP),
             required=True,
         )
-        self.min_server_version = "0.9.2"
         self.report_id = None
 
     def _validate_args(self):

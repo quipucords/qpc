@@ -233,7 +233,7 @@ class TestReportDownload:
                 with pytest.raises(SystemExit):
                     self.command.main(args)
                 err_msg = messages.SERVER_TOO_OLD_FOR_CLI % {
-                    "min_version": "0.9.2",
+                    "min_version": QPC_MIN_SERVER_VERSION,
                     "current_version": "0.0.45",
                 }
                 assert err_msg in caplog.text

@@ -25,8 +25,7 @@ class CliCommand:
         self.req_headers = None
         self.response = None
 
-        # If you add or change API, you must update these versions
-        # this includes self.min_server_version
+        # Minimum server version required by the CLI
         self.min_server_version = QPC_MIN_SERVER_VERSION
 
     def _validate_args(self):

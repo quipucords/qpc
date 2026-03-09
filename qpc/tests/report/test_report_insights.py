@@ -14,12 +14,11 @@ import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.insights import ReportInsightsCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests.utilities import redirect_stdout
-from qpc.utils import create_tar_buffer, get_server_location
+from qpc.utils import QPC_MIN_SERVER_VERSION, create_tar_buffer, get_server_location
 
 
 @pytest.fixture
@@ -67,7 +66,7 @@ class TestReportInsights:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -92,13 +91,13 @@ class TestReportInsights:
             mocker.get(
                 scanjob_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 json=scanjob_data,
             )
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -173,13 +172,13 @@ class TestReportInsights:
             mocker.get(
                 scanjob_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 json=scanjob_data,
             )
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -223,7 +222,7 @@ class TestReportInsights:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -245,12 +244,12 @@ class TestReportInsights:
             mocker.get(
                 scanjob_report_url,
                 status_code=404,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
             mocker.get(
                 get_report_url,
                 status_code=400,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -274,7 +273,7 @@ class TestReportInsights:
             mocker.get(
                 get_report_url,
                 status_code=400,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -295,7 +294,7 @@ def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
         scanjob_report_url,
         status_code=200,
         json=scanjob_data,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     report_url = get_server_location() + REPORT_URI + "1/insights/"
     report_json_data = {
@@ -309,7 +308,7 @@ def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
         report_url,
         status_code=200,
         json=expected_json,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",
@@ -370,7 +369,7 @@ def test_insights_not_available_report_id(caplog, capsys, requests_mock):
         scanjob_report_url,
         status_code=200,
         json=scanjob_data,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",
@@ -414,7 +413,7 @@ def test_insights_mix_sources_scan_job(caplog, capsys, requests_mock):
         report_url,
         status_code=200,
         json=expected_json,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",
@@ -447,7 +446,7 @@ def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
         scanjob_report_url,
         status_code=200,
         json=scanjob_data,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     report_url = get_server_location() + REPORT_URI + "1/insights/"
     report_json_data = {
@@ -461,7 +460,7 @@ def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
         report_url,
         status_code=200,
         json=expected_json,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",

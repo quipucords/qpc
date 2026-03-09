@@ -9,11 +9,10 @@ import pytest
 import requests_mock
 
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_V2_URI
 from qpc.report.list import ReportListCommand
 from qpc.tests.utilities import redirect_stdout
-from qpc.utils import get_server_location
+from qpc.utils import QPC_MIN_SERVER_VERSION, get_server_location
 
 
 @pytest.fixture
@@ -58,7 +57,7 @@ class TestReportListCommand:
                 get_report_url,
                 status_code=200,
                 json=report_json_data,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace()
@@ -79,7 +78,7 @@ def test_list_report_as_json(
         get_report_url,
         status_code=200,
         json=report_json_data,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",

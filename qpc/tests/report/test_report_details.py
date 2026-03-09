@@ -14,12 +14,11 @@ import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.details import ReportDetailsCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests.utilities import redirect_stdout
-from qpc.utils import create_tar_buffer, get_server_location
+from qpc.utils import QPC_MIN_SERVER_VERSION, create_tar_buffer, get_server_location
 
 
 @pytest.fixture
@@ -66,7 +65,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=200,
                 content=buffer_content,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -95,7 +94,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=200,
                 content=buffer_content,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -130,7 +129,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=200,
                 json=get_report_csv_data,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -231,7 +230,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=200,
                 content=buffer_content,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -330,7 +329,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=400,
                 json=get_report_json_data,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -360,7 +359,7 @@ class TestReportDetails:
                 get_report_url,
                 status_code=400,
                 content=buffer_content,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
             )
 
             args = Namespace(
@@ -417,7 +416,7 @@ def test_details_report_as_json_no_output_file(caplog, capsys, requests_mock):
         report_url,
         status_code=200,
         content=buffer_content,
-        headers={"X-Server-Version": VERSION},
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
     sys.argv = [
         "/bin/qpc",

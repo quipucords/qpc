@@ -11,11 +11,10 @@ import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.release import VERSION
 from qpc.report import REPORT_URI
 from qpc.report.download import ReportDownloadCommand
 from qpc.scan import SCAN_JOB_URI
-from qpc.utils import create_tar_buffer, get_server_location
+from qpc.utils import QPC_MIN_SERVER_VERSION, create_tar_buffer, get_server_location
 
 
 @pytest.fixture
@@ -56,7 +55,7 @@ class TestReportDownload:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -79,7 +78,7 @@ class TestReportDownload:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -184,7 +183,7 @@ class TestReportDownload:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 
@@ -206,7 +205,7 @@ class TestReportDownload:
             mocker.get(
                 get_report_url,
                 status_code=400,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 json=get_report_json_data,
             )
 
@@ -249,7 +248,7 @@ class TestReportDownload:
             mocker.get(
                 get_report_url,
                 status_code=200,
-                headers={"X-Server-Version": VERSION},
+                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
                 content=buffer_content,
             )
 

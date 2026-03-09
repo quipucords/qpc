@@ -584,7 +584,7 @@ wheels = [
 
 [[package]]
 name = "qpc"
-version = "2.4.3"
+version = "2.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },

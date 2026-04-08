@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from qpc import cred, insights, messages, report, scan, server, source
+from qpc import cred, insights, messages, report, scan, server, source, vault
 from qpc.cred.commands import (
     CredAddCommand,
     CredClearCommand,
@@ -59,6 +59,13 @@ from qpc.utils import (
     logger,
     read_client_token,
     setup_logging,
+)
+from qpc.vault.commands import (
+    VaultClearCommand,
+    VaultEditCommand,
+    VaultSetCommand,
+    VaultShowCommand,
+    VaultUpdateCommand,
 )
 
 
@@ -184,6 +191,16 @@ class CLI:
                 InsightsConfigureCommand,
                 InsightsLoginCommand,
                 InsightsPublishCommand,
+            ],
+        )
+        self._add_subcommand(
+            vault.SUBCOMMAND,
+            [
+                VaultSetCommand,
+                VaultUpdateCommand,
+                VaultEditCommand,
+                VaultShowCommand,
+                VaultClearCommand,
             ],
         )
 

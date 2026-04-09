@@ -5,7 +5,7 @@ from logging import getLogger
 
 from requests import codes
 
-import qpc.vault as vault
+from qpc import vault
 from qpc.clicommand import CliCommand
 from qpc.request import GET
 

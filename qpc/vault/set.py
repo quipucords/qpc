@@ -5,8 +5,7 @@ from logging import getLogger
 
 from requests import codes
 
-import qpc.vault as vault
-from qpc import messages
+from qpc import messages, vault
 from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.source.utils import validate_port

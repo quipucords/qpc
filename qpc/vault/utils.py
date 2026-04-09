@@ -27,8 +27,12 @@ def read_and_encode_cert_file(file_path, file_type):
         logger.error(_(messages.VAULT_CERT_FILE_NOT_FOUND), file_type, file_path)
         sys.exit(1)
     except PermissionError:
-        logger.error(_(messages.VAULT_CERT_FILE_PERMISSION_DENIED), file_type, file_path)
+        logger.error(
+            _(messages.VAULT_CERT_FILE_PERMISSION_DENIED), file_type, file_path
+        )
         sys.exit(1)
-    except Exception as e:
-        logger.error(_(messages.VAULT_CERT_FILE_READ_ERROR), file_type, file_path, str(e))
+    except (OSError, UnicodeDecodeError) as e:
+        logger.error(
+            _(messages.VAULT_CERT_FILE_READ_ERROR), file_type, file_path, str(e)
+        )
         sys.exit(1)

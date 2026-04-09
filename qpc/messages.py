@@ -410,3 +410,4 @@ VAULT_CLIENT_CERT_KEY_MISMATCH = (
 VAULT_CERT_FILE_NOT_FOUND = "The %s file %s does not exist."
 VAULT_CERT_FILE_PERMISSION_DENIED = "Permission denied reading %s file %s."
 VAULT_CERT_FILE_READ_ERROR = "Failed to read %s file %s: %s"
+VAULT_INVALID_JSON_RESPONSE = "Server returned invalid JSON response"

@@ -8,9 +8,8 @@ from requests import codes
 from qpc import messages, vault
 from qpc.clicommand import CliCommand
 from qpc.request import PUT
-from qpc.source.utils import validate_port
 from qpc.translation import _
-from qpc.vault.utils import read_and_encode_cert_file
+from qpc.vault.utils import add_vault_arguments, read_and_encode_cert_file
 
 logger = getLogger(__name__)
 
@@ -37,55 +36,11 @@ class VaultUpdateCommand(CliCommand):
             [codes.ok],
         )
 
-        self.parser.add_argument(
-            "--address",
-            dest="address",
-            metavar="ADDRESS",
-            help=_(messages.VAULT_ADDRESS_HELP),
-            required=True,
-        )
-        self.parser.add_argument(
-            "--port",
-            dest="port",
-            metavar="PORT",
-            type=validate_port,
-            default=8200,
-            help=_(messages.VAULT_PORT_HELP),
-            required=False,
-        )
-        self.parser.add_argument(
-            "--ssl-verify",
-            dest="ssl_verify",
-            choices=vault.BOOLEAN_CHOICES,
-            type=str.lower,
-            default="true",
-            help=_(messages.VAULT_SSL_VERIFY_HELP),
-            required=False,
-        )
-        self.parser.add_argument(
-            "--client-cert",
-            dest="client_cert",
-            metavar="CLIENT_CERT_FILE",
-            help=_(messages.VAULT_CLIENT_CERT_HELP),
-            required=True,
-        )
-        self.parser.add_argument(
-            "--client-key",
-            dest="client_key",
-            metavar="CLIENT_KEY_FILE",
-            help=_(messages.VAULT_CLIENT_KEY_HELP),
-            required=True,
-        )
-        self.parser.add_argument(
-            "--ca-cert",
-            dest="ca_cert",
-            metavar="CA_CERT_FILE",
-            help=_(messages.VAULT_CA_CERT_HELP),
-            required=False,
-        )
+        add_vault_arguments(self.parser, required_certs=True)
 
     def _validate_args(self):
         """Validate arguments."""
+        CliCommand._validate_args(self)
         # Convert string "true"/"false" to boolean for validation
         ssl_verify_bool = self.args.ssl_verify == "true"
         if ssl_verify_bool and not self.args.ca_cert:

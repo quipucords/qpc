@@ -1,13 +1,15 @@
 """VaultShowCommand is used to show HashiCorp Vault configuration."""
 
 import json
+import sys
 from logging import getLogger
 
 from requests import codes
 
-from qpc import vault
+from qpc import messages, vault
 from qpc.clicommand import CliCommand
 from qpc.request import GET
+from qpc.translation import _
 
 logger = getLogger(__name__)
 
@@ -35,8 +37,12 @@ class VaultShowCommand(CliCommand):
         )
 
     def _handle_response_success(self):
-        json_data = self.response.json()
-        formatted_json = json.dumps(
-            json_data, sort_keys=True, indent=4, separators=(",", ": ")
-        )
-        print(formatted_json)
+        try:
+            json_data = self.response.json()
+            formatted_json = json.dumps(
+                json_data, sort_keys=True, indent=4, separators=(",", ": ")
+            )
+            print(formatted_json)
+        except ValueError:
+            logger.error(_(messages.VAULT_INVALID_JSON_RESPONSE))
+            sys.exit(1)

@@ -1,4 +1,4 @@
-"""VaultSetCommand is used to set HashiCorp Vault integration."""
+"""VaultSetCommand is used to set the HashiCorp Vault server configuration."""
 
 import sys
 from logging import getLogger
@@ -9,16 +9,24 @@ from qpc import messages, vault
 from qpc.clicommand import CliCommand
 from qpc.request import POST
 from qpc.translation import _
-from qpc.vault.utils import add_vault_arguments, read_and_encode_cert_file
+from qpc.vault.utils import (
+    CERT_TYPE_CA,
+    CERT_TYPE_CLIENT_CERT,
+    CERT_TYPE_CLIENT_KEY,
+    add_vault_arguments,
+    read_and_encode_cert_file,
+    str_to_bool,
+)
 
 logger = getLogger(__name__)
 
 
 class VaultSetCommand(CliCommand):
-    """Defines the set command.
+    """Defines the set command for the HasiCorp Vault server configuration.
 
-    This command is for setting HashiCorp Vault integration
-    for secure credential storage.
+    This command is for setting HashiCorp Vault server configuration
+    for secure credential storage. This is done by performing an HTTP POST
+    to the HashiCorp Vault server Singleton endpoint.
     """
 
     SUBCOMMAND = vault.SUBCOMMAND
@@ -41,7 +49,7 @@ class VaultSetCommand(CliCommand):
         """Validate arguments."""
         CliCommand._validate_args(self)
         # Convert string "true"/"false" to boolean for validation
-        ssl_verify_bool = self.args.ssl_verify == "true"
+        ssl_verify_bool = str_to_bool(self.args.ssl_verify)
         if ssl_verify_bool and not self.args.ca_cert:
             logger.error(_(messages.VAULT_CA_CERT_REQUIRED))
             sys.exit(1)
@@ -50,14 +58,14 @@ class VaultSetCommand(CliCommand):
         """Build request payload."""
         # Read and encode certificate files
         client_cert_encoded = read_and_encode_cert_file(
-            self.args.client_cert, "client certificate"
+            self.args.client_cert, CERT_TYPE_CLIENT_CERT
         )
         client_key_encoded = read_and_encode_cert_file(
-            self.args.client_key, "client key"
+            self.args.client_key, CERT_TYPE_CLIENT_KEY
         )
 
         # Convert string "true"/"false" to boolean
-        ssl_verify_bool = self.args.ssl_verify == "true"
+        ssl_verify_bool = str_to_bool(self.args.ssl_verify)
 
         self.req_payload = {
             "address": self.args.address,
@@ -69,9 +77,7 @@ class VaultSetCommand(CliCommand):
 
         # Add CA cert if provided (required when ssl_verify is True)
         if self.args.ca_cert:
-            ca_cert_encoded = read_and_encode_cert_file(
-                self.args.ca_cert, "CA certificate"
-            )
+            ca_cert_encoded = read_and_encode_cert_file(self.args.ca_cert, CERT_TYPE_CA)
             self.req_payload["ca_cert"] = ca_cert_encoded
 
     def _handle_response_success(self):

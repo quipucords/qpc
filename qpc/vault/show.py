@@ -1,4 +1,4 @@
-"""VaultShowCommand is used to show HashiCorp Vault configuration."""
+"""VaultShowCommand is used to show HashiCorp Vault server configuration."""
 
 import json
 import sys
@@ -15,10 +15,13 @@ logger = getLogger(__name__)
 
 
 class VaultShowCommand(CliCommand):
-    """Defines the show command.
+    """Defines the show command for the HashiCorp Server configuration.
 
     This command is for showing the current HashiCorp Vault
-    configuration for secure credential storage.
+    configuration for secure credential storage. It basically
+    does a GET of the HashiCorp Vault Singleton endpoint. The
+    server is set to not return any sensitive attributes, so
+    Client certs, keys or CA_Certs will not be seen.
     """
 
     SUBCOMMAND = vault.SUBCOMMAND

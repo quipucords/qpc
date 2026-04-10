@@ -5,11 +5,16 @@ import sys
 from logging import getLogger
 from pathlib import Path
 
-from qpc import messages
+from qpc import messages, vault
 from qpc.source.utils import validate_port
 from qpc.translation import _
 
 logger = getLogger(__name__)
+
+# Certificate type constants for error messages
+CERT_TYPE_CA = "CA certificate"
+CERT_TYPE_CLIENT_CERT = "Client certificate"
+CERT_TYPE_CLIENT_KEY = "Client key"
 
 
 def read_and_encode_cert_file(file_path, file_type):
@@ -73,7 +78,7 @@ def add_vault_arguments(parser, required_certs=True, required_address=True):
     parser.add_argument(
         "--ssl-verify",
         dest="ssl_verify",
-        choices=["true", "false"],
+        choices=vault.BOOLEAN_CHOICES,
         type=str.lower,
         default="true" if required_certs else None,
         help=_(messages.VAULT_SSL_VERIFY_HELP),

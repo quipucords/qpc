@@ -13,9 +13,10 @@ logger = getLogger(__name__)
 
 
 class VaultClearCommand(CliCommand):
-    """Defines the clear command.
+    """Defines the clear command for the HashiCorp Vault configuration.
 
-    This command is for clearing the HashiCorp Vault configuration.
+    This command is for clearing the HashiCorp Vault configuration. This is
+    done by deleting the HashiCorp Vault settings Singleton from the server.
     """
 
     SUBCOMMAND = vault.SUBCOMMAND

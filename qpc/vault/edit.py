@@ -9,16 +9,25 @@ from qpc import messages, vault
 from qpc.clicommand import CliCommand
 from qpc.request import PATCH
 from qpc.translation import _
-from qpc.vault.utils import add_vault_arguments, read_and_encode_cert_file
+from qpc.vault.utils import (
+    CERT_TYPE_CA,
+    CERT_TYPE_CLIENT_CERT,
+    CERT_TYPE_CLIENT_KEY,
+    add_vault_arguments,
+    read_and_encode_cert_file,
+    str_to_bool,
+)
 
 logger = getLogger(__name__)
 
 
 class VaultEditCommand(CliCommand):
-    """Defines the edit command.
+    """Defines the edit command for the HashiCorp Vault server configuration.
 
-    This command is for editing existing HashiCorp Vault
-    configuration for secure credential storage.
+    This command is for editing the existing HashiCorp Vault configuration for
+    secure credential storage. This is done via an HTTP PATCH request
+    to the HachiCorp Vault Singleton allowing us to edit one or more
+    Vault server settings.
     """
 
     SUBCOMMAND = vault.SUBCOMMAND
@@ -68,23 +77,21 @@ class VaultEditCommand(CliCommand):
             self.req_payload["port"] = self.args.port
         if self.args.ssl_verify is not None:
             # Convert string "true"/"false" to boolean
-            self.req_payload["ssl_verify"] = self.args.ssl_verify == "true"
+            self.req_payload["ssl_verify"] = str_to_bool(self.args.ssl_verify)
 
         # Handle certificate files
         if self.args.client_cert and self.args.client_key:
             client_cert_encoded = read_and_encode_cert_file(
-                self.args.client_cert, "client certificate"
+                self.args.client_cert, CERT_TYPE_CLIENT_CERT
             )
             client_key_encoded = read_and_encode_cert_file(
-                self.args.client_key, "client key"
+                self.args.client_key, CERT_TYPE_CLIENT_KEY
             )
             self.req_payload["client_cert"] = client_cert_encoded
             self.req_payload["client_key"] = client_key_encoded
 
         if self.args.ca_cert:
-            ca_cert_encoded = read_and_encode_cert_file(
-                self.args.ca_cert, "CA certificate"
-            )
+            ca_cert_encoded = read_and_encode_cert_file(self.args.ca_cert, CERT_TYPE_CA)
             self.req_payload["ca_cert"] = ca_cert_encoded
 
     def _handle_response_success(self):

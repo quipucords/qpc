@@ -65,6 +65,11 @@ The ``QPC_VAR_PROGRAM_NAME`` command has several subcommands that encompass the 
 
   ``QPC_VAR_PROGRAM_NAME report list``
 
+* Configuring HashiCorp Vault integration (optional):
+
+  ``QPC_VAR_PROGRAM_NAME vault set --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem``
+
+
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
 
 Server Authentication
@@ -707,6 +712,75 @@ The ``QPC_VAR_PROGRAM_NAME insights publish`` command allows you to publish an I
   Contains the path to the tar.gz containing the Insights report. Mutually exclusive with ``--report`` option.
 
 
+HashiCorp Vault Integration
+----------------------------
+
+Use the ``QPC_VAR_PROGRAM_NAME vault`` command to configure HashiCorp Vault integration for secure credential storage. HashiCorp Vault provides an additional layer of security for storing sensitive authentication data. When configured, credentials can also be stored in the HashiCorp Vault instead of the local database.
+
+Setting Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To initially configure HashiCorp Vault integration, use the ``vault set`` subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
+
+**QPC_VAR_PROGRAM_NAME vault set --address=** *address* **[--port=** *port* **]** **--client-cert=** *client_cert_file* **--client-key=** *client_key_file* **[--ca-cert=** *ca_cert_file* **]** **[--ssl-verify=** *(true | false)* **]**
+
+``--address=address``
+
+  Required. Sets the HashiCorp Vault server address.
+
+``--port=port``
+
+  Optional. Sets the HashiCorp Vault server port. The default is ``8200``.
+
+``--client-cert=client_cert_file``
+
+  Required. Sets the path to the client certificate file to use for mTLS authentication.
+
+``--client-key=client_key_file``
+
+  Required. Sets the path to the client key file to use for mTLS authentication.
+
+``--ca-cert=ca_cert_file``
+
+  Optional, but required when ``--ssl-verify`` is ``true``. Sets the path to the CA certificate file to use for SSL verification.
+
+``--ssl-verify=(true | false)``
+
+  Optional. Determines whether to verify SSL certificates. The default is ``true``.
+
+Updating Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To completely replace the existing HashiCorp Vault configuration, use the ``vault update`` subcommand. This command requires all the same parameters as ``vault set`` and replaces the entire configuration.
+
+**QPC_VAR_PROGRAM_NAME vault update --address=** *address* **[--port=** *port* **]** **--client-cert=** *client_cert_file* **--client-key=** *client_key_file* **[--ca-cert=** *ca_cert_file* **]** **[--ssl-verify=** *(true | false)* **]**
+
+The options for ``vault update`` are the same as those for ``vault set``.
+
+Editing Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To modify specific fields in the existing HashiCorp Vault configuration, use the ``vault edit`` subcommand. This command allows you to update one or more configuration parameters without having to specify all parameters.
+
+**QPC_VAR_PROGRAM_NAME vault edit [--address=** *address* **] [--port=** *port* **] [--client-cert=** *client_cert_file* **] [--client-key=** *client_key_file* **] [--ca-cert=** *ca_cert_file* **] [--ssl-verify=** *(true | false)* **]**
+
+All options are optional, but at least one must be provided. When updating client certificates, both ``--client-cert`` and ``--client-key`` must be provided together.
+
+Showing Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To view the current HashiCorp Vault configuration, use the ``vault show`` subcommand. This command displays the vault server address, port, and SSL verification settings. For security reasons, certificate, key and CA Cert data are not displayed.
+
+**QPC_VAR_PROGRAM_NAME vault show**
+
+Clearing Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To remove the HashiCorp Vault configuration and stop allowing Vault for optional credential storage, use the ``vault clear`` subcommand.
+
+**QPC_VAR_PROGRAM_NAME vault clear**
+
+
 Options for All Commands
 ------------------------
 
@@ -902,6 +976,38 @@ Examples
 * Publishing to Insights using a previously downloaded report
 
   ``QPC_VAR_PROGRAM_NAME insights publish --input-file path_to_report.tar.gz``
+
+* Setting up HashiCorp Vault integration with a CA certificate
+
+  ``QPC_VAR_PROGRAM_NAME vault set --address vault.example.com --port 8200 --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem --ssl-verify true``
+
+* Setting up HashiCorp Vault integration without SSL verification
+
+  ``QPC_VAR_PROGRAM_NAME vault set --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ssl-verify false``
+
+* Updating the entire HashiCorp Vault configuration
+
+  ``QPC_VAR_PROGRAM_NAME vault update --address vault-new.example.com --port 8200 --client-cert /path/to/new-client.pem --client-key /path/to/new-client-key.pem --ca-cert /path/to/ca.pem``
+
+* Editing only the HashiCorp Vault server address
+
+  ``QPC_VAR_PROGRAM_NAME vault edit --address vault-updated.example.com``
+
+* Editing the HashiCorp Vault client certificates
+
+  ``QPC_VAR_PROGRAM_NAME vault edit --client-cert /path/to/updated-client.pem --client-key /path/to/updated-client-key.pem``
+
+* Editing Vault CA certificate and SSL verification
+
+  ``QPC_VAR_PROGRAM_NAME vault edit --ca-cert /path/to/new-ca.pem --ssl-verify true``
+
+* Showing the current HashiCorp Vault configuration
+
+  ``QPC_VAR_PROGRAM_NAME vault show``
+
+* Clearing the HashiCorp Vault configuration
+
+  ``QPC_VAR_PROGRAM_NAME vault clear``
 
 
 Security Considerations

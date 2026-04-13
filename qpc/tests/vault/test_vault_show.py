@@ -69,9 +69,11 @@ class TestVaultShowCli:
                 self.command.main(args)
             result = output.getvalue()
             result_json = json.loads(result)
-            assert result_json["address"] == "vault.example.com"
-            assert result_json["port"] == 9200
-            assert result_json["ssl_verify"] is False
+            assert result_json == {
+                "address": "vault.example.com",
+                "port": 9200,
+                "ssl_verify": False,
+            }
 
     def test_show_vault_invalid_json(self, caplog):
         """Test showing vault configuration with invalid JSON response."""
@@ -125,7 +127,7 @@ class TestVaultShowCli:
         error_message = "Server Error"
 
         with requests_mock.Mocker() as mocker:
-            mocker.get(url, status_code=500, json={"error": ["Server Error"]})
+            mocker.get(url, status_code=500, json={"error": [error_message]})
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
@@ -135,34 +137,36 @@ class TestVaultShowCli:
     def test_show_vault_not_found(self, caplog):
         """Test showing vault configuration that doesn't exist."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Not found."
 
         with requests_mock.Mocker() as mocker:
             mocker.get(
                 url,
                 status_code=404,
-                json={"detail": "Not found."},
+                json={"detail": error_message},
             )
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Not found" in caplog.text
+            assert error_message in caplog.text
 
     def test_show_vault_unauthorized(self, caplog):
         """Test showing vault configuration with unauthorized error."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Authentication credentials were not provided."
 
         with requests_mock.Mocker() as mocker:
             mocker.get(
                 url,
                 status_code=401,
-                json={"detail": "Authentication credentials were not provided."},
+                json={"detail": error_message},
             )
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Authentication credentials" in caplog.text
+            assert error_message in caplog.text
 
     def test_show_vault_empty_response(self):
         """Test showing vault configuration with empty response."""

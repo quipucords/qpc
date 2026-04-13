@@ -29,7 +29,9 @@ class TestVaultUpdateCli:
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
 
-    def test_update_vault_success(self, tmp_path, caplog):
+    def test_update_vault_success(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test successfully updating vault configuration."""
         url = get_server_location() + vault.VAULT_URI
 
@@ -38,12 +40,9 @@ class TestVaultUpdateCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----"
-        key_content = b"-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(key_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200)
@@ -59,7 +58,9 @@ class TestVaultUpdateCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_update_vault_without_ca_cert_when_ssl_verify_false(self, tmp_path, caplog):
+    def test_update_vault_without_ca_cert_when_ssl_verify_false(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault without CA cert when ssl_verify is false."""
         url = get_server_location() + vault.VAULT_URI
 
@@ -67,10 +68,8 @@ class TestVaultUpdateCli:
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200)
@@ -86,16 +85,16 @@ class TestVaultUpdateCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_update_vault_missing_ca_cert_when_ssl_verify_true(self, tmp_path, caplog):
+    def test_update_vault_missing_ca_cert_when_ssl_verify_true(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault with ssl_verify true but missing CA cert fails."""
         # Create test certificate files
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
 
         args = Namespace(
             address="vault.example.com",
@@ -111,7 +110,9 @@ class TestVaultUpdateCli:
                 self.command.main(args)
         assert messages.VAULT_CA_CERT_REQUIRED in caplog.text
 
-    def test_update_vault_ssl_err(self, tmp_path, caplog):
+    def test_update_vault_ssl_err(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration with SSL error."""
         url = get_server_location() + vault.VAULT_URI
         expected_error = CONNECTION_ERROR_MSG % {
@@ -125,11 +126,9 @@ class TestVaultUpdateCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.SSLError)
@@ -146,7 +145,9 @@ class TestVaultUpdateCli:
                     self.command.main(args)
             assert expected_error in caplog.text
 
-    def test_update_vault_conn_err(self, tmp_path, caplog):
+    def test_update_vault_conn_err(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration with connection error."""
         url = get_server_location() + vault.VAULT_URI
         expected_error = CONNECTION_ERROR_MSG % {
@@ -160,11 +161,9 @@ class TestVaultUpdateCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(url, exc=requests.exceptions.ConnectTimeout)
@@ -181,7 +180,9 @@ class TestVaultUpdateCli:
                     self.command.main(args)
             assert expected_error in caplog.text
 
-    def test_update_vault_internal_err(self, tmp_path, caplog):
+    def test_update_vault_internal_err(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration with internal server error."""
         url = get_server_location() + vault.VAULT_URI
         error_message = "Server Error"
@@ -191,14 +192,12 @@ class TestVaultUpdateCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
-            mocker.put(url, status_code=500, json={"error": ["Server Error"]})
+            mocker.put(url, status_code=500, json={"error": [error_message]})
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
@@ -212,26 +211,27 @@ class TestVaultUpdateCli:
                     self.command.main(args)
             assert error_message in caplog.text
 
-    def test_update_vault_bad_request(self, tmp_path, caplog):
+    def test_update_vault_bad_request(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration with bad request error."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Invalid port number"
 
         # Create test certificate files
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(
                 url,
                 status_code=400,
-                json={"port": ["Invalid port number"]},
+                json={"port": [error_message]},
             )
             args = Namespace(
                 address="vault.example.com",
@@ -244,7 +244,7 @@ class TestVaultUpdateCli:
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Invalid port number" in caplog.text
+            assert error_message in caplog.text
 
     def test_update_vault_file_not_found(self, caplog):
         """Test updating vault configuration with non-existent certificate file."""
@@ -262,7 +262,9 @@ class TestVaultUpdateCli:
                 self.command.main(args)
         assert "does not exist" in caplog.text
 
-    def test_update_vault_custom_port(self, tmp_path, caplog):
+    def test_update_vault_custom_port(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration with custom port."""
         url = get_server_location() + vault.VAULT_URI
 
@@ -271,11 +273,9 @@ class TestVaultUpdateCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(url, status_code=200)
@@ -291,26 +291,27 @@ class TestVaultUpdateCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_update_vault_not_found(self, tmp_path, caplog):
+    def test_update_vault_not_found(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test updating vault configuration that doesn't exist."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Not found."
 
         # Create test certificate files
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        cert_content = b"test cert"
-
-        client_cert.write_bytes(cert_content)
-        client_key.write_bytes(cert_content)
-        ca_cert.write_bytes(cert_content)
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.put(
                 url,
                 status_code=404,
-                json={"detail": "Not found."},
+                json={"detail": error_message},
             )
             args = Namespace(
                 address="vault.example.com",
@@ -323,4 +324,4 @@ class TestVaultUpdateCli:
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Not found" in caplog.text
+            assert error_message in caplog.text

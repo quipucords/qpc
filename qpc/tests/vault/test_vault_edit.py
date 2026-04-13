@@ -83,12 +83,12 @@ class TestVaultEditCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_edit_vault_ca_cert_only(self, tmp_path, caplog):
+    def test_edit_vault_ca_cert_only(self, tmp_path, test_cert_content, caplog):
         """Test editing vault configuration with CA cert only."""
         url = get_server_location() + vault.VAULT_URI
 
         ca_cert = tmp_path / "ca.pem"
-        ca_cert.write_bytes(b"test ca cert")
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.patch(url, status_code=200)
@@ -104,15 +104,17 @@ class TestVaultEditCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_edit_vault_client_certs(self, tmp_path, caplog):
+    def test_edit_vault_client_certs(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test editing vault configuration with client cert and key."""
         url = get_server_location() + vault.VAULT_URI
 
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
 
-        client_cert.write_bytes(b"test client cert")
-        client_key.write_bytes(b"test client key")
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.patch(url, status_code=200)
@@ -128,12 +130,12 @@ class TestVaultEditCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
-    def test_edit_vault_multiple_fields(self, tmp_path, caplog):
+    def test_edit_vault_multiple_fields(self, tmp_path, test_cert_content, caplog):
         """Test editing vault configuration with multiple fields."""
         url = get_server_location() + vault.VAULT_URI
 
         ca_cert = tmp_path / "ca.pem"
-        ca_cert.write_bytes(b"test ca cert")
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.patch(url, status_code=200)
@@ -165,10 +167,12 @@ class TestVaultEditCli:
                 self.command.main(args)
         assert messages.VAULT_EDIT_NO_ARGS in caplog.text
 
-    def test_edit_vault_client_cert_without_key(self, tmp_path, caplog):
+    def test_edit_vault_client_cert_without_key(
+        self, tmp_path, test_cert_content, caplog
+    ):
         """Test editing vault with client cert but no key fails."""
         client_cert = tmp_path / "client.pem"
-        client_cert.write_bytes(b"test client cert")
+        client_cert.write_bytes(test_cert_content)
 
         args = Namespace(
             address=None,
@@ -184,10 +188,12 @@ class TestVaultEditCli:
                 self.command.main(args)
         assert messages.VAULT_CLIENT_CERT_KEY_MISMATCH in caplog.text
 
-    def test_edit_vault_client_key_without_cert(self, tmp_path, caplog):
+    def test_edit_vault_client_key_without_cert(
+        self, tmp_path, test_key_content, caplog
+    ):
         """Test editing vault with client key but no cert fails."""
         client_key = tmp_path / "client-key.pem"
-        client_key.write_bytes(b"test client key")
+        client_key.write_bytes(test_key_content)
 
         args = Namespace(
             address=None,
@@ -257,7 +263,7 @@ class TestVaultEditCli:
         error_message = "Server Error"
 
         with requests_mock.Mocker() as mocker:
-            mocker.patch(url, status_code=500, json={"error": ["Server Error"]})
+            mocker.patch(url, status_code=500, json={"error": [error_message]})
             args = Namespace(
                 address="vault.example.com",
                 port=None,
@@ -274,12 +280,13 @@ class TestVaultEditCli:
     def test_edit_vault_not_found(self, caplog):
         """Test editing vault configuration that doesn't exist."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Not found"
 
         with requests_mock.Mocker() as mocker:
             mocker.patch(
                 url,
                 status_code=404,
-                json={"detail": "Not found."},
+                json={"detail": error_message},
             )
             args = Namespace(
                 address="vault.example.com",
@@ -292,9 +299,11 @@ class TestVaultEditCli:
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Not found" in caplog.text
+            assert error_message in caplog.text
 
-    def test_edit_vault_all_fields(self, tmp_path, caplog):
+    def test_edit_vault_all_fields(
+        self, tmp_path, test_cert_content, test_key_content, caplog
+    ):
         """Test editing vault configuration with all fields."""
         url = get_server_location() + vault.VAULT_URI
 
@@ -302,9 +311,9 @@ class TestVaultEditCli:
         client_key = tmp_path / "client-key.pem"
         ca_cert = tmp_path / "ca.pem"
 
-        client_cert.write_bytes(b"test client cert")
-        client_key.write_bytes(b"test client key")
-        ca_cert.write_bytes(b"test ca cert")
+        client_cert.write_bytes(test_cert_content)
+        client_key.write_bytes(test_key_content)
+        ca_cert.write_bytes(test_cert_content)
 
         with requests_mock.Mocker() as mocker:
             mocker.patch(url, status_code=200)

@@ -80,7 +80,7 @@ class TestVaultClearCli:
         error_message = "Server Error"
 
         with requests_mock.Mocker() as mocker:
-            mocker.delete(url, status_code=500, json={"error": ["Server Error"]})
+            mocker.delete(url, status_code=500, json={"error": [error_message]})
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
@@ -90,47 +90,50 @@ class TestVaultClearCli:
     def test_clear_vault_not_found(self, caplog):
         """Test clearing vault configuration that doesn't exist."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Not found."
 
         with requests_mock.Mocker() as mocker:
             mocker.delete(
                 url,
                 status_code=404,
-                json={"detail": "Not found."},
+                json={"detail": error_message},
             )
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Not found" in caplog.text
+            assert error_message in caplog.text
 
     def test_clear_vault_unauthorized(self, caplog):
         """Test clearing vault configuration with unauthorized error."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "Authentication credentials were not provided."
 
         with requests_mock.Mocker() as mocker:
             mocker.delete(
                 url,
                 status_code=401,
-                json={"detail": "Authentication credentials were not provided."},
+                json={"detail": error_message},
             )
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "Authentication credentials" in caplog.text
+            assert error_message in caplog.text
 
     def test_clear_vault_forbidden(self, caplog):
         """Test clearing vault configuration with forbidden error."""
         url = get_server_location() + vault.VAULT_URI
+        error_message = "You do not have permission to perform this action."
 
         with requests_mock.Mocker() as mocker:
             mocker.delete(
                 url,
                 status_code=403,
-                json={"detail": "You do not have permission to perform this action."},
+                json={"detail": error_message},
             )
             args = Namespace()
             with pytest.raises(SystemExit):
                 with caplog.at_level(logging.ERROR):
                     self.command.main(args)
-            assert "permission" in caplog.text
+            assert error_message in caplog.text

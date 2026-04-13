@@ -37,16 +37,13 @@ class TestVaultUtils:
         assert str_to_bool("yes") is False
         assert str_to_bool("") is False
 
-    def test_read_and_encode_cert_file_success(self, tmp_path):
+    def test_read_and_encode_cert_file_success(self, test_cert_content, tmp_path):
         """Test successful reading and encoding of certificate file."""
         cert_file = tmp_path / "test.pem"
-        cert_content = (
-            b"-----BEGIN CERTIFICATE-----\ntest content\n-----END CERTIFICATE-----"
-        )
-        cert_file.write_bytes(cert_content)
+        cert_file.write_bytes(test_cert_content)
 
         result = read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_CERT)
-        expected = base64.b64encode(cert_content).decode("utf-8")
+        expected = base64.b64encode(test_cert_content).decode("utf-8")
         assert result == expected
 
     def test_read_and_encode_cert_file_not_found(self, caplog):
@@ -56,10 +53,12 @@ class TestVaultUtils:
                 read_and_encode_cert_file("/nonexistent/file.pem", CERT_TYPE_CA)
         assert "does not exist" in caplog.text
 
-    def test_read_and_encode_cert_file_permission_denied(self, tmp_path, caplog):
+    def test_read_and_encode_cert_file_permission_denied(
+        self, tmp_path, test_cert_content, caplog
+    ):
         """Test reading certificate file with permission denied."""
         cert_file = tmp_path / "noperm.pem"
-        cert_file.write_bytes(b"test")
+        cert_file.write_bytes(test_cert_content)
 
         with patch.object(Path, "read_bytes") as mock_read:
             mock_read.side_effect = PermissionError("Permission denied")
@@ -68,10 +67,12 @@ class TestVaultUtils:
                     read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_KEY)
             assert "Permission denied" in caplog.text
 
-    def test_read_and_encode_cert_file_os_error(self, tmp_path, caplog):
+    def test_read_and_encode_cert_file_os_error(
+        self, tmp_path, test_cert_content, caplog
+    ):
         """Test reading certificate file with OS error."""
         cert_file = tmp_path / "error.pem"
-        cert_file.write_bytes(b"test")
+        cert_file.write_bytes(test_cert_content)
 
         with patch.object(Path, "read_bytes") as mock_read:
             mock_read.side_effect = OSError("OS error occurred")
@@ -81,10 +82,12 @@ class TestVaultUtils:
             assert "Failed to read" in caplog.text
             assert "OS error occurred" in caplog.text
 
-    def test_read_and_encode_cert_file_unicode_decode_error(self, tmp_path, caplog):
+    def test_read_and_encode_cert_file_unicode_decode_error(
+        self, tmp_path, test_cert_content, caplog
+    ):
         """Test reading certificate file with unicode decode error."""
         cert_file = tmp_path / "unicode.pem"
-        cert_file.write_bytes(b"test")
+        cert_file.write_bytes(test_cert_content)
 
         with patch.object(Path, "read_bytes") as mock_read:
             mock_read.side_effect = UnicodeDecodeError(

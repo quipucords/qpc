@@ -2,7 +2,6 @@
 
 SUBCOMMAND = "vault"
 ADD = "add"
-UPDATE = "update"
 EDIT = "edit"
 SHOW = "show"
 CLEAR = "clear"

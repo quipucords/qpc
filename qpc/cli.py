@@ -65,7 +65,6 @@ from qpc.vault.commands import (
     VaultClearCommand,
     VaultEditCommand,
     VaultShowCommand,
-    VaultUpdateCommand,
 )
 
 
@@ -197,7 +196,6 @@ class CLI:
             vault.SUBCOMMAND,
             [
                 VaultAddCommand,
-                VaultUpdateCommand,
                 VaultEditCommand,
                 VaultShowCommand,
                 VaultClearCommand,

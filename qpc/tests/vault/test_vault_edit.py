@@ -162,9 +162,8 @@ class TestVaultEditCli:
             ca_cert=None,
         )
 
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                self.command.main(args)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            self.command.main(args)
         assert messages.VAULT_EDIT_NO_ARGS in caplog.text
 
     def test_edit_vault_client_cert_without_key(
@@ -183,9 +182,8 @@ class TestVaultEditCli:
             ca_cert=None,
         )
 
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                self.command.main(args)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            self.command.main(args)
         assert messages.VAULT_CLIENT_CERT_KEY_MISMATCH in caplog.text
 
     def test_edit_vault_client_key_without_cert(
@@ -204,9 +202,8 @@ class TestVaultEditCli:
             ca_cert=None,
         )
 
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                self.command.main(args)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            self.command.main(args)
         assert messages.VAULT_CLIENT_CERT_KEY_MISMATCH in caplog.text
 
     def test_edit_vault_ssl_err(self, caplog):
@@ -228,9 +225,8 @@ class TestVaultEditCli:
                 client_key=None,
                 ca_cert=None,
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_edit_vault_conn_err(self, caplog):
@@ -252,9 +248,8 @@ class TestVaultEditCli:
                 client_key=None,
                 ca_cert=None,
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_edit_vault_internal_err(self, caplog):
@@ -272,9 +267,8 @@ class TestVaultEditCli:
                 client_key=None,
                 ca_cert=None,
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_edit_vault_not_found(self, caplog):
@@ -296,9 +290,8 @@ class TestVaultEditCli:
                 client_key=None,
                 ca_cert=None,
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_edit_vault_all_fields(

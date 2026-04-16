@@ -82,9 +82,8 @@ class TestVaultShowCli:
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=200, text="not valid json")
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert messages.VAULT_INVALID_JSON_RESPONSE in caplog.text
 
     def test_show_vault_ssl_err(self, caplog):
@@ -99,9 +98,8 @@ class TestVaultShowCli:
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.SSLError)
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_show_vault_conn_err(self, caplog):
@@ -116,9 +114,8 @@ class TestVaultShowCli:
         with requests_mock.Mocker() as mocker:
             mocker.get(url, exc=requests.exceptions.ConnectTimeout)
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_show_vault_internal_err(self, caplog):
@@ -129,9 +126,8 @@ class TestVaultShowCli:
         with requests_mock.Mocker() as mocker:
             mocker.get(url, status_code=500, json={"error": [error_message]})
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_show_vault_not_found(self, caplog):
@@ -146,9 +142,8 @@ class TestVaultShowCli:
                 json={"detail": error_message},
             )
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_show_vault_unauthorized(self, caplog):
@@ -163,9 +158,8 @@ class TestVaultShowCli:
                 json={"detail": error_message},
             )
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_show_vault_empty_response(self):

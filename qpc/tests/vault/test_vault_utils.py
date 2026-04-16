@@ -48,9 +48,8 @@ class TestVaultUtils:
 
     def test_read_and_encode_cert_file_not_found(self, caplog):
         """Test reading certificate file that doesn't exist."""
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                read_and_encode_cert_file("/nonexistent/file.pem", CERT_TYPE_CA)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            read_and_encode_cert_file("/nonexistent/file.pem", CERT_TYPE_CA)
         assert "does not exist" in caplog.text
 
     def test_read_and_encode_cert_file_permission_denied(
@@ -62,9 +61,8 @@ class TestVaultUtils:
 
         with patch.object(Path, "read_bytes") as mock_read:
             mock_read.side_effect = PermissionError("Permission denied")
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_KEY)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_KEY)
             assert "Permission denied" in caplog.text
 
     def test_read_and_encode_cert_file_os_error(
@@ -76,9 +74,8 @@ class TestVaultUtils:
 
         with patch.object(Path, "read_bytes") as mock_read:
             mock_read.side_effect = OSError("OS error occurred")
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    read_and_encode_cert_file(str(cert_file), CERT_TYPE_CA)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                read_and_encode_cert_file(str(cert_file), CERT_TYPE_CA)
             assert "Failed to read" in caplog.text
             assert "OS error occurred" in caplog.text
 
@@ -93,9 +90,8 @@ class TestVaultUtils:
             mock_read.side_effect = UnicodeDecodeError(
                 "utf-8", b"", 0, 1, "invalid start byte"
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_CERT)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                read_and_encode_cert_file(str(cert_file), CERT_TYPE_CLIENT_CERT)
             assert "Failed to read" in caplog.text
 
     def test_add_vault_arguments_required_certs_true_required_address_true(self):

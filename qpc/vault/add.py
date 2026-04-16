@@ -48,7 +48,6 @@ class VaultAddCommand(CliCommand):
     def _validate_args(self):
         """Validate arguments."""
         CliCommand._validate_args(self)
-        # Convert string "true"/"false" to boolean for validation
         ssl_verify_bool = str_to_bool(self.args.ssl_verify)
         if ssl_verify_bool and not self.args.ca_cert:
             logger.error(_(messages.VAULT_CA_CERT_REQUIRED))
@@ -56,7 +55,6 @@ class VaultAddCommand(CliCommand):
 
     def _build_data(self):
         """Build request payload."""
-        # Read and encode certificate files
         client_cert_encoded = read_and_encode_cert_file(
             self.args.client_cert, CERT_TYPE_CLIENT_CERT
         )
@@ -64,7 +62,6 @@ class VaultAddCommand(CliCommand):
             self.args.client_key, CERT_TYPE_CLIENT_KEY
         )
 
-        # Convert string "true"/"false" to boolean
         ssl_verify_bool = str_to_bool(self.args.ssl_verify)
 
         self.req_payload = {

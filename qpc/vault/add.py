@@ -15,7 +15,6 @@ from qpc.vault.utils import (
     CERT_TYPE_CLIENT_KEY,
     add_vault_arguments,
     read_and_encode_cert_file,
-    str_to_bool,
 )
 
 logger = getLogger(__name__)
@@ -48,7 +47,7 @@ class VaultAddCommand(CliCommand):
     def _validate_args(self):
         """Validate arguments."""
         CliCommand._validate_args(self)
-        ssl_verify_bool = str_to_bool(self.args.ssl_verify)
+        ssl_verify_bool = self.args.ssl_verify == "true"
         if ssl_verify_bool and not self.args.ca_cert:
             logger.error(_(messages.VAULT_CA_CERT_REQUIRED))
             sys.exit(1)
@@ -62,7 +61,7 @@ class VaultAddCommand(CliCommand):
             self.args.client_key, CERT_TYPE_CLIENT_KEY
         )
 
-        ssl_verify_bool = str_to_bool(self.args.ssl_verify)
+        ssl_verify_bool = self.args.ssl_verify == "true"
 
         self.req_payload = {
             "address": self.args.address,

@@ -67,7 +67,7 @@ The ``qpc`` command has several subcommands that encompass the inspection and re
 
 * Configuring HashiCorp Vault integration (optional):
 
-  ``qpc vault set --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem``
+  ``qpc vault add --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem``
 
 
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
@@ -717,12 +717,12 @@ HashiCorp Vault Integration
 
 Use the ``qpc vault`` command to configure HashiCorp Vault integration for secure credential storage. HashiCorp Vault provides an additional layer of security for storing sensitive authentication data. When configured, credentials can also be stored in the HashiCorp Vault instead of the local database.
 
-Setting Vault Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding Vault Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To initially configure HashiCorp Vault integration, use the ``vault set`` subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
+To initially configure HashiCorp Vault integration, use the ``vault add`` subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
 
-**qpc vault set --address=** *address* **[--port=** *port* **]** **--client-cert=** *client_cert_file* **--client-key=** *client_key_file* **[--ca-cert=** *ca_cert_file* **]** **[--ssl-verify=** *(true | false)* **]**
+**qpc vault add --address=** *address* **[--port=** *port* **]** **--client-cert=** *client_cert_file* **--client-key=** *client_key_file* **[--ca-cert=** *ca_cert_file* **]** **[--ssl-verify=** *(true | false)* **]**
 
 ``--address=address``
 
@@ -751,11 +751,11 @@ To initially configure HashiCorp Vault integration, use the ``vault set`` subcom
 Updating Vault Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To completely replace the existing HashiCorp Vault configuration, use the ``vault update`` subcommand. This command requires all the same parameters as ``vault set`` and replaces the entire configuration.
+To completely replace the existing HashiCorp Vault configuration, use the ``vault update`` subcommand. This command requires all the same parameters as ``vault add`` and replaces the entire configuration.
 
 **qpc vault update --address=** *address* **[--port=** *port* **]** **--client-cert=** *client_cert_file* **--client-key=** *client_key_file* **[--ca-cert=** *ca_cert_file* **]** **[--ssl-verify=** *(true | false)* **]**
 
-The options for ``vault update`` are the same as those for ``vault set``.
+The options for ``vault update`` are the same as those for ``vault add``.
 
 Editing Vault Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -979,11 +979,11 @@ Examples
 
 * Setting up HashiCorp Vault integration with a CA certificate
 
-  ``qpc vault set --address vault.example.com --port 8200 --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem --ssl-verify true``
+  ``qpc vault add --address vault.example.com --port 8200 --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ca-cert /path/to/ca.pem --ssl-verify true``
 
 * Setting up HashiCorp Vault integration without SSL verification
 
-  ``qpc vault set --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ssl-verify false``
+  ``qpc vault add --address vault.example.com --client-cert /path/to/client.pem --client-key /path/to/client-key.pem --ssl-verify false``
 
 * Updating the entire HashiCorp Vault configuration
 

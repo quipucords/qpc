@@ -1,4 +1,4 @@
-"""Test the "vault set" command."""
+"""Test the "vault add" command."""
 
 import logging
 from argparse import ArgumentParser, Namespace
@@ -11,28 +11,28 @@ from qpc import messages, vault
 from qpc.request import CONNECTION_ERROR_MSG
 from qpc.tests.utilities import DEFAULT_CONFIG
 from qpc.utils import get_server_location, write_server_config
-from qpc.vault.set import VaultSetCommand
+from qpc.vault.add import VaultAddCommand
 
 
 @pytest.mark.usefixtures("server_config")
-class TestVaultSetCli:
-    """Class for testing the vault set command for qpc."""
+class TestVaultAddCli:
+    """Class for testing the vault add command for qpc."""
 
     @classmethod
     def setup_class(cls):
         """Set up test case."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
-        cls.command = VaultSetCommand(subparser)
+        cls.command = VaultAddCommand(subparser)
 
     def setup_method(self, _test_method):
         """Create test setup."""
         write_server_config(DEFAULT_CONFIG)
 
-    def test_set_vault_success(
+    def test_add_vault_success(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test successfully setting vault configuration."""
+        """Test successfully adding vault configuration."""
         url = get_server_location() + vault.VAULT_URI
 
         # Create test certificate files
@@ -58,10 +58,10 @@ class TestVaultSetCli:
                 self.command.main(args)
                 assert messages.VAULT_CONFIG_SUCCESS in caplog.text
 
-    def test_set_vault_success_with_ok_status(
+    def test_add_vault_success_with_ok_status(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test successfully setting vault configuration with 200 OK status."""
+        """Test successfully adding vault configuration with 200 OK status."""
         url = get_server_location() + vault.VAULT_URI
 
         # Create test certificate files
@@ -87,10 +87,10 @@ class TestVaultSetCli:
                 self.command.main(args)
                 assert messages.VAULT_CONFIG_SUCCESS in caplog.text
 
-    def test_set_vault_without_ca_cert_when_ssl_verify_false(
+    def test_add_vault_without_ca_cert_when_ssl_verify_false(
         self, tmp_path, test_cert_content, caplog
     ):
-        """Test setting vault configuration without CA cert when ssl_verify is false."""
+        """Test adding vault configuration without CA cert when ssl_verify is false."""
         url = get_server_location() + vault.VAULT_URI
 
         # Create test certificate files
@@ -114,10 +114,10 @@ class TestVaultSetCli:
                 self.command.main(args)
                 assert messages.VAULT_CONFIG_SUCCESS in caplog.text
 
-    def test_set_vault_missing_ca_cert_when_ssl_verify_true(
+    def test_add_vault_missing_ca_cert_when_ssl_verify_true(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test setting vault with ssl_verify true but missing CA cert fails."""
+        """Test adding vault with ssl_verify true but missing CA cert fails."""
         # Create test certificate files
         client_cert = tmp_path / "client.pem"
         client_key = tmp_path / "client-key.pem"
@@ -139,10 +139,10 @@ class TestVaultSetCli:
                 self.command.main(args)
         assert messages.VAULT_CA_CERT_REQUIRED in caplog.text
 
-    def test_set_vault_ssl_err(
+    def test_add_vault_ssl_err(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test setting vault configuration with SSL error."""
+        """Test adding vault configuration with SSL error."""
         url = get_server_location() + vault.VAULT_URI
         expected_error = CONNECTION_ERROR_MSG % {
             "host": DEFAULT_CONFIG["host"],
@@ -174,8 +174,8 @@ class TestVaultSetCli:
                     self.command.main(args)
             assert expected_error in caplog.text
 
-    def test_set_vault_conn_err(self, tmp_path, test_cert_content, caplog):
-        """Test setting vault configuration with connection error."""
+    def test_add_vault_conn_err(self, tmp_path, test_cert_content, caplog):
+        """Test adding vault configuration with connection error."""
         url = get_server_location() + vault.VAULT_URI
         expected_error = CONNECTION_ERROR_MSG % {
             "host": DEFAULT_CONFIG["host"],
@@ -207,10 +207,10 @@ class TestVaultSetCli:
                     self.command.main(args)
             assert expected_error in caplog.text
 
-    def test_set_vault_internal_err(
+    def test_add_vault_internal_err(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test setting vault configuration with internal server error."""
+        """Test adding vault configuration with internal server error."""
         url = get_server_location() + vault.VAULT_URI
         error_message = "Server Error"
 
@@ -238,10 +238,10 @@ class TestVaultSetCli:
                     self.command.main(args)
             assert error_message in caplog.text
 
-    def test_set_vault_bad_request(
+    def test_add_vault_bad_request(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test setting vault configuration with bad request error."""
+        """Test adding vault configuration with bad request error."""
         url = get_server_location() + vault.VAULT_URI
         error_message = "Invalid address format"
 
@@ -273,8 +273,8 @@ class TestVaultSetCli:
                     self.command.main(args)
             assert error_message in caplog.text
 
-    def test_set_vault_file_not_found(self, tmp_path, caplog):
-        """Test setting vault configuration with non-existent certificate file."""
+    def test_add_vault_file_not_found(self, tmp_path, caplog):
+        """Test adding vault configuration with non-existent certificate file."""
         args = Namespace(
             address="vault.example.com",
             port=8200,
@@ -289,10 +289,10 @@ class TestVaultSetCli:
                 self.command.main(args)
         assert "does not exist" in caplog.text
 
-    def test_set_vault_custom_port(
+    def test_add_vault_custom_port(
         self, tmp_path, test_cert_content, test_key_content, caplog
     ):
-        """Test setting vault configuration with custom port."""
+        """Test adding vault configuration with custom port."""
         url = get_server_location() + vault.VAULT_URI
 
         # Create test certificate files

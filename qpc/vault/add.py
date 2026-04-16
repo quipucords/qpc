@@ -1,4 +1,4 @@
-"""VaultSetCommand is used to set the HashiCorp Vault server configuration."""
+"""VaultAddCommand is used to add the HashiCorp Vault server configuration."""
 
 import sys
 from logging import getLogger
@@ -21,16 +21,16 @@ from qpc.vault.utils import (
 logger = getLogger(__name__)
 
 
-class VaultSetCommand(CliCommand):
-    """Defines the set command for the HasiCorp Vault server configuration.
+class VaultAddCommand(CliCommand):
+    """Defines the add command for the HashiCorp Vault server configuration.
 
-    This command is for setting HashiCorp Vault server configuration
+    This command is for adding HashiCorp Vault server configuration
     for secure credential storage. This is done by performing an HTTP POST
     to the HashiCorp Vault server Singleton endpoint.
     """
 
     SUBCOMMAND = vault.SUBCOMMAND
-    ACTION = vault.SET
+    ACTION = vault.ADD
 
     def __init__(self, subparsers):
         """Create command."""

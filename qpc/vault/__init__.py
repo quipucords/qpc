@@ -1,7 +1,7 @@
 """Constants for the Vault commands."""
 
 SUBCOMMAND = "vault"
-SET = "set"
+ADD = "add"
 UPDATE = "update"
 EDIT = "edit"
 SHOW = "show"

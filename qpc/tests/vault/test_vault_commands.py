@@ -4,9 +4,9 @@ import pytest
 
 from qpc import vault
 from qpc.vault.commands import (
+    VaultAddCommand,
     VaultClearCommand,
     VaultEditCommand,
-    VaultSetCommand,
     VaultShowCommand,
     VaultUpdateCommand,
 )
@@ -19,17 +19,17 @@ class TestVaultCommandsImports:
     def test_commands_imports(self):
         """Test that all command classes can be imported from vault.commands."""
         # Verify all command classes are importable
+        assert VaultAddCommand is not None
         assert VaultClearCommand is not None
         assert VaultEditCommand is not None
-        assert VaultSetCommand is not None
         assert VaultShowCommand is not None
         assert VaultUpdateCommand is not None
 
     def test_commands_classes_have_correct_attributes(self):
         """Test that imported command classes have expected attributes."""
         # Verify class attributes
-        assert VaultSetCommand.SUBCOMMAND == vault.SUBCOMMAND
-        assert VaultSetCommand.ACTION == vault.SET
+        assert VaultAddCommand.SUBCOMMAND == vault.SUBCOMMAND
+        assert VaultAddCommand.ACTION == vault.ADD
         assert VaultEditCommand.SUBCOMMAND == vault.SUBCOMMAND
         assert VaultEditCommand.ACTION == vault.EDIT
         assert VaultUpdateCommand.SUBCOMMAND == vault.SUBCOMMAND

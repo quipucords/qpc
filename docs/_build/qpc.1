@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "April 13, 2026" "" "qpc"
+.TH "qpc" "1" "April 16, 2026" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -87,7 +87,7 @@ Listing reports:
 .IP \(bu 2
 Configuring HashiCorp Vault integration (optional):
 .sp
-\fBqpc vault set \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem\fP
+\fBqpc vault add \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem\fP
 .UNINDENT
 .sp
 The following sections describe these commands, their subcommands, and their options in more detail. They also describe additional tasks that are not highlighted in the previous list of major workflow tasks.
@@ -896,11 +896,11 @@ Contains the path to the tar.gz containing the Insights report. Mutually exclusi
 .SH HASHICORP VAULT INTEGRATION
 .sp
 Use the \fBqpc vault\fP command to configure HashiCorp Vault integration for secure credential storage. HashiCorp Vault provides an additional layer of security for storing sensitive authentication data. When configured, credentials can also be stored in the HashiCorp Vault instead of the local database.
-.SS Setting Vault Configuration
+.SS Adding Vault Configuration
 .sp
-To initially configure HashiCorp Vault integration, use the \fBvault set\fP subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
+To initially configure HashiCorp Vault integration, use the \fBvault add\fP subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
 .sp
-\fBqpc vault set \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB[\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP \fB[\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
+\fBqpc vault add \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB[\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP \fB[\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
 .sp
 \fB\-\-address=address\fP
 .INDENT 0.0
@@ -945,11 +945,11 @@ Optional. Determines whether to verify SSL certificates. The default is \fBtrue\
 .UNINDENT
 .SS Updating Vault Configuration
 .sp
-To completely replace the existing HashiCorp Vault configuration, use the \fBvault update\fP subcommand. This command requires all the same parameters as \fBvault set\fP and replaces the entire configuration.
+To completely replace the existing HashiCorp Vault configuration, use the \fBvault update\fP subcommand. This command requires all the same parameters as \fBvault add\fP and replaces the entire configuration.
 .sp
 \fBqpc vault update \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB[\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP \fB[\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
 .sp
-The options for \fBvault update\fP are the same as those for \fBvault set\fP\&.
+The options for \fBvault update\fP are the same as those for \fBvault add\fP\&.
 .SS Editing Vault Configuration
 .sp
 To modify specific fields in the existing HashiCorp Vault configuration, use the \fBvault edit\fP subcommand. This command allows you to update one or more configuration parameters without having to specify all parameters.
@@ -1169,11 +1169,11 @@ Publishing to Insights using a previously downloaded report
 .IP \(bu 2
 Setting up HashiCorp Vault integration with a CA certificate
 .sp
-\fBqpc vault set \-\-address vault.example.com \-\-port 8200 \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem \-\-ssl\-verify true\fP
+\fBqpc vault add \-\-address vault.example.com \-\-port 8200 \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem \-\-ssl\-verify true\fP
 .IP \(bu 2
 Setting up HashiCorp Vault integration without SSL verification
 .sp
-\fBqpc vault set \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ssl\-verify false\fP
+\fBqpc vault add \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ssl\-verify false\fP
 .IP \(bu 2
 Updating the entire HashiCorp Vault configuration
 .sp

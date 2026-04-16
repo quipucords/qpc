@@ -134,9 +134,8 @@ class TestVaultAddCli:
             ca_cert=None,
         )
 
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                self.command.main(args)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            self.command.main(args)
         assert messages.VAULT_CA_CERT_REQUIRED in caplog.text
 
     def test_add_vault_ssl_err(
@@ -169,9 +168,8 @@ class TestVaultAddCli:
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_add_vault_conn_err(self, tmp_path, test_cert_content, caplog):
@@ -202,9 +200,8 @@ class TestVaultAddCli:
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_add_vault_internal_err(
@@ -233,9 +230,8 @@ class TestVaultAddCli:
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_add_vault_bad_request(
@@ -268,9 +264,8 @@ class TestVaultAddCli:
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
             )
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_add_vault_file_not_found(self, tmp_path, caplog):
@@ -284,9 +279,8 @@ class TestVaultAddCli:
             ca_cert="/nonexistent/ca.pem",
         )
 
-        with pytest.raises(SystemExit):
-            with caplog.at_level(logging.ERROR):
-                self.command.main(args)
+        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+            self.command.main(args)
         assert "does not exist" in caplog.text
 
     def test_add_vault_custom_port(

@@ -52,9 +52,8 @@ class TestVaultClearCli:
         with requests_mock.Mocker() as mocker:
             mocker.delete(url, exc=requests.exceptions.SSLError)
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_clear_vault_conn_err(self, caplog):
@@ -69,9 +68,8 @@ class TestVaultClearCli:
         with requests_mock.Mocker() as mocker:
             mocker.delete(url, exc=requests.exceptions.ConnectTimeout)
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert expected_error in caplog.text
 
     def test_clear_vault_internal_err(self, caplog):
@@ -82,9 +80,8 @@ class TestVaultClearCli:
         with requests_mock.Mocker() as mocker:
             mocker.delete(url, status_code=500, json={"error": [error_message]})
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_clear_vault_not_found(self, caplog):
@@ -99,9 +96,8 @@ class TestVaultClearCli:
                 json={"detail": error_message},
             )
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_clear_vault_unauthorized(self, caplog):
@@ -116,9 +112,8 @@ class TestVaultClearCli:
                 json={"detail": error_message},
             )
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text
 
     def test_clear_vault_forbidden(self, caplog):
@@ -133,7 +128,6 @@ class TestVaultClearCli:
                 json={"detail": error_message},
             )
             args = Namespace()
-            with pytest.raises(SystemExit):
-                with caplog.at_level(logging.ERROR):
-                    self.command.main(args)
+            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
+                self.command.main(args)
             assert error_message in caplog.text

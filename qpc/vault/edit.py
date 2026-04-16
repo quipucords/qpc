@@ -15,7 +15,6 @@ from qpc.vault.utils import (
     CERT_TYPE_CLIENT_KEY,
     add_vault_arguments,
     read_and_encode_cert_file,
-    str_to_bool,
 )
 
 logger = getLogger(__name__)
@@ -77,7 +76,7 @@ class VaultEditCommand(CliCommand):
             self.req_payload["port"] = self.args.port
         if self.args.ssl_verify is not None:
             # Convert string "true"/"false" to boolean
-            self.req_payload["ssl_verify"] = str_to_bool(self.args.ssl_verify)
+            self.req_payload["ssl_verify"] = self.args.ssl_verify == "true"
 
         # Handle certificate files
         if self.args.client_cert and self.args.client_key:

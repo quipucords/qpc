@@ -43,15 +43,6 @@ def read_and_encode_cert_file(file_path, file_type):
         sys.exit(1)
 
 
-def str_to_bool(value):
-    """Convert string 'true'/'false' to boolean.
-
-    :param value: string value ('true' or 'false')
-    :returns: boolean
-    """
-    return value == "true"
-
-
 def add_vault_arguments(parser, required_certs=True, required_address=True):
     """Add common vault arguments to argument parser.
 

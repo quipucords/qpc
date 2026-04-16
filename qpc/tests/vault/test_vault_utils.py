@@ -14,28 +14,12 @@ from qpc.vault.utils import (
     CERT_TYPE_CLIENT_KEY,
     add_vault_arguments,
     read_and_encode_cert_file,
-    str_to_bool,
 )
 
 
 @pytest.mark.usefixtures("server_config")
 class TestVaultUtils:
     """Class for testing vault utility functions."""
-
-    def test_str_to_bool_true(self):
-        """Test str_to_bool with 'true' string."""
-        assert str_to_bool("true") is True
-
-    def test_str_to_bool_false(self):
-        """Test str_to_bool with 'false' string."""
-        assert str_to_bool("false") is False
-
-    def test_str_to_bool_other(self):
-        """Test str_to_bool with other string values."""
-        assert str_to_bool("True") is False
-        assert str_to_bool("False") is False
-        assert str_to_bool("yes") is False
-        assert str_to_bool("") is False
 
     def test_read_and_encode_cert_file_success(self, tmp_path, test_cert_content):
         """Test successful reading and encoding of certificate file."""

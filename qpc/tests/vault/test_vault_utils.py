@@ -37,7 +37,7 @@ class TestVaultUtils:
         assert str_to_bool("yes") is False
         assert str_to_bool("") is False
 
-    def test_read_and_encode_cert_file_success(self, test_cert_content, tmp_path):
+    def test_read_and_encode_cert_file_success(self, tmp_path, test_cert_content):
         """Test successful reading and encoding of certificate file."""
         cert_file = tmp_path / "test.pem"
         cert_file.write_bytes(test_cert_content)

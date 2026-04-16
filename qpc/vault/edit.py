@@ -26,7 +26,7 @@ class VaultEditCommand(CliCommand):
 
     This command is for editing the existing HashiCorp Vault configuration for
     secure credential storage. This is done via an HTTP PATCH request
-    to the HachiCorp Vault Singleton allowing us to edit one or more
+    to the HashiCorp Vault Singleton allowing us to edit one or more
     Vault server settings.
     """
 

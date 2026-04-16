@@ -943,13 +943,6 @@ Optional, but required when \fB\-\-ssl\-verify\fP is \fBtrue\fP\&. Sets the path
 Optional. Determines whether to verify SSL certificates. The default is \fBtrue\fP\&.
 .UNINDENT
 .UNINDENT
-.SS Updating Vault Configuration
-.sp
-To completely replace the existing HashiCorp Vault configuration, use the \fBvault update\fP subcommand. This command requires all the same parameters as \fBvault add\fP and replaces the entire configuration.
-.sp
-\fBQPC_VAR_PROGRAM_NAME vault update \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB[\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP \fB[\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
-.sp
-The options for \fBvault update\fP are the same as those for \fBvault add\fP\&.
 .SS Editing Vault Configuration
 .sp
 To modify specific fields in the existing HashiCorp Vault configuration, use the \fBvault edit\fP subcommand. This command allows you to update one or more configuration parameters without having to specify all parameters.
@@ -1174,10 +1167,6 @@ Setting up HashiCorp Vault integration with a CA certificate
 Setting up HashiCorp Vault integration without SSL verification
 .sp
 \fBQPC_VAR_PROGRAM_NAME vault add \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ssl\-verify false\fP
-.IP \(bu 2
-Updating the entire HashiCorp Vault configuration
-.sp
-\fBQPC_VAR_PROGRAM_NAME vault update \-\-address vault\-new.example.com \-\-port 8200 \-\-client\-cert /path/to/new\-client.pem \-\-client\-key /path/to/new\-client\-key.pem \-\-ca\-cert /path/to/ca.pem\fP
 .IP \(bu 2
 Editing only the HashiCorp Vault server address
 .sp

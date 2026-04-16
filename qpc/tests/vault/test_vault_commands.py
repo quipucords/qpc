@@ -8,7 +8,6 @@ from qpc.vault.commands import (
     VaultClearCommand,
     VaultEditCommand,
     VaultShowCommand,
-    VaultUpdateCommand,
 )
 
 
@@ -23,7 +22,6 @@ class TestVaultCommandsImports:
         assert VaultClearCommand is not None
         assert VaultEditCommand is not None
         assert VaultShowCommand is not None
-        assert VaultUpdateCommand is not None
 
     def test_commands_classes_have_correct_attributes(self):
         """Test that imported command classes have expected attributes."""
@@ -32,8 +30,6 @@ class TestVaultCommandsImports:
         assert VaultAddCommand.ACTION == vault.ADD
         assert VaultEditCommand.SUBCOMMAND == vault.SUBCOMMAND
         assert VaultEditCommand.ACTION == vault.EDIT
-        assert VaultUpdateCommand.SUBCOMMAND == vault.SUBCOMMAND
-        assert VaultUpdateCommand.ACTION == vault.UPDATE
         assert VaultShowCommand.SUBCOMMAND == vault.SUBCOMMAND
         assert VaultShowCommand.ACTION == vault.SHOW
         assert VaultClearCommand.SUBCOMMAND == vault.SUBCOMMAND

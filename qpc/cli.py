@@ -61,9 +61,9 @@ from qpc.utils import (
     setup_logging,
 )
 from qpc.vault.commands import (
+    VaultAddCommand,
     VaultClearCommand,
     VaultEditCommand,
-    VaultSetCommand,
     VaultShowCommand,
     VaultUpdateCommand,
 )
@@ -196,7 +196,7 @@ class CLI:
         self._add_subcommand(
             vault.SUBCOMMAND,
             [
-                VaultSetCommand,
+                VaultAddCommand,
                 VaultUpdateCommand,
                 VaultEditCommand,
                 VaultShowCommand,

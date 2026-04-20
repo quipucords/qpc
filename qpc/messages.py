@@ -382,6 +382,7 @@ UNKNOWN_FILE_EXTENSION = "ERROR: unknown file extension"
 # Vault messages
 VAULT_ADDRESS_HELP = "HashiCorp Vault server address."
 VAULT_PORT_HELP = "HashiCorp Vault server port (default: 8200)."
+VAULT_PORT_HELP_NO_DEFAULT = "HashiCorp Vault server port."
 VAULT_SSL_VERIFY_HELP = (
     "Enable/disable SSL certificate verification for Vault connection."
     " Valid values: true, false. (default: true)"
@@ -396,7 +397,7 @@ VAULT_CONFIG_SUCCESS = "HashiCorp Vault configuration was successfully configure
 VAULT_UPDATED = "HashiCorp Vault configuration was updated."
 VAULT_CLEARED = "HashiCorp Vault configuration was cleared."
 VAULT_EDIT_NO_ARGS = (
-    "No arguments were provided to edit the HashiCorp vault configuration."
+    "No arguments were provided to edit the HashiCorp Vault configuration."
 )
 VAULT_CA_CERT_REQUIRED = (
     "The --ca-cert option is required when ssl-verify is true (default behavior)."

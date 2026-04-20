@@ -45,6 +45,13 @@ class VaultEditCommand(CliCommand):
         )
 
         add_vault_arguments(self.parser, required_certs=False, required_address=False)
+        # Override port default to None. For edit, only send if explicitly provided.
+        # Also update help text to not show default value
+        for action in self.parser._actions:
+            if action.dest == "port":
+                action.default = None
+                action.help = _(messages.VAULT_PORT_HELP_NO_DEFAULT)
+                break
 
     def _validate_args(self):
         CliCommand._validate_args(self)

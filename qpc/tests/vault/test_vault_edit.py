@@ -47,6 +47,29 @@ class TestVaultEditCli:
                 self.command.main(args)
                 assert messages.VAULT_UPDATED in caplog.text
 
+    def test_edit_vault_address_only_port_not_sent(self, caplog):
+        """Test that port is not included in PATCH when only address is provided."""
+        url = get_server_location() + vault.VAULT_URI
+        new_address = "new-vault.example.com"
+
+        with requests_mock.Mocker() as mocker:
+            mock_patch = mocker.patch(url, status_code=200)
+            args = Namespace(
+                address=new_address,
+                port=None,
+                ssl_verify=None,
+                client_cert=None,
+                client_key=None,
+                ca_cert=None,
+            )
+            with caplog.at_level(logging.INFO):
+                self.command.main(args)
+                assert messages.VAULT_UPDATED in caplog.text
+
+                # Verify the request payload only contains address
+                request_json = mock_patch.last_request.json()
+                assert request_json == {"address": new_address}
+
     def test_edit_vault_port_only(self, caplog):
         """Test editing vault configuration with port only."""
         url = get_server_location() + vault.VAULT_URI

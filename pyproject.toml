@@ -3,7 +3,7 @@ name = "qpc"
 version = "2.5.0"
 description = "The command-line client for quipucords servers"
 authors = [{ name = "QPC Team", email = "quipucords@redhat.com" }]
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 (GPLv3)"]
 dependencies = [

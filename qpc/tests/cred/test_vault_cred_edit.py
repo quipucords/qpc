@@ -84,6 +84,12 @@ class TestVaultEditCredential:
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_UPDATED % "ansible_cred"
 
+        # Validate outgoing request payload
+        payload = requests_mock.last_request.json()
+        assert payload["vault_secret_path"] == "secret/data/my-creds"
+        # Mount point should not be present when not provided
+        assert "vault_mount_point" not in payload
+
     @patch("sys.stdin.isatty")
     def test_edit_vault_with_mount_point(
         self,
@@ -121,6 +127,11 @@ class TestVaultEditCredential:
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_UPDATED % "openshift_cred"
+
+        # Validate outgoing request payload includes mount point when provided
+        payload = requests_mock.last_request.json()
+        assert payload["vault_secret_path"] == "secret/data/my-creds"
+        assert payload["vault_mount_point"] == "custom-mount"
 
     def test_edit_vault_invalid_type(
         self,

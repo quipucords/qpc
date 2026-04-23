@@ -143,7 +143,8 @@ Creating and Editing Credentials
 
 To create a credential, supply the type of credential and supply SSH credentials as either a username-password pair, a username-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 
-**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)*) **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred add --name=** *name* **--type=** *(network | vcenter | satellite | openshift | rhacs | ansible)* { **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)* | **--token**) | **--vault-secret-path=** *path* [**--vault-mount-point=** *mount_point*] } **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]**
+
 
 ``--name=name``
 
@@ -183,11 +184,19 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--token``
 
-  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile`` and ``--password`` options.
+  Prompts for the access token for authentication. Mutually exclusive with the ``--sshkeyfile``, ``--password``, and ``--vault-secret-path`` options.
+
+``--vault-secret-path=path``
+
+  Sets the HashiCorp Vault secret path for credential storage. Only valid for ``openshift`` and ``ansible`` credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Cannot be used with ``--username``, ``--password``, or ``--token`` options. Mutually exclusive with the ``--sshkeyfile``, ``--password``, and ``--token`` options.
+
+``--vault-mount-point=mount_point``
+
+  Sets the HashiCorp Vault mount point. Only valid when ``--vault-secret-path`` is also specified. This is optional and allows you to specify a custom secret engine mount point if your Vault configuration uses non-default mount points. If not specified, the default mount point used for a Key/Value (KV) secrets engine is **secret**.
 
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the ``qpc cred edit`` command to change credential information. The parameters for ``qpc cred edit`` are the same as those for ``qpc cred add``.
 
-**qpc cred edit --name=** *name* **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)*) **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--token]**
+**qpc cred edit --name=** *name* **--username=** *username* (**--password** | **--sshkeyfile** *(ssh_keyfile | -)* **| --token | --vault-secret-path** *path*) **[--sshpassphrase]** **--become-method=** *(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )* **--become-user=** *user* **[--become-password]** **[--vault-mount-point** *mount_point* **]**
 
 Listing and Showing Credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -811,6 +820,10 @@ Examples
 * Creating a new openshift type credential with a password
 
   ``qpc cred add --name ocp_cred2 --type openshift --username ocp_user --password``
+
+* Creating a new openshift type credential using a HashiCorp Vault secret
+
+  ``qpc cred add --name ocp_cred3 --type openshift --vault-secret-path ocp3_secret``
 
 * Creating a new vcenter type credential
 

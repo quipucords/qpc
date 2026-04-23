@@ -91,7 +91,11 @@ class TestOpenShiftAddCredential:
             CLI().main()
         out, err = capsys.readouterr()
         assert out == ""
-        assert "one of the arguments --password --sshkeyfile --token is required" in err
+        expected_error = (
+            "one of the arguments --password --sshkeyfile "
+            "--token --vault-secret-path is required"
+        )
+        assert expected_error in err
 
     def test_add_no_name(
         self,

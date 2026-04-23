@@ -63,6 +63,20 @@ class CredEditCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_TOKEN_HELP),
         )
+        self.parser.add_argument(
+            "--vault-secret-path",
+            dest="vault_secret_path",
+            metavar="VAULT_SECRET_PATH",
+            help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
+            "--vault-mount-point",
+            dest="vault_mount_point",
+            metavar="VAULT_MOUNT_POINT",
+            help=_(messages.CRED_VAULT_MOUNT_POINT_HELP),
+            required=False,
+        )
         group.add_argument(
             "--sshkeyfile",
             dest="ssh_keyfile",
@@ -99,6 +113,10 @@ class CredEditCommand(CliCommand):
     def _validate_args(self):
         CliCommand._validate_args(self)
 
+        # Get vault options (use getattr for legacy test compatibility)
+        vault_secret_path = getattr(self.args, "vault_secret_path", None)
+        vault_mount_point = getattr(self.args, "vault_mount_point", None)
+
         if not (
             self.args.username
             or self.args.password
@@ -108,6 +126,8 @@ class CredEditCommand(CliCommand):
             or self.args.become_user
             or self.args.become_password
             or self.args.token
+            or vault_secret_path
+            or vault_mount_point
         ):
             logger.error(_(messages.CRED_EDIT_NO_ARGS), self.args.name)
             self.parser.print_help()
@@ -133,6 +153,22 @@ class CredEditCommand(CliCommand):
                 sys.exit(1)
         else:
             logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)
+            sys.exit(1)
+
+        # Validate vault options are only used with openshift or ansible types
+        if vault_secret_path:
+            if self.cred_type not in ["openshift", "ansible"]:
+                logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
+                sys.exit(1)
+
+            # vault_secret_path cannot be used with username/password or token
+            if self.args.username or self.args.password or self.args.token:
+                logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
+                sys.exit(1)
+
+        # vault_mount_point can only be specified if vault_secret_path is specified
+        if vault_mount_point and not vault_secret_path:
+            logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))
             sys.exit(1)
 
     def _build_data(self):

@@ -127,6 +127,10 @@ def build_credential_payload(args, cred_type, add_none=True):
         req_payload["become_method"] = args.become_method
     if "become_user" in args and args.become_user:
         req_payload["become_user"] = args.become_user
+    if "vault_secret_path" in args and args.vault_secret_path:
+        req_payload["vault_secret_path"] = args.vault_secret_path
+    if "vault_mount_point" in args and args.vault_mount_point:
+        req_payload["vault_mount_point"] = args.vault_mount_point
 
     req_payload = get_password(args, req_payload, add_none)
     return req_payload

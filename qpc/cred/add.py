@@ -1,5 +1,6 @@
 """CredAddCommand is used to add authentication credentials."""
 
+import sys
 from logging import getLogger
 
 from requests import codes
@@ -79,6 +80,19 @@ class CredAddCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_TOKEN_HELP),
         )
+        group.add_argument(
+            "--vault-secret-path",
+            dest="vault_secret_path",
+            metavar="VAULT_SECRET_PATH",
+            help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
+        )
+        self.parser.add_argument(
+            "--vault-mount-point",
+            dest="vault_mount_point",
+            metavar="VAULT_MOUNT_POINT",
+            help=_(messages.CRED_VAULT_MOUNT_POINT_HELP),
+            required=False,
+        )
         self.parser.add_argument(
             "--sshpassphrase",
             dest="ssh_passphrase",
@@ -104,6 +118,30 @@ class CredAddCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_BECOME_PASSWORD_HELP),
         )
+
+    def _validate_args(self):
+        """Validate command arguments."""
+        CliCommand._validate_args(self)
+
+        # Get vault options (use getattr for legacy test compatibility)
+        vault_secret_path = getattr(self.args, "vault_secret_path", None)
+        vault_mount_point = getattr(self.args, "vault_mount_point", None)
+
+        # Validate vault options are only used with openshift or ansible types
+        if vault_secret_path:
+            if self.args.type not in ["openshift", "ansible"]:
+                logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
+                sys.exit(1)
+
+            # vault_secret_path cannot be used with username
+            if self.args.username:
+                logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
+                sys.exit(1)
+
+        # vault_mount_point can only be specified if vault_secret_path is specified
+        if vault_mount_point and not vault_secret_path:
+            logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))
+            sys.exit(1)
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

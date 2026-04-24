@@ -158,3 +158,39 @@ def get_multiline_pass(prompt="Password: "):
         sys.stderr.flush()
     sys.stderr.write("\n")
     return "".join(multiline_password)
+
+
+def validate_vault_args(args, cred_type=None):
+    """Validate vault-related credential arguments.
+
+    :param args: The command line arguments
+    :param cred_type: The credential type (for edit command, None for add)
+    :returns: None
+    :raises SystemExit: If validation fails
+    """
+    # Get vault options (use getattr for legacy test compatibility)
+    vault_secret_path = getattr(args, "vault_secret_path", None)
+    vault_mount_point = getattr(args, "vault_mount_point", None)
+
+    if vault_secret_path:
+        # Determine credential type from args or parameter
+        check_type = cred_type if cred_type else getattr(args, "type", None)
+
+        # Vault options are only valid for openshift and ansible types
+        if check_type not in ["openshift", "ansible"]:
+            logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
+            sys.exit(1)
+
+        # vault_secret_path cannot be used with username/password/token
+        if (
+            getattr(args, "username", None)
+            or getattr(args, "password", None)
+            or getattr(args, "token", None)
+        ):
+            logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
+            sys.exit(1)
+
+    # vault_mount_point can only be specified if vault_secret_path is specified
+    if vault_mount_point and not vault_secret_path:
+        logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))
+        sys.exit(1)

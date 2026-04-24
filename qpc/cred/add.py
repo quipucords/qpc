@@ -1,6 +1,5 @@
 """CredAddCommand is used to add authentication credentials."""
 
-import sys
 from logging import getLogger
 
 from requests import codes
@@ -8,7 +7,7 @@ from requests import codes
 import qpc.cred as credential
 from qpc import messages
 from qpc.clicommand import CliCommand
-from qpc.cred.utils import build_credential_payload
+from qpc.cred.utils import build_credential_payload, validate_vault_args
 from qpc.request import POST
 from qpc.source import SOURCE_TYPE_CHOICES
 from qpc.translation import _
@@ -123,25 +122,8 @@ class CredAddCommand(CliCommand):
         """Validate command arguments."""
         CliCommand._validate_args(self)
 
-        # Get vault options (use getattr for legacy test compatibility)
-        vault_secret_path = getattr(self.args, "vault_secret_path", None)
-        vault_mount_point = getattr(self.args, "vault_mount_point", None)
-
-        # Validate vault options are only used with openshift or ansible types
-        if vault_secret_path:
-            if self.args.type not in ["openshift", "ansible"]:
-                logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
-                sys.exit(1)
-
-            # vault_secret_path cannot be used with username
-            if self.args.username:
-                logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
-                sys.exit(1)
-
-        # vault_mount_point can only be specified if vault_secret_path is specified
-        if vault_mount_point and not vault_secret_path:
-            logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))
-            sys.exit(1)
+        # Validate vault options
+        validate_vault_args(self.args)
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

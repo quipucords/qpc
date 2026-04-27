@@ -160,7 +160,7 @@ When a scan runs, it uses a source that contains information such as the host na
 .sp
 To create a credential, supply the type of credential and supply SSH credentials as either a username\-password pair, a username\-key pair, or an access token. The QPC_VAR_PROJECT tool stores each set of credentials in a separate credential entry.
 .sp
-\fBQPC_VAR_PROGRAM_NAME cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBQPC_VAR_PROGRAM_NAME cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP { \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP | \fB\-\-token\fP) | \fB\-\-vault\-secret\-path=\fP \fIpath\fP [\fB\-\-vault\-mount\-point=\fP \fImount_point\fP] } \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -228,13 +228,27 @@ Prompts for the privilege escalation password to be used when running a network 
 \fB\-\-token\fP
 .INDENT 0.0
 .INDENT 3.5
-Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkeyfile\fP and \fB\-\-password\fP options.
+Prompts for the access token for authentication. Mutually exclusive with the \fB\-\-sshkeyfile\fP, \fB\-\-password\fP, and \fB\-\-vault\-secret\-path\fP options.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-\-vault\-secret\-path=path\fP
+.INDENT 0.0
+.INDENT 3.5
+Sets the HashiCorp Vault secret path for credential storage. Only valid for \fBopenshift\fP and \fBansible\fP credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Mutually exclusive with the \fB\-\-username\fP, \fB\-\-password\fP, \fB\-\-sshkeyfile\fP, and \fB\-\-token\fP options.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-\-vault\-mount\-point=mount_point\fP
+.INDENT 0.0
+.INDENT 3.5
+Sets the HashiCorp Vault mount point. Only valid when \fB\-\-vault\-secret\-path\fP is also specified. This is optional and allows you to specify a custom secret engine mount point if your Vault configuration uses non\-default mount points. If not specified, the default mount point used for a Key/Value (KV) secrets engine is \fBsecret\fP\&.
 .UNINDENT
 .UNINDENT
 .sp
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the \fBQPC_VAR_PROGRAM_NAME cred edit\fP command to change credential information. The parameters for \fBQPC_VAR_PROGRAM_NAME cred edit\fP are the same as those for \fBQPC_VAR_PROGRAM_NAME cred add\fP\&.
 .sp
-\fBQPC_VAR_PROGRAM_NAME cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-token]\fP
+\fBQPC_VAR_PROGRAM_NAME cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP \fB| \-\-token | \-\-vault\-secret\-path\fP \fIpath\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-vault\-mount\-point\fP \fImount_point\fP \fB]\fP
 .SS Listing and Showing Credentials
 .sp
 The \fBQPC_VAR_PROGRAM_NAME cred list\fP command returns the details for every credential that is configured for QPC_VAR_PROJECT. This output includes the name and username for each entry. Secret values such as passwords and tokens are never displated in the output.
@@ -1003,6 +1017,10 @@ Creating a new openshift type credential with a token
 Creating a new openshift type credential with a password
 .sp
 \fBQPC_VAR_PROGRAM_NAME cred add \-\-name ocp_cred2 \-\-type openshift \-\-username ocp_user \-\-password\fP
+.IP \(bu 2
+Creating a new openshift type credential using a HashiCorp Vault secret
+.sp
+\fBQPC_VAR_PROGRAM_NAME cred add \-\-name ocp_cred3 \-\-type openshift \-\-vault\-secret\-path ocp3_secret\fP
 .IP \(bu 2
 Creating a new vcenter type credential
 .sp

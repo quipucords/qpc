@@ -8,7 +8,7 @@ from requests import codes
 import qpc.cred as credential
 from qpc import messages
 from qpc.clicommand import CliCommand
-from qpc.cred.utils import build_credential_payload
+from qpc.cred.utils import build_credential_payload, validate_vault_args
 from qpc.request import GET, PATCH, request
 from qpc.translation import _
 
@@ -64,6 +64,19 @@ class CredEditCommand(CliCommand):
             help=_(messages.CRED_TOKEN_HELP),
         )
         group.add_argument(
+            "--vault-secret-path",
+            dest="vault_secret_path",
+            metavar="VAULT_SECRET_PATH",
+            help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
+        )
+        self.parser.add_argument(
+            "--vault-mount-point",
+            dest="vault_mount_point",
+            metavar="VAULT_MOUNT_POINT",
+            help=_(messages.CRED_VAULT_MOUNT_POINT_HELP),
+            required=False,
+        )
+        group.add_argument(
             "--sshkeyfile",
             dest="ssh_keyfile",
             metavar="SSH_KEYFILE",
@@ -99,6 +112,10 @@ class CredEditCommand(CliCommand):
     def _validate_args(self):
         CliCommand._validate_args(self)
 
+        # Get vault options (use getattr for legacy test compatibility)
+        vault_secret_path = getattr(self.args, "vault_secret_path", None)
+        vault_mount_point = getattr(self.args, "vault_mount_point", None)
+
         if not (
             self.args.username
             or self.args.password
@@ -108,6 +125,8 @@ class CredEditCommand(CliCommand):
             or self.args.become_user
             or self.args.become_password
             or self.args.token
+            or vault_secret_path
+            or vault_mount_point
         ):
             logger.error(_(messages.CRED_EDIT_NO_ARGS), self.args.name)
             self.parser.print_help()
@@ -134,6 +153,9 @@ class CredEditCommand(CliCommand):
         else:
             logger.error(_(messages.CRED_DOES_NOT_EXIST), self.args.name)
             sys.exit(1)
+
+        # Validate vault options
+        validate_vault_args(self.args, self.cred_type)
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

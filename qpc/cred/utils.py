@@ -127,6 +127,10 @@ def build_credential_payload(args, cred_type, add_none=True):
         req_payload["become_method"] = args.become_method
     if "become_user" in args and args.become_user:
         req_payload["become_user"] = args.become_user
+    if "vault_secret_path" in args and args.vault_secret_path:
+        req_payload["vault_secret_path"] = args.vault_secret_path
+    if "vault_mount_point" in args and args.vault_mount_point:
+        req_payload["vault_mount_point"] = args.vault_mount_point
 
     req_payload = get_password(args, req_payload, add_none)
     return req_payload
@@ -154,3 +158,40 @@ def get_multiline_pass(prompt="Password: "):
         sys.stderr.flush()
     sys.stderr.write("\n")
     return "".join(multiline_password)
+
+
+def validate_vault_args(args, cred_type=None):
+    """Validate vault-related credential arguments.
+
+    :param args: The command line arguments
+    :param cred_type: The credential type (for edit command, None for add)
+    :returns: None
+    :raises SystemExit: If validation fails
+    """
+    # Get vault options (use getattr for legacy test compatibility)
+    vault_secret_path = getattr(args, "vault_secret_path", None)
+    vault_mount_point = getattr(args, "vault_mount_point", None)
+
+    if vault_secret_path:
+        # Determine credential type from args or parameter
+        check_type = cred_type if cred_type else getattr(args, "type", None)
+
+        # Vault options are only valid for openshift and ansible types
+        if check_type not in ["openshift", "ansible"]:
+            logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
+            sys.exit(1)
+
+        # vault_secret_path cannot be used with username/password/sshkeyfile/token
+        if (
+            getattr(args, "username", None)
+            or getattr(args, "password", None)
+            or getattr(args, "ssh_keyfile", None)
+            or getattr(args, "token", None)
+        ):
+            logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
+            sys.exit(1)
+
+    # vault_mount_point can only be specified if vault_secret_path is specified
+    if vault_mount_point and not vault_secret_path:
+        logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))
+        sys.exit(1)

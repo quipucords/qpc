@@ -58,6 +58,27 @@ CRED_BECOME_PASSWORD_HELP = (
     "The privilege escalation password to be used when running a network scan."
 )
 CRED_TOKEN_HELP = "Authentication token."
+CRED_VAULT_SECRET_PATH_HELP = (
+    "HashiCorp Vault secret path for credential storage. "
+    "Only valid for openshift and ansible credential types. "
+    "Cannot be used with --username, --password, --sshkeyfile, or --token."
+)
+CRED_VAULT_MOUNT_POINT_HELP = (
+    "Optional HashiCorp Vault mount point. "
+    "Only valid when --vault-secret-path is specified."
+)
+CRED_VAULT_INVALID_TYPE = (
+    "The --vault-secret-path option is only valid for "
+    "openshift and ansible credential types."
+)
+CRED_VAULT_EXCLUSIVE_WITH_CREDS = (
+    "The --vault-secret-path option cannot be used with "
+    "--username, --password, --sshkeyfile, or --token."
+)
+CRED_VAULT_MOUNT_REQUIRES_PATH = (
+    "The --vault-mount-point option can only be specified "
+    "when --vault-secret-path is also specified."
+)
 
 SOURCE_NAME_HELP = "Source name."
 SOURCES_NAME_HELP = "List of source names."

@@ -7,7 +7,7 @@ from requests import codes
 import qpc.cred as credential
 from qpc import messages
 from qpc.clicommand import CliCommand
-from qpc.cred.utils import build_credential_payload
+from qpc.cred.utils import build_credential_payload, validate_vault_args
 from qpc.request import POST
 from qpc.source import SOURCE_TYPE_CHOICES
 from qpc.translation import _
@@ -79,6 +79,19 @@ class CredAddCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_TOKEN_HELP),
         )
+        group.add_argument(
+            "--vault-secret-path",
+            dest="vault_secret_path",
+            metavar="VAULT_SECRET_PATH",
+            help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
+        )
+        self.parser.add_argument(
+            "--vault-mount-point",
+            dest="vault_mount_point",
+            metavar="VAULT_MOUNT_POINT",
+            help=_(messages.CRED_VAULT_MOUNT_POINT_HELP),
+            required=False,
+        )
         self.parser.add_argument(
             "--sshpassphrase",
             dest="ssh_passphrase",
@@ -104,6 +117,13 @@ class CredAddCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_BECOME_PASSWORD_HELP),
         )
+
+    def _validate_args(self):
+        """Validate command arguments."""
+        CliCommand._validate_args(self)
+
+        # Validate vault options
+        validate_vault_args(self.args)
 
     def _build_data(self):
         """Construct the dictionary credential given our arguments.

@@ -63,12 +63,11 @@ class CredEditCommand(CliCommand):
             action="store_true",
             help=_(messages.CRED_TOKEN_HELP),
         )
-        self.parser.add_argument(
+        group.add_argument(
             "--vault-secret-path",
             dest="vault_secret_path",
             metavar="VAULT_SECRET_PATH",
             help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
-            required=False,
         )
         self.parser.add_argument(
             "--vault-mount-point",

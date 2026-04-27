@@ -186,6 +186,32 @@ class TestVaultAddCredential:
         assert messages.CRED_VAULT_MOUNT_REQUIRES_PATH in err
 
     @patch("sys.stdin.isatty")
+    def test_add_vault_with_sshkeyfile_mutually_exclusive(
+        self,
+        mock_isatty,
+        capsys,
+    ):
+        """Test that vault secret path and sshkeyfile are mutually exclusive."""
+        mock_isatty.return_value = True
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_vault_credential",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+            "--sshkeyfile",
+            "/path/to/key",
+            "--vault-secret-path",
+            "secret/data/my-creds",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert "not allowed with argument" in err
+
+    @patch("sys.stdin.isatty")
     def test_add_vault_with_token_mutually_exclusive(
         self,
         mock_isatty,

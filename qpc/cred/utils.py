@@ -181,10 +181,11 @@ def validate_vault_args(args, cred_type=None):
             logger.error(_(messages.CRED_VAULT_INVALID_TYPE))
             sys.exit(1)
 
-        # vault_secret_path cannot be used with username/password/token
+        # vault_secret_path cannot be used with username/password/sshkeyfile/token
         if (
             getattr(args, "username", None)
             or getattr(args, "password", None)
+            or getattr(args, "ssh_keyfile", None)
             or getattr(args, "token", None)
         ):
             logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))

@@ -188,7 +188,7 @@ To create a credential, supply the type of credential and supply SSH credentials
 
 ``--vault-secret-path=path``
 
-  Sets the HashiCorp Vault secret path for credential storage. Only valid for ``openshift`` and ``ansible`` credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Mutually exclusive with the ``--username``, ``--password``, and ``--token`` options.
+  Sets the HashiCorp Vault secret path for credential storage. Only valid for ``openshift`` and ``ansible`` credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Mutually exclusive with the ``--username``, ``--password``, ``--sshkeyfile``, and ``--token`` options.
 
 ``--vault-mount-point=mount_point``
 

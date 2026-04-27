@@ -197,6 +197,39 @@ class TestVaultEditCredential:
         out, err = capsys.readouterr()
         assert messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS in err
 
+    def test_edit_vault_with_sshkeyfile_mutually_exclusive(
+        self,
+        capsys,
+        requests_mock,
+    ):
+        """Test that vault secret path and sshkeyfile are mutually exclusive."""
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.get(
+            url,
+            status_code=200,
+            json={
+                "count": 1,
+                "results": [
+                    {"id": 1, "name": "openshift_cred", "cred_type": "openshift"}
+                ],
+            },
+        )
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "edit",
+            "--name",
+            "openshift_cred",
+            "--sshkeyfile",
+            "/path/to/key",
+            "--vault-secret-path",
+            "secret/data/my-creds",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert "not allowed with argument" in err
+
     def test_edit_vault_mount_without_path(
         self,
         capsys,

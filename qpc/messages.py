@@ -61,7 +61,7 @@ CRED_TOKEN_HELP = "Authentication token."
 CRED_VAULT_SECRET_PATH_HELP = (
     "HashiCorp Vault secret path for credential storage. "
     "Only valid for openshift and ansible credential types. "
-    "Cannot be used with --username/--password or --token."
+    "Cannot be used with --username, --password, --sshkeyfile, or --token."
 )
 CRED_VAULT_MOUNT_POINT_HELP = (
     "Optional HashiCorp Vault mount point. "
@@ -73,7 +73,7 @@ CRED_VAULT_INVALID_TYPE = (
 )
 CRED_VAULT_EXCLUSIVE_WITH_CREDS = (
     "The --vault-secret-path option cannot be used with "
-    "--username, --password, or --token."
+    "--username, --password, --sshkeyfile, or --token."
 )
 CRED_VAULT_MOUNT_REQUIRES_PATH = (
     "The --vault-mount-point option can only be specified "

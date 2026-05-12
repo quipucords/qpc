@@ -1,4 +1,6 @@
-%if 0%{?fedora} >= 41
+%if 0%{?fedora} >= 43
+    # Use the default %{python3_pkgversion} macro which should just be '3'.
+%elif 0%{?fedora} >= 41
     # Fedora 41 with Python 3.13
     # When will RHEL have 3.13? TBD
     # Add condition like this when necessary:
@@ -68,6 +70,9 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Tue May 12 2026 Brad Smith <brasmith@redhat.com> - 0:2.5.0-2
+- Fix broken Python package names on Fedora >= 43.
+
 * Fri Apr 4 2025 Brad Smith <brasmith@redhat.com> - 0:1.13.1-1
 - Pattern replace build bin name more consistently.
 

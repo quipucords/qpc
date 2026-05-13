@@ -37,6 +37,8 @@ class TestVaultAddCredential:
             OPENSHIFT_CRED_TYPE,
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_ADDED % "openshift_vault_credential"
@@ -63,6 +65,8 @@ class TestVaultAddCredential:
             ANSIBLE_SOURCE_TYPE,
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_ADDED % "ansible_vault_credential"
@@ -70,6 +74,7 @@ class TestVaultAddCredential:
         # Validate outgoing request payload
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
+        assert payload["vault_key"] == "my-key"
         # Mount point should not be present when not provided
         assert "vault_mount_point" not in payload
 
@@ -95,6 +100,8 @@ class TestVaultAddCredential:
             OPENSHIFT_CRED_TYPE,
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
             "--vault-mount-point",
             "custom-mount",
         ]
@@ -104,6 +111,7 @@ class TestVaultAddCredential:
         # Validate outgoing request payload includes mount point when provided
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
+        assert payload["vault_key"] == "my-key"
         assert payload["vault_mount_point"] == "custom-mount"
 
     def test_add_vault_invalid_type(
@@ -126,6 +134,27 @@ class TestVaultAddCredential:
             CLI().main()
         out, err = capsys.readouterr()
         assert messages.CRED_VAULT_INVALID_TYPE in err
+
+    def test_add_vault_missing_key(
+        self,
+        capsys,
+    ):
+        """Test that vault secret path without vault key fails."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_vault_credential",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+            "--vault-secret-path",
+            "secret/data/my-creds",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert messages.CRED_VAULT_KEY_REQUIRED in err
 
     @patch("sys.stdin.isatty")
     def test_add_vault_with_username(

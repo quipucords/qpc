@@ -46,6 +46,8 @@ class TestVaultEditCredential:
             "openshift_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_UPDATED % "openshift_cred"
@@ -80,6 +82,8 @@ class TestVaultEditCredential:
             "ansible_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
         ]
         CLI().main()
         assert caplog.messages[-1] == messages.CRED_UPDATED % "ansible_cred"
@@ -87,6 +91,7 @@ class TestVaultEditCredential:
         # Validate outgoing request payload
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
+        assert payload["vault_key"] == "my-key"
         # Mount point should not be present when not provided
         assert "vault_mount_point" not in payload
 
@@ -122,6 +127,8 @@ class TestVaultEditCredential:
             "openshift_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
+            "--vault-key",
+            "my-key",
             "--vault-mount-point",
             "custom-mount",
         ]
@@ -131,7 +138,39 @@ class TestVaultEditCredential:
         # Validate outgoing request payload includes mount point when provided
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
+        assert payload["vault_key"] == "my-key"
         assert payload["vault_mount_point"] == "custom-mount"
+
+    def test_edit_vault_missing_key(
+        self,
+        capsys,
+        requests_mock,
+    ):
+        """Test that vault secret path without vault key fails."""
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.get(
+            url,
+            status_code=200,
+            json={
+                "count": 1,
+                "results": [
+                    {"id": 1, "name": "openshift_cred", "cred_type": "openshift"}
+                ],
+            },
+        )
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "edit",
+            "--name",
+            "openshift_cred",
+            "--vault-secret-path",
+            "secret/data/my-creds",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert messages.CRED_VAULT_KEY_REQUIRED in err
 
     def test_edit_vault_invalid_type(
         self,

@@ -300,3 +300,34 @@ class TestVaultEditCredential:
             CLI().main()
         out, err = capsys.readouterr()
         assert messages.CRED_VAULT_MOUNT_REQUIRES_PATH in err
+
+    def test_edit_vault_key_without_path(
+        self,
+        capsys,
+        requests_mock,
+    ):
+        """Test that vault key without vault secret path fails."""
+        url = get_server_location() + CREDENTIAL_URI
+        requests_mock.get(
+            url,
+            status_code=200,
+            json={
+                "count": 1,
+                "results": [
+                    {"id": 1, "name": "openshift_cred", "cred_type": "openshift"}
+                ],
+            },
+        )
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "edit",
+            "--name",
+            "openshift_cred",
+            "--vault-key",
+            "my-key",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert messages.CRED_VAULT_KEY_REQUIRES_PATH in err

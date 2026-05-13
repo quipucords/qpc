@@ -86,6 +86,10 @@ CRED_VAULT_MOUNT_REQUIRES_PATH = (
 CRED_VAULT_KEY_REQUIRED = (
     "The --vault-key option is required when --vault-secret-path is specified."
 )
+CRED_VAULT_KEY_REQUIRES_PATH = (
+    "The --vault-key option can only be specified "
+    "when --vault-secret-path is also specified."
+)
 
 SOURCE_NAME_HELP = "Source name."
 SOURCES_NAME_HELP = "List of source names."

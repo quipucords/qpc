@@ -129,8 +129,8 @@ def build_credential_payload(args, cred_type, add_none=True):
         req_payload["become_user"] = args.become_user
     if "vault_secret_path" in args and args.vault_secret_path:
         req_payload["vault_secret_path"] = args.vault_secret_path
-    if "vault_key" in args and args.vault_key:
-        req_payload["vault_key"] = args.vault_key
+    if "vault_secret_key" in args and args.vault_secret_key:
+        req_payload["vault_secret_key"] = args.vault_secret_key
     if "vault_mount_point" in args and args.vault_mount_point:
         req_payload["vault_mount_point"] = args.vault_mount_point
 
@@ -172,7 +172,7 @@ def validate_vault_args(args, cred_type=None):
     """
     # Get vault options (use getattr for legacy test compatibility)
     vault_secret_path = getattr(args, "vault_secret_path", None)
-    vault_key = getattr(args, "vault_key", None)
+    vault_secret_key = getattr(args, "vault_secret_key", None)
     vault_mount_point = getattr(args, "vault_mount_point", None)
 
     if vault_secret_path:
@@ -194,14 +194,14 @@ def validate_vault_args(args, cred_type=None):
             logger.error(_(messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS))
             sys.exit(1)
 
-        # vault_key is required when vault_secret_path is specified
-        if not vault_key:
-            logger.error(_(messages.CRED_VAULT_KEY_REQUIRED))
+        # vault_secret_key is required when vault_secret_path is specified
+        if not vault_secret_key:
+            logger.error(_(messages.CRED_VAULT_SECRET_KEY_REQUIRED))
             sys.exit(1)
 
-    # vault_key can only be specified if vault_secret_path is specified
-    if vault_key and not vault_secret_path:
-        logger.error(_(messages.CRED_VAULT_KEY_REQUIRES_PATH))
+    # vault_secret_key can only be specified if vault_secret_path is specified
+    if vault_secret_key and not vault_secret_path:
+        logger.error(_(messages.CRED_VAULT_SECRET_KEY_REQUIRES_PATH))
         sys.exit(1)
 
     # vault_mount_point can only be specified if vault_secret_path is specified

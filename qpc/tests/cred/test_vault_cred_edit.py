@@ -46,7 +46,7 @@ class TestVaultEditCredential:
             "openshift_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
-            "--vault-key",
+            "--vault-secret-key",
             "my-key",
         ]
         CLI().main()
@@ -82,7 +82,7 @@ class TestVaultEditCredential:
             "ansible_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
-            "--vault-key",
+            "--vault-secret-key",
             "my-key",
         ]
         CLI().main()
@@ -91,7 +91,7 @@ class TestVaultEditCredential:
         # Validate outgoing request payload
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
-        assert payload["vault_key"] == "my-key"
+        assert payload["vault_secret_key"] == "my-key"
         # Mount point should not be present when not provided
         assert "vault_mount_point" not in payload
 
@@ -127,7 +127,7 @@ class TestVaultEditCredential:
             "openshift_cred",
             "--vault-secret-path",
             "secret/data/my-creds",
-            "--vault-key",
+            "--vault-secret-key",
             "my-key",
             "--vault-mount-point",
             "custom-mount",
@@ -138,7 +138,7 @@ class TestVaultEditCredential:
         # Validate outgoing request payload includes mount point when provided
         payload = requests_mock.last_request.json()
         assert payload["vault_secret_path"] == "secret/data/my-creds"
-        assert payload["vault_key"] == "my-key"
+        assert payload["vault_secret_key"] == "my-key"
         assert payload["vault_mount_point"] == "custom-mount"
 
     def test_edit_vault_missing_key(
@@ -170,7 +170,7 @@ class TestVaultEditCredential:
         with pytest.raises(SystemExit):
             CLI().main()
         out, err = capsys.readouterr()
-        assert messages.CRED_VAULT_KEY_REQUIRED in err
+        assert messages.CRED_VAULT_SECRET_KEY_REQUIRED in err
 
     def test_edit_vault_invalid_type(
         self,
@@ -301,7 +301,7 @@ class TestVaultEditCredential:
         out, err = capsys.readouterr()
         assert messages.CRED_VAULT_MOUNT_REQUIRES_PATH in err
 
-    def test_edit_vault_key_without_path(
+    def test_edit_vault_secret_key_without_path(
         self,
         capsys,
         requests_mock,
@@ -324,10 +324,10 @@ class TestVaultEditCredential:
             "edit",
             "--name",
             "openshift_cred",
-            "--vault-key",
+            "--vault-secret-key",
             "my-key",
         ]
         with pytest.raises(SystemExit):
             CLI().main()
         out, err = capsys.readouterr()
-        assert messages.CRED_VAULT_KEY_REQUIRES_PATH in err
+        assert messages.CRED_VAULT_SECRET_KEY_REQUIRES_PATH in err

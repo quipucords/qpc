@@ -199,6 +199,11 @@ def validate_vault_args(args, cred_type=None):
             logger.error(_(messages.CRED_VAULT_KEY_REQUIRED))
             sys.exit(1)
 
+    # vault_key can only be specified if vault_secret_path is specified
+    if vault_key and not vault_secret_path:
+        logger.error(_(messages.CRED_VAULT_KEY_REQUIRES_PATH))
+        sys.exit(1)
+
     # vault_mount_point can only be specified if vault_secret_path is specified
     if vault_mount_point and not vault_secret_path:
         logger.error(_(messages.CRED_VAULT_MOUNT_REQUIRES_PATH))

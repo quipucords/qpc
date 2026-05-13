@@ -185,6 +185,28 @@ class TestVaultAddCredential:
         out, err = capsys.readouterr()
         assert messages.CRED_VAULT_EXCLUSIVE_WITH_CREDS in err
 
+    def test_add_vault_key_without_path(
+        self,
+        capsys,
+    ):
+        """Test that vault key without vault secret path fails."""
+        sys.argv = [
+            "/bin/qpc",
+            "cred",
+            "add",
+            "--name",
+            "openshift_vault_credential",
+            "--type",
+            OPENSHIFT_CRED_TYPE,
+            "--password",
+            "--vault-key",
+            "my-key",
+        ]
+        with pytest.raises(SystemExit):
+            CLI().main()
+        out, err = capsys.readouterr()
+        assert messages.CRED_VAULT_KEY_REQUIRES_PATH in err
+
     @patch("sys.stdin.isatty")
     def test_add_vault_mount_without_path(
         self,

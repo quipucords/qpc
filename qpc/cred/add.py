@@ -86,6 +86,13 @@ class CredAddCommand(CliCommand):
             help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
         )
         self.parser.add_argument(
+            "--vault-key",
+            dest="vault_key",
+            metavar="VAULT_KEY",
+            help=_(messages.CRED_VAULT_KEY_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
             "--vault-mount-point",
             dest="vault_mount_point",
             metavar="VAULT_MOUNT_POINT",

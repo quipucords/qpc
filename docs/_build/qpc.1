@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "qpc" "1" "April 27, 2026" "" "qpc"
+.TH "qpc" "1" "May 13, 2026" "" "qpc"
 .SH NAME
 .sp
 qpc \- Inspect and report on product entitlement metadata from various sources, including networks and systems management solutions.
@@ -160,7 +160,7 @@ When a scan runs, it uses a source that contains information such as the host na
 .sp
 To create a credential, supply the type of credential and supply SSH credentials as either a username\-password pair, a username\-key pair, or an access token. The Quipucords tool stores each set of credentials in a separate credential entry.
 .sp
-\fBqpc cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP { \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP | \fB\-\-token\fP) | \fB\-\-vault\-secret\-path=\fP \fIpath\fP [\fB\-\-vault\-mount\-point=\fP \fImount_point\fP] } \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP
+\fBqpc cred add \-\-name=\fP \fIname\fP \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP { \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP | \fB\-\-token\fP) | \fB\-\-vault\-secret\-path=\fP \fIpath\fP \fB\-\-vault\-key=\fP \fIkey\fP [\fB\-\-vault\-mount\-point=\fP \fImount_point\fP] } \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -235,7 +235,14 @@ Prompts for the access token for authentication. Mutually exclusive with the \fB
 \fB\-\-vault\-secret\-path=path\fP
 .INDENT 0.0
 .INDENT 3.5
-Sets the HashiCorp Vault secret path for credential storage. Only valid for \fBopenshift\fP and \fBansible\fP credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Mutually exclusive with the \fB\-\-username\fP, \fB\-\-password\fP, \fB\-\-sshkeyfile\fP, and \fB\-\-token\fP options.
+Sets the HashiCorp Vault secret path for credential storage. Only valid for \fBopenshift\fP and \fBansible\fP credential types. When this option is used, credentials are retrieved from the configured HashiCorp Vault server instead of being stored in the QPC database. Mutually exclusive with the \fB\-\-username\fP, \fB\-\-password\fP, \fB\-\-sshkeyfile\fP, and \fB\-\-token\fP options. Requires \fB\-\-vault\-key\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+\fB\-\-vault\-key=key\fP
+.INDENT 0.0
+.INDENT 3.5
+Required when \fB\-\-vault\-secret\-path\fP is specified. Sets the key within the HashiCorp Vault secret from which the credential value is retrieved.
 .UNINDENT
 .UNINDENT
 .sp
@@ -248,7 +255,7 @@ Sets the HashiCorp Vault mount point. Only valid when \fB\-\-vault\-secret\-path
 .sp
 The information in a credential might change, including passwords, become passwords, SSH keys, the become_method, tokens or even the username. For example, your local security policies might require you to change passwords periodically. Use the \fBqpc cred edit\fP command to change credential information. The parameters for \fBqpc cred edit\fP are the same as those for \fBqpc cred add\fP\&.
 .sp
-\fBqpc cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP \fB| \-\-token | \-\-vault\-secret\-path\fP \fIpath\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-vault\-mount\-point\fP \fImount_point\fP \fB]\fP
+\fBqpc cred edit \-\-name=\fP \fIname\fP \fB\-\-username=\fP \fIusername\fP (\fB\-\-password\fP | \fB\-\-sshkeyfile\fP \fI(ssh_keyfile | \-)\fP \fB| \-\-token | \-\-vault\-secret\-path\fP \fIpath\fP \fB\-\-vault\-key\fP \fIkey\fP) \fB[\-\-sshpassphrase]\fP \fB\-\-become\-method=\fP \fI(sudo | su | pbrun | pfexec | doas | dzdo | ksu | runas )\fP \fB\-\-become\-user=\fP \fIuser\fP \fB[\-\-become\-password]\fP \fB[\-\-vault\-mount\-point\fP \fImount_point\fP \fB]\fP
 .SS Listing and Showing Credentials
 .sp
 The \fBqpc cred list\fP command returns the details for every credential that is configured for Quipucords. This output includes the name and username for each entry. Secret values such as passwords and tokens are never displated in the output.
@@ -1020,7 +1027,7 @@ Creating a new openshift type credential with a password
 .IP \(bu 2
 Creating a new openshift type credential using a HashiCorp Vault secret
 .sp
-\fBqpc cred add \-\-name ocp_cred3 \-\-type openshift \-\-vault\-secret\-path ocp3_secret\fP
+\fBqpc cred add \-\-name ocp_cred3 \-\-type openshift \-\-vault\-secret\-path ocp3_secret \-\-vault\-key ocp3_key\fP
 .IP \(bu 2
 Creating a new vcenter type credential
 .sp

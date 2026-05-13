@@ -70,6 +70,13 @@ class CredEditCommand(CliCommand):
             help=_(messages.CRED_VAULT_SECRET_PATH_HELP),
         )
         self.parser.add_argument(
+            "--vault-key",
+            dest="vault_key",
+            metavar="VAULT_KEY",
+            help=_(messages.CRED_VAULT_KEY_HELP),
+            required=False,
+        )
+        self.parser.add_argument(
             "--vault-mount-point",
             dest="vault_mount_point",
             metavar="VAULT_MOUNT_POINT",
@@ -114,6 +121,7 @@ class CredEditCommand(CliCommand):
 
         # Get vault options (use getattr for legacy test compatibility)
         vault_secret_path = getattr(self.args, "vault_secret_path", None)
+        vault_key = getattr(self.args, "vault_key", None)
         vault_mount_point = getattr(self.args, "vault_mount_point", None)
 
         if not (
@@ -126,6 +134,7 @@ class CredEditCommand(CliCommand):
             or self.args.become_password
             or self.args.token
             or vault_secret_path
+            or vault_key
             or vault_mount_point
         ):
             logger.error(_(messages.CRED_EDIT_NO_ARGS), self.args.name)

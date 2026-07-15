@@ -38,7 +38,6 @@ class TestVaultShowCli:
         vault_data = {
             "address": "vault.example.com",
             "port": 8200,
-            "ssl_verify": True,
         }
 
         with requests_mock.Mocker() as mocker:
@@ -58,7 +57,6 @@ class TestVaultShowCli:
         vault_data = {
             "address": "vault.example.com",
             "port": 9200,
-            "ssl_verify": False,
         }
 
         with requests_mock.Mocker() as mocker:
@@ -72,7 +70,6 @@ class TestVaultShowCli:
             assert result_json == {
                 "address": "vault.example.com",
                 "port": 9200,
-                "ssl_verify": False,
             }
 
     def test_show_vault_invalid_json(self, caplog):
@@ -183,7 +180,6 @@ class TestVaultShowCli:
         vault_data = {
             "address": "vault.example.com",
             "port": 8200,
-            "ssl_verify": True,
         }
 
         with requests_mock.Mocker() as mocker:

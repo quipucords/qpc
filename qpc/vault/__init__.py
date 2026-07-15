@@ -7,5 +7,3 @@ SHOW = "show"
 CLEAR = "clear"
 
 VAULT_URI = "/api/v2/auth/hashicorp-vault/"
-
-BOOLEAN_CHOICES = ["true", "false"]

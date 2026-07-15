@@ -1,6 +1,5 @@
 """VaultAddCommand is used to add the HashiCorp Vault server configuration."""
 
-import sys
 from logging import getLogger
 
 from requests import codes
@@ -44,14 +43,6 @@ class VaultAddCommand(CliCommand):
         )
         add_vault_arguments(self.parser, required_certs=True)
 
-    def _validate_args(self):
-        """Validate arguments."""
-        CliCommand._validate_args(self)
-        ssl_verify_bool = self.args.ssl_verify == "true"
-        if ssl_verify_bool and not self.args.ca_cert:
-            logger.error(_(messages.VAULT_CA_CERT_REQUIRED))
-            sys.exit(1)
-
     def _build_data(self):
         """Build request payload."""
         client_cert_encoded = read_and_encode_cert_file(
@@ -60,21 +51,15 @@ class VaultAddCommand(CliCommand):
         client_key_encoded = read_and_encode_cert_file(
             self.args.client_key, CERT_TYPE_CLIENT_KEY
         )
-
-        ssl_verify_bool = self.args.ssl_verify == "true"
+        ca_cert_encoded = read_and_encode_cert_file(self.args.ca_cert, CERT_TYPE_CA)
 
         self.req_payload = {
             "address": self.args.address,
             "port": self.args.port,
-            "ssl_verify": ssl_verify_bool,
             "client_cert": client_cert_encoded,
             "client_key": client_key_encoded,
+            "ca_cert": ca_cert_encoded,
         }
-
-        # Add CA cert if provided (required when ssl_verify is True)
-        if self.args.ca_cert:
-            ca_cert_encoded = read_and_encode_cert_file(self.args.ca_cert, CERT_TYPE_CA)
-            self.req_payload["ca_cert"] = ca_cert_encoded
 
     def _handle_response_success(self):
         logger.info(_(messages.VAULT_CONFIG_SUCCESS))

@@ -5,7 +5,7 @@ import sys
 from logging import getLogger
 from pathlib import Path
 
-from qpc import messages, vault
+from qpc import messages
 from qpc.source.utils import validate_port
 from qpc.translation import _
 
@@ -67,15 +67,6 @@ def add_vault_arguments(parser, required_certs=True, required_address=True):
         required=False,
     )
     parser.add_argument(
-        "--ssl-verify",
-        dest="ssl_verify",
-        choices=vault.BOOLEAN_CHOICES,
-        type=str.lower,
-        default="true" if required_certs else None,
-        help=_(messages.VAULT_SSL_VERIFY_HELP),
-        required=False,
-    )
-    parser.add_argument(
         "--client-cert",
         dest="client_cert",
         metavar="CLIENT_CERT_FILE",
@@ -94,5 +85,5 @@ def add_vault_arguments(parser, required_certs=True, required_address=True):
         dest="ca_cert",
         metavar="CA_CERT_FILE",
         help=_(messages.VAULT_CA_CERT_HELP),
-        required=False,
+        required=required_certs,
     )

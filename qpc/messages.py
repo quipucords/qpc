@@ -415,24 +415,14 @@ UNKNOWN_FILE_EXTENSION = "ERROR: unknown file extension"
 VAULT_ADDRESS_HELP = "HashiCorp Vault server address."
 VAULT_PORT_HELP = "HashiCorp Vault server port (default: 8200)."
 VAULT_PORT_HELP_NO_DEFAULT = "HashiCorp Vault server port."
-VAULT_SSL_VERIFY_HELP = (
-    "Enable/disable SSL certificate verification for Vault connection."
-    " Valid values: true, false. (default: true)"
-)
 VAULT_CLIENT_CERT_HELP = "Path to the Client certificate file for mTLS authentication."
 VAULT_CLIENT_KEY_HELP = "Path to the Client key file for mTLS authentication."
-VAULT_CA_CERT_HELP = (
-    "Path to the CA certificate file for SSL verification"
-    " (required when --ssl-verify true is specified)."
-)
+VAULT_CA_CERT_HELP = "Path to the CA certificate file for SSL verification."
 VAULT_CONFIG_SUCCESS = "HashiCorp Vault configuration was successfully configured."
 VAULT_UPDATED = "HashiCorp Vault configuration was updated."
 VAULT_CLEARED = "HashiCorp Vault configuration was cleared."
 VAULT_EDIT_NO_ARGS = (
     "No arguments were provided to edit the HashiCorp Vault configuration."
-)
-VAULT_CA_CERT_REQUIRED = (
-    "The --ca-cert option is required when ssl-verify is true (default behavior)."
 )
 VAULT_CLIENT_CERT_KEY_MISMATCH = (
     "Both --client-cert and --client-key options must be provided together."

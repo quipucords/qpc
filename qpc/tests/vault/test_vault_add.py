@@ -38,7 +38,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -58,7 +57,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -66,43 +64,6 @@ class TestVaultAddCli:
             with caplog.at_level(logging.INFO):
                 self.command.main(args)
                 assert messages.VAULT_CONFIG_SUCCESS in caplog.text
-
-    def test_add_vault_without_ca_cert_when_ssl_verify_false(
-        self, client_cert, client_key, caplog
-    ):
-        """Test adding vault configuration without CA cert when ssl_verify is false."""
-        url = get_server_location() + vault.VAULT_URI
-
-        with requests_mock.Mocker() as mocker:
-            mocker.post(url, status_code=201)
-            args = Namespace(
-                address="vault.example.com",
-                port=8200,
-                ssl_verify="false",
-                client_cert=str(client_cert),
-                client_key=str(client_key),
-                ca_cert=None,
-            )
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                assert messages.VAULT_CONFIG_SUCCESS in caplog.text
-
-    def test_add_vault_missing_ca_cert_when_ssl_verify_true(
-        self, client_cert, client_key, caplog
-    ):
-        """Test adding vault with ssl_verify true but missing CA cert fails."""
-        args = Namespace(
-            address="vault.example.com",
-            port=8200,
-            ssl_verify="true",
-            client_cert=str(client_cert),
-            client_key=str(client_key),
-            ca_cert=None,
-        )
-
-        with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-            self.command.main(args)
-        assert messages.VAULT_CA_CERT_REQUIRED in caplog.text
 
     def test_add_vault_ssl_err(self, client_cert, client_key, ca_cert, caplog):
         """Test adding vault configuration with SSL error."""
@@ -118,7 +79,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -141,7 +101,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -160,7 +119,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -183,7 +141,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=8200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),
@@ -197,7 +154,6 @@ class TestVaultAddCli:
         args = Namespace(
             address="vault.example.com",
             port=8200,
-            ssl_verify="true",
             client_cert="/nonexistent/client.pem",
             client_key="/nonexistent/client-key.pem",
             ca_cert="/nonexistent/ca.pem",
@@ -216,7 +172,6 @@ class TestVaultAddCli:
             args = Namespace(
                 address="vault.example.com",
                 port=9200,
-                ssl_verify="true",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),

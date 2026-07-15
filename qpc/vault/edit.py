@@ -45,6 +45,11 @@ class VaultEditCommand(CliCommand):
         )
 
         add_vault_arguments(self.parser, required_certs=False, required_address=False)
+        self.parser.usage = (
+            "%(prog)s [--address ADDRESS] [--port PORT]"
+            " [--client-cert CLIENT_CERT_FILE --client-key CLIENT_KEY_FILE]"
+            " [--ca-cert CA_CERT_FILE]"
+        )
         # Override port default to None. For edit, only send if explicitly provided.
         # Also update help text to not show default value
         for action in self.parser._actions:
@@ -64,7 +69,6 @@ class VaultEditCommand(CliCommand):
         has_data = (
             self.args.address
             or self.args.port
-            or self.args.ssl_verify
             or self.args.client_cert
             or self.args.client_key
             or self.args.ca_cert
@@ -81,9 +85,6 @@ class VaultEditCommand(CliCommand):
             self.req_payload["address"] = self.args.address
         if self.args.port:
             self.req_payload["port"] = self.args.port
-        if self.args.ssl_verify is not None:
-            # Convert string "true"/"false" to boolean
-            self.req_payload["ssl_verify"] = self.args.ssl_verify == "true"
 
         # Handle certificate files
         if self.args.client_cert and self.args.client_key:

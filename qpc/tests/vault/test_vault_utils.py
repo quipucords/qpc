@@ -83,15 +83,12 @@ class TestVaultUtils:
         parser = ArgumentParser()
         add_vault_arguments(parser, required_certs=True, required_address=True)
 
-        # Check that arguments were added
         args = parser.parse_args(
             [
                 "--address",
                 "vault.example.com",
                 "--port",
                 "8200",
-                "--ssl-verify",
-                "true",
                 "--client-cert",
                 "client.pem",
                 "--client-key",
@@ -103,7 +100,6 @@ class TestVaultUtils:
 
         assert args.address == "vault.example.com"
         assert args.port == 8200
-        assert args.ssl_verify == "true"
         assert args.client_cert == "client.pem"
         assert args.client_key == "client-key.pem"
         assert args.ca_cert == "ca.pem"
@@ -113,12 +109,10 @@ class TestVaultUtils:
         parser = ArgumentParser()
         add_vault_arguments(parser, required_certs=False, required_address=False)
 
-        # Check that arguments can be omitted
         args = parser.parse_args([])
 
         assert args.address is None
         assert args.port == 8200  # default
-        assert args.ssl_verify is None
         assert args.client_cert is None
         assert args.client_key is None
         assert args.ca_cert is None
@@ -136,48 +130,9 @@ class TestVaultUtils:
                 "client.pem",
                 "--client-key",
                 "client-key.pem",
+                "--ca-cert",
+                "ca.pem",
             ]
         )
 
         assert args.port == 8200  # default port
-        assert args.ssl_verify == "true"  # default when required_certs=True
-
-    def test_add_vault_arguments_ssl_verify_false(self):
-        """Test ssl_verify argument with false value."""
-        parser = ArgumentParser()
-        add_vault_arguments(parser, required_certs=True, required_address=True)
-
-        args = parser.parse_args(
-            [
-                "--address",
-                "vault.example.com",
-                "--ssl-verify",
-                "false",
-                "--client-cert",
-                "client.pem",
-                "--client-key",
-                "client-key.pem",
-            ]
-        )
-
-        assert args.ssl_verify == "false"
-
-    def test_add_vault_arguments_ssl_verify_case_insensitive(self):
-        """Test ssl_verify argument is case insensitive."""
-        parser = ArgumentParser()
-        add_vault_arguments(parser, required_certs=True, required_address=True)
-
-        args = parser.parse_args(
-            [
-                "--address",
-                "vault.example.com",
-                "--ssl-verify",
-                "TRUE",
-                "--client-cert",
-                "client.pem",
-                "--client-key",
-                "client-key.pem",
-            ]
-        )
-
-        assert args.ssl_verify == "true"

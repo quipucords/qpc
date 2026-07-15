@@ -921,7 +921,7 @@ Use the \fBQPC_VAR_PROGRAM_NAME vault\fP command to configure HashiCorp Vault in
 .sp
 To initially configure HashiCorp Vault integration, use the \fBvault add\fP subcommand. This command requires the Vault server address and mutual TLS (mTLS) authentication certificates.
 .sp
-\fBQPC_VAR_PROGRAM_NAME vault add \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB[\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP \fB[\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
+\fBQPC_VAR_PROGRAM_NAME vault add \-\-address=\fP \fIaddress\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB\-\-ca\-cert=\fP \fIca_cert_file\fP
 .sp
 \fB\-\-address=address\fP
 .INDENT 0.0
@@ -954,26 +954,19 @@ Required. Sets the path to the client key file to use for mTLS authentication.
 \fB\-\-ca\-cert=ca_cert_file\fP
 .INDENT 0.0
 .INDENT 3.5
-Optional, but required when \fB\-\-ssl\-verify\fP is \fBtrue\fP\&. Sets the path to the CA certificate file to use for SSL verification.
-.UNINDENT
-.UNINDENT
-.sp
-\fB\-\-ssl\-verify=(true | false)\fP
-.INDENT 0.0
-.INDENT 3.5
-Optional. Determines whether to verify SSL certificates. The default is \fBtrue\fP\&.
+Required. Sets the path to the CA certificate file to use for SSL verification.
 .UNINDENT
 .UNINDENT
 .SS Editing Vault Configuration
 .sp
 To modify specific fields in the existing HashiCorp Vault configuration, use the \fBvault edit\fP subcommand. This command allows you to update one or more configuration parameters without having to specify all parameters.
 .sp
-\fBQPC_VAR_PROGRAM_NAME vault edit [\-\-address=\fP \fIaddress\fP \fB] [\-\-port=\fP \fIport\fP \fB] [\-\-client\-cert=\fP \fIclient_cert_file\fP \fB] [\-\-client\-key=\fP \fIclient_key_file\fP \fB] [\-\-ca\-cert=\fP \fIca_cert_file\fP \fB] [\-\-ssl\-verify=\fP \fI(true | false)\fP \fB]\fP
+\fBQPC_VAR_PROGRAM_NAME vault edit [\-\-address=\fP \fIaddress\fP \fB] [\-\-port=\fP \fIport\fP \fB] [\-\-client\-cert=\fP \fIclient_cert_file\fP \fB\-\-client\-key=\fP \fIclient_key_file\fP \fB] [\-\-ca\-cert=\fP \fIca_cert_file\fP \fB]\fP
 .sp
 All options are optional, but at least one must be provided. When updating client certificates, both \fB\-\-client\-cert\fP and \fB\-\-client\-key\fP must be provided together.
 .SS Showing Vault Configuration
 .sp
-To view the current HashiCorp Vault configuration, use the \fBvault show\fP subcommand. This command displays the vault server address, port, and SSL verification settings. For security reasons, certificate, key and CA Cert data are not displayed.
+To view the current HashiCorp Vault configuration, use the \fBvault show\fP subcommand. This command displays the vault server address and port. For security reasons, certificate, key and CA Cert data are not displayed.
 .sp
 \fBQPC_VAR_PROGRAM_NAME vault show\fP
 .SS Clearing Vault Configuration
@@ -1185,13 +1178,9 @@ Publishing to Insights using a previously downloaded report
 .sp
 \fBQPC_VAR_PROGRAM_NAME insights publish \-\-input\-file path_to_report.tar.gz\fP
 .IP \(bu 2
-Setting up HashiCorp Vault integration with a CA certificate
+Setting up HashiCorp Vault integration
 .sp
-\fBQPC_VAR_PROGRAM_NAME vault add \-\-address vault.example.com \-\-port 8200 \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem \-\-ssl\-verify true\fP
-.IP \(bu 2
-Setting up HashiCorp Vault integration without SSL verification
-.sp
-\fBQPC_VAR_PROGRAM_NAME vault add \-\-address vault.example.com \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ssl\-verify false\fP
+\fBQPC_VAR_PROGRAM_NAME vault add \-\-address vault.example.com \-\-port 8200 \-\-client\-cert /path/to/client.pem \-\-client\-key /path/to/client\-key.pem \-\-ca\-cert /path/to/ca.pem\fP
 .IP \(bu 2
 Editing only the HashiCorp Vault server address
 .sp
@@ -1201,9 +1190,9 @@ Editing the HashiCorp Vault client certificates
 .sp
 \fBQPC_VAR_PROGRAM_NAME vault edit \-\-client\-cert /path/to/updated\-client.pem \-\-client\-key /path/to/updated\-client\-key.pem\fP
 .IP \(bu 2
-Editing Vault CA certificate and SSL verification
+Editing the Vault CA certificate
 .sp
-\fBQPC_VAR_PROGRAM_NAME vault edit \-\-ca\-cert /path/to/new\-ca.pem \-\-ssl\-verify true\fP
+\fBQPC_VAR_PROGRAM_NAME vault edit \-\-ca\-cert /path/to/new\-ca.pem\fP
 .IP \(bu 2
 Showing the current HashiCorp Vault configuration
 .sp

@@ -38,7 +38,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="new-vault.example.com",
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -57,7 +56,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address=new_address,
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -79,25 +77,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address=None,
                 port=9200,
-                ssl_verify=None,
-                client_cert=None,
-                client_key=None,
-                ca_cert=None,
-            )
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                assert messages.VAULT_UPDATED in caplog.text
-
-    def test_edit_vault_ssl_verify_only(self, caplog):
-        """Test editing vault configuration with ssl_verify only."""
-        url = get_server_location() + vault.VAULT_URI
-
-        with requests_mock.Mocker() as mocker:
-            mocker.patch(url, status_code=200)
-            args = Namespace(
-                address=None,
-                port=None,
-                ssl_verify="false",
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -115,7 +94,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address=None,
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=str(ca_cert),
@@ -133,7 +111,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address=None,
                 port=None,
-                ssl_verify=None,
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=None,
@@ -151,7 +128,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="new-vault.example.com",
                 port=9200,
-                ssl_verify="true",
                 client_cert=None,
                 client_key=None,
                 ca_cert=str(ca_cert),
@@ -165,7 +141,6 @@ class TestVaultEditCli:
         args = Namespace(
             address=None,
             port=None,
-            ssl_verify=None,
             client_cert=None,
             client_key=None,
             ca_cert=None,
@@ -180,7 +155,6 @@ class TestVaultEditCli:
         args = Namespace(
             address=None,
             port=None,
-            ssl_verify=None,
             client_cert=str(client_cert),
             client_key=None,
             ca_cert=None,
@@ -195,7 +169,6 @@ class TestVaultEditCli:
         args = Namespace(
             address=None,
             port=None,
-            ssl_verify=None,
             client_cert=None,
             client_key=str(client_key),
             ca_cert=None,
@@ -219,7 +192,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="vault.example.com",
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -242,7 +214,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="vault.example.com",
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -261,7 +232,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="vault.example.com",
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -284,7 +254,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="vault.example.com",
                 port=None,
-                ssl_verify=None,
                 client_cert=None,
                 client_key=None,
                 ca_cert=None,
@@ -302,7 +271,6 @@ class TestVaultEditCli:
             args = Namespace(
                 address="new-vault.example.com",
                 port=9200,
-                ssl_verify="false",
                 client_cert=str(client_cert),
                 client_key=str(client_key),
                 ca_cert=str(ca_cert),

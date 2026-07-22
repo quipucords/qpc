@@ -17,7 +17,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        2.6.0
+Version:        2.7.0
 Release:        1%{?dist}
 Epoch:          0
 
@@ -70,6 +70,9 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Wed Jul 22 2026 Alberto Bellotti <abellott@redhat.com> - 0:2.7.0-1
+- Removing ssl_verify from vault support and always require a ca_cert
+
 * Thu Jun 18 2026 Ruda Moura <rmoura@redhat.com> - 0:2.6.0-1
 - Add support for HashiCorp Vault credentials
 

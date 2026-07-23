@@ -71,7 +71,8 @@ sed \
 
 %changelog
 * Wed Jul 22 2026 Alberto Bellotti <abellott@redhat.com> - 0:2.7.0-1
-- Removing ssl_verify from vault support and always require a ca_cert
+- Removing the ssl_verify option from vault support.
+- Require a ca_cert when adding a vault configuration.
 
 * Thu Jun 18 2026 Ruda Moura <rmoura@redhat.com> - 0:2.6.0-1
 - Add support for HashiCorp Vault credentials

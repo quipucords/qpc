@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /app/qpc
-QPC_VAR_PROGRAM_NAME="${QPC_VAR_PROGRAM_NAME:-qpc}"
+QPC_VAR_PROGRAM_NAME=qpc
 QPC_COMMAND="${1}"
 if [ "${QPC_COMMAND}" = "man" ]; then
   shift

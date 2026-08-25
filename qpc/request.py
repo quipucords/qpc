@@ -164,7 +164,7 @@ methods = {
 }
 
 
-def request(  # noqa: PLR0913
+def request(  # noqa: PLR0913, PLR0917
     method,
     path,
     params=None,
@@ -230,7 +230,7 @@ def handle_connection_error():
     logger.error(_(messages.SERVER_CONFIG_REQUIRED), QPC_VAR_PROGRAM_NAME)
 
 
-def perform_request(  # noqa: PLR0913
+def perform_request(  # noqa: PLR0913, PLR0917
     method,
     url,
     params=None,

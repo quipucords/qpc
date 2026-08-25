@@ -17,7 +17,7 @@
 Name:           qpc
 Summary:        command-line client interface for quipucords
 
-Version:        2.7.0
+Version:        2.7.1
 Release:        1%{?dist}
 Epoch:          0
 
@@ -70,6 +70,9 @@ sed \
 %{python3_sitelib}/qpc-*.egg-info/
 
 %changelog
+* Tue Aug 25 2026 Brad Smith <brasmith@redhat.com> - 0:2.7.1-1
+- Fix inconsistencies when customizing bin name.
+
 * Wed Jul 22 2026 Alberto Bellotti <abellott@redhat.com> - 0:2.7.0-1
 - Removing the ssl_verify option from vault support.
 - Require a ca_cert when adding a vault configuration.

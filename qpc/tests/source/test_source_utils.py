@@ -53,7 +53,6 @@ class TestBuildSourcePayloadV2:
                 "ssl_cert_verify": "true",
                 "disable_ssl": "false",
                 "ssl_protocol": "TLSv1_1",
-                "use_paramiko": "true",
             }
         )
         result = build_source_payload(args)
@@ -67,7 +66,6 @@ class TestBuildSourcePayloadV2:
             "ssl_cert_verify": True,
             "disable_ssl": False,
             "ssl_protocol": "TLSv1_1",
-            "use_paramiko": "true",
             "proxy_url": None,
         }
 

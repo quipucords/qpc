@@ -110,14 +110,6 @@ class SourceAddCommand(CliCommand):
             required=False,
         )
         self.parser.add_argument(
-            "--use-paramiko",
-            dest="use_paramiko",
-            choices=source.BOOLEAN_CHOICES,
-            type=str.lower,
-            help=_(messages.SOURCE_PARAMIKO_HELP),
-            required=False,
-        )
-        self.parser.add_argument(
             "--proxy-url",
             dest="proxy_url",
             metavar="PROXY_URL",

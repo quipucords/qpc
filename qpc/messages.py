@@ -108,9 +108,6 @@ SOURCE_PORT_HELP = (
     "Port to use for connection for the scan; "
     "network default is 22, vcenter default is 443."
 )
-SOURCE_PARAMIKO_HELP = (
-    "Set Ansible connection method to paramiko. default connection method is ssh."
-)
 SOURCE_SSL_CERT_HELP = (
     "If true, the SSL certificate will"
     " be verified when making requests to the source, otherwise no "

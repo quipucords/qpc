@@ -32,6 +32,7 @@ help:
 	@echo "  manpage             to build the manpage"
 	@echo "  lock-requirements   to lock all python dependencies"
 	@echo "  update-requirements to update all python dependencies"
+	@echo "  bump-version        to bump the project version (VERSION=x.y.z or SEGMENT=major|minor|patch)"
 
 .PHONY: clean
 clean:
@@ -133,4 +134,21 @@ lock-requirements:
 update-requirements:
 	uv lock --upgrade
 	$(MAKE) lock-requirements
+
+.PHONY: bump-version
+bump-version:
+ifdef VERSION
+ifdef SEGMENT
+	$(error Specify either VERSION or SEGMENT, not both)
+endif
+	uv version $(VERSION)
+else ifdef SEGMENT
+ifneq ($(filter $(SEGMENT),major minor patch),$(SEGMENT))
+	$(error SEGMENT must be 'major', 'minor', or 'patch', got '$(SEGMENT)')
+endif
+	uv version --bump $(SEGMENT)
+else
+	$(error Specify either SEGMENT=<major|minor|patch> or VERSION=<x.y.z>)
+endif
+	$(SED) -i "s/^Version:.*/Version:        $$(uv run python get-version.py)/" qpc.spec
 

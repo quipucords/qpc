@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from qpc.release import QPC_MIN_SERVER_VERSION
 from qpc.request import request, version_tuple
-from qpc.utils import CLIENT_TOKEN_TEST_VALUE, QPC_MIN_SERVER_VERSION
+from qpc.utils import CLIENT_TOKEN_TEST_VALUE
 
 
 def test_request_invalid_method(server_config, caplog):

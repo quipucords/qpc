@@ -7,13 +7,12 @@ import sys
 import requests
 
 from qpc import messages
-from qpc.release import QPC_VAR_PROGRAM_NAME
+from qpc.release import QPC_MIN_SERVER_VERSION, QPC_VAR_PROGRAM_NAME
 from qpc.translation import _
 from qpc.utils import (
     CONFIG_HOST_KEY,
     CONFIG_PORT_KEY,
     CONFIG_USE_HTTP,
-    QPC_MIN_SERVER_VERSION,
     get_server_location,
     get_ssl_verify,
     handle_error_response,

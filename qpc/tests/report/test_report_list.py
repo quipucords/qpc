@@ -9,10 +9,11 @@ import pytest
 import requests_mock
 
 from qpc.cli import CLI
+from qpc.release import QPC_MIN_SERVER_VERSION
 from qpc.report import REPORT_V2_URI
 from qpc.report.list import ReportListCommand
 from qpc.tests.utilities import redirect_stdout
-from qpc.utils import QPC_MIN_SERVER_VERSION, get_server_location
+from qpc.utils import get_server_location
 
 
 @pytest.fixture

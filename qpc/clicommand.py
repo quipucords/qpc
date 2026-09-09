@@ -2,8 +2,9 @@
 
 import sys
 
+from qpc.release import QPC_MIN_SERVER_VERSION
 from qpc.request import request
-from qpc.utils import QPC_MIN_SERVER_VERSION, handle_error_response, log_args
+from qpc.utils import handle_error_response, log_args
 
 
 class CliCommand:

@@ -18,6 +18,7 @@ OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 SPHINX_BUILD = $(shell uv run which sphinx-build)
 SED = sed
 
+.PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of:"
 	@echo "  help                to show this message"
@@ -32,38 +33,47 @@ help:
 	@echo "  lock-requirements   to lock all python dependencies"
 	@echo "  update-requirements to update all python dependencies"
 
+.PHONY: clean
 clean:
 	-rm -rf dist/ build/ qpc.egg-info/
 	find . -type f -name '*.pyc' -delete
 	find . -type d -name __pycache__ -delete
 
+.PHONY: install
 install:
 	$(PYTHON) setup.py build -f
 	$(PYTHON) setup.py install -f
 
+.PHONY: lint
 lint: lint-ruff lint-docs
 
+.PHONY: lint-ruff
 lint-ruff:
 	uv run ruff check .
 	uv run ruff format --check .
 
+.PHONY: lint-docs
 lint-docs:
 	uv run rstcheck docs/source/man-template.rst
 	uv run rstcheck docs/_build/man-qpc.rst
 
+.PHONY: test
 test:
 	uv run pytest
 
+.PHONY: test-coverage
 test-coverage:
 	uv run pytest --cov=qpc
 	uv run coverage report --show-missing
 	uv run coverage xml
 
 # verify the pyproject.toml configuration file integrity
+.PHONY: config-verify
 config-verify:
 	$(PYTHON) config-verify.py
 
 # write a man page (roff format) with placeholders for names, version, and dates
+.PHONY: update-man-template-roff
 update-man-template-roff:
 	@$(SPHINX_BUILD) -b man -q \
 	  -D project='QPC_VAR_PROGRAM_NAME' \
@@ -72,6 +82,7 @@ update-man-template-roff:
 	  docs docs/_build
 
 # generate an upstream "qpc" man page in human-readable RST
+.PHONY: generate-man-qpc-rst
 generate-man-qpc-rst:
 	@$(SED) \
 	  -e "s/QPC_VAR_PROGRAM_NAME/${QPC_VAR_PROGRAM_NAME}/g" \
@@ -79,10 +90,12 @@ generate-man-qpc-rst:
 	  -e "s/QPC_VAR_CURRENT_YEAR/${QPC_VAR_CURRENT_YEAR}/g" \
 	  docs/source/man-template.rst
 
+.PHONY: update-man-qpc-rst
 update-man-qpc-rst:
 	$(MAKE) --no-print-directory generate-man-qpc-rst > docs/_build/man-qpc.rst
 
 # generate an upstream "qpc" man page in man-parsable roff format
+.PHONY: generate-man-qpc-roff
 generate-man-qpc-roff:
 	@$(SED) \
 	  -e "s/QPC_VAR_PROGRAM_NAME/${QPC_VAR_PROGRAM_NAME}/g" \
@@ -92,16 +105,19 @@ generate-man-qpc-roff:
 	  -e "s/BUILD_DATE/${BUILD_DATE}/g" \
 	  docs/_build/QPC_VAR_PROGRAM_NAME.1
 
+.PHONY: update-man-qpc-roff
 update-man-qpc-roff:
 	$(MAKE) --no-print-directory generate-man-qpc-roff > docs/_build/qpc.1
 
 # regenerate and update all man page files
+.PHONY: manpage
 manpage:
 	$(MAKE) update-man-template-roff
 	$(MAKE) update-man-qpc-rst
 	$(MAKE) update-man-qpc-roff
 
 # test if man page files have changed
+.PHONY: manpage-test
 manpage-test:
 	$(MAKE) update-man-template-roff
 	$(MAKE) update-man-qpc-rst
@@ -109,9 +125,11 @@ manpage-test:
 	git diff --exit-code docs
 	git diff --staged --exit-code docs
 
+.PHONY: lock-requirements
 lock-requirements:
 	uv lock
 
+.PHONY: update-requirements
 update-requirements:
 	uv lock --upgrade
 	$(MAKE) lock-requirements

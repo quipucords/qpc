@@ -33,6 +33,7 @@ help:
 	@echo "  lock-requirements   to lock all python dependencies"
 	@echo "  update-requirements to update all python dependencies"
 	@echo "  bump-version        to bump the project version (VERSION=x.y.z or SEGMENT=major|minor|patch)"
+	@echo "  bump-min-server-version VERSION=<x.y.z>  to set the minimum supported server version"
 
 .PHONY: clean
 clean:
@@ -151,4 +152,11 @@ else
 	$(error Specify either SEGMENT=<major|minor|patch> or VERSION=<x.y.z>)
 endif
 	$(SED) -i "s/^Version:.*/Version:        $$(uv run python get-version.py)/" qpc.spec
+
+.PHONY: bump-min-server-version
+bump-min-server-version:
+ifndef VERSION
+	$(error Specify VERSION=<x.y.z>)
+endif
+	$(SED) -i 's/^QPC_MIN_SERVER_VERSION = .*/QPC_MIN_SERVER_VERSION = "$(VERSION)"/' qpc/release.py
 

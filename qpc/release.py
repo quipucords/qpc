@@ -16,6 +16,7 @@ QPC_VAR_PROGRAM_NAME = "qpc"
 ENTRYPOINT = f"{QPC_VAR_PROGRAM_NAME}=qpc.__main__:main"
 # END IMPORTANT NOTE.
 URL = "https://github.com/quipucords/qpc"
+QPC_MIN_SERVER_VERSION = "2.7.0"
 
 
 def get_current_sha1() -> str:

@@ -14,11 +14,12 @@ import requests_mock
 
 from qpc import messages
 from qpc.cli import CLI
+from qpc.release import QPC_MIN_SERVER_VERSION
 from qpc.report import REPORT_URI
 from qpc.report.deployments import ReportDeploymentsCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests.utilities import redirect_stdout
-from qpc.utils import QPC_MIN_SERVER_VERSION, create_tar_buffer, get_server_location
+from qpc.utils import create_tar_buffer, get_server_location
 
 
 @pytest.fixture

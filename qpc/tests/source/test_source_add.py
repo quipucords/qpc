@@ -275,58 +275,6 @@ class TestSourceAddCli:
                 expected_message = messages.SOURCE_ADDED % "source1"
                 assert expected_message in caplog.text
 
-    def test_add_source_with_paramiko(self, caplog):
-        """Testing add network source command with use_paramiko set to true."""
-        get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
-        cred_results = [{"id": 1, "name": "cred1"}]
-        get_cred_data = {"count": 1, "results": cred_results}
-        post_source_url = get_server_location() + SOURCE_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_cred_url, status_code=200, json=get_cred_data)
-            mocker.post(post_source_url, status_code=201)
-
-            args = Namespace(
-                name="source1",
-                cred=["cred1"],
-                hosts=["10.10.181.9"],
-                use_paramiko=True,
-                type="network",
-                port=22,
-            )
-
-            with caplog.at_level(logging.INFO):
-                self.command.main(args)
-                expected_message = messages.SOURCE_ADDED % "source1"
-                assert expected_message in caplog.text
-
-    def test_add_source_with_paramiko_and_ssl(self, caplog):
-        """Testing add network source command with use_paramiko set to true."""
-        get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"
-        cred_results = [{"id": 1, "name": "cred1"}]
-        get_cred_data = {"count": 1, "results": cred_results}
-        post_source_url = get_server_location() + SOURCE_URI
-        with requests_mock.Mocker() as mocker:
-            mocker.get(get_cred_url, status_code=200, json=get_cred_data)
-            mocker.post(post_source_url, status_code=400)
-
-            args = Namespace(
-                name="source1",
-                cred=["cred1"],
-                hosts=["10.10.181.9"],
-                ssl_cert_verify="False",
-                use_paramiko=True,
-                type="network",
-                port=22,
-            )
-            with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
-                self.command.main(args)
-            # TODO Assert *something* meaningful is in the output!
-            # assert caplog.text
-            # FIXME utils.handle_error_response does literally nothing if the
-            #  server's response is not JSON (raises JSONDecodeError).
-            #  This means the process simply exits with NO OUTPUT.
-            # TODO Underlying code needs a thorough evaluation and rewrite.
-
     def test_add_source_one_excludehost(self, caplog):
         """Testing the add network source command with one exclude host."""
         get_cred_url = get_server_location() + CREDENTIAL_URI + "?name=cred1"

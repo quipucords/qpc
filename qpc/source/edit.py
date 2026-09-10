@@ -100,14 +100,6 @@ class SourceEditCommand(CliCommand):
             required=False,
         )
         self.parser.add_argument(
-            "--use-paramiko",
-            dest="use_paramiko",
-            choices=source.BOOLEAN_CHOICES,
-            type=str.lower,
-            help=_(messages.SOURCE_PARAMIKO_HELP),
-            required=False,
-        )
-        self.parser.add_argument(
             "--proxy-url",
             dest="proxy_url",
             metavar="PROXY_URL",
@@ -123,7 +115,6 @@ class SourceEditCommand(CliCommand):
             or self.args.exclude_hosts
             or self.args.cred
             or self.args.port
-            or self.args.use_paramiko
             or self.args.ssl_cert_verify
             or self.args.disable_ssl
             or self.args.ssl_protocol

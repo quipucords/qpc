@@ -65,8 +65,6 @@ def build_source_payload(args, add_none=True):  # noqa: C901 PLR0912
         req_payload["disable_ssl"] = args.disable_ssl == "true"
     if hasattr(args, "ssl_protocol") and args.ssl_protocol is not None:
         req_payload["ssl_protocol"] = args.ssl_protocol
-    if hasattr(args, "use_paramiko") and args.use_paramiko is not None:
-        req_payload["use_paramiko"] = args.use_paramiko
     if hasattr(args, "proxy_url") and args.proxy_url:
         req_payload["proxy_url"] = args.proxy_url
     elif add_none:

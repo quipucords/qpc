@@ -311,7 +311,7 @@ When you configure a scan, it contains references to one or more sources, includ
 .sp
 To create a source, supply the type of source with the \fBtype\fP option, one or more host names or IP addresses to connect to with the \fB\-\-hosts\fP option, and the credentials needed to access those systems with the \fB\-\-cred\fP option. The \fBQPC_VAR_PROGRAM_NAME source\fP command allows multiple entries for the \fBhosts\fP and \fBcred\fP options. Therefore, a single source can access a collection of servers and subnets as needed to create an accurate and complete scan.
 .sp
-\fBQPC_VAR_PROGRAM_NAME source add \-\-name=\fP \fIname\fP  \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-hosts\fP \fIip_address\fP \fB\-\-cred\fP \fIcredential\fP \fB[\-\-exclude\-hosts\fP \fIip_address\fP \fB]\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-paramiko=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-proxy\-url=\fP \fIproxy url\fP \fB]\fP
+\fBQPC_VAR_PROGRAM_NAME source add \-\-name=\fP \fIname\fP  \fB\-\-type=\fP \fI(network | vcenter | satellite | openshift | rhacs | ansible)\fP \fB\-\-hosts\fP \fIip_address\fP \fB\-\-cred\fP \fIcredential\fP \fB[\-\-exclude\-hosts\fP \fIip_address\fP \fB]\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-proxy\-url=\fP \fIproxy url\fP \fB]\fP
 .sp
 \fB\-\-name=name\fP
 .INDENT 0.0
@@ -379,13 +379,6 @@ Optional. Sets a port to be used for the scan. This value supports connection an
 .UNINDENT
 .UNINDENT
 .sp
-\fB\-\-use\-paramiko=(True | False)\fP
-.INDENT 0.0
-.INDENT 3.5
-Optional. Changes the Ansible connection method from the default open\-ssh to the python ssh implementation.
-.UNINDENT
-.UNINDENT
-.sp
 \fB\-\-ssl\-cert\-verify=(True | False)\fP
 .INDENT 0.0
 .INDENT 3.5
@@ -419,7 +412,7 @@ The information in a source might change as the structure of the network changes
 .sp
 Although \fBQPC_VAR_PROGRAM_NAME source\fP options can accept more than one value, the \fBQPC_VAR_PROGRAM_NAME source edit\fP command is not additive. To edit a source and add a new value for an option, you must enter both the current and the new values for that option. Include only the options that you want to change in the \fBQPC_VAR_PROGRAM_NAME source edit\fP command. Options that are not included are not changed.
 .sp
-\fBQPC_VAR_PROGRAM_NAME source edit \-\-name\fP \fIname\fP \fB[\-\-hosts\fP \fIip_address\fP \fB] [\-\-cred\fP \fIcredential\fP \fB] **[\-\-exclude\-hosts\fP \fIip_address\fP \fB] [\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-paramiko=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP
+\fBQPC_VAR_PROGRAM_NAME source edit \-\-name\fP \fIname\fP \fB[\-\-hosts\fP \fIip_address\fP \fB] [\-\-cred\fP \fIcredential\fP \fB] **[\-\-exclude\-hosts\fP \fIip_address\fP \fB] [\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-ssl\-cert\-verify=\fP \fI(True | False)\fP \fB]\fP \fB[\-\-ssl\-protocol=\fP \fIprotocol\fP \fB]\fP \fB[\-\-disable\-ssl=\fP \fI(True | False)\fP \fB]\fP
 .sp
 For example, if a source contains a value of \fBserver1creds\fP for the \fB\-\-cred\fP option, and you want to change that source to use both the \fBserver1creds\fP and \fBserver2creds\fP credentials, you would edit the source as follows:
 .sp

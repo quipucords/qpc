@@ -151,4 +151,4 @@ else
 	$(error Specify either SEGMENT=<major|minor|patch> or VERSION=<x.y.z>)
 endif
 	$(SED) -i "s/^Version:.*/Version:        $$(uv run python get-version.py)/" qpc.spec
-
+	$(SED) -i "s/^QPC_MIN_SERVER_VERSION\s.*/QPC_MIN_SERVER_VERSION = \"$$(uv run python get-version.py --major-minor)\"/" qpc/utils.py

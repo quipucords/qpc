@@ -17,12 +17,6 @@ reviews:
     - "!*.egg-info/**"
     - "!**_cache/**"
 
-  instructions: |
-    - User-facing strings belong in qpc/messages.py, not inline in command modules.
-    - Ensure proper error handling with clear user-facing messages for CLI errors.
-    - Flag broad "except Exception" handlers - prefer specific exception types.
-    - Verify secrets are never logged or returned in output.
-
   path_instructions:
     - path: "**/*"
       instructions: |

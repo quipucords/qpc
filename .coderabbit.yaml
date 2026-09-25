@@ -1,0 +1,46 @@
+language: en-US
+
+reviews:
+  profile: "chill"
+  auto_review:
+    enabled: true
+    drafts: false
+    ignore_title_keywords:
+      - "build(deps)"
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "konflux-internal-p02[bot]"
+      - "mintmaker[bot]"
+
+  path_filters:
+    - "!uv.lock"
+    - "!*.egg-info/**"
+    - "!**_cache/**"
+
+  path_instructions:
+    - path: "**/*"
+      instructions: |
+        - User-facing strings belong in qpc/messages.py, not inline in command modules.
+        - Ensure proper error handling with clear user-facing messages for CLI errors.
+        - Flag broad "except Exception" handlers - prefer specific exception types.
+        - Verify secrets are never logged or returned in output.
+        - Shell commands should be constructed safely - no shell injection risks.
+    - path: "qpc/cred/**"
+      instructions: |
+        - Ensure credentials are never logged or exposed in output.
+        - Verify input validation for credential fields.
+    - path: "qpc/insights/**"
+      instructions: |
+        - Check for proper error handling in network operations.
+        - Ensure credentials and tokens are never logged or exposed.
+        - Verify timeout handling on external connections.
+    - path: "qpc/server/**"
+      instructions: |
+        - Verify server connection parameters are validated.
+        - Ensure proper error handling for unreachable servers.
+    - path: "qpc/tests/**"
+      instructions: |
+        - Tests should not depend on execution order.
+        - Use pytest patterns: plain assert, standalone test functions, not unittest classes.
+        - Flag tests that use sleep or hardcoded waits.
+        - Naming convention: test_<function>_<scenario>.

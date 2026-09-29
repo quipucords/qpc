@@ -58,6 +58,7 @@ sed \
   -e "s/QPC_VAR_PROJECT/quipucords/g" \
   -e "s/QPC_VAR_CURRENT_YEAR/$(date +'%Y')/g" \
   -e "s/BUILD_DATE/$(date +'%B %d, %Y')/g" \
+  -e "s/PKG_VERSION/%{version}/g" \
   docs/_build/QPC_VAR_PROGRAM_NAME.1 > \
   %{buildroot}%{_mandir}/man1/%{binname}.1
 

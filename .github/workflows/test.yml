@@ -35,6 +35,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install system dependencies
+        if: ${{ contains(matrix.type, 'lint') }}
+        run: sudo apt-get install -y mandoc
+
       - name: Install Python dependencies
         run: uv sync
 

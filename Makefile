@@ -46,7 +46,7 @@ help:
 	@echo "  clean               to remove cache, dist, build, and egg files"
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
-	@echo "  lint-docs           to run rstcheck against docs"
+	@echo "  lint-docs           to run rstcheck and mandoc lint against docs"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
@@ -77,6 +77,7 @@ lint-ruff:
 lint-docs:
 	uv run rstcheck docs/source/man-template.rst
 	uv run rstcheck docs/_build/man-qpc.rst
+	mandoc -T lint docs/_build/qpc.1 2>&1 | grep -vE '^mandoc:.*STYLE:' | (! grep .)
 
 .PHONY: test
 test:

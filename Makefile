@@ -1,11 +1,32 @@
-DATE		= $(shell date)
 PYTHON		= $(shell uv run which python 2>/dev/null || which python)
 PKG_VERSION = $(shell uv run python get-version.py)
-BUILD_DATE  = $(shell date +'%B %d, %Y')
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+  # macOS/Darwin's built-in `sed` and `date` are BSD-style and incompatible with Linux/GNU-style arguments.
+  # However, macOS users can install GNU sed as `gsed` and GNU date as `gdate` using Homebrew.
+  ifneq ($(shell command -v gsed),)
+    SED := gsed
+  else
+    $(info "Warning: gsed may be required on macOS, but it is not installed.")
+    $(info "Please run 'brew install gnu-sed' to install it.")
+    SED := sed # Fall back to default sed for now
+  endif
+  ifneq ($(shell command -v gdate),)
+    DATE := gdate
+  else
+    $(info "Warning: gdate may be required on macOS, but it is not installed.")
+    $(info "Please run 'brew install coreutils' to install it.")
+    DATE := date # Fall back to default date for now
+  endif
+else
+  SED := sed
+  DATE := date
+endif
+BUILD_DATE  = $(shell $(DATE) +'%B %d, %Y')
 PARALLEL_NUM ?= $(shell python -c 'import multiprocessing as m;print(int(max(m.cpu_count()/2, 2)))')
 QPC_VAR_PROGRAM_NAME := $(or $(QPC_VAR_PROGRAM_NAME), qpc)
 QPC_VAR_PROGRAM_NAME_UPPER := $(shell echo $(QPC_VAR_PROGRAM_NAME) | tr '[:lower:]' '[:upper:]')
-QPC_VAR_CURRENT_YEAR := $(shell date +'%Y')
+QPC_VAR_CURRENT_YEAR := $(shell $(DATE) +'%Y')
 QPC_VAR_PROJECT := $(or $(QPC_VAR_PROJECT), Quipucords)
 OLD_MAN_PAGE_BUILD_DATE := $(shell grep -e "^\.TH" docs/_build/qpc.1 | cut -d '"' -f 6)
 
@@ -16,7 +37,6 @@ BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
 SPHINX_BUILD = $(shell uv run which sphinx-build)
-SED = sed
 
 .PHONY: help
 help:

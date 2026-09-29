@@ -99,7 +99,7 @@ config-verify:
 update-man-template-roff:
 	@$(SPHINX_BUILD) -b man -q \
 	  -D project='QPC_VAR_PROGRAM_NAME' \
-	  -D release='PKG_VERSION' \
+	  -D version='PKG_VERSION' \
 	  -D today='BUILD_DATE' \
 	  docs docs/_build
 
@@ -174,3 +174,4 @@ else
 endif
 	$(SED) -i "s/^Version:.*/Version:        $$(uv run python get-version.py)/" qpc.spec
 	$(SED) -i "s/^QPC_MIN_SERVER_VERSION\s.*/QPC_MIN_SERVER_VERSION = \"$$(uv run python get-version.py --major-minor)\"/" qpc/utils.py
+	$(MAKE) manpage

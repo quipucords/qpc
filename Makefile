@@ -47,6 +47,7 @@ help:
 	@echo "  lint                to run all linters"
 	@echo "  lint-ruff           to run the ruff linter"
 	@echo "  lint-docs           to run rstcheck and mandoc lint against docs"
+	@echo "  auto-fix            to run linter auto-fix commands"
 	@echo "  test                to run unit tests"
 	@echo "  test-coverage       to run unit tests and measure test coverage"
 	@echo "  manpage             to build the manpage"
@@ -78,6 +79,19 @@ lint-docs:
 	uv run rstcheck docs/source/man-template.rst
 	uv run rstcheck docs/_build/man-qpc.rst
 	mandoc -T lint docs/_build/qpc.1 2>&1 | grep -vE '^mandoc:.*STYLE:' | (! grep .)
+
+# auto-fix code using multiple linter commands.
+# We invoke ruff multiple times because: https://docs.astral.sh/ruff/formatter/#sorting-imports
+# "In order to both sort imports and format, call the Ruff linter and then the formatter"
+# The sequence is a ;-chained command with status checks so one command doesn't block another from running.
+.PHONY: auto-fix
+auto-fix:
+	@final_status=0; \
+	uv run ruff check --select I --fix qpc/; status=$$?; \
+	if [ $$status -ne 0 ]; then final_status=$$status; fi; \
+	uv run ruff format qpc/; status=$$?; \
+	if [ $$status -ne 0 ]; then final_status=$$status; fi; \
+	exit $$final_status
 
 .PHONY: test
 test:

@@ -78,7 +78,7 @@ lint-ruff:
 lint-docs:
 	uv run rstcheck docs/source/man-template.rst
 	uv run rstcheck docs/_build/man-qpc.rst
-	mandoc -T lint docs/_build/qpc.1 2>&1 | grep -vE '^mandoc:.*STYLE:' | (! grep .)
+	mandoc -T lint -W warning docs/_build/qpc.1
 
 # auto-fix code using multiple linter commands.
 # We invoke ruff multiple times because: https://docs.astral.sh/ruff/formatter/#sorting-imports

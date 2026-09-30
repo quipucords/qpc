@@ -36,7 +36,6 @@ PYDIRS	= quipucords
 BINDIR  = bin
 
 OMIT_PATTERNS = */test*.py,*/.virtualenvs/*.py,*/virtualenvs/*.py,.tox/*.py
-SPHINX_BUILD = $(shell uv run which sphinx-build)
 
 .PHONY: help
 help:
@@ -111,7 +110,11 @@ config-verify:
 # write a man page (roff format) with placeholders for names, version, and dates
 .PHONY: update-man-template-roff
 update-man-template-roff:
-	@$(SPHINX_BUILD) -b man -q \
+	@if ! uv run sphinx-build --version >/dev/null 2>&1; then \
+		echo "Error: sphinx-build not found. Install with: uv sync --group build"; \
+		exit 1; \
+	fi; \
+	uv run sphinx-build -b man -q \
 	  -D project='QPC_VAR_PROGRAM_NAME' \
 	  -D version='PKG_VERSION' \
 	  -D today='BUILD_DATE' \

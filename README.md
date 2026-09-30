@@ -50,7 +50,7 @@ qpc development requires Python 3.12, uv, and mandoc. Install using your local p
 * https://www.python.org/downloads/
 * https://docs.astral.sh/uv/
 
-`mandoc` is used by `make lint-docs` to validate the generated man page. It is pre-installed on macOS. On Linux, install it with your package manager (e.g. `dnf install mandoc` or `apt-get install mandoc`).
+`mandoc` is used by `make lint-docs` to validate the generated man page. It is pre-installed on macOS. On Linux, install it with your package manager (e.g. `dnf install mandoc`).
 
 ## Installation with development dependencies
 

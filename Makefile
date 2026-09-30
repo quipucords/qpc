@@ -144,7 +144,7 @@ generate-man-qpc-roff:
 .PHONY: update-man-qpc-roff
 update-man-qpc-roff:
 	$(MAKE) --no-print-directory generate-man-qpc-roff > docs/_build/qpc.1
-	$(SED) '/^\.SH/{n;/^\.sp$$/d}' docs/_build/qpc.1 | $(SED) '/^\.SS/{n;/^\.sp$$/d}' > docs/_build/qpc.1.tmp && mv docs/_build/qpc.1.tmp docs/_build/qpc.1
+	$(SED) -i -e '/^\.SH/{n;/^\.sp$$/d}' -e '/^\.SS/{n;/^\.sp$$/d}' docs/_build/qpc.1
 
 # regenerate and update all man page files
 .PHONY: manpage

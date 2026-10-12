@@ -9,17 +9,18 @@ jobs:
   - job: copr_build
     trigger: pull_request
     targets: &targets_list
-      # we officially support RHEL 8 and RHEL 9 downstream.
+      # we officially support RHEL 8, RHEL 9 and RHEL 10 downstream.
       - rhel-8-x86_64
       - rhel-8-aarch64
       - rhel-9-x86_64
       - rhel-9-aarch64
-      # we also build for RHEL 10
       - rhel-10-x86_64
       - rhel-10-aarch64
-      # fedora is like an even farther future preview.
+      # and also build on Fedora as an early preview of future releases.
       - fedora-43-x86_64
       - fedora-43-aarch64
+      - fedora-44-x86_64
+      - fedora-44-aarch64
 
   - job: copr_build
     trigger: commit

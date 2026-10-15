@@ -9,6 +9,7 @@ from unittest import mock
 from uuid import uuid4
 
 import pytest
+from pytest_lazy_fixtures import lf
 
 from qpc import messages
 from qpc.cli import CLI
@@ -421,9 +422,9 @@ class TestReportMergeTests:
     @pytest.mark.parametrize(
         "path_to_dir",
         (
-            pytest.lazy_fixture("bad_details1"),
-            pytest.lazy_fixture("bad_details5"),
-            pytest.lazy_fixture("doesnt_exist_json"),
+            lf("bad_details1"),
+            lf("bad_details5"),
+            lf("doesnt_exist_json"),
         ),
     )
     def test_detail_merge_json_directory_not_found(self, path_to_dir, caplog):

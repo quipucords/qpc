@@ -6,6 +6,7 @@ import tempfile
 from unittest import mock
 
 import pytest
+from pytest_lazy_fixtures import lf
 
 from qpc import messages
 from qpc.cli import CLI
@@ -275,23 +276,23 @@ class TestInsightsPublishCommand:
         "payload,log_message",
         [
             (
-                pytest.lazy_fixture("empty_payload"),
+                lf("empty_payload"),
                 messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER,
             ),
             (
-                pytest.lazy_fixture("payload_with_non_json_file"),
+                lf("payload_with_non_json_file"),
                 messages.INSIGHTS_REPORT_CONTENT_NOT_JSON,
             ),
             (
-                pytest.lazy_fixture("payload_without_metadata"),
+                lf("payload_without_metadata"),
                 messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA,
             ),
             (
-                pytest.lazy_fixture("unexpected_payload"),
+                lf("unexpected_payload"),
                 messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
             ),
             (
-                pytest.lazy_fixture("non_tarball_payload"),
+                lf("non_tarball_payload"),
                 messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
             ),
         ],

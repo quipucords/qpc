@@ -251,6 +251,9 @@ REPORT_NO_INSIGHTS_CLARIFICATION = (
     "The Insights report can only be generated if at least one source type is "
     "network, satellite, or vcenter."
 )
+REPORT_INSIGHTS_ERROR_DETAIL_PARSE_FAILED = (
+    "Could not parse error detail from response body."
+)
 REPORT_ID_DOES_NOT_EXIST = "Report id %s does not exist."
 REPORT_OUTPUT_CANNOT_BE_EMPTY = "%s cannot be empty string."
 REPORT_OUTPUT_IS_A_DIRECTORY = "%s %s was a directory."

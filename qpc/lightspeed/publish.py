@@ -1,4 +1,4 @@
-"""InsightsPublishCommand is used to publish insights report to C.RH.C."""
+"""LightspeedPublishCommand is used to publish lightspeed report to C.RH.C."""
 
 import re
 import sys
@@ -9,10 +9,10 @@ from tempfile import NamedTemporaryFile
 
 from requests.exceptions import BaseHTTPError, ConnectionError, JSONDecodeError
 
-from qpc import insights, messages
+from qpc import lightspeed, messages
 from qpc.clicommand import CliCommand
 from qpc.exceptions import QPCError
-from qpc.insights.http import InsightsClient
+from qpc.lightspeed.http import LightspeedClient
 from qpc.request import GET
 from qpc.request import request as qpc_request
 from qpc.translation import _
@@ -20,21 +20,21 @@ from qpc.utils import (
     CONFIG_HOST_KEY,
     CONFIG_PORT_KEY,
     CONFIG_USE_HTTP,
-    read_insights_auth_token,
-    read_insights_config,
+    read_lightspeed_auth_token,
+    read_lightspeed_config,
 )
 
 logger = getLogger(__name__)
 
 
-class InsightsPublishCommand(CliCommand):
-    """Defines the Insights command.
+class LightspeedPublishCommand(CliCommand):
+    """Defines the Lightspeed command.
 
-    This command is for publishing server reports to insights client
+    This command is for publishing server reports to lightspeed client
     """
 
-    SUBCOMMAND = insights.SUBCOMMAND
-    ACTION = insights.PUBLISH
+    SUBCOMMAND = lightspeed.SUBCOMMAND
+    ACTION = lightspeed.PUBLISH
 
     def __init__(self, subparsers):
         """Create command."""
@@ -51,7 +51,7 @@ class InsightsPublishCommand(CliCommand):
             "--input-file",
             dest="input_file",
             metavar="INPUT_FILE",
-            help=_(messages.INSIGHTS_INPUT_GZIP_HELP),
+            help=_(messages.LIGHTSPEED_INPUT_GZIP_HELP),
         )
         id_group.add_argument(
             "--report",
@@ -61,27 +61,27 @@ class InsightsPublishCommand(CliCommand):
             help=_(messages.REPORT_REPORT_ID_HELP),
         )
 
-    def _validate_insights_report_name(self, input_file: Path):
+    def _validate_lightspeed_report_name(self, input_file: Path):
         """Validate if report file exists and its file extension (tar.gz)."""
         if not input_file.is_file():
-            logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT), input_file)
+            logger.error(_(messages.LIGHTSPEED_LOCAL_REPORT_NOT), input_file)
             sys.exit(1)
         if not input_file.name.endswith("tar.gz"):
-            logger.error(_(messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ), input_file)
+            logger.error(_(messages.LIGHTSPEED_LOCAL_REPORT_NOT_TAR_GZ), input_file)
             sys.exit(1)
 
-    def _validate_insights_report_content(self, input_file: Path):
+    def _validate_lightspeed_report_content(self, input_file: Path):
         """Check if report tarball contains the expected json files."""
         filenames = self._get_filenames(input_file)
 
         if len(filenames) < 2:
-            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER))
+            logger.error(_(messages.LIGHTSPEED_REPORT_CONTENT_MIN_NUMBER))
             raise SystemExit(1)
 
         top_folder, filenames = self._separate_top_folder(filenames)
 
         if f"{top_folder}/metadata.json" not in filenames:
-            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA))
+            logger.error(_(messages.LIGHTSPEED_REPORT_CONTENT_MISSING_METADATA))
             raise SystemExit(1)
 
         for filename in filenames:
@@ -92,7 +92,7 @@ class InsightsPublishCommand(CliCommand):
             with tarfile.open(input_file) as tarball:
                 filenames = sorted(tarball.getnames())
         except tarfile.ReadError as err:
-            logger.exception(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.exception(_(messages.LIGHTSPEED_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1) from err
         return filenames
 
@@ -107,17 +107,17 @@ class InsightsPublishCommand(CliCommand):
         elif self._is_top_folder(top_folder.parent):
             top_folder = top_folder.parent
         else:
-            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.error(_(messages.LIGHTSPEED_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1)
         return top_folder, filenames
 
     def _validate_filename(self, top_folder, filename):
         filepath = Path(filename)
         if filepath.parent != top_folder:
-            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED))
+            logger.error(_(messages.LIGHTSPEED_REPORT_CONTENT_UNEXPECTED))
             raise SystemExit(1)
         if filepath.suffix != ".json":
-            logger.error(_(messages.INSIGHTS_REPORT_CONTENT_NOT_JSON))
+            logger.error(_(messages.LIGHTSPEED_REPORT_CONTENT_NOT_JSON))
             raise SystemExit(1)
 
     def _remove_file_extension(self, input_file):
@@ -128,32 +128,32 @@ class InsightsPublishCommand(CliCommand):
         if self.args.input_file:
             input_file = Path(self.args.input_file)
         else:
-            input_file = self._download_insights_report()
-        self._validate_insights_report_name(input_file)
-        self._validate_insights_report_content(input_file)
+            input_file = self._download_lightspeed_report()
+        self._validate_lightspeed_report_name(input_file)
+        self._validate_lightspeed_report_content(input_file)
 
         base_url = self._get_base_url()
 
-        auth_token = read_insights_auth_token()
+        auth_token = read_lightspeed_auth_token()
         if not auth_token:
-            raise QPCError(_(messages.INSIGHTS_NOT_LOGGED_IN))
+            raise QPCError(_(messages.LIGHTSPEED_NOT_LOGGED_IN))
 
-        insights_client = InsightsClient(base_url=base_url, auth_token=auth_token)
+        lightspeed_client = LightspeedClient(base_url=base_url, auth_token=auth_token)
         filename_without_extensions = self._remove_file_extension(input_file)
         with input_file.open("rb") as file_to_be_uploaded:
             files = {
                 "file": (
                     filename_without_extensions,
                     file_to_be_uploaded,
-                    insights.CONTENT_TYPE,
+                    lightspeed.CONTENT_TYPE,
                 )
             }
             successfully_submitted = self._make_publish_request(
-                insights_client, insights.INGRESS_REPORT_URI, files
+                lightspeed_client, lightspeed.INGRESS_REPORT_URI, files
             )
 
         if not self.args.input_file:
-            # remove temporarily downloaded insights report
+            # remove temporarily downloaded lightspeed report
             input_file.unlink()
 
         if not successfully_submitted:
@@ -165,9 +165,11 @@ class InsightsPublishCommand(CliCommand):
             sys.exit(1)
         return super()._handle_response_error(response)
 
-    def _download_insights_report(self):
+    def _download_lightspeed_report(self):
         path = (
-            insights.REPORT_URI + str(self.args.report) + insights.INSIGHTS_PATH_SUFFIX
+            lightspeed.REPORT_URI
+            + str(self.args.report)
+            + lightspeed.LIGHTSPEED_PATH_SUFFIX
         )
 
         response = qpc_request(
@@ -179,7 +181,7 @@ class InsightsPublishCommand(CliCommand):
         if not response.ok:
             self._handle_response_error(response)
 
-        logger.info(_(messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL))
+        logger.info(_(messages.LIGHTSPEED_REPORT_DOWNLOAD_SUCCESSFUL))
 
         output_file = NamedTemporaryFile(suffix=".tar.gz", delete=False)
         output_file_path = Path(output_file.name)
@@ -188,34 +190,34 @@ class InsightsPublishCommand(CliCommand):
         return output_file_path
 
     def _get_base_url(self):
-        insights_config = read_insights_config()
+        lightspeed_config = read_lightspeed_config()
 
-        if insights_config[CONFIG_USE_HTTP]:
+        if lightspeed_config[CONFIG_USE_HTTP]:
             protocol = "http://"
         else:
             protocol = "https://"
-        host = insights_config[CONFIG_HOST_KEY]
-        port = insights_config[CONFIG_PORT_KEY]
+        host = lightspeed_config[CONFIG_HOST_KEY]
+        port = lightspeed_config[CONFIG_PORT_KEY]
 
         base_url = f"{protocol}{host}:{port}"
         return base_url
 
     def _make_publish_request(self, session_client, url, files):
-        """Make insights client request and log status code."""
+        """Make lightspeed client request and log status code."""
         logger.info(
-            _(messages.INSIGHTS_PUBLISH_REPORT), f"{session_client.base_url}{url}"
+            _(messages.LIGHTSPEED_PUBLISH_REPORT), f"{session_client.base_url}{url}"
         )
         try:
             response = session_client.post(url=url, files=files)
-            logger.info(_(messages.INSIGHTS_PUBLISH_RESPONSE), response.text)
+            logger.info(_(messages.LIGHTSPEED_PUBLISH_RESPONSE), response.text)
         except ConnectionError as err:
-            logger.error(_(messages.INSIGHTS_PUBLISH_FAILED), err)
+            logger.error(_(messages.LIGHTSPEED_PUBLISH_FAILED), err)
             return False
         except BaseHTTPError as err:
-            logger.error(_(messages.INSIGHTS_PUBLISH_FAILED), err)
+            logger.error(_(messages.LIGHTSPEED_PUBLISH_FAILED), err)
             return False
         if response.ok:
-            logger.info(_(messages.INSIGHTS_PUBLISH_SUCCESSFUL))
+            logger.info(_(messages.LIGHTSPEED_PUBLISH_SUCCESSFUL))
             print(response.text)
         elif response.status_code == 401:
             try:
@@ -224,15 +226,15 @@ class InsightsPublishCommand(CliCommand):
             except JSONDecodeError:
                 err_detail = ""
             if re.match(r"Invalid JWT token .*expired.*", err_detail):
-                logger.error(_(messages.INSIGHTS_TOKEN_EXPIRED))
+                logger.error(_(messages.LIGHTSPEED_TOKEN_EXPIRED))
             elif re.match(r"JWT token header is malformed.*", err_detail):
-                logger.error(_(messages.INSIGHTS_TOKEN_INVALID))
+                logger.error(_(messages.LIGHTSPEED_TOKEN_INVALID))
             else:
-                logger.error(_(messages.INSIGHTS_AUTH_ERROR))
+                logger.error(_(messages.LIGHTSPEED_AUTH_ERROR))
         elif response.status_code == 404:
-            logger.error(_(messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR))
+            logger.error(_(messages.LIGHTSPEED_PUBLISH_NOT_FOUND_ERROR))
         elif response.status_code == 500:
-            logger.error(_(messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR))
+            logger.error(_(messages.LIGHTSPEED_PUBLISH_INTERNAL_SERVER_ERROR))
 
         return response.ok
 

@@ -1,4 +1,4 @@
-"""ReportInsightsCommand is to show insights report."""
+"""ReportLightspeedCommand is to show lightspeed report."""
 
 import sys
 from logging import getLogger
@@ -14,14 +14,14 @@ from qpc.utils import check_extension, validate_write_file, write_file
 logger = getLogger(__name__)
 
 
-class ReportInsightsCommand(CliCommand):
-    """Defines the report insights command.
+class ReportLightspeedCommand(CliCommand):
+    """Defines the report lightspeed command.
 
-    This command is for showing the insights report.
+    This command is for showing the lightspeed report.
     """
 
     SUBCOMMAND = report.SUBCOMMAND
-    ACTION = report.INSIGHTS
+    ACTION = report.LIGHTSPEED
 
     def __init__(self, subparsers):
         """Create command."""
@@ -84,11 +84,12 @@ class ReportInsightsCommand(CliCommand):
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
                     self.req_path = (
-                        f"{self.req_path}{self.report_id}{report.INSIGHTS_PATH_SUFFIX}"
+                        f"{self.req_path}{self.report_id}"
+                        f"{report.LIGHTSPEED_PATH_SUFFIX}"
                     )
                 else:
                     logger.error(
-                        _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
+                        _(messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_SJ),
                         self.args.scan_job_id,
                     )
                     sys.exit(1)
@@ -100,7 +101,7 @@ class ReportInsightsCommand(CliCommand):
         else:
             self.report_id = self.args.report_id
             self.req_path = (
-                f"{self.req_path}{self.report_id}{report.INSIGHTS_PATH_SUFFIX}"
+                f"{self.req_path}{self.report_id}{report.LIGHTSPEED_PATH_SUFFIX}"
             )
 
     def _handle_response_success(self):
@@ -120,16 +121,17 @@ class ReportInsightsCommand(CliCommand):
     def _handle_response_error(self):
         if self.args.report_id is None:
             logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ), self.args.scan_job_id
+                _(messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_SJ), self.args.scan_job_id
             )
         else:
             logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID), self.args.report_id
+                _(messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_REPORT_ID),
+                self.args.report_id,
             )
         try:
             detail = self.response.json().get("detail")
             if detail:
                 logger.error(detail)
         except ValueError:
-            logger.warning(_(messages.REPORT_INSIGHTS_ERROR_DETAIL_PARSE_FAILED))
+            logger.warning(_(messages.REPORT_LIGHTSPEED_ERROR_DETAIL_PARSE_FAILED))
         sys.exit(1)

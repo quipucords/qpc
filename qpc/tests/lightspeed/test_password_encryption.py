@@ -5,7 +5,7 @@ import secrets
 import pytest
 
 from qpc import utils
-from qpc.insights.exceptions import QPCEncryptionKeyError
+from qpc.lightspeed.exceptions import QPCEncryptionKeyError
 from qpc.utils import (
     decrypt_password,
     encrypt_password,
@@ -14,19 +14,19 @@ from qpc.utils import (
 )
 
 
-def test_insights_encryption_file_is_created():
-    """Test if insights encryption file is created if non-existent."""
-    assert not utils.INSIGHTS_ENCRYPTION.exists()
+def test_lightspeed_encryption_file_is_created():
+    """Test if lightspeed encryption file is created if non-existent."""
+    assert not utils.LIGHTSPEED_ENCRYPTION.exists()
 
     write_encryption_key_if_non_existent()
 
-    assert utils.INSIGHTS_ENCRYPTION.exists()
+    assert utils.LIGHTSPEED_ENCRYPTION.exists()
 
 
 def test_if_encryption_file_permission_is_set_to_600():
     """Assert encryption file permissions are set to 600 when created."""
     write_encryption_key_if_non_existent()
-    stats = utils.INSIGHTS_ENCRYPTION.stat()
+    stats = utils.LIGHTSPEED_ENCRYPTION.stat()
     print(stats.st_mode)
 
     assert "600" in oct(stats.st_mode)
@@ -35,7 +35,7 @@ def test_if_encryption_file_permission_is_set_to_600():
 def test_if_key_is_loaded_with_wrong_permissions():
     """Assert key is only loaded with right permissions."""
     write_encryption_key_if_non_existent()
-    utils.INSIGHTS_ENCRYPTION.chmod(0o777)
+    utils.LIGHTSPEED_ENCRYPTION.chmod(0o777)
 
     with pytest.raises(QPCEncryptionKeyError):
         load_encryption_key()

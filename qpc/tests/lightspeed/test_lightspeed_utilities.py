@@ -1,10 +1,10 @@
-"""Test insights utilities functions."""
+"""Test lightspeed utilities functions."""
 
 from argparse import ArgumentTypeError
 
 import pytest
 
-from qpc.insights.utils import validate_host
+from qpc.lightspeed.utils import validate_host
 
 
 @pytest.mark.parametrize(

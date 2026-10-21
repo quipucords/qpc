@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from qpc import cred, insights, messages, report, scan, server, source, vault
+from qpc import cred, lightspeed, messages, report, scan, server, source, vault
 from qpc.cred.commands import (
     CredAddCommand,
     CredClearCommand,
@@ -11,10 +11,10 @@ from qpc.cred.commands import (
     CredListCommand,
     CredShowCommand,
 )
-from qpc.insights.commands import (
-    InsightsConfigureCommand,
-    InsightsLoginCommand,
-    InsightsPublishCommand,
+from qpc.lightspeed.commands import (
+    LightspeedConfigureCommand,
+    LightspeedLoginCommand,
+    LightspeedPublishCommand,
 )
 from qpc.release import QPC_VAR_PROGRAM_NAME, VERSION, get_current_sha1
 from qpc.report.aggregate import ReportAggregateCommand
@@ -22,7 +22,7 @@ from qpc.report.commands import (
     ReportDeploymentsCommand,
     ReportDetailsCommand,
     ReportDownloadCommand,
-    ReportInsightsCommand,
+    ReportLightspeedCommand,
     ReportListCommand,
     ReportMergeCommand,
     ReportShowCommand,
@@ -176,7 +176,7 @@ class CLI:
                 ReportAggregateCommand,
                 ReportDeploymentsCommand,
                 ReportDetailsCommand,
-                ReportInsightsCommand,
+                ReportLightspeedCommand,
                 ReportDownloadCommand,
                 ReportListCommand,
                 ReportMergeCommand,
@@ -185,11 +185,11 @@ class CLI:
             ],
         )
         self._add_subcommand(
-            insights.SUBCOMMAND,
+            lightspeed.SUBCOMMAND,
             [
-                InsightsConfigureCommand,
-                InsightsLoginCommand,
-                InsightsPublishCommand,
+                LightspeedConfigureCommand,
+                LightspeedLoginCommand,
+                LightspeedPublishCommand,
             ],
         )
         self._add_subcommand(

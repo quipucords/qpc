@@ -1,4 +1,4 @@
-"""Utilities for the insights module."""
+"""Utilities for the lightspeed module."""
 
 import re
 from argparse import ArgumentTypeError

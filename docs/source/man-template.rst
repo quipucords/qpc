@@ -505,7 +505,7 @@ The ``QPC_VAR_PROGRAM_NAME scan cancel`` command cancels the execution of a scan
 Reports
 -------
 
-Use the ``QPC_VAR_PROGRAM_NAME report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of reports that you can retrieve, a *details* report, a *deployments* report, and an *insights* report.
+Use the ``QPC_VAR_PROGRAM_NAME report`` command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma-separated values (CSV) format. There are three different types of reports that you can retrieve, a *details* report, a *deployments* report, and a *lightspeed* report.
 
 
 Viewing the Details Report
@@ -564,12 +564,12 @@ For example, the raw facts of a scan that includes both Network and vCenter sour
 
   Optional. Sets the path to a file location where the report data is saved. The file extension must be ``.json`` for the JSON report or ``.csv`` for the CSV report. When the field is not provided and `--json` specified, a JSON report will be generated to stdout.
 
-Viewing the Insights Report
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Viewing the Red Hat Lightspeed Report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``QPC_VAR_PROGRAM_NAME report insights`` command retrieves a report that contains the hosts to be uploaded to the subscription insights service. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
+The ``QPC_VAR_PROGRAM_NAME report lightspeed`` command retrieves a report that contains the hosts to be uploaded to Red Hat Lightspeed. A *host* is the set of system, product, and entitlement facts for a particular physical or virtual machine.
 
-**QPC_VAR_PROGRAM_NAME report insights (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
+**QPC_VAR_PROGRAM_NAME report lightspeed (--scan-job** *scan_job_identifier* **|** **--report** *report_identifier* **)** **--output-file** *path*
 
 ``--scan-job=scan_job_identifier``
 
@@ -671,54 +671,54 @@ The ``QPC_VAR_PROGRAM_NAME report upload`` command runs an asynchronous job. The
 
 # QPC_VAR_PROGRAM_NAME job status --id 1
 
-Insights
---------
+Red Hat Lightspeed
+------------------
 
-Use the ``QPC_VAR_PROGRAM_NAME insights`` command to interact with Red Hat Insights and its services.
+Use the ``QPC_VAR_PROGRAM_NAME lightspeed`` command to interact with Red Hat Lightspeed and its services.
 
-Configuring Insights
-~~~~~~~~~~~~~~~~~~~~
+Configuring Red Hat Lightspeed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To configure the connection to Insights server, you may optionally provide the host address and port to override the default values.
+To configure the connection to Lightspeed, you may optionally provide the host address and port to override the default values.
 
-**QPC_VAR_PROGRAM_NAME insights config --host=** *host* **[--port=** *port* **]** **[--use-http]**
+**QPC_VAR_PROGRAM_NAME lightspeed config --host=** *host* **[--port=** *port* **]** **[--use-http]**
 
 ``--host=host``
 
-  Optional. Sets the host address for Insights. The default host is ``console.redhat.com``.
+  Optional. Sets the host address for Lightspeed. The default host is ``console.redhat.com``.
 
 ``--port=port``
 
-  Optional. Sets the port to use to connect to Insights. The default port is ``443``.
+  Optional. Sets the port to use to connect to Lightspeed. The default port is ``443``.
 
 ``--use-http``
 
   Optional. Determines whether to use HTTP instead of HTTPS. The default value is ``False``.
 
-Login to Insights
-~~~~~~~~~~~~~~~~~
+Login to Red Hat Lightspeed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To be able to publish reports to Insights, one must be authorized and successfully logged into Insights.
+To be able to publish reports to Lightspeed, one must be authorized and successfully logged into Lightspeed.
 
-**QPC_VAR_PROGRAM_NAME insights login**
+**QPC_VAR_PROGRAM_NAME lightspeed login**
 
-This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use {{QPC_VAR_PROGRAM_NAME}} to publish reports.
+This command requests the authorization of the user to Lightspeed. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Lightspeed and be authorized to use {{QPC_VAR_PROGRAM_NAME}} to publish reports.
 
 
-Publishing to Insights
-~~~~~~~~~~~~~~~~~~~~~~
+Publishing to Red Hat Lightspeed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``QPC_VAR_PROGRAM_NAME insights publish`` command allows you to publish an Insights report to Red Hat Insights and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
+The ``QPC_VAR_PROGRAM_NAME lightspeed publish`` command allows you to publish a Lightspeed report to Red Hat Lightspeed and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
 
-**QPC_VAR_PROGRAM_NAME insights publish (--report** *report_identifiers* **| --input-file** *path_to_tar_gz* )
+**QPC_VAR_PROGRAM_NAME lightspeed publish (--report** *report_identifiers* **| --input-file** *path_to_tar_gz* )
 
 ``--report=report_identifier``
 
-  Contains the report identifier to use to retrieve and publish the Insights report. Mutually exclusive with the ``--input-file`` option.
+  Contains the report identifier to use to retrieve and publish the Lightspeed report. Mutually exclusive with the ``--input-file`` option.
 
-``--input-file=path to tar.gz containing the Insights report``
+``--input-file=path to tar.gz containing the Lightspeed report``
 
-  Contains the path to the tar.gz containing the Insights report. Mutually exclusive with ``--report`` option.
+  Contains the path to the tar.gz containing the Lightspeed report. Mutually exclusive with ``--report`` option.
 
 
 HashiCorp Vault Integration
@@ -929,13 +929,13 @@ Examples
 
   ``QPC_VAR_PROGRAM_NAME report deployments --report 2  --csv --output-file path_to_your_file.csv``
 
-* Retrieves a JSON Insights report with no output file
+* Retrieves a JSON Red Hat Lightspeed report with no output file
 
-  ``QPC_VAR_PROGRAM_NAME report insights --scan-job 1``
+  ``QPC_VAR_PROGRAM_NAME report lightspeed --scan-job 1``
 
-* Retrieves a tar.gz Insights report
+* Retrieves a tar.gz Lightspeed report
 
-  ``QPC_VAR_PROGRAM_NAME report insights --scan-job 1 --output-file path_to_your_file.tar.gz``
+  ``QPC_VAR_PROGRAM_NAME report lightspeed --scan-job 1 --output-file path_to_your_file.tar.gz``
 
 * Downloading a set of reports
 
@@ -961,21 +961,21 @@ Examples
 
   ``QPC_VAR_PROGRAM_NAME report upload --json-file path_to_report.json``
 
-* Configuring Insights
+* Configuring Red Hat Lightspeed
 
-  ``QPC_VAR_PROGRAM_NAME insights config --host stage.console.redhat.com --port 8080``
+  ``QPC_VAR_PROGRAM_NAME lightspeed config --host stage.console.redhat.com --port 8080``
 
-* Login to Insights
+* Login to Red Hat Lightspeed
 
-  ``QPC_VAR_PROGRAM_NAME insights login``
+  ``QPC_VAR_PROGRAM_NAME lightspeed login``
 
-* Publishing to Insights using a report id
+* Publishing to Red Hat Lightspeed using a report id
 
-  ``QPC_VAR_PROGRAM_NAME insights publish --report 1``
+  ``QPC_VAR_PROGRAM_NAME lightspeed publish --report 1``
 
-* Publishing to Insights using a previously downloaded report
+* Publishing to Red Hat Lightspeed using a previously downloaded report
 
-  ``QPC_VAR_PROGRAM_NAME insights publish --input-file path_to_report.tar.gz``
+  ``QPC_VAR_PROGRAM_NAME lightspeed publish --input-file path_to_report.tar.gz``
 
 * Setting up HashiCorp Vault integration
 

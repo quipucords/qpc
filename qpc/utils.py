@@ -12,7 +12,7 @@ from pathlib import Path
 from cryptography.fernet import Fernet, InvalidToken
 
 from qpc import messages
-from qpc.insights.exceptions import QPCEncryptionKeyError
+from qpc.lightspeed.exceptions import QPCEncryptionKeyError
 from qpc.translation import _ as t
 
 QPC_PATH = "qpc"
@@ -25,10 +25,10 @@ DATA_DIR = DATA_HOME / QPC_PATH
 QPC_LOG = DATA_DIR / "qpc.log"
 QPC_SERVER_CONFIG = CONFIG_DIR / "server.config"
 QPC_CLIENT_TOKEN = CONFIG_DIR / "client_token"
-INSIGHTS_CONFIG = CONFIG_DIR / "insights.config"
-INSIGHTS_AUTH_TOKEN = CONFIG_DIR / "insights_token"
+LIGHTSPEED_CONFIG = CONFIG_DIR / "lightspeed.config"
+LIGHTSPEED_AUTH_TOKEN = CONFIG_DIR / "lightspeed_token"
 
-INSIGHTS_ENCRYPTION = DATA_DIR / "insights_encryption"
+LIGHTSPEED_ENCRYPTION = DATA_DIR / "lightspeed_encryption"
 
 CONFIG_HOST_KEY = "host"
 CONFIG_PORT_KEY = "port"
@@ -39,17 +39,16 @@ CONFIG_SSO_HOST_KEY = "sso_host"
 CLIENT_TOKEN_KEY = "token"
 CLIENT_TOKEN_TEST_VALUE = "abc123"
 
+DEFAULT_HOST_LIGHTSPEED_CONFIG = "console.redhat.com"
+DEFAULT_PORT_LIGHTSPEED_CONFIG = 443
+DEFAULT_USE_HTTP_LIGHTSPEED_CONFIG = False
+DEFAULT_SSO_HOST_LIGHTSPEED_CONFIG = "sso.redhat.com"
 
-DEFAULT_HOST_INSIGHTS_CONFIG = "console.redhat.com"
-DEFAULT_PORT_INSIGHTS_CONFIG = 443
-DEFAULT_USE_HTTP_INSIGHTS_CONFIG = False
-DEFAULT_SSO_HOST_INSIGHTS_CONFIG = "sso.redhat.com"
-
-DEFAULT_INSIGHTS_CONFIG = {
-    CONFIG_HOST_KEY: DEFAULT_HOST_INSIGHTS_CONFIG,
-    CONFIG_PORT_KEY: DEFAULT_PORT_INSIGHTS_CONFIG,
-    CONFIG_USE_HTTP: DEFAULT_USE_HTTP_INSIGHTS_CONFIG,
-    CONFIG_SSO_HOST_KEY: DEFAULT_SSO_HOST_INSIGHTS_CONFIG,
+DEFAULT_LIGHTSPEED_CONFIG = {
+    CONFIG_HOST_KEY: DEFAULT_HOST_LIGHTSPEED_CONFIG,
+    CONFIG_PORT_KEY: DEFAULT_PORT_LIGHTSPEED_CONFIG,
+    CONFIG_USE_HTTP: DEFAULT_USE_HTTP_LIGHTSPEED_CONFIG,
+    CONFIG_SSO_HOST_KEY: DEFAULT_SSO_HOST_LIGHTSPEED_CONFIG,
 }
 
 LOG_LEVEL_INFO = 0
@@ -114,20 +113,20 @@ def read_client_token():
         return None
 
 
-def read_insights_config():
-    """Retrieve insights configuration.
+def read_lightspeed_config():
+    """Retrieve lightspeed configuration.
 
     :returns: The validated dictionary with configuration
     """
-    if not INSIGHTS_CONFIG.exists():
-        return DEFAULT_INSIGHTS_CONFIG
+    if not LIGHTSPEED_CONFIG.exists():
+        return DEFAULT_LIGHTSPEED_CONFIG
 
     try:
-        config = json.loads(INSIGHTS_CONFIG.read_text())
+        config = json.loads(LIGHTSPEED_CONFIG.read_text())
     except json.decoder.JSONDecodeError:
-        return DEFAULT_INSIGHTS_CONFIG
-    insights_config = dict(DEFAULT_INSIGHTS_CONFIG, **config)
-    return insights_config
+        return DEFAULT_LIGHTSPEED_CONFIG
+    lightspeed_config = dict(DEFAULT_LIGHTSPEED_CONFIG, **config)
+    return lightspeed_config
 
 
 def read_server_config():  # noqa: C901 PLR0911
@@ -234,46 +233,46 @@ def write_server_config(server_config):
     write_config(QPC_SERVER_CONFIG, server_config)
 
 
-def write_insights_config(insights_config):
-    """Write insights configuration to insights.config.
+def write_lightspeed_config(lightspeed_config):
+    """Write lightspeed configuration to lightspeed.config.
 
-    :param insights_config: dict containing insights configuration
+    :param lightspeed_config: dict containing Lightspeed configuration
     """
-    write_config(INSIGHTS_CONFIG, insights_config)
+    write_config(LIGHTSPEED_CONFIG, lightspeed_config)
 
 
-def clear_insights_auth_token():
-    """Delete the insights authentication token."""
+def clear_lightspeed_auth_token():
+    """Delete the lightspeed authentication token."""
     ensure_config_dir_exists()
-    Path(INSIGHTS_AUTH_TOKEN).unlink(missing_ok=True)
+    Path(LIGHTSPEED_AUTH_TOKEN).unlink(missing_ok=True)
 
 
-def read_insights_auth_token():
-    """Retrieve the insights authentication token.
+def read_lightspeed_auth_token():
+    """Retrieve the lightspeed authentication token.
 
-    :returns: The Insight's user JWT auth token
+    :returns: the Lightspeed user JWT auth token
     """
-    if not INSIGHTS_AUTH_TOKEN.exists():
+    if not LIGHTSPEED_AUTH_TOKEN.exists():
         return None
 
     try:
-        return decrypt_password(INSIGHTS_AUTH_TOKEN.read_text())
+        return decrypt_password(LIGHTSPEED_AUTH_TOKEN.read_text())
     except QPCEncryptionKeyError:
-        raise QPCEncryptionKeyError(t(messages.INSIGHTS_TOKEN_CORRUPT))
+        raise QPCEncryptionKeyError(t(messages.LIGHTSPEED_TOKEN_CORRUPT))
 
 
-def write_insights_auth_token(auth_token):
-    """Write insights user authentication.
+def write_lightspeed_auth_token(auth_token):
+    """Write lightspeed user authentication.
 
-    :param auth_token: Insight's user JWT auth token
+    :param auth_token: the Lightspeed user JWT auth token
     """
     ensure_config_dir_exists()
 
     if auth_token:
-        with Path(INSIGHTS_AUTH_TOKEN).open("w", encoding="utf-8") as auth_token_file:
+        with Path(LIGHTSPEED_AUTH_TOKEN).open("w", encoding="utf-8") as auth_token_file:
             auth_token_file.write(encrypt_password(auth_token))
     else:
-        clear_insights_auth_token()
+        clear_lightspeed_auth_token()
 
 
 def write_client_token(client_token):
@@ -573,20 +572,20 @@ def check_extension(extension, path):
 def write_encryption_key_if_non_existent():
     """Generate encryption key.
 
-    Key will be generated only once and saved at INSIGHTS_ENCRYPTION file,
+    Key will be generated only once and saved at LIGHTSPEED_ENCRYPTION file,
     the function will check its existence every time it is called
     """
-    if not INSIGHTS_ENCRYPTION.exists():
+    if not LIGHTSPEED_ENCRYPTION.exists():
         key = Fernet.generate_key()
-        INSIGHTS_ENCRYPTION.write_bytes(key)
-        INSIGHTS_ENCRYPTION.chmod(0o600)
+        LIGHTSPEED_ENCRYPTION.write_bytes(key)
+        LIGHTSPEED_ENCRYPTION.chmod(0o600)
 
 
 def load_encryption_key():
-    """Load encryption from insights_encryption file."""
-    stats = INSIGHTS_ENCRYPTION.stat()
+    """Load encryption from lightspeed_encryption file."""
+    stats = LIGHTSPEED_ENCRYPTION.stat()
     if oct(stats.st_mode).endswith("00"):
-        return INSIGHTS_ENCRYPTION.read_bytes()
+        return LIGHTSPEED_ENCRYPTION.read_bytes()
 
     raise QPCEncryptionKeyError(
         "There was a problem while trying to load the password encryption key."

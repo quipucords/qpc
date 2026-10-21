@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from qpc.insights.http import InsightsClient
+from qpc.lightspeed.http import LightspeedClient
 
 
 @mock.patch("requests.Session.request")
@@ -35,9 +35,9 @@ def test_request_joins_url_with_base_url(
     request_session_mocker, base_url, method, url, full_url
 ):
     """Test if urljoin is performed successfully."""
-    insights_client_session = InsightsClient(base_url=base_url)
+    lightspeed_client_session = LightspeedClient(base_url=base_url)
 
-    insights_client_session.request(method, url)
+    lightspeed_client_session.request(method, url)
 
     request_session_mocker.assert_called_with(method, full_url)
 
@@ -74,9 +74,9 @@ def test_extra_args_are_passed_to_request(
     full_url,
 ):
     """Test if parent class receives all args passed."""
-    insights_client_session = InsightsClient(base_url=base_url)
+    lightspeed_client_session = LightspeedClient(base_url=base_url)
 
-    insights_client_session.request("post", url, args)
+    lightspeed_client_session.request("post", url, args)
 
     request_session_mocker.assert_called_with("post", full_url, args)
 
@@ -84,5 +84,5 @@ def test_extra_args_are_passed_to_request(
 def test_auth():
     """Test if auth is being passed with the right parameters."""
     test_token = "userJwt"
-    client = InsightsClient(auth_token=test_token)
+    client = LightspeedClient(auth_token=test_token)
     assert client.headers["Authorization"] == f"Bearer {test_token}"

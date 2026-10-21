@@ -172,7 +172,6 @@ SOURCE_PROXY_URL_HELP = (
     "Optional proxy to use for this source in the format http(s)://host:port"
 )
 
-
 SCAN_NAME_HELP = "Scan name."
 SCAN_ADDED = 'Scan "%s" was added.'
 SCAN_UPDATED = 'Scan "%s" was updated.'
@@ -245,13 +244,13 @@ REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ = "No deployments report available for scan 
 REPORT_NO_DEPLOYMENTS_REPORT_FOR_REPORT_ID = "The deployments report %s does not exist."
 REPORT_NO_DETAIL_REPORT_FOR_SJ = "No report detail available for scan job %s."
 REPORT_NO_DETAIL_REPORT_FOR_REPORT_ID = "No report detail available for report id %s."
-REPORT_NO_INSIGHTS_REPORT_FOR_SJ = "No Insights report available for scan job %s."
-REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID = "Insights report %s does not exist."
-REPORT_NO_INSIGHTS_CLARIFICATION = (
-    "The Insights report can only be generated if at least one source type is "
+REPORT_NO_LIGHTSPEED_REPORT_FOR_SJ = "No Lightspeed report available for scan job %s."
+REPORT_NO_LIGHTSPEED_REPORT_FOR_REPORT_ID = "Lightspeed report %s does not exist."
+REPORT_NO_LIGHTSPEED_CLARIFICATION = (
+    "the Lightspeed report can only be generated if at least one source type is "
     "network, satellite, or vcenter."
 )
-REPORT_INSIGHTS_ERROR_DETAIL_PARSE_FAILED = (
+REPORT_LIGHTSPEED_ERROR_DETAIL_PARSE_FAILED = (
     "Could not parse error detail from response body."
 )
 REPORT_ID_DOES_NOT_EXIST = "Report id %s does not exist."
@@ -280,7 +279,6 @@ DISABLE_OPT_PRODUCTS_HELP = (
 )
 
 VERBOSITY_HELP = "Verbose mode. Use up to -vvvv for more verbosity."
-
 
 CONNECTION_ERROR_MSG = (
     "A connection error occurred while attempting to "
@@ -343,21 +341,33 @@ LOGIN_SUCCESS = "Login successful."
 
 LOGOUT_SUCCESS = "Logged out."
 
-INSIGHTS_NOT_LOGGED_IN = "Must first login to authenticate"
-INSIGHTS_TOKEN_EXPIRED = "Authorization token expired, please re-login to Insights"
-INSIGHTS_TOKEN_CORRUPT = "Corrupt Authorization token, please re-login to Insights"
-INSIGHTS_TOKEN_INVALID = "Invalid Authorization token, please re-login to Insights"
-INSIGHTS_SSO_CONFIG_QUERY = "Querying Insights SSO configuration at %s for %s"
-INSIGHTS_SSO_QUERY_FAILED = "Failed to query the Insights SSO configuration: missing %s"
-INSIGHTS_AUTH_ERROR = "Authorization failed, please re-login to Insights"
-INSIGHTS_LOGIN_REQUEST = "Requesting Login authorization from %s"
-INSIGHTS_LOGIN_REQUEST_FAILED = "Failed to request login authorization: %s"
-INSIGHTS_LOGIN_VERIFYING = "Verifying Login authorization at %s"
-INSIGHTS_LOGIN_VERIFICATION_FAILED = "Failed to verify Login authorization: %s"
-INSIGHTS_LOGIN_VERIFICATION_TIMEOUT = "Time-out while waiting for Login authorization"
-INSIGHTS_INPUT_GZIP_HELP = "Path to local tar.gz file containing an Insights report."
-INSIGHTS_LOCAL_REPORT_NOT = "%s file cannot be found."
-INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ = "%s file is not a tar.gz."
+LIGHTSPEED_NOT_LOGGED_IN = "Must first login to authenticate"
+LIGHTSPEED_TOKEN_EXPIRED = (
+    "Authorization token expired, please re-login to Red Hat Lightspeed"
+)
+LIGHTSPEED_TOKEN_CORRUPT = (
+    "Corrupt Authorization token, please re-login to Red Hat Lightspeed"
+)
+LIGHTSPEED_TOKEN_INVALID = (
+    "Invalid Authorization token, please re-login to Red Hat Lightspeed"
+)
+LIGHTSPEED_SSO_CONFIG_QUERY = (
+    "Querying Red Hat Lightspeed SSO configuration at %s for %s"
+)
+LIGHTSPEED_SSO_QUERY_FAILED = (
+    "Failed to query the Red Hat Lightspeed SSO configuration: missing %s"
+)
+LIGHTSPEED_AUTH_ERROR = "Authorization failed, please re-login to Red Hat Lightspeed"
+LIGHTSPEED_LOGIN_REQUEST = "Requesting Login authorization from %s"
+LIGHTSPEED_LOGIN_REQUEST_FAILED = "Failed to request login authorization: %s"
+LIGHTSPEED_LOGIN_VERIFYING = "Verifying Login authorization at %s"
+LIGHTSPEED_LOGIN_VERIFICATION_FAILED = "Failed to verify Login authorization: %s"
+LIGHTSPEED_LOGIN_VERIFICATION_TIMEOUT = "Time-out while waiting for Login authorization"
+LIGHTSPEED_INPUT_GZIP_HELP = (
+    "Path to local tar.gz file containing a Red Hat Lightspeed report."
+)
+LIGHTSPEED_LOCAL_REPORT_NOT = "%s file cannot be found."
+LIGHTSPEED_LOCAL_REPORT_NOT_TAR_GZ = "%s file is not a tar.gz."
 DOWNLOAD_NO_REPORT_FOR_SJ = "No reports available for scan job %s."
 DOWNLOAD_NO_REPORT_FOUND = "Report %s not found."
 DOWNLOAD_PATH_HELP = (
@@ -372,40 +382,41 @@ SERVER_TOO_OLD_FOR_CLI = (
     "Server is currently at version %(current_version)s."
 )
 OUTPUT_FILE_TYPE = "The output file's extension is required to be %s."
-INSIGHTS_CONFIG_HOST_HELP = "Host or IP address."
-INSIGHTS_CONFIG_PORT_HELP = "Port number."
-INSIGHTS_CONFIG_SUCCESS = (
-    "Insights configuration was successfully added. Captured values: %s"
+LIGHTSPEED_CONFIG_HOST_HELP = "Host or IP address."
+LIGHTSPEED_CONFIG_PORT_HELP = "Port number."
+LIGHTSPEED_CONFIG_SUCCESS = (
+    "Red Hat Lightspeed configuration was successfully added. Captured values: %s"
 )
-INSIGHTS_CONFIG_SSO_HOST_HELP = "Insights SSO Host"
-INSIGHTS_PUBLISH_REPORT = "Publishing report to Insights at %s"
-INSIGHTS_PUBLISH_FAILED = "Failed to publish the report to Insights: %s"
-INSIGHTS_PUBLISH_SUCCESSFUL = "The report was successfully published."
-INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR = (
+LIGHTSPEED_CONFIG_SSO_HOST_HELP = "Red Hat Lightspeed SSO Host"
+LIGHTSPEED_PUBLISH_REPORT = "Publishing report to Red Hat Lightspeed at %s"
+LIGHTSPEED_PUBLISH_FAILED = "Failed to publish the report to Red Hat Lightspeed: %s"
+LIGHTSPEED_PUBLISH_SUCCESSFUL = "The report was successfully published."
+LIGHTSPEED_PUBLISH_INTERNAL_SERVER_ERROR = (
     "The server encountered an unexpected condition"
     " that prevented it from fulfilling the request."
 )
-INSIGHTS_PUBLISH_NOT_FOUND_ERROR = (
+LIGHTSPEED_PUBLISH_NOT_FOUND_ERROR = (
     "The server is either unavailable or the page couldn't be found."
-    " Check your insights configuration."
+    " Check your Red Hat Lightspeed configuration."
 )
-INSIGHTS_PUBLISH_RESPONSE = "Response from insights: %s"
-INSIGHTS_RESPONSE = "Response from %s: %s"
+LIGHTSPEED_PUBLISH_RESPONSE = "Response from Red Hat Lightspeed: %s"
+LIGHTSPEED_RESPONSE = "Response from %s: %s"
 
 _INVALID_PREFIX = "Payload file is not valid, due to:"
-INSIGHTS_REPORT_CONTENT_MIN_NUMBER = (
-    f"{_INVALID_PREFIX} Insights report should contain at least 2 files."
+LIGHTSPEED_REPORT_CONTENT_MIN_NUMBER = (
+    f"{_INVALID_PREFIX} Red Hat Lightspeed report should contain at least 2 files."
 )
-INSIGHTS_REPORT_CONTENT_MISSING_METADATA = (
-    f"{_INVALID_PREFIX} Insights report is missing metadata.json file."
+LIGHTSPEED_REPORT_CONTENT_MISSING_METADATA = (
+    f"{_INVALID_PREFIX} Red Hat Lightspeed report is missing metadata.json file."
 )
-INSIGHTS_REPORT_CONTENT_NOT_JSON = (
-    f"{_INVALID_PREFIX} Insights report should contain only json files."
+LIGHTSPEED_REPORT_CONTENT_NOT_JSON = (
+    f"{_INVALID_PREFIX} Red Hat Lightspeed report should contain only json files."
 )
-INSIGHTS_REPORT_CONTENT_UNEXPECTED = (
-    f"{_INVALID_PREFIX} Insights report tarball contains an unexpected file structure."
+LIGHTSPEED_REPORT_CONTENT_UNEXPECTED = (
+    f"{_INVALID_PREFIX} Red Hat Lightspeed report tarball "
+    f"contains an unexpected file structure."
 )
-INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL = "The report was successfully downloaded."
+LIGHTSPEED_REPORT_DOWNLOAD_SUCCESSFUL = "The report was successfully downloaded."
 
 CREATE_TAR_ERROR_FILE = "ERROR: files_data is not a dict"
 CREATE_TAR_ERROR_INCORRECT_STRUCTURE = "ERROR: Not correct structure for tar"

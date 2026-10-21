@@ -10,32 +10,32 @@ from pytest_lazy_fixtures import lf
 
 from qpc import messages
 from qpc.cli import CLI
-from qpc.insights import INGRESS_REPORT_URI, INSIGHTS_PATH_SUFFIX, REPORT_URI
-from qpc.insights.publish import InsightsPublishCommand
+from qpc.lightspeed import INGRESS_REPORT_URI, LIGHTSPEED_PATH_SUFFIX, REPORT_URI
+from qpc.lightspeed.publish import LightspeedPublishCommand
 
 
 @pytest.fixture
-def patched_insights_config():
-    """Mock insights config file values."""
+def patched_lightspeed_config():
+    """Mock Lightspeed config file values."""
     config = {
-        "host": "insights.test",
+        "host": "lightspeed.test",
         "port": 1111,
         "use_http": False,
     }
 
     with mock.patch(
-        "qpc.insights.publish.read_insights_config", return_value=config
+        "qpc.lightspeed.publish.read_lightspeed_config", return_value=config
     ) as patched_config:
         yield patched_config
 
 
 @pytest.fixture
-def patched_insights_auth_token():
-    """Mock insights auth token value."""
+def patched_lightspeed_auth_token():
+    """Mock Lightspeed auth token value."""
     auth_token = {"auth_token": "userJWt"}
 
     with mock.patch(
-        "qpc.insights.publish.read_insights_auth_token", return_value=auth_token
+        "qpc.lightspeed.publish.read_lightspeed_auth_token", return_value=auth_token
     ) as patched_auth_token:
         yield patched_auth_token
 
@@ -105,23 +105,23 @@ def non_tarball_payload(tmp_path):
     yield payload
 
 
-class TestInsightsPublishCommand:
-    """Class for testing insights publish command."""
+class TestLightspeedPublishCommand:
+    """Class for testing Lightspeed publish command."""
 
-    def test_insights_publish_req_args_err(self):
-        """Testing if insights publish command requires args."""
-        test_argv = ["/bin/qpc", "insights", "publish"]
+    def test_lightspeed_publish_req_args_err(self):
+        """Testing if lightspeed publish command requires args."""
+        test_argv = ["/bin/qpc", "lightspeed", "publish"]
         with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
 
-    def test_insights_publish_args_are_mutually_exclusive(self, mocker):
-        """Testing if insights publish command args are mutually exclusive."""
+    def test_lightspeed_publish_args_are_mutually_exclusive(self, mocker):
+        """Testing if lightspeed publish command args are mutually exclusive."""
         mocker.patch.object(
-            InsightsPublishCommand, "_publish_to_ingress", side_effect=RuntimeError()
+            LightspeedPublishCommand, "_publish_to_ingress", side_effect=RuntimeError()
         )
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             "file_example",
@@ -145,7 +145,7 @@ class TestInsightsPublishCommand:
         caplog.set_level("ERROR")
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             inapropriate_payload_file.name,
@@ -154,77 +154,79 @@ class TestInsightsPublishCommand:
             CLI().main()
         assert (
             caplog.messages[-1]
-            == messages.INSIGHTS_LOCAL_REPORT_NOT_TAR_GZ
+            == messages.LIGHTSPEED_LOCAL_REPORT_NOT_TAR_GZ
             % inapropriate_payload_file.name
         )
 
     def test_validate_report_name_if_not_file(self, tmp_path, caplog):
-        """Testing if insights publish --input-file will accept dir as file."""
+        """Testing if lightspeed publish --input-file will accept dir as file."""
         caplog.set_level("ERROR")
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             tmp_path.name,
         ]
         with pytest.raises(SystemExit), mock.patch.object(sys, "argv", test_argv):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_LOCAL_REPORT_NOT % tmp_path.name
+        assert (
+            caplog.messages[-1] == messages.LIGHTSPEED_LOCAL_REPORT_NOT % tmp_path.name
+        )
 
-    def test_insights_publish_successful(
+    def test_lightspeed_publish_successful(
         self,
         payload_file,
-        patched_insights_config,
-        patched_insights_auth_token,
+        patched_lightspeed_config,
+        patched_lightspeed_auth_token,
         caplog,
         requests_mock,
     ):
-        """Testing insights publish --input-file green path."""
+        """Testing Lightspeed publish --input-file green path."""
         caplog.set_level("INFO")
         requests_mock.post(
-            f"https://insights.test:1111{INGRESS_REPORT_URI}",
+            f"https://lightspeed.test:1111{INGRESS_REPORT_URI}",
             status_code=202,
         )
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             str(payload_file),
         ]
         with mock.patch.object(sys, "argv", test_argv):
             CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_PUBLISH_SUCCESSFUL
+        assert caplog.messages[-1] == messages.LIGHTSPEED_PUBLISH_SUCCESSFUL
         assert payload_file.exists(), "Input file should not be removed."
 
     @pytest.mark.parametrize(
         "status_code,log_message",
         [
-            (401, messages.INSIGHTS_AUTH_ERROR),
-            (404, messages.INSIGHTS_PUBLISH_NOT_FOUND_ERROR),
-            (500, messages.INSIGHTS_PUBLISH_INTERNAL_SERVER_ERROR),
+            (401, messages.LIGHTSPEED_AUTH_ERROR),
+            (404, messages.LIGHTSPEED_PUBLISH_NOT_FOUND_ERROR),
+            (500, messages.LIGHTSPEED_PUBLISH_INTERNAL_SERVER_ERROR),
         ],
     )
-    def test_insights_publish_returning_error(
+    def test_lightspeed_publish_returning_error(
         self,
         payload_file,
-        patched_insights_config,
-        patched_insights_auth_token,
+        patched_lightspeed_config,
+        patched_lightspeed_auth_token,
         caplog,
         requests_mock,
         status_code,
         log_message,
     ):
-        """Testing insights publish with several errors."""
+        """Testing Lightspeed publish with several errors."""
         caplog.set_level("ERROR")
         requests_mock.post(
-            f"https://insights.test:1111{INGRESS_REPORT_URI}",
+            f"https://lightspeed.test:1111{INGRESS_REPORT_URI}",
             status_code=status_code,
         )
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             str(payload_file),
@@ -237,32 +239,32 @@ class TestInsightsPublishCommand:
     @pytest.mark.parametrize(
         "status_code,err_detail,log_message",
         [
-            (401, "Invalid JWT token expired", messages.INSIGHTS_TOKEN_EXPIRED),
-            (401, "JWT token header is malformed", messages.INSIGHTS_TOKEN_INVALID),
+            (401, "Invalid JWT token expired", messages.LIGHTSPEED_TOKEN_EXPIRED),
+            (401, "JWT token header is malformed", messages.LIGHTSPEED_TOKEN_INVALID),
         ],
     )
-    def test_insights_publish_token_authentication_errors(
+    def test_lightspeed_publish_token_authentication_errors(
         self,
         payload_file,
-        patched_insights_config,
-        patched_insights_auth_token,
+        patched_lightspeed_config,
+        patched_lightspeed_auth_token,
         caplog,
         requests_mock,
         status_code,
         err_detail,
         log_message,
     ):
-        """Testing insights publish with several token authentication errors."""
+        """Testing Lightspeed publish with several token authentication errors."""
         caplog.set_level("ERROR")
         error_json = {"errors": [{"detail": err_detail}]}
         requests_mock.post(
-            f"https://insights.test:1111{INGRESS_REPORT_URI}",
+            f"https://lightspeed.test:1111{INGRESS_REPORT_URI}",
             status_code=status_code,
             json=error_json,
         )
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             str(payload_file),
@@ -277,23 +279,23 @@ class TestInsightsPublishCommand:
         [
             (
                 lf("empty_payload"),
-                messages.INSIGHTS_REPORT_CONTENT_MIN_NUMBER,
+                messages.LIGHTSPEED_REPORT_CONTENT_MIN_NUMBER,
             ),
             (
                 lf("payload_with_non_json_file"),
-                messages.INSIGHTS_REPORT_CONTENT_NOT_JSON,
+                messages.LIGHTSPEED_REPORT_CONTENT_NOT_JSON,
             ),
             (
                 lf("payload_without_metadata"),
-                messages.INSIGHTS_REPORT_CONTENT_MISSING_METADATA,
+                messages.LIGHTSPEED_REPORT_CONTENT_MISSING_METADATA,
             ),
             (
                 lf("unexpected_payload"),
-                messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
+                messages.LIGHTSPEED_REPORT_CONTENT_UNEXPECTED,
             ),
             (
                 lf("non_tarball_payload"),
-                messages.INSIGHTS_REPORT_CONTENT_UNEXPECTED,
+                messages.LIGHTSPEED_REPORT_CONTENT_UNEXPECTED,
             ),
         ],
     )
@@ -302,7 +304,7 @@ class TestInsightsPublishCommand:
         caplog.set_level("INFO")
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--input-file",
             str(payload),
@@ -315,31 +317,31 @@ class TestInsightsPublishCommand:
         self,
         mocker,
         payload_file,
-        patched_insights_auth_token,
+        patched_lightspeed_auth_token,
         caplog,
         requests_mock,
     ):
-        """Testing successful report id download from insights publish."""
+        """Testing successful report id download from lightspeed publish."""
         caplog.set_level("INFO")
         mocker.patch.object(
-            InsightsPublishCommand, "_make_publish_request", return_value=True
+            LightspeedPublishCommand, "_make_publish_request", return_value=True
         )
         requests_mock.request(
             method="GET",
-            url=REPORT_URI + "1" + INSIGHTS_PATH_SUFFIX,
+            url=REPORT_URI + "1" + LIGHTSPEED_PATH_SUFFIX,
             status_code=200,
             content=payload_file.read_bytes(),
         )
 
         sys.argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--report",
             "1",
         ]
         CLI().main()
-        assert caplog.messages[-1] == messages.INSIGHTS_REPORT_DOWNLOAD_SUCCESSFUL
+        assert caplog.messages[-1] == messages.LIGHTSPEED_REPORT_DOWNLOAD_SUCCESSFUL
 
     @pytest.mark.parametrize(
         "status_code, error_message",
@@ -349,23 +351,23 @@ class TestInsightsPublishCommand:
             (500, messages.SERVER_INTERNAL_ERROR),
         ],
     )
-    def test_insights_publish_download_error(
+    def test_lightspeed_publish_download_error(
         self,
         caplog,
         requests_mock,
         status_code,
         error_message,
     ):
-        """Testing errors in download for insights publish."""
+        """Testing errors in download for lightspeed publish."""
         caplog.set_level("ERROR")
         requests_mock.request(
             method="GET",
-            url=f"{REPORT_URI}1{INSIGHTS_PATH_SUFFIX}",
+            url=f"{REPORT_URI}1{LIGHTSPEED_PATH_SUFFIX}",
             status_code=status_code,
         )
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--report",
             "1",
@@ -378,29 +380,29 @@ class TestInsightsPublishCommand:
         self,
         mocker,
         caplog,
-        patched_insights_auth_token,
+        patched_lightspeed_auth_token,
         payload_file,
     ):
         """Testing if file created during report download is deleted after published."""
         caplog.set_level("INFO")
         mocker.patch.object(
-            InsightsPublishCommand,
-            "_download_insights_report",
+            LightspeedPublishCommand,
+            "_download_lightspeed_report",
             return_value=payload_file,
         )
         mock_validate_report_name = mocker.patch.object(
-            InsightsPublishCommand, "_validate_insights_report_name"
+            LightspeedPublishCommand, "_validate_lightspeed_report_name"
         )
         mock_validate_report_content = mocker.patch.object(
-            InsightsPublishCommand, "_validate_insights_report_content"
+            LightspeedPublishCommand, "_validate_lightspeed_report_content"
         )
         mocker.patch.object(
-            InsightsPublishCommand, "_make_publish_request", return_value=True
+            LightspeedPublishCommand, "_make_publish_request", return_value=True
         )
 
         test_argv = [
             "/bin/qpc",
-            "insights",
+            "lightspeed",
             "publish",
             "--report",
             "1",

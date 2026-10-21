@@ -29,7 +29,7 @@ reviews:
       instructions: |
         - Ensure credentials are never logged or exposed in output.
         - Verify input validation for credential fields.
-    - path: "qpc/insights/**"
+    - path: "qpc/lightspeed/**"
       instructions: |
         - Check for proper error handling in network operations.
         - Ensure credentials and tokens are never logged or exposed.

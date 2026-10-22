@@ -1,4 +1,4 @@
-"""Insights Auth is used to handle the Insights authentication workflow."""
+"""Lightspeed Auth is used to handle the Lightspeed authentication workflow."""
 
 import http
 import time
@@ -8,18 +8,18 @@ import requests
 from requests.exceptions import BaseHTTPError, ConnectionError
 
 from qpc import messages
-from qpc.insights.exceptions import InsightsAuthError
+from qpc.lightspeed.exceptions import LightspeedAuthError
 from qpc.translation import _
-from qpc.utils import CONFIG_SSO_HOST_KEY, read_insights_config
+from qpc.utils import CONFIG_SSO_HOST_KEY, read_lightspeed_config
 
 logger = getLogger(__name__)
 
 DISCOVERY_CLIENT_ID = "discovery-client-id"
-INSIGHTS_REALM = "redhat-external"
-INSIGHTS_SCOPE = "api.console"
+LIGHTSPEED_REALM = "redhat-external"
+LIGHTSPEED_SCOPE = "api.console"
 GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code"
 OPENID_CONFIG_ENDPOINT = (
-    f"/auth/realms/{INSIGHTS_REALM}/.well-known/openid-configuration"
+    f"/auth/realms/{LIGHTSPEED_REALM}/.well-known/openid-configuration"
 )
 DEVICE_AUTH_ENDPOINT_KEY = "device_authorization_endpoint"
 TOKEN_ENDPOINT_KEY = "token_endpoint"
@@ -27,10 +27,10 @@ TOKEN_ENDPOINT_KEY = "token_endpoint"
 
 def get_sso_endpoint(endpoint):
     """Get the SSO OpenID Configuration endpoint."""
-    insights_sso_server = read_insights_config().get(CONFIG_SSO_HOST_KEY)
-    url = f"https://{insights_sso_server}{OPENID_CONFIG_ENDPOINT}"  # Always SSL
+    lightspeed_sso_server = read_lightspeed_config().get(CONFIG_SSO_HOST_KEY)
+    url = f"https://{lightspeed_sso_server}{OPENID_CONFIG_ENDPOINT}"  # Always SSL
     try:
-        logger.info(_(messages.INSIGHTS_SSO_CONFIG_QUERY), url, endpoint)
+        logger.info(_(messages.LIGHTSPEED_SSO_CONFIG_QUERY), url, endpoint)
         response = requests.get(url)
     except ConnectionError as err:
         raise err
@@ -39,12 +39,12 @@ def get_sso_endpoint(endpoint):
 
     config = response.json()
     if endpoint not in config:
-        raise InsightsAuthError(_(messages.INSIGHTS_SSO_QUERY_FAILED % endpoint))
+        raise LightspeedAuthError(_(messages.LIGHTSPEED_SSO_QUERY_FAILED % endpoint))
     return config[endpoint]
 
 
-class InsightsAuth:
-    """Implement the Insights Device Authorization workflow."""
+class LightspeedAuth:
+    """Implement the Lightspeed Device Authorization workflow."""
 
     def __init__(self):
         self.auth_request = None
@@ -61,29 +61,29 @@ class InsightsAuth:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         params = {
             "grant_type": GRANT_TYPE,
-            "scope": INSIGHTS_SCOPE,
+            "scope": LIGHTSPEED_SCOPE,
             "client_id": DISCOVERY_CLIENT_ID,
         }
         try:
             device_auth_endpoint = get_sso_endpoint(DEVICE_AUTH_ENDPOINT_KEY)
-            logger.info(_(messages.INSIGHTS_LOGIN_REQUEST), device_auth_endpoint)
+            logger.info(_(messages.LIGHTSPEED_LOGIN_REQUEST), device_auth_endpoint)
             response = requests.post(device_auth_endpoint, headers=headers, data=params)
         except ConnectionError as err:
-            raise InsightsAuthError(_(messages.INSIGHTS_LOGIN_REQUEST_FAILED % err))
+            raise LightspeedAuthError(_(messages.LIGHTSPEED_LOGIN_REQUEST_FAILED % err))
         except BaseHTTPError as err:
-            raise InsightsAuthError(_(messages.INSIGHTS_LOGIN_REQUEST_FAILED % err))
+            raise LightspeedAuthError(_(messages.LIGHTSPEED_LOGIN_REQUEST_FAILED % err))
 
         if response.status_code == http.HTTPStatus.OK:
             self.auth_request = response.json()
             logger.debug(
-                _(messages.INSIGHTS_RESPONSE), device_auth_endpoint, self.auth_request
+                _(messages.LIGHTSPEED_RESPONSE), device_auth_endpoint, self.auth_request
             )
         else:
             logger.debug(
-                _(messages.INSIGHTS_RESPONSE), device_auth_endpoint, response.text
+                _(messages.LIGHTSPEED_RESPONSE), device_auth_endpoint, response.text
             )
-            raise InsightsAuthError(
-                _(messages.INSIGHTS_LOGIN_REQUEST_FAILED % response.reason)
+            raise LightspeedAuthError(
+                _(messages.LIGHTSPEED_LOGIN_REQUEST_FAILED % response.reason)
             )
 
         return self.auth_request
@@ -112,17 +112,17 @@ class InsightsAuth:
                 try:
                     if not token_endpoint:
                         token_endpoint = get_sso_endpoint(TOKEN_ENDPOINT_KEY)
-                    logger.debug(_(messages.INSIGHTS_LOGIN_VERIFYING), token_endpoint)
+                    logger.debug(_(messages.LIGHTSPEED_LOGIN_VERIFYING), token_endpoint)
                     response = requests.post(
                         token_endpoint, headers=headers, data=params
                     )
                 except ConnectionError as err:
-                    raise InsightsAuthError(
-                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % err)
+                    raise LightspeedAuthError(
+                        _(messages.LIGHTSPEED_LOGIN_VERIFICATION_FAILED % err)
                     )
                 except BaseHTTPError as err:
-                    raise InsightsAuthError(
-                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % err)
+                    raise LightspeedAuthError(
+                        _(messages.LIGHTSPEED_LOGIN_VERIFICATION_FAILED % err)
                     )
 
                 if response.status_code == http.HTTPStatus.OK:
@@ -134,46 +134,49 @@ class InsightsAuth:
                     response_error = self.token_response.get("error")
                     if response_error == "expired_token":
                         logger.debug(
-                            _(messages.INSIGHTS_RESPONSE),
+                            _(messages.LIGHTSPEED_RESPONSE),
                             token_endpoint,
                             response.text,
                         )
-                        raise InsightsAuthError(
-                            _(messages.INSIGHTS_LOGIN_VERIFICATION_TIMEOUT)
+                        raise LightspeedAuthError(
+                            _(messages.LIGHTSPEED_LOGIN_VERIFICATION_TIMEOUT)
                         )
                     if response_error != "authorization_pending":
                         logger.debug(
-                            _(messages.INSIGHTS_RESPONSE),
+                            _(messages.LIGHTSPEED_RESPONSE),
                             token_endpoint,
                             response.text,
                         )
-                        raise InsightsAuthError(
+                        raise LightspeedAuthError(
                             _(
-                                messages.INSIGHTS_LOGIN_VERIFICATION_FAILED
+                                messages.LIGHTSPEED_LOGIN_VERIFICATION_FAILED
                                 % response.reason
                             )
                         )
                     else:
                         logger.debug(
-                            _(messages.INSIGHTS_RESPONSE),
+                            _(messages.LIGHTSPEED_RESPONSE),
                             token_endpoint,
                             self.token_response,
                         )
                 else:
                     logger.debug(
-                        _(messages.INSIGHTS_RESPONSE),
+                        _(messages.LIGHTSPEED_RESPONSE),
                         token_endpoint,
                         response.text,
                     )
-                    raise InsightsAuthError(
-                        _(messages.INSIGHTS_LOGIN_VERIFICATION_FAILED % response.reason)
+                    raise LightspeedAuthError(
+                        _(
+                            messages.LIGHTSPEED_LOGIN_VERIFICATION_FAILED
+                            % response.reason
+                        )
                     )
 
                 time.sleep(interval)
                 elapsed_time += interval
                 if elapsed_time > expires_in:
-                    raise InsightsAuthError(
-                        _(messages.INSIGHTS_LOGIN_VERIFICATION_TIMEOUT)
+                    raise LightspeedAuthError(
+                        _(messages.LIGHTSPEED_LOGIN_VERIFICATION_TIMEOUT)
                     )
 
         return self.auth_token

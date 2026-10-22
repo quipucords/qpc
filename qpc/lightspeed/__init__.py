@@ -1,13 +1,13 @@
-"""Constants for the Insights commands."""
+"""Constants for the Lightspeed commands."""
 
-SUBCOMMAND = "insights"
+SUBCOMMAND = "lightspeed"
 CONFIG = "config"
 LOGIN = "login"
 PUBLISH = "publish"
 
 REPORT_URI = "/api/v1/reports/"
-INSIGHTS_PATH_SUFFIX = "/insights/"
-# Note the the insights version check does not handle if versions equal
+LIGHTSPEED_PATH_SUFFIX = "/lightspeed/"
+# Note the the lightspeed version check does not handle if versions equal
 CLIENT_VERSION = "3.0.3-1"
 CORE_VERSION = "3.0.71-1"
 

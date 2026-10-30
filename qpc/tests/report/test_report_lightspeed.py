@@ -15,7 +15,7 @@ import requests_mock
 from qpc import messages
 from qpc.cli import CLI
 from qpc.report import REPORT_URI
-from qpc.report.insights import ReportInsightsCommand
+from qpc.report.lightspeed import ReportLightspeedCommand
 from qpc.scan import SCAN_JOB_URI
 from qpc.tests.utilities import redirect_stdout
 from qpc.utils import QPC_MIN_SERVER_VERSION, create_tar_buffer, get_server_location
@@ -28,14 +28,14 @@ def fake_tarball(tmp_path):
 
 
 @pytest.mark.usefixtures("server_config")
-class TestReportInsights:
-    """Class for testing the insights report command."""
+class TestReportLightspeed:
+    """Class for testing the lightspeed report command."""
 
     def _init_command(self):
         """Initialize command."""
         argument_parser = ArgumentParser()
         subparser = argument_parser.add_subparsers(dest="subcommand")
-        return ReportInsightsCommand(subparser)
+        return ReportLightspeedCommand(subparser)
 
     def setup_method(self, _test_method):
         """Create test setup."""
@@ -45,15 +45,15 @@ class TestReportInsights:
         # code smell to me, but I'm choosing to ignore it for now
         self.command = self._init_command()
 
-    def test_insights_report_as_json(self, caplog, fake_tarball):
-        """Testing retrieving insights report as json."""
+    def test_lightspeed_report_as_json(self, caplog, fake_tarball):
+        """Testing retrieving Lightspeed report as json."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {
             "id": 1,
             "report_id": 1,
             "sources": [{"source_type": "vcenter"}],
         }
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         get_report_json_data = {
             "id": 1,
             "report_id": 1,
@@ -75,11 +75,9 @@ class TestReportInsights:
                 self.command.main(args)
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
 
-    def test_insights_report_as_json_report_id(self, caplog, fake_tarball):
-        """Testing retreiving insights report as json with report id."""
-        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
-        scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
+    def test_lightspeed_report_as_json_report_id(self, caplog, fake_tarball):
+        """Testing retreiving Lightspeed report as json with report id."""
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         get_report_json_data = {
             "id": 1,
             "report_id": 1,
@@ -88,12 +86,6 @@ class TestReportInsights:
         test_dict = {fake_tarball: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
-            mocker.get(
-                scanjob_report_url,
-                status_code=200,
-                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-                json=scanjob_data,
-            )
             mocker.get(
                 get_report_url,
                 status_code=200,
@@ -107,25 +99,31 @@ class TestReportInsights:
                 assert messages.REPORT_SUCCESSFULLY_WRITTEN in caplog.text
 
     # Test validation
-    def test_insights_report_output_directory(self):
+    def test_lightspeed_report_output_directory(self):
         """Testing fail because output directory."""
         with pytest.raises(SystemExit):
-            sys.argv = ["/bin/qpc", "report", "insights", "--output-file", "/"]
+            sys.argv = ["/bin/qpc", "report", "lightspeed", "--output-file", "/"]
             CLI().main()
 
-    def test_insights_report_output_directory_not_exist(self):
+    def test_lightspeed_report_output_directory_not_exist(self):
         """Testing fail because output directory does not exist."""
         with pytest.raises(SystemExit):
-            sys.argv = ["/bin/qpc", "report", "insights", "--output-file", "/foo/bar/"]
+            sys.argv = [
+                "/bin/qpc",
+                "report",
+                "lightspeed",
+                "--output-file",
+                "/foo/bar/",
+            ]
             CLI().main()
 
-    def test_insights_report_output_file_empty(self):
+    def test_lightspeed_report_output_file_empty(self):
         """Testing fail because output file empty."""
         with pytest.raises(SystemExit):
-            sys.argv = ["/bin/qpc", "report", "insights", "--output-file", ""]
+            sys.argv = ["/bin/qpc", "report", "lightspeed", "--output-file", ""]
             CLI().main()
 
-    def test_insights_report_scan_job_not_exist(self, fake_tarball):
+    def test_lightspeed_report_scan_job_not_exist(self, fake_tarball):
         """Deployments report with nonexistent scanjob."""
         report_out = StringIO()
 
@@ -140,7 +138,7 @@ class TestReportInsights:
                     self.command.main(args)
                     assert report_out.getvalue() == messages.REPORT_SJ_DOES_NOT_EXIST
 
-    def test_insights_report_invalid_scan_job(self, fake_tarball):
+    def test_lightspeed_report_invalid_scan_job(self, fake_tarball):
         """Deployments report with scanjob but no report_id."""
         report_out = StringIO()
 
@@ -158,23 +156,15 @@ class TestReportInsights:
                         == messages.REPORT_NO_DEPLOYMENTS_REPORT_FOR_SJ
                     )
 
-    @patch("qpc.report.insights.write_file")
-    def test_insights_file_fails_to_write(self, file, caplog, fake_tarball):
-        """Testing insights failure while writing to file."""
+    @patch("qpc.report.lightspeed.write_file")
+    def test_lightspeed_file_fails_to_write(self, file, caplog, fake_tarball):
+        """Testing Lightspeed failure while writing to file."""
         file.side_effect = EnvironmentError()
-        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
-        scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {fake_tarball: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
         with requests_mock.Mocker() as mocker:
-            mocker.get(
-                scanjob_report_url,
-                status_code=200,
-                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-                json=scanjob_data,
-            )
             mocker.get(
                 get_report_url,
                 status_code=200,
@@ -192,10 +182,10 @@ class TestReportInsights:
                 }
                 assert err_msg in caplog.text
 
-    def test_insights_nonexistent_directory(self, caplog, fake_tarball):
+    def test_lightspeed_nonexistent_directory(self, caplog, fake_tarball):
         """Testing error for nonexistent directory in output."""
-        fake_dir = "/kevan/is/awesome/insights.tar.gz"
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
+        fake_dir = "/kevan/is/awesome/lightspeed.tar.gz"
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {fake_tarball: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -211,10 +201,10 @@ class TestReportInsights:
                 )
                 assert err_msg in caplog.text
 
-    def test_insights_tar_path(self, caplog, fake_tarball):
+    def test_lightspeed_tar_path(self, caplog, fake_tarball):
         """Testing error for nonjson output path."""
-        non_tar_file = "/Users/insights.json"
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
+        non_tar_file = "/Users/lightspeed.json"
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
         test_dict = {fake_tarball: get_report_json_data}
         buffer_content = create_tar_buffer(test_dict)
@@ -233,60 +223,50 @@ class TestReportInsights:
                 err_msg = messages.OUTPUT_FILE_TYPE % "tar.gz"
                 assert err_msg in caplog.text
 
-    def test_insights_report_id_not_exist(self, caplog, fake_tarball):
-        """Test insights with nonexistent report id."""
-        scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {fake_tarball: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
+    def test_lightspeed_report_id_not_exist(self, caplog, fake_tarball):
+        """Test lightspeed with nonexistent report id."""
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         with requests_mock.Mocker() as mocker:
             mocker.get(
-                scanjob_report_url,
+                get_report_url,
                 status_code=404,
                 headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-            )
-            mocker.get(
-                get_report_url,
-                status_code=400,
-                headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-                content=buffer_content,
+                json={"detail": "Not found."},
             )
 
             args = Namespace(scan_job_id=None, report_id="1", path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
-                err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID % 1
+                err_msg = messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_REPORT_ID % 1
                 assert err_msg in caplog.text
+                assert "Not found." in caplog.text
 
-    def test_insights_report_error_scan_job(self, caplog, fake_tarball):
-        """Testing error with scan job id."""
+    def test_lightspeed_report_error_scan_job(self, caplog, fake_tarball):
+        """Testing error with scan job id, server returns JSON detail."""
         get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
         get_scanjob_json_data = {"id": 1, "report_id": 1}
-        get_report_url = get_server_location() + REPORT_URI + "1/insights/"
-        get_report_json_data = {"id": 1, "report": [{"key": "value"}]}
-        test_dict = {fake_tarball: get_report_json_data}
-        buffer_content = create_tar_buffer(test_dict)
+        get_report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
         with requests_mock.Mocker() as mocker:
             mocker.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
             mocker.get(
                 get_report_url,
-                status_code=400,
+                status_code=404,
                 headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-                content=buffer_content,
+                json={"detail": "Not found."},
             )
 
             args = Namespace(scan_job_id="1", report_id=None, path=fake_tarball)
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(SystemExit):
                     self.command.main(args)
-                err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1
+                err_msg = messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_SJ % 1
                 assert err_msg in caplog.text
+                assert "Not found." in caplog.text
 
 
-def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
-    """Testing retrieving insights report as json without output file."""
+def test_lightspeed_report_as_json_no_output_file(caplog, capsys, requests_mock):
+    """Testing retrieving Lightspeed report as json without output file."""
     caplog.set_level("INFO")
     scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
     scanjob_data = {"results": [{"sources": [{"source_type": "network"}]}]}
@@ -296,7 +276,7 @@ def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
         json=scanjob_data,
         headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
     )
-    report_url = get_server_location() + REPORT_URI + "1/insights/"
+    report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
     report_json_data = {
         "id": 1,
         "report_id": 1,
@@ -313,7 +293,7 @@ def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
     sys.argv = [
         "/bin/qpc",
         "report",
-        "insights",
+        "lightspeed",
         "--report",
         "1",
     ]
@@ -323,85 +303,13 @@ def test_insights_report_as_json_no_output_file(caplog, capsys, requests_mock):
     assert json.loads(captured.out)
 
 
-def test_insights_not_available_scan_job(caplog, capsys, requests_mock):
-    """Insights report can't be downloaded if only source is ansible.
-
-    Insights report exist only if at least one of the sources is in
-    {network, satellite, vcenter}. If all sources are using different
-    type, report can't be downloaded. This test tries to download report
-    using --scan-job param.
-    """
+def test_lightspeed_mix_sources_scan_job(caplog, capsys, requests_mock):
+    """Lightspeed report downloads successfully via --scan-job."""
     caplog.set_level("INFO")
     get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
-    get_scanjob_json_data = {
-        "id": 1,
-        "report_id": 1,
-        "sources": [{"source_type": "ansible"}],
-    }
+    get_scanjob_json_data = {"id": 1, "report_id": 1}
     requests_mock.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-    sys.argv = [
-        "/bin/qpc",
-        "report",
-        "insights",
-        "--scan-job",
-        "1",
-    ]
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(SystemExit):
-            CLI().main()
-        err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ % 1
-        assert err_msg in caplog.text
-        assert messages.REPORT_NO_INSIGHTS_CLARIFICATION in caplog.text
-
-
-def test_insights_not_available_report_id(caplog, capsys, requests_mock):
-    """Insights report can't be downloaded if only source is ansible.
-
-    Insights report exist only if at least one of the sources is in
-    {network, satellite, vcenter}. If all sources are using different
-    type, report can't be downloaded. This test tries to download report
-    using --report param.
-    """
-    caplog.set_level("INFO")
-    scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
-    scanjob_data = {"results": [{"sources": [{"source_type": "ansible"}]}]}
-    requests_mock.get(
-        scanjob_report_url,
-        status_code=200,
-        json=scanjob_data,
-        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-    )
-    sys.argv = [
-        "/bin/qpc",
-        "report",
-        "insights",
-        "--report",
-        "1",
-    ]
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(SystemExit):
-            CLI().main()
-        err_msg = messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID % 1
-        assert err_msg in caplog.text
-        assert messages.REPORT_NO_INSIGHTS_CLARIFICATION in caplog.text
-
-
-def test_insights_mix_sources_scan_job(caplog, capsys, requests_mock):
-    """Insights report can be downloaded if one source is satellite.
-
-    Insights report exist only if at least one of the sources is in
-    {network, satellite, vcenter}. This test tries to download report
-    using --scan-job param.
-    """
-    caplog.set_level("INFO")
-    get_scanjob_url = get_server_location() + SCAN_JOB_URI + "1"
-    get_scanjob_json_data = {
-        "id": 1,
-        "report_id": 1,
-        "sources": [{"source_type": "ansible"}, {"source_type": "satellite"}],
-    }
-    requests_mock.get(get_scanjob_url, status_code=200, json=get_scanjob_json_data)
-    report_url = get_server_location() + REPORT_URI + "1/insights/"
+    report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
     report_json_data = {
         "id": 1,
         "report_id": 1,
@@ -418,7 +326,7 @@ def test_insights_mix_sources_scan_job(caplog, capsys, requests_mock):
     sys.argv = [
         "/bin/qpc",
         "report",
-        "insights",
+        "lightspeed",
         "--scan-job",
         "1",
     ]
@@ -428,27 +336,10 @@ def test_insights_mix_sources_scan_job(caplog, capsys, requests_mock):
     assert json.loads(captured.out)
 
 
-def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
-    """Insights report can be downloaded if one source is network.
-
-    Insights report exist only if at least one of the sources is in
-    {network, satellite, vcenter}. This test tries to download report
-    using --report param.
-    """
+def test_lightspeed_mix_sources_report_id(caplog, capsys, requests_mock):
+    """Lightspeed report can be downloaded via --report."""
     caplog.set_level("INFO")
-    scanjob_report_url = get_server_location() + SCAN_JOB_URI + "?report_id=1"
-    scanjob_data = {
-        "results": [
-            {"sources": [{"source_type": "ansible"}, {"source_type": "satellite"}]}
-        ]
-    }
-    requests_mock.get(
-        scanjob_report_url,
-        status_code=200,
-        json=scanjob_data,
-        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
-    )
-    report_url = get_server_location() + REPORT_URI + "1/insights/"
+    report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
     report_json_data = {
         "id": 1,
         "report_id": 1,
@@ -465,7 +356,7 @@ def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
     sys.argv = [
         "/bin/qpc",
         "report",
-        "insights",
+        "lightspeed",
         "--report",
         "1",
     ]
@@ -473,3 +364,46 @@ def test_insights_mix_sources_report_id(caplog, capsys, requests_mock):
     captured = capsys.readouterr()
     assert caplog.messages[-1] == messages.REPORT_SUCCESSFULLY_WRITTEN
     assert json.loads(captured.out)
+
+
+def test_lightspeed_error_response_includes_json_detail(
+    caplog, server_config, requests_mock, tmp_path
+):
+    """Server 404 with JSON detail is logged after the primary error message."""
+    report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
+    requests_mock.get(
+        report_url,
+        status_code=404,
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
+        json={"detail": "Lightspeed report was not generated."},
+    )
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers(dest="subcommand")
+    command = ReportLightspeedCommand(subparser)
+    args = Namespace(scan_job_id=None, report_id="1", path=str(tmp_path / "out.tar.gz"))
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(SystemExit):
+            command.main(args)
+    assert messages.REPORT_NO_LIGHTSPEED_REPORT_FOR_REPORT_ID % 1 in caplog.text
+    assert "Lightspeed report was not generated." in caplog.text
+
+
+def test_lightspeed_error_response_non_json_body_logs_warning(
+    caplog, server_config, requests_mock, tmp_path
+):
+    """Non-JSON error response body triggers a warning instead of crashing."""
+    report_url = get_server_location() + REPORT_URI + "1/lightspeed/"
+    requests_mock.get(
+        report_url,
+        status_code=404,
+        headers={"X-Server-Version": QPC_MIN_SERVER_VERSION},
+        text="unexpected plain text",
+    )
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers(dest="subcommand")
+    command = ReportLightspeedCommand(subparser)
+    args = Namespace(scan_job_id=None, report_id="1", path=str(tmp_path / "out.tar.gz"))
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(SystemExit):
+            command.main(args)
+    assert messages.REPORT_LIGHTSPEED_ERROR_DETAIL_PARSE_FAILED in caplog.text

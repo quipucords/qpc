@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 import requests
 
 
-class InsightsClient(requests.Session):
+class LightspeedClient(requests.Session):
     """An HTTP Client for C.RH.C. based on requests Session class."""
 
     def __init__(self, *, base_url=None, auth_token=None, **kwargs):

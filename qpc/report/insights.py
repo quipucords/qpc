@@ -8,7 +8,6 @@ from requests import codes
 from qpc import messages, report, scan
 from qpc.clicommand import CliCommand
 from qpc.request import GET, request
-from qpc.source import NETWORK_SOURCE_TYPE, SATELLITE_SOURCE_TYPE, VCENTER_SOURCE_TYPE
 from qpc.translation import _
 from qpc.utils import check_extension, validate_write_file, write_file
 
@@ -57,15 +56,6 @@ class ReportInsightsCommand(CliCommand):
         )
         self.report_id = None
 
-    def _insights_report_available(self, sources):
-        types_supporting_insights = {
-            NETWORK_SOURCE_TYPE,
-            SATELLITE_SOURCE_TYPE,
-            VCENTER_SOURCE_TYPE,
-        }
-        existing_types = {source.get("source_type") for source in sources}
-        return bool(existing_types.intersection(types_supporting_insights))
-
     def _validate_args(self):  # noqa: PLR0912
         CliCommand._validate_args(self)
         if self.args.path:
@@ -91,13 +81,6 @@ class ReportInsightsCommand(CliCommand):
             )
             if response.status_code == codes.ok:
                 json_data = response.json()
-                if not self._insights_report_available(json_data.get("sources", [])):
-                    msg = [
-                        _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ),
-                        _(messages.REPORT_NO_INSIGHTS_CLARIFICATION),
-                    ]
-                    logger.error(" ".join(msg), self.args.scan_job_id)
-                    sys.exit(1)
                 self.report_id = json_data.get("report_id")
                 if self.report_id:
                     self.req_path = (
@@ -115,24 +98,6 @@ class ReportInsightsCommand(CliCommand):
                 )
                 sys.exit(1)
         else:
-            response = request(
-                parser=self.parser,
-                method=GET,
-                path=f"{scan.SCAN_JOB_URI}",
-                params={"report_id": self.args.report_id},
-                payload=None,
-            )
-            if response.status_code == codes.ok:
-                json_data = response.json().get("results", [])
-                if json_data and not self._insights_report_available(
-                    json_data[0].get("sources", [])
-                ):
-                    msg = [
-                        _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID),
-                        _(messages.REPORT_NO_INSIGHTS_CLARIFICATION),
-                    ]
-                    logger.error(" ".join(msg), self.args.report_id)
-                    sys.exit(1)
             self.report_id = self.args.report_id
             self.req_path = (
                 f"{self.req_path}{self.report_id}{report.INSIGHTS_PATH_SUFFIX}"
@@ -161,4 +126,10 @@ class ReportInsightsCommand(CliCommand):
             logger.error(
                 _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID), self.args.report_id
             )
+        try:
+            detail = self.response.json().get("detail")
+            if detail:
+                logger.error(detail)
+        except ValueError:
+            logger.warning(_(messages.REPORT_INSIGHTS_ERROR_DETAIL_PARSE_FAILED))
         sys.exit(1)

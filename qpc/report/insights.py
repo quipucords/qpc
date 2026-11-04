@@ -118,18 +118,19 @@ class ReportInsightsCommand(CliCommand):
             sys.exit(1)
 
     def _handle_response_error(self):
-        if self.args.report_id is None:
-            logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ), self.args.scan_job_id
+        msg = (
+            _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_SJ) % self.args.scan_job_id
+            if self.args.report_id is None
+            else (
+                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID)
+                % self.args.report_id
             )
-        else:
-            logger.error(
-                _(messages.REPORT_NO_INSIGHTS_REPORT_FOR_REPORT_ID), self.args.report_id
-            )
+        )
         try:
-            detail = self.response.json().get("detail")
-            if detail:
-                logger.error(detail)
+            if detail := self.response.json().get("detail"):
+                msg = " ".join([msg, detail])
         except ValueError:
             logger.warning(_(messages.REPORT_INSIGHTS_ERROR_DETAIL_PARSE_FAILED))
+
+        logger.error(msg)
         sys.exit(1)

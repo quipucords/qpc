@@ -11,6 +11,14 @@ from qpc.cred.commands import (
     CredListCommand,
     CredShowCommand,
 )
+from qpc.insights_compat import (
+    SUBCOMMAND as INSIGHTS_SUBCOMMAND,
+)
+from qpc.insights_compat import (
+    InsightsConfigureCommand,
+    InsightsLoginCommand,
+    InsightsPublishCommand,
+)
 from qpc.lightspeed.commands import (
     LightspeedConfigureCommand,
     LightspeedLoginCommand,
@@ -22,6 +30,7 @@ from qpc.report.commands import (
     ReportDeploymentsCommand,
     ReportDetailsCommand,
     ReportDownloadCommand,
+    ReportInsightsCommand,
     ReportLightspeedCommand,
     ReportListCommand,
     ReportMergeCommand,
@@ -177,6 +186,7 @@ class CLI:
                 ReportDeploymentsCommand,
                 ReportDetailsCommand,
                 ReportLightspeedCommand,
+                ReportInsightsCommand,  # TODO: remove after 2.10 release
                 ReportDownloadCommand,
                 ReportListCommand,
                 ReportMergeCommand,
@@ -184,6 +194,16 @@ class CLI:
                 ReportUploadCommand,
             ],
         )
+        # TODO: remove after 2.10 release (DISCOVERY-1571)
+        self._add_subcommand(
+            INSIGHTS_SUBCOMMAND,
+            [
+                InsightsConfigureCommand,
+                InsightsLoginCommand,
+                InsightsPublishCommand,
+            ],
+        )
+        # END TODO
         self._add_subcommand(
             lightspeed.SUBCOMMAND,
             [

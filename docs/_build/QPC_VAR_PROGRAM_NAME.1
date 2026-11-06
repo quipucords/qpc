@@ -624,7 +624,7 @@ Required. Contains the identifier of the scan job to cancel.
 .UNINDENT
 .SH REPORTS
 .sp
-Use the \fBQPC_VAR_PROGRAM_NAME report\fP command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma\-separated values (CSV) format. There are three different types of reports that you can retrieve, a \fIdetails\fP report, a \fIdeployments\fP report, and an \fIinsights\fP report.
+Use the \fBQPC_VAR_PROGRAM_NAME report\fP command to retrieve a report from a scan. You can retrieve a report in a JavaScript Object Notation (JSON) format or in a comma\-separated values (CSV) format. There are three different types of reports that you can retrieve, a \fIdetails\fP report, a \fIdeployments\fP report, and a \fIlightspeed\fP report.
 .SS Viewing the Details Report
 .sp
 The \fBQPC_VAR_PROGRAM_NAME report details\fP command retrieves a detailed report that contains the unprocessed facts that are gathered during a scan. These facts are the raw output from Network, vCenter, Satellite, Openshift, Red Hat Advanced Cluster Security and Ansible scans, as applicable.
@@ -707,11 +707,11 @@ Displays the results of the report in CSV format. Mutually exclusive with the \f
 Optional. Sets the path to a file location where the report data is saved. The file extension must be \fB\&.json\fP for the JSON report or \fB\&.csv\fP for the CSV report. When the field is not provided and \fI\-\-json\fP specified, a JSON report will be generated to stdout.
 .UNINDENT
 .UNINDENT
-.SS Viewing the Insights Report
+.SS Viewing the Red Hat Lightspeed Report
 .sp
-The \fBQPC_VAR_PROGRAM_NAME report insights\fP command retrieves a report that contains the hosts to be uploaded to the subscription insights service. A \fIhost\fP is the set of system, product, and entitlement facts for a particular physical or virtual machine.
+The \fBQPC_VAR_PROGRAM_NAME report lightspeed\fP command retrieves a report that contains the hosts to be uploaded to Red Hat Lightspeed. A \fIhost\fP is the set of system, product, and entitlement facts for a particular physical or virtual machine.
 .sp
-\fBQPC_VAR_PROGRAM_NAME report insights (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB\-\-output\-file\fP \fIpath\fP
+\fBQPC_VAR_PROGRAM_NAME report lightspeed (\-\-scan\-job\fP \fIscan_job_identifier\fP \fB|\fP \fB\-\-report\fP \fIreport_identifier\fP \fB)\fP \fB\-\-output\-file\fP \fIpath\fP
 .sp
 \fB\-\-scan\-job=scan_job_identifier\fP
 .INDENT 0.0
@@ -852,26 +852,26 @@ The \fBQPC_VAR_PROGRAM_NAME report upload\fP command runs an asynchronous job. T
 .EE
 .UNINDENT
 .UNINDENT
-.SH INSIGHTS
+.SH RED HAT LIGHTSPEED
 .sp
-Use the \fBQPC_VAR_PROGRAM_NAME insights\fP command to interact with Red Hat Insights and its services.
-.SS Configuring Insights
+Use the \fBQPC_VAR_PROGRAM_NAME lightspeed\fP command to interact with Red Hat Lightspeed and its services.
+.SS Configuring Red Hat Lightspeed
 .sp
-To configure the connection to Insights server, you may optionally provide the host address and port to override the default values.
+To configure the connection to Lightspeed, you may optionally provide the host address and port to override the default values.
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights config \-\-host=\fP \fIhost\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-http]\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed config \-\-host=\fP \fIhost\fP \fB[\-\-port=\fP \fIport\fP \fB]\fP \fB[\-\-use\-http]\fP
 .sp
 \fB\-\-host=host\fP
 .INDENT 0.0
 .INDENT 3.5
-Optional. Sets the host address for Insights. The default host is \fBconsole.redhat.com\fP\&.
+Optional. Sets the host address for Lightspeed. The default host is \fBconsole.redhat.com\fP\&.
 .UNINDENT
 .UNINDENT
 .sp
 \fB\-\-port=port\fP
 .INDENT 0.0
 .INDENT 3.5
-Optional. Sets the port to use to connect to Insights. The default port is \fB443\fP\&.
+Optional. Sets the port to use to connect to Lightspeed. The default port is \fB443\fP\&.
 .UNINDENT
 .UNINDENT
 .sp
@@ -881,30 +881,30 @@ Optional. Sets the port to use to connect to Insights. The default port is \fB44
 Optional. Determines whether to use HTTP instead of HTTPS. The default value is \fBFalse\fP\&.
 .UNINDENT
 .UNINDENT
-.SS Login to Insights
+.SS Login to Red Hat Lightspeed
 .sp
-To be able to publish reports to Insights, one must be authorized and successfully logged into Insights.
+To be able to publish reports to Lightspeed, one must be authorized and successfully logged into Lightspeed.
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights login\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed login\fP
 .sp
-This command requests the authorization of the user to Insights. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Insights and be authorized to use {{QPC_VAR_PROGRAM_NAME}} to publish reports.
-.SS Publishing to Insights
+This command requests the authorization of the user to Lightspeed. A user code and associated authorization URL is displayed that the user can access in a separate browser window to login to Lightspeed and be authorized to use {{QPC_VAR_PROGRAM_NAME}} to publish reports.
+.SS Publishing to Red Hat Lightspeed
 .sp
-The \fBQPC_VAR_PROGRAM_NAME insights publish\fP command allows you to publish an Insights report to Red Hat Insights and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
+The \fBQPC_VAR_PROGRAM_NAME lightspeed publish\fP command allows you to publish a Lightspeed report to Red Hat Lightspeed and its services. You have two options for publishing a report: use the associated report identifier from the generating scan, or provide a previously downloaded report as an input file.
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights publish (\-\-report\fP \fIreport_identifiers\fP \fB| \-\-input\-file\fP \fIpath_to_tar_gz\fP )
+\fBQPC_VAR_PROGRAM_NAME lightspeed publish (\-\-report\fP \fIreport_identifiers\fP \fB| \-\-input\-file\fP \fIpath_to_tar_gz\fP )
 .sp
 \fB\-\-report=report_identifier\fP
 .INDENT 0.0
 .INDENT 3.5
-Contains the report identifier to use to retrieve and publish the Insights report. Mutually exclusive with the \fB\-\-input\-file\fP option.
+Contains the report identifier to use to retrieve and publish the Lightspeed report. Mutually exclusive with the \fB\-\-input\-file\fP option.
 .UNINDENT
 .UNINDENT
 .sp
-\fB\-\-input\-file=path to tar.gz containing the Insights report\fP
+\fB\-\-input\-file=path to tar.gz containing the Lightspeed report\fP
 .INDENT 0.0
 .INDENT 3.5
-Contains the path to the tar.gz containing the Insights report. Mutually exclusive with \fB\-\-report\fP option.
+Contains the path to the tar.gz containing the Lightspeed report. Mutually exclusive with \fB\-\-report\fP option.
 .UNINDENT
 .UNINDENT
 .SH HASHICORP VAULT INTEGRATION
@@ -1123,13 +1123,13 @@ Retrieves a CSV deployments report
 .sp
 \fBQPC_VAR_PROGRAM_NAME report deployments \-\-report 2  \-\-csv \-\-output\-file path_to_your_file.csv\fP
 .IP \(bu 2
-Retrieves a JSON Insights report with no output file
+Retrieves a JSON Red Hat Lightspeed report with no output file
 .sp
-\fBQPC_VAR_PROGRAM_NAME report insights \-\-scan\-job 1\fP
+\fBQPC_VAR_PROGRAM_NAME report lightspeed \-\-scan\-job 1\fP
 .IP \(bu 2
-Retrieves a tar.gz Insights report
+Retrieves a tar.gz Lightspeed report
 .sp
-\fBQPC_VAR_PROGRAM_NAME report insights \-\-scan\-job 1 \-\-output\-file path_to_your_file.tar.gz\fP
+\fBQPC_VAR_PROGRAM_NAME report lightspeed \-\-scan\-job 1 \-\-output\-file path_to_your_file.tar.gz\fP
 .IP \(bu 2
 Downloading a set of reports
 .sp
@@ -1155,21 +1155,21 @@ Reprocessing a report
 .sp
 \fBQPC_VAR_PROGRAM_NAME report upload \-\-json\-file path_to_report.json\fP
 .IP \(bu 2
-Configuring Insights
+Configuring Red Hat Lightspeed
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights config \-\-host stage.console.redhat.com \-\-port 8080\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed config \-\-host stage.console.redhat.com \-\-port 8080\fP
 .IP \(bu 2
-Login to Insights
+Login to Red Hat Lightspeed
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights login\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed login\fP
 .IP \(bu 2
-Publishing to Insights using a report id
+Publishing to Red Hat Lightspeed using a report id
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights publish \-\-report 1\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed publish \-\-report 1\fP
 .IP \(bu 2
-Publishing to Insights using a previously downloaded report
+Publishing to Red Hat Lightspeed using a previously downloaded report
 .sp
-\fBQPC_VAR_PROGRAM_NAME insights publish \-\-input\-file path_to_report.tar.gz\fP
+\fBQPC_VAR_PROGRAM_NAME lightspeed publish \-\-input\-file path_to_report.tar.gz\fP
 .IP \(bu 2
 Setting up HashiCorp Vault integration
 .sp

@@ -1,10 +1,10 @@
-"""Errors for insights module."""
+"""Errors for lightspeed module."""
 
 from qpc.exceptions import QPCError
 
 
-class InsightsAuthError(QPCError):
-    """Class for Insights device authorization errors."""
+class LightspeedAuthError(QPCError):
+    """Class for Lightspeed device authorization errors."""
 
 
 class QPCLoginConfigError(QPCError):

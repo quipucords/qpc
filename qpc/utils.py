@@ -125,6 +125,8 @@ def read_lightspeed_config():
         config = json.loads(LIGHTSPEED_CONFIG.read_text())
     except json.decoder.JSONDecodeError:
         return DEFAULT_LIGHTSPEED_CONFIG
+    if not isinstance(config, dict):
+        return DEFAULT_LIGHTSPEED_CONFIG
     lightspeed_config = dict(DEFAULT_LIGHTSPEED_CONFIG, **config)
     return lightspeed_config
 

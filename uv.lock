@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 
 [[package]]
@@ -832,8 +832,9 @@ wheels = [
 
 [[package]]
 name = "qpc"
-version = "2.9.0"
+version = "2.10.0"
 source = { editable = "." }
+default-groups = ["build", "dev"]
 dependencies = [
     { name = "cryptography" },
     { name = "requests" },

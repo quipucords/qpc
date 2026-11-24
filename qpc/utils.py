@@ -53,7 +53,7 @@ DEFAULT_LIGHTSPEED_CONFIG = {
 
 LOG_LEVEL_INFO = 0
 
-QPC_MIN_SERVER_VERSION = "2.9.0"
+QPC_MIN_SERVER_VERSION = "2.10.0"
 
 logging.captureWarnings(True)
 logger = logging.getLogger(__name__)

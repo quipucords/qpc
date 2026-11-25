@@ -18,9 +18,5 @@ DETAILS_PATH_SUFFIX = "/details/"
 DEPLOYMENTS_PATH_SUFFIX = "/deployments/"
 AGGREGATE_PATH_SUFFIX = "/aggregate/"
 LIGHTSPEED_PATH_SUFFIX = "/lightspeed/"
-# TODO: remove after 2.10 release when CI no longer uses `report insights`
-INSIGHTS = "insights"
-INSIGHTS_PATH_SUFFIX = "/insights/"
-# END TODO
 ASYNC_MERGE_URI = "/api/v1/reports/merge/"
 ASYNC_UPLOAD_URI = "/api/v1/reports/"
